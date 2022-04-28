@@ -20,3 +20,14 @@ CREATE TABLE artifact_types (
 
 CREATE UNIQUE INDEX idx_artifact_types_name ON artifact_types (attp_name)
 ;
+
+DROP TABLE IF EXISTS media_files;
+
+CREATE TABLE media_files (
+    mdfl_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mdfl_name TEXT NOT NULL,
+    mdfl_format_code TEXT NOT NULL,
+    mdfl_size INTEGER NOT NULL,
+    mdfl_bitrate INTEGER NULL,
+    mdfl_duration INTEGER NULL
+);
