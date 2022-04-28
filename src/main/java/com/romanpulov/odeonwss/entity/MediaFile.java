@@ -35,14 +35,14 @@ public class MediaFile {
     }
 
     @Column(name = "mdfl_format_code")
-    private String formatCode;
+    private String format;
 
-    public String getFormatCode() {
-        return formatCode;
+    public String getFormat() {
+        return format;
     }
 
-    public void setFormatCode(String formatCode) {
-        this.formatCode = formatCode;
+    public void setFormat(String format) {
+        this.format = format;
     }
 
     @Column(name = "mdfl_size")
@@ -81,10 +81,10 @@ public class MediaFile {
     public MediaFile() {
     }
 
-    public MediaFile(Long id, String name, String formatCode, Long size, Long bitrate, Long duration) {
+    public MediaFile(Long id, String name, String format, Long size, Long bitrate, Long duration) {
         this.id = id;
         this.name = name;
-        this.formatCode = formatCode;
+        this.format = format;
         this.size = size;
         this.bitrate = bitrate;
         this.duration = duration;
@@ -108,7 +108,7 @@ public class MediaFile {
         return "MediaFile{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", formatCode='" + formatCode + '\'' +
+                ", format='" + format + '\'' +
                 ", size=" + size +
                 ", bitrate=" + bitrate +
                 ", duration=" + duration +

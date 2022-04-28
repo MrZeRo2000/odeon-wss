@@ -31,3 +31,20 @@ CREATE TABLE media_files (
     mdfl_bitrate INTEGER NULL,
     mdfl_duration INTEGER NULL
 );
+
+DROP TABLE IF EXISTS artifacts;
+
+CREATE TABLE artifacts (
+    artf_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    attp_id INTEGER NOT NULL,
+    arts_id INTEGER NULL,
+    mdfl_id INTEGER NULL,
+    artf_title TEXT NOT NULL,
+    artf_year INTEGER NULL,
+    artf_duration INTEGER NULL,
+    artf_ins_date INTEGER NULL
+);
+
+CREATE INDEX idx_artifact_attp ON artifacts (attp_id);
+
+CREATE INDEX idx_artifact_arts ON artifacts (arts_id);
