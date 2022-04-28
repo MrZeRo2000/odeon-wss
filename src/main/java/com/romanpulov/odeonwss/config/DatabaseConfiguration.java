@@ -13,19 +13,19 @@ import java.util.Objects;
 @Component
 public class DatabaseConfiguration {
     private final Environment env;
-    private final ServletContext context;
+    private final AppConfiguration appConfiguration;
 
     @Autowired
-    public DatabaseConfiguration(Environment env, ServletContext context) {
+    public DatabaseConfiguration(Environment env, AppConfiguration appConfiguration) {
         this.env = env;
-        this.context = context;
+        this.appConfiguration = appConfiguration;
     }
 
     @Bean
     public DataSource dataSource() {
         final DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(Objects.requireNonNull(env.getProperty("db.driverClassName")));
-        dataSource.setUrl(context.getInitParameter("db-url"));
+        dataSource.setUrl(appConfiguration.getDbUrl());
         dataSource.setUsername(env.getProperty("db.username"));
         dataSource.setPassword(env.getProperty("db.password"));
         return dataSource;

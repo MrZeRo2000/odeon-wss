@@ -18,6 +18,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
+	//https://stackoverflow.com/questions/53326271/spring-nullable-annotation-generates-unknown-enum-constant-warning
+	implementation 'com.google.code.findbugs:jsr305:3.0.2'
+
 	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
 
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
