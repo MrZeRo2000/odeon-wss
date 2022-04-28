@@ -7,12 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RepositoryArtistTests {
 
     @Autowired
@@ -21,14 +23,9 @@ public class RepositoryArtistTests {
     @Autowired
     ArtistRepository artistRepository;
 
-    @BeforeEach
-    @Transactional
-    void beforeEach() {
-
-    }
-
     @Test
     @Order(1)
+    @Sql(value = {"/schema.sql", "/data.sql"})
     void testAutoIncrement() throws Exception {
         List<Artist> artists = artistRepository.getAllByType("A");
         artistRepository.deleteAll(artists);
