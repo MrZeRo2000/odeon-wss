@@ -1,17 +1,15 @@
 package com.romanpulov.odeonwss.entity;
 
+import org.springframework.lang.Nullable;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "artists", indexes = @Index(
-        name = "idx_artists_arts_name",
-        columnList = "arts_type_code, arts_name",
-        unique = true)
-)
+@Table(name = "artists")
 public class Artist {
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "arts_id")
     private Long id;
 
@@ -45,6 +43,19 @@ public class Artist {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Column(name = "arts_migration_id")
+    @Nullable
+    private Long migrationId;
+
+    @Nullable
+    public Long getMigrationId() {
+        return migrationId;
+    }
+
+    public void setMigrationId(@Nullable Long migrationId) {
+        this.migrationId = migrationId;
     }
 
     public Artist() {

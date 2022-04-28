@@ -24,13 +24,16 @@ public class RepositoryArtistTests {
     @BeforeEach
     @Transactional
     void beforeEach() {
-        artistRepository.deleteAll();
+
     }
 
     @Test
     @Order(1)
     void testAutoIncrement() throws Exception {
         List<Artist> artists = artistRepository.getAllByType("A");
+        artistRepository.deleteAll(artists);
+
+        artists = artistRepository.getAllByType("A");
         Assertions.assertEquals(0, artists.size());
 
         artistRepository.save(new Artist(null, "A", "Name 1"));
@@ -54,6 +57,12 @@ public class RepositoryArtistTests {
     @Test
     @Order(2)
     void testAutoIncrement1() throws Exception {
+        Assertions.assertEquals(2, artistRepository.getAllByType("A").size());
+        artistRepository.deleteAll();
         Assertions.assertEquals(0, artistRepository.getAllByType("A").size());
+
+        Artist artist = new Artist(10L, "A", "Name 10");
+        Artist savedArtist = artistRepository.save(artist);
+        Assertions.assertEquals(4, savedArtist.getId());
     }
 }
