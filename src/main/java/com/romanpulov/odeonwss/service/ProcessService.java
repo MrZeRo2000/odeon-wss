@@ -1,14 +1,19 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.service.processor.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class ProcessService implements ProgressHandler {
+
+    private Logger logger = LoggerFactory.getLogger(ProcessService.class);
 
     private final ProcessorFactory processorFactory;
 
@@ -34,12 +39,22 @@ public class ProcessService implements ProgressHandler {
         }
     }
 
+    public ProgressInfo getLastProgressInfo() {
+        if (progress == null || progress.size() == 0) {
+            return null;
+        } else {
+            return progress.get(progress.size() - 1);
+        }
+    }
+
     @Override
     public void handleProgress(ProgressInfo progressInfo) {
         progress.add(progressInfo);
     }
 
     synchronized public void executeProcessor(ProcessorType processorType, String rootPath) throws Exception {
+        logger.debug("Starting execution: " + processorType + ", parameter path: " + Optional.ofNullable(rootPath).orElse("null"));
+
         if (currentProcessor.get() != null) {
             throw new ProcessorException("Process already running");
         }
@@ -51,6 +66,8 @@ public class ProcessService implements ProgressHandler {
             if (rootPath != null) {
                 currentProcessor.get().setRootPath(rootPath);
             }
+
+            logger.debug(String.format("Executing: %s with path: %s", processorType, currentProcessor.get().getRootPath()));
             currentProcessor.get().execute();
             progress.add(new ProgressInfo("Successfully completed", ProcessingStatus.SUCCESS));
             currentProcessor.set(null);

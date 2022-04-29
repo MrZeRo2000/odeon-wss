@@ -5,10 +5,7 @@ import com.romanpulov.odeonwss.service.processor.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.ProcessorType;
 import com.romanpulov.odeonwss.service.processor.ProgressInfo;
 import org.apache.tomcat.jni.Proc;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
@@ -16,7 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql({"/schema.sql", "/data.sql"})
+//@Sql({"/schema.sql", "/data.sql"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceProcessLoadMP3Test {
 
@@ -24,6 +21,7 @@ public class ServiceProcessLoadMP3Test {
     ProcessService service;
 
     @Test
+    @Order(1)
     void test() throws Exception {
         List<ProgressInfo> progressInfo;
 
@@ -43,5 +41,13 @@ public class ServiceProcessLoadMP3Test {
         progressInfo = service.getProgress();
         Assertions.assertEquals(1, progressInfo.size());
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getLastProcessingStatus());
+    }
+
+    @Test
+    @Order(2)
+    void testDirectoryWithFiles() throws Exception {
+        service.executeProcessor(ProcessorType.MP3_LOADER, "");
+        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getLastProcessingStatus());
+        Assertions.assertTrue(service.getLastProgressInfo().info.contains("directory, found "));
     }
 }
