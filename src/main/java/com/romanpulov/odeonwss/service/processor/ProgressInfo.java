@@ -9,9 +9,13 @@ public class ProgressInfo {
 
     public final ProcessingStatus status;
 
-    public ProgressInfo(LocalDateTime time, String info, ProcessingStatus status) {
-        this.time = time;
+    public ProgressInfo(String info, ProcessingStatus status) {
+        this.time = LocalDateTime.now();
         this.info = info;
         this.status = status;
+    }
+
+    public static ProgressInfo fromException(Exception e) {
+        return new ProgressInfo(e.getMessage(), ProcessingStatus.FAILURE);
     }
 }

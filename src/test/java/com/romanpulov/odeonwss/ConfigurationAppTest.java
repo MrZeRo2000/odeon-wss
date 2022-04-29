@@ -1,18 +1,19 @@
 package com.romanpulov.odeonwss;
 
-import com.romanpulov.odeonwss.config.DatabaseConfiguration;
+import com.romanpulov.odeonwss.config.AppConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class DatabaseConfigurationTest {
+public class ConfigurationAppTest {
+
     @Autowired
-    DatabaseConfiguration databaseConfiguration;
+    AppConfiguration appConfiguration;
 
     @Test
-    void testDbUrl() throws Exception {
-        Assertions.assertEquals("jdbc:sqlite:db/database/odeon-test.db", databaseConfiguration.dataSource().getConnection().getMetaData().getURL());
+    void test() {
+        Assertions.assertEquals("D:/Temp/MP3 Music/", appConfiguration.getMp3Path());
     }
 }
