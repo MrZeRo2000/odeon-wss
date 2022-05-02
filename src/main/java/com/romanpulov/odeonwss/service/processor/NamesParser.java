@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class NamesParser {
     private static final Pattern REGEXP_PATTERN_MUSIC_ARTIFACT = Pattern.compile("^((?:19|20)[0-9]{2})\\s(\\S.*)");
-    private static final Pattern REGEXP_PATTERN_MUSIC_COMPOSITION = Pattern.compile("^([0-9][0-9])\\s-\\s(\\S.*)");
+    private static final Pattern REGEXP_PATTERN_MUSIC_COMPOSITION = Pattern.compile("^([0-9][0-9])\\s-\\s(\\S.*)(?:\\.\\S{2,4})$");
 
     public static class YearTitle {
         public final int year;

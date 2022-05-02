@@ -46,8 +46,8 @@ public class UnitNamesParserTest {
 
     @Test
     void testMusicCompositionValidator() {
-        Assertions.assertTrue(NamesParser.validateMusicComposition("02 - Title"));
-        Assertions.assertTrue(NamesParser.validateMusicComposition("21 - Title can be long"));
+        Assertions.assertTrue(NamesParser.validateMusicComposition("02 - Title.mp3"));
+        Assertions.assertTrue(NamesParser.validateMusicComposition("21 - Title can be long.flac"));
 
         Assertions.assertFalse(NamesParser.validateMusicComposition("1980 Title"));
         Assertions.assertFalse(NamesParser.validateMusicComposition(" 02 - Title"));
@@ -57,18 +57,24 @@ public class UnitNamesParserTest {
         Assertions.assertFalse(NamesParser.validateMusicComposition("02 -  Title"));
         Assertions.assertFalse(NamesParser.validateMusicComposition("102 -  Title"));
         Assertions.assertFalse(NamesParser.validateMusicComposition("d2 - Title"));
+        Assertions.assertFalse(NamesParser.validateMusicComposition("02 - Title"));
     }
 
     @Test
     void testMusicCompositionParser() {
         NamesParser.NumberTitle nt;
-        nt = NamesParser.parseMusicComposition("02 - Title");
+        nt = NamesParser.parseMusicComposition("02 - Title.mp3");
         Assertions.assertNotNull(nt);
         Assertions.assertEquals(2, nt.number);
         Assertions.assertEquals("Title", nt.title);
 
         Assertions.assertNull(NamesParser.parseMusicComposition("02  - Title"));
         Assertions.assertNull(NamesParser.parseMusicComposition("t2 - Title"));
+
+        nt = NamesParser.parseMusicComposition("22 - Title. Can have dots.mp3");
+        Assertions.assertNotNull(nt);
+        Assertions.assertEquals(22, nt.number);
+        Assertions.assertEquals("Title. Can have dots", nt.title);
     }
 
     @Test

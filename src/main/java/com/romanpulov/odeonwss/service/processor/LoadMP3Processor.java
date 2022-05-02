@@ -38,14 +38,14 @@ public class LoadMP3Processor extends AbstractProcessor {
         try {
             for (Path p : Files.list(path).collect(Collectors.toList())) {
                 logger.debug("Path:" + p.getFileName());
-                processPath(p);
+                processArtistsPath(p);
             }
         } catch (IOException e) {
             throw new ProcessorException("Exception:" + e.getMessage());
         }
     }
 
-    private void processPath(Path path) throws ProcessorException {
+    private void processArtistsPath(Path path) throws ProcessorException {
         if (!Files.isDirectory(path)) {
             errorHandler("Expected directory, found " + path.getFileName());
             return;
@@ -62,9 +62,49 @@ public class LoadMP3Processor extends AbstractProcessor {
         try {
             for (Path p: Files.list(path).collect(Collectors.toList())) {
                 logger.debug("File:" + p.getFileName());
+                processArtifactsPath(p);
             }
         } catch (IOException e) {
             throw new ProcessorException("Error processing files: " + e.getMessage());
         }
     }
+
+    private void processArtifactsPath(Path path) throws ProcessorException {
+        if (!Files.isDirectory(path)) {
+            errorHandler("Expected directory, found " + path.getFileName());
+            return;
+        }
+
+        String artifactName = path.getFileName().toString();
+
+        NamesParser.YearTitle yt = NamesParser.parseMusicArtifactTitle(artifactName);
+        if (yt == null) {
+            errorHandler("Error parsing artifact name:" + path.toAbsolutePath().getFileName());
+            return;
+        }
+
+        try {
+            for (Path p: Files.list(path).collect(Collectors.toList())) {
+                logger.debug("File:" + p.getFileName());
+                processCompositionPath(p);
+            }
+        } catch (IOException e) {
+            throw new ProcessorException("Error processing files: " + e.getMessage());
+        }
+    }
+
+    private void processCompositionPath(Path path) throws ProcessorException {
+        if (Files.isDirectory(path)) {
+            errorHandler("Expected file, found: " + path.toAbsolutePath());
+            return;
+        }
+
+        String compositionName = path.getFileName().toString();
+        if (compositionName.endsWith("mp3")) {
+            errorHandler("Wrong file type: " + path.toAbsolutePath());
+        }
+
+        NamesParser.NumberTitle nt = NamesParser.parseMusicComposition(compositionName);
+    }
+
 }
