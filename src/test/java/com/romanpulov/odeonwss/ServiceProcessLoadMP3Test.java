@@ -5,7 +5,6 @@ import com.romanpulov.odeonwss.entity.ArtistTypes;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.service.ProcessService;
 import com.romanpulov.odeonwss.service.processor.*;
-import org.apache.tomcat.jni.Proc;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,7 +13,6 @@ import org.springframework.test.context.jdbc.Sql;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@Sql({"/schema.sql", "/data.sql"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceProcessLoadMP3Test {
 

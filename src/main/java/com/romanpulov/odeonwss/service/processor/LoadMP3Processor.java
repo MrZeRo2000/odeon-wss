@@ -1,7 +1,10 @@
 package com.romanpulov.odeonwss.service.processor;
 
+import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistTypes;
+import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import org.springframework.stereotype.Component;
 
@@ -19,10 +22,13 @@ public class LoadMP3Processor extends AbstractProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(LoadMP3Processor.class);
 
-    private ArtistRepository artistRepository;
+    private final ArtistRepository artistRepository;
 
-    public LoadMP3Processor(ArtistRepository artistRepository) {
+    private final ArtifactRepository artifactRepository;
+
+    public LoadMP3Processor(ArtistRepository artistRepository, ArtifactRepository artifactRepository) {
         this.artistRepository = artistRepository;
+        this.artifactRepository = artifactRepository;
     }
 
     @Override
@@ -53,8 +59,8 @@ public class LoadMP3Processor extends AbstractProcessor {
 
         String artistName = path.getFileName().toString();
 
-        Artist artist = artistRepository.findFirstByTypeAndName(ArtistTypes.A.name(), artistName);
-        if (artist == null) {
+        Optional<Artist> artist = artistRepository.findFirstByTypeAndName(ArtistTypes.A.name(), artistName);
+        if (artist.isEmpty()) {
             warningHandlerWithAddArtistAction(String.format("Artist %s not found", artistName), artistName);
             return;
         }
@@ -62,14 +68,14 @@ public class LoadMP3Processor extends AbstractProcessor {
         try {
             for (Path p: Files.list(path).collect(Collectors.toList())) {
                 logger.debug("File:" + p.getFileName());
-                processArtifactsPath(p);
+                processArtifactsPath(p, artist.get());
             }
         } catch (IOException e) {
             throw new ProcessorException("Error processing files: " + e.getMessage());
         }
     }
 
-    private void processArtifactsPath(Path path) throws ProcessorException {
+    private void processArtifactsPath(Path path, Artist artist) throws ProcessorException {
         if (!Files.isDirectory(path)) {
             errorHandler("Expected directory, found " + path.getFileName());
             return;
@@ -83,17 +89,35 @@ public class LoadMP3Processor extends AbstractProcessor {
             return;
         }
 
-        try {
-            for (Path p: Files.list(path).collect(Collectors.toList())) {
-                logger.debug("File:" + p.getFileName());
-                processCompositionPath(p);
+        Artifact artifact = new Artifact();
+        artifact.setArtifactType(ArtifactType.withMP3());
+        artifact.setArtist(artist);
+        artifact.setTitle(yt.getTitle());
+        artifact.setYear((long) yt.getYear());
+
+        Optional<Artifact> existingArtifact = artifactRepository.findFirstByArtifactTypeAndArtistAndTitleAndYear(
+                artifact.getArtifactType(),
+                artifact.getArtist(),
+                artifact.getTitle(),
+                artifact.getYear()
+        );
+
+        if (existingArtifact.isEmpty()) {
+
+            Artifact savedArtifact = artifactRepository.save(artifact);
+
+            try {
+                for (Path p : Files.list(path).collect(Collectors.toList())) {
+                    logger.debug("File:" + p.getFileName());
+                    processCompositionPath(p, savedArtifact);
+                }
+            } catch (IOException e) {
+                throw new ProcessorException("Error processing files: " + e.getMessage());
             }
-        } catch (IOException e) {
-            throw new ProcessorException("Error processing files: " + e.getMessage());
         }
     }
 
-    private void processCompositionPath(Path path) throws ProcessorException {
+    private void processCompositionPath(Path path, Artifact artifact) throws ProcessorException {
         if (Files.isDirectory(path)) {
             errorHandler("Expected file, found: " + path.toAbsolutePath());
             return;
@@ -105,6 +129,10 @@ public class LoadMP3Processor extends AbstractProcessor {
         }
 
         NamesParser.NumberTitle nt = NamesParser.parseMusicComposition(compositionName);
+        if (nt == null) {
+            errorHandler("Error parsing composition:" + path.toAbsolutePath().getFileName());
+            return;
+        }
     }
 
 }

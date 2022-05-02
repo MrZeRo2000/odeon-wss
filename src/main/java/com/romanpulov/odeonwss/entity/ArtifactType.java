@@ -76,4 +76,20 @@ public class ArtifactType {
                 ", parentId=" + parentId +
                 '}';
     }
+
+    public static ArtifactType withMP3() {
+        ArtifactType artifactType = new ArtifactType();
+        artifactType.setId(101L);
+        artifactType.setName("MP3");
+
+        return artifactType;
+    }
+
+    public static ArtifactType withLA() {
+        ArtifactType artifactType = new ArtifactType();
+        artifactType.setId(102L);
+        artifactType.setName("LA");
+
+        return artifactType;
+    }
 }

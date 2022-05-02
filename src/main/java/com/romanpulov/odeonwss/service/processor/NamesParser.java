@@ -8,8 +8,17 @@ public class NamesParser {
     private static final Pattern REGEXP_PATTERN_MUSIC_COMPOSITION = Pattern.compile("^([0-9][0-9])\\s-\\s(\\S.*)(?:\\.\\S{2,4})$");
 
     public static class YearTitle {
-        public final int year;
-        public final String title;
+        private final int year;
+
+        public int getYear() {
+            return year;
+        }
+
+        private final String title;
+
+        public String getTitle() {
+            return title;
+        }
 
         public YearTitle(int year, String title) {
             this.year = year;
@@ -18,8 +27,17 @@ public class NamesParser {
     }
 
     public static class NumberTitle {
-        public final int number;
-        public final String title;
+        private final int number;
+
+        public int getNumber() {
+            return number;
+        }
+
+        private final String title;
+
+        public String getTitle() {
+            return title;
+        }
 
         public NumberTitle(int number, String title) {
             this.number = number;

@@ -14,6 +14,6 @@ public class ConfigurationAppTest {
 
     @Test
     void test() {
-        Assertions.assertEquals("D:/Temp/MP3 Music/", appConfiguration.getMp3Path());
+        Assertions.assertEquals("D:/Temp/ok/MP3 Music/", appConfiguration.getMp3Path());
     }
 }

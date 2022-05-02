@@ -48,3 +48,5 @@ CREATE TABLE artifacts (
 CREATE INDEX idx_artifact_attp ON artifacts (attp_id);
 
 CREATE INDEX idx_artifact_arts ON artifacts (arts_id);
+
+CREATE UNIQUE INDEX idx_artifact_attp_arts_title_year ON artifacts(attp_id, arts_id, artf_title, artf_year);

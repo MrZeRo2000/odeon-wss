@@ -32,16 +32,16 @@ public class UnitNamesParserTest {
 
         yt = NamesParser.parseMusicArtifactTitle("1980 Title");
         Assertions.assertNotNull(yt);
-        Assertions.assertEquals(1980, yt.year);
-        Assertions.assertEquals("Title", yt.title);
+        Assertions.assertEquals(1980, yt.getYear());
+        Assertions.assertEquals("Title", yt.getTitle());
 
         yt = NamesParser.parseMusicArtifactTitle("198r Title");
         Assertions.assertNull(yt);
 
         yt = NamesParser.parseMusicArtifactTitle("2022 Title can be long");
         Assertions.assertNotNull(yt);
-        Assertions.assertEquals(2022, yt.year);
-        Assertions.assertEquals("Title can be long", yt.title);
+        Assertions.assertEquals(2022, yt.getYear());
+        Assertions.assertEquals("Title can be long", yt.getTitle());
     }
 
     @Test
@@ -65,16 +65,16 @@ public class UnitNamesParserTest {
         NamesParser.NumberTitle nt;
         nt = NamesParser.parseMusicComposition("02 - Title.mp3");
         Assertions.assertNotNull(nt);
-        Assertions.assertEquals(2, nt.number);
-        Assertions.assertEquals("Title", nt.title);
+        Assertions.assertEquals(2, nt.getNumber());
+        Assertions.assertEquals("Title", nt.getTitle());
 
         Assertions.assertNull(NamesParser.parseMusicComposition("02  - Title"));
         Assertions.assertNull(NamesParser.parseMusicComposition("t2 - Title"));
 
         nt = NamesParser.parseMusicComposition("22 - Title. Can have dots.mp3");
         Assertions.assertNotNull(nt);
-        Assertions.assertEquals(22, nt.number);
-        Assertions.assertEquals("Title. Can have dots", nt.title);
+        Assertions.assertEquals(22, nt.getNumber());
+        Assertions.assertEquals("Title. Can have dots", nt.getTitle());
     }
 
     @Test
