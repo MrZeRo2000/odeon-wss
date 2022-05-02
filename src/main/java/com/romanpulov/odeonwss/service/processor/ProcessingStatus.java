@@ -7,6 +7,6 @@ public enum ProcessingStatus {
     IN_PROGRESS,
     SUCCESS,
     FAILURE,
-    WAITING,
+    WARNING,
     NOT_RUNNING
 }

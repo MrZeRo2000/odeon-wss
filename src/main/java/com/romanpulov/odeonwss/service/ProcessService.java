@@ -35,11 +35,19 @@ public class ProcessService implements ProgressHandler {
         } else if (progress.size() == 0) {
             return ProcessingStatus.IN_PROGRESS;
         } else {
-            return progress.get(progress.size() - 1).status;
+            return progress.get(progress.size() - 1).getStatus();
         }
     }
 
     public ProgressInfo getLastProgressInfo() {
+        if (progress == null || progress.size() < 2) {
+            return null;
+        } else {
+            return progress.get(progress.size() - 2);
+        }
+    }
+
+    public ProgressInfo getFinalProgressInfo() {
         if (progress == null || progress.size() == 0) {
             return null;
         } else {
@@ -64,12 +72,17 @@ public class ProcessService implements ProgressHandler {
         currentProcessor.set(processorFactory.fromProcessorType(processorType, this));
         try {
             if (rootPath != null) {
-                currentProcessor.get().setRootPath(rootPath);
+                currentProcessor.get().setRootFolder(rootPath);
             }
 
-            logger.debug(String.format("Executing: %s with path: %s", processorType, currentProcessor.get().getRootPath()));
+            // execute
+            logger.debug(String.format("Executing: %s with path: %s", processorType, currentProcessor.get().getRootFolder()));
             currentProcessor.get().execute();
-            progress.add(new ProgressInfo("Successfully completed", ProcessingStatus.SUCCESS));
+
+            // get task status
+            progress.add(ProgressInfo.createTaskStatus(progress));
+
+            // clear processor
             currentProcessor.set(null);
         } catch (Exception e) {
             progress.add(ProgressInfo.fromException(e));

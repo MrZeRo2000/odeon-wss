@@ -11,15 +11,27 @@ public abstract class AbstractProcessor {
         this.progressHandler = progressHandler;
     }
 
-    protected String rootPath;
+    protected String rootFolder;
 
-    public String getRootPath() {
-        return rootPath;
+    public String getRootFolder() {
+        return rootFolder;
     }
 
-    public void setRootPath(String rootPath) {
-        this.rootPath = rootPath;
+    public void setRootFolder(String rootFolder) {
+        this.rootFolder = rootFolder;
     }
 
     abstract public void execute() throws Exception;
+
+    protected void errorHandler(String errorMessage) {
+        progressHandler.handleProgress(ProgressInfo.fromErrorMessage(errorMessage));
+    }
+
+    protected void warningHandler(String warningMessage) {
+        progressHandler.handleProgress(ProgressInfo.fromWarningMessage(warningMessage));
+    }
+
+    protected void warningHandlerWithAddArtistAction(String warningMessage, String artistName) {
+        progressHandler.handleProgress(ProgressInfo.fromWarningMessageWithAction(warningMessage, ProcessingActionType.ADD_ARTIST, artistName));
+    }
 }

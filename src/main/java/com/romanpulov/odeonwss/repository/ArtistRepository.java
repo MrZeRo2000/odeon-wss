@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ArtistRepository extends PagingAndSortingRepository<Artist, Long> {
     List<Artist> getAllByType(String type);
+
+    Artist findFirstByTypeAndName(String type, String name);
 }

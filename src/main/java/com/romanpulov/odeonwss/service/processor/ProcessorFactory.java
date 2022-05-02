@@ -20,7 +20,7 @@ public class ProcessorFactory {
             case MP3_LOADER:
                 AbstractProcessor processor = loadMP3Processor;
                 processor.setProgressHandler(handler);
-                processor.setRootPath(appConfiguration.getMp3Path());
+                processor.setRootFolder(appConfiguration.getMp3Path());
                 return processor;
             default:
                 throw new UnsupportedOperationException();
