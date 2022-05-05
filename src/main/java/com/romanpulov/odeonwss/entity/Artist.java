@@ -1,9 +1,11 @@
 package com.romanpulov.odeonwss.entity;
 
+import org.hibernate.HibernateException;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -57,6 +59,24 @@ public class Artist {
 
     public void setMigrationId(@Nullable Long migrationId) {
         this.migrationId = migrationId;
+    }
+
+    @OneToMany(mappedBy = "artist", fetch = FetchType.LAZY)
+    private List<Artifact> artifacts;
+
+    public List<Artifact> getArtifacts() {
+        return artifacts;
+    }
+
+    public void setArtifacts(List<Artifact> artifacts) {
+        this.artifacts = artifacts;
+    }
+
+    @PreRemove
+    private void removeArtist() {
+        if (artifacts.size() > 0) {
+            throw new HibernateException("Unable to delete " + this + " because it has child payments");
+        }
     }
 
     public Artist() {

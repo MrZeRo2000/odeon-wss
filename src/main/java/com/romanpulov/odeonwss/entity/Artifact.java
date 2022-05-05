@@ -6,6 +6,7 @@ import org.springframework.lang.Nullable;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -115,6 +116,17 @@ public class Artifact {
 
     public void setInsertDate(@Nullable LocalDate insertDate) {
         this.insertDate = insertDate;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "artifact", fetch = FetchType.LAZY)
+    List<Composition> compositions;
+
+    public List<Composition> getCompositions() {
+        return compositions;
+    }
+
+    public void setCompositions(List<Composition> compositions) {
+        this.compositions = compositions;
     }
 
     @Override

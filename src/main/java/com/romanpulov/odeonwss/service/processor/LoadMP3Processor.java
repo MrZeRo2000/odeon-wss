@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +42,8 @@ public class LoadMP3Processor extends AbstractProcessor {
             throw new ProcessorException("Path not found:" + path);
         }
 
-        try {
-            for (Path p : Files.list(path).collect(Collectors.toList())) {
+        try (Stream<Path> stream = Files.list(path)){
+            for (Path p : stream.collect(Collectors.toList())) {
                 logger.debug("Path:" + p.getFileName());
                 processArtistsPath(p);
             }
@@ -65,8 +66,8 @@ public class LoadMP3Processor extends AbstractProcessor {
             return;
         }
 
-        try {
-            for (Path p: Files.list(path).collect(Collectors.toList())) {
+        try (Stream<Path> stream = Files.list(path)){
+            for (Path p: stream.collect(Collectors.toList())) {
                 logger.debug("File:" + p.getFileName());
                 processArtifactsPath(p, artist.get());
             }
@@ -106,8 +107,8 @@ public class LoadMP3Processor extends AbstractProcessor {
 
             Artifact savedArtifact = artifactRepository.save(artifact);
 
-            try {
-                for (Path p : Files.list(path).collect(Collectors.toList())) {
+            try (Stream<Path> stream = Files.list(path)) {
+                for (Path p : stream.collect(Collectors.toList())) {
                     logger.debug("File:" + p.getFileName());
                     processCompositionPath(p, savedArtifact);
                 }

@@ -50,3 +50,17 @@ CREATE INDEX idx_artifact_attp ON artifacts (attp_id);
 CREATE INDEX idx_artifact_arts ON artifacts (arts_id);
 
 CREATE UNIQUE INDEX idx_artifact_attp_arts_title_year ON artifacts(attp_id, arts_id, artf_title, artf_year);
+
+DROP TABLE IF EXISTS compositions;
+
+CREATE TABLE compositions (
+    comp_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    artf_id INTEGER NOT NULL,
+    mdfl_id INTEGER NOT NULL,
+    comp_title TEXT NOT NULL,
+    comp_duration INTEGER NULL,
+    comp_disk_num INTEGER NULL,
+    comp_num INTEGER NULL
+);
+
+CREATE INDEX idx_composition_artf ON compositions(artf_id);
