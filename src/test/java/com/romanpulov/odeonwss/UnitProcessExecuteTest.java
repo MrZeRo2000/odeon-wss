@@ -1,6 +1,9 @@
 package com.romanpulov.odeonwss;
 
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
@@ -79,19 +82,36 @@ public class UnitProcessExecuteTest {
                 Callable<String> callable = () -> {
 
                     Process process = new ProcessBuilder()
-                            .command(FFPROBE_PATH, "-print_format", "json", "-show_format", "-v", "quiet", file.toAbsolutePath().toString()
+                            .command(FFPROBE_PATH, "-print_format", "json", "-show_format", "-show_streams", "-v", "quiet", file.toAbsolutePath().toString()
                             )
                             .start();
 
                     String text = new BufferedReader(
                             new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))
                             .lines()
-                            .collect(Collectors.joining("\n"));
+                            .collect(Collectors.joining());
 
                     String errorText = new BufferedReader(
                             new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8))
                             .lines()
-                            .collect(Collectors.joining("\n"));
+                            .collect(Collectors.joining());
+
+                    if (!text.isEmpty()) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(text);
+                            JSONArray streamsArray = jsonObject.optJSONArray("streams");
+                            JSONObject formatObject = jsonObject.optJSONObject("format");
+                            if (streamsArray == null) {
+                                throw new JSONException("Streams not found");
+                            }
+                            if (formatObject == null) {
+                                throw new JSONException("Format not found");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
 
 
                     System.out.println(file.getFileName().toString() + ":" + text);
@@ -113,6 +133,10 @@ public class UnitProcessExecuteTest {
             }
         } catch (InterruptedException e) {
             executorService.shutdownNow();
+        }
+
+        for (Future<String>f : futures ) {
+            System.out.println("Future:" + f.get());
         }
     }
 }

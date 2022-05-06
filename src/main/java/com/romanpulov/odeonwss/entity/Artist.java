@@ -74,7 +74,7 @@ public class Artist {
 
     @PreRemove
     private void removeArtist() {
-        if (artifacts.size() > 0) {
+        if (artifacts != null && artifacts.size() > 0) {
             throw new HibernateException("Unable to delete " + this + " because it has child payments");
         }
     }
