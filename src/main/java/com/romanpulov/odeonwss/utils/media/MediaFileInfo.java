@@ -17,23 +17,16 @@ public class MediaFileInfo {
         return primaryMediaType;
     }
 
-    private final List<MediaStreamInfo> mediaStreams;
+    private final MediaContentInfo mediaContentInfo;
 
-    public List<MediaStreamInfo> getMediaStreams() {
-        return mediaStreams;
+    public MediaContentInfo getMediaContentInfo() {
+        return mediaContentInfo;
     }
 
-    private final MediaFormatInfo mediaFormatInfo;
-
-    public MediaFormatInfo getMediaFormatInfo() {
-        return mediaFormatInfo;
-    }
-
-    public MediaFileInfo(String fileName, MediaType primaryMediaType, List<MediaStreamInfo> mediaStreams, MediaFormatInfo mediaFormatInfo) {
+    public MediaFileInfo(String fileName, MediaType primaryMediaType, MediaContentInfo mediaContentInfo) {
         this.fileName = fileName;
         this.primaryMediaType = primaryMediaType;
-        this.mediaStreams = Collections.unmodifiableList(mediaStreams);
-        this.mediaFormatInfo = mediaFormatInfo;
+        this.mediaContentInfo = mediaContentInfo;
     }
 
     @Override
@@ -41,12 +34,12 @@ public class MediaFileInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MediaFileInfo that = (MediaFileInfo) o;
-        return fileName.equals(that.fileName) && primaryMediaType == that.primaryMediaType && Objects.equals(mediaStreams, that.mediaStreams) && Objects.equals(mediaFormatInfo, that.mediaFormatInfo);
+        return fileName.equals(that.fileName) && primaryMediaType == that.primaryMediaType && mediaContentInfo.equals(that.mediaContentInfo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fileName, primaryMediaType, mediaStreams, mediaFormatInfo);
+        return Objects.hash(fileName, primaryMediaType, mediaContentInfo);
     }
 
     @Override
@@ -54,8 +47,7 @@ public class MediaFileInfo {
         return "MediaFileInfo{" +
                 "fileName='" + fileName + '\'' +
                 ", primaryMediaType=" + primaryMediaType +
-                ", mediaStreams=" + mediaStreams +
-                ", mediaFormatInfo=" + mediaFormatInfo +
+                ", mediaContentInfo=" + mediaContentInfo +
                 '}';
     }
 }
