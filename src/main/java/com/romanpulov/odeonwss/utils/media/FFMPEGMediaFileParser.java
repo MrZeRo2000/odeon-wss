@@ -50,7 +50,11 @@ public class FFMPEGMediaFileParser implements MediaFileParserInterface {
 
             if (errorStreamText.isEmpty()) {
                 MediaContentInfo mediaContentInfo = parseOutput(inputStreamText);
-                return null;
+                return new MediaFileInfo(
+                        file.getFileName().toString(),
+                        getPrimaryMediaTypeFromStreams(mediaContentInfo.getMediaStreams()),
+                        mediaContentInfo
+                );
             } else {
                 throw new MediaFileInfoException(file.getFileName().toString(), "Error during file processing:" + errorStreamText);
             }
@@ -58,6 +62,14 @@ public class FFMPEGMediaFileParser implements MediaFileParserInterface {
             throw new MediaFileInfoException(file.getFileName().toString(), "IO Error:" + e.getMessage());
         } catch (MediaInfoParsingException e) {
             throw new MediaFileInfoException(file.getFileName().toString(), e.getMessage());
+        }
+    }
+
+    private static MediaType getPrimaryMediaTypeFromStreams(List<MediaStreamInfo> mediaStreams) throws MediaInfoParsingException {
+        if (mediaStreams.size() > 0) {
+            return mediaStreams.get(0).getMediaType();
+        } else {
+            throw new MediaInfoParsingException("Error obtaining media primary type from streams");
         }
     }
 
@@ -114,5 +126,4 @@ public class FFMPEGMediaFileParser implements MediaFileParserInterface {
 
         return new MediaFormatInfo(formatName, duration, size, bitRate);
     }
-
 }
