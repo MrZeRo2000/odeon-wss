@@ -18,6 +18,10 @@ import java.util.stream.Collectors;
 public class FFMPEGMediaFileParser implements MediaFileParserInterface {
     private final String executableFileName;
 
+    public String getExecutableFileName() {
+        return executableFileName;
+    }
+
     public FFMPEGMediaFileParser(String executableFileName) {
         this.executableFileName = executableFileName;
     }
