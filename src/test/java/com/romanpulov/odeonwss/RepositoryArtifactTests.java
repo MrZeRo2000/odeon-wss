@@ -49,7 +49,7 @@ public class RepositoryArtifactTests {
 
         //Artist
         Artist artist = new EntityArtistBuilder().withType("A").withName("Name1").build();
-        artist = artistRepository.save(artist);
+        artistRepository.save(artist);
         Assertions.assertNotNull(artist);
         Assertions.assertNotNull(artist.getId());
 
@@ -62,17 +62,17 @@ public class RepositoryArtifactTests {
                 .withInsertDate(LocalDate.now().minusDays(1))
                 .build();
 
-        Artifact savedArtifact = artifactRepository.save(artifact);
+        artifactRepository.save(artifact);
 
-        Assertions.assertNotNull(savedArtifact);
-        Assertions.assertNotNull(savedArtifact.getId());
-        Assertions.assertEquals(savedArtifact.getArtist(), artist);
-        Assertions.assertEquals(savedArtifact.getArtifactType(), artifactType);
-        Assertions.assertEquals(savedArtifact.getTitle(), "Title 1");
-        Assertions.assertEquals(savedArtifact.getYear(), 2000L);
-        Assertions.assertEquals(savedArtifact.getDuration(), 54334L);
+        Assertions.assertNotNull(artifact);
+        Assertions.assertNotNull(artifact.getId());
+        Assertions.assertEquals(artist, artifact.getArtist());
+        Assertions.assertEquals(artifactType, artifact.getArtifactType());
+        Assertions.assertEquals("Title 1", artifact.getTitle());
+        Assertions.assertEquals(2000L, artifact.getYear());
+        Assertions.assertEquals(54334L, artifact.getDuration());
 
-        log.info("Saved artifact summary:" + savedArtifact);
+        log.info("Saved artifact summary:" + artifact);
 
         Assertions.assertEquals(1, artifactRepository.getArtifactsByArtist(artist).size());
     }

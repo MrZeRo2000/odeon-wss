@@ -52,20 +52,6 @@ public class Artifact {
         this.artist = artist;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mdfl_id", referencedColumnName = "mdfl_id")
-    @Nullable
-    private MediaFile mediaFile;
-
-    @Nullable
-    public MediaFile getMediaFile() {
-        return mediaFile;
-    }
-
-    public void setMediaFile(@Nullable MediaFile mediaFile) {
-        this.mediaFile = mediaFile;
-    }
-
     @Column(name = "artf_title")
     @NotNull
     private String title;
@@ -118,8 +104,8 @@ public class Artifact {
         this.insertDate = insertDate;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "artifact", fetch = FetchType.LAZY)
-    List<Composition> compositions;
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "artifact", fetch = FetchType.LAZY)
+    private List<Composition> compositions;
 
     public List<Composition> getCompositions() {
         return compositions;
@@ -128,6 +114,9 @@ public class Artifact {
     public void setCompositions(List<Composition> compositions) {
         this.compositions = compositions;
     }
+
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "artifact", fetch = FetchType.LAZY)
+    private List<MediaFile> mediaFiles;
 
     @Override
     public boolean equals(Object o) {
@@ -148,7 +137,6 @@ public class Artifact {
                 "id=" + id +
                 ", artifactType=" + artifactType +
                 ", artist=" + artist +
-                ", mediaFile=" + mediaFile +
                 ", title='" + title + '\'' +
                 ", year=" + year +
                 ", duration=" + duration +

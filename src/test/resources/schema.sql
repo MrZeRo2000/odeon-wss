@@ -21,24 +21,12 @@ CREATE TABLE artifact_types (
 CREATE UNIQUE INDEX idx_artifact_types_name ON artifact_types (attp_name)
 ;
 
-DROP TABLE IF EXISTS media_files;
-
-CREATE TABLE media_files (
-    mdfl_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    mdfl_name TEXT NOT NULL,
-    mdfl_format_code TEXT NOT NULL,
-    mdfl_size INTEGER NOT NULL,
-    mdfl_bitrate INTEGER NULL,
-    mdfl_duration INTEGER NULL
-);
-
 DROP TABLE IF EXISTS artifacts;
 
 CREATE TABLE artifacts (
     artf_id INTEGER PRIMARY KEY AUTOINCREMENT,
     attp_id INTEGER NOT NULL,
     arts_id INTEGER NULL,
-    mdfl_id INTEGER NULL,
     artf_title TEXT NOT NULL,
     artf_year INTEGER NULL,
     artf_duration INTEGER NULL,
@@ -56,7 +44,6 @@ DROP TABLE IF EXISTS compositions;
 CREATE TABLE compositions (
     comp_id INTEGER PRIMARY KEY AUTOINCREMENT,
     artf_id INTEGER NOT NULL,
-    mdfl_id INTEGER NOT NULL,
     comp_title TEXT NOT NULL,
     comp_duration INTEGER NULL,
     comp_disk_num INTEGER NULL,
@@ -64,3 +51,19 @@ CREATE TABLE compositions (
 );
 
 CREATE INDEX idx_composition_artf ON compositions(artf_id);
+
+DROP TABLE IF EXISTS media_files;
+
+CREATE TABLE media_files (
+    mdfl_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    artf_id INTEGER NULL,
+    comp_id INTEGER NULL,
+    mdfl_name TEXT NOT NULL,
+    mdfl_format_code TEXT NOT NULL,
+    mdfl_size INTEGER NOT NULL,
+    mdfl_bitrate INTEGER NULL,
+    mdfl_duration INTEGER NULL
+);
+
+CREATE INDEX idx_media_files_artf ON media_files(artf_id);
+CREATE INDEX idx_media_files_comp ON media_files(comp_id);

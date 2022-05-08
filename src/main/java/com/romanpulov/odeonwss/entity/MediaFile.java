@@ -21,6 +21,30 @@ public class MediaFile {
         this.id = id;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artf_id", referencedColumnName = "artf_id")
+    private Artifact artifact;
+
+    public Artifact getArtifact() {
+        return artifact;
+    }
+
+    public void setArtifact(Artifact artifact) {
+        this.artifact = artifact;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comp_id", referencedColumnName = "comp_id")
+    private Composition composition;
+
+    public Composition getComposition() {
+        return composition;
+    }
+
+    public void setComposition(Composition composition) {
+        this.composition = composition;
+    }
+
     @Column(name = "mdfl_name")
     @NotNull
     private String name;
@@ -80,15 +104,6 @@ public class MediaFile {
     public MediaFile() {
     }
 
-    public MediaFile(Long id, String name, String format, Long size, Long bitrate, Long duration) {
-        this.id = id;
-        this.name = name;
-        this.format = format;
-        this.size = size;
-        this.bitrate = bitrate;
-        this.duration = duration;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -106,6 +121,8 @@ public class MediaFile {
     public String toString() {
         return "MediaFile{" +
                 "id=" + id +
+                ", artifact=" + artifact +
+                ", composition=" + composition +
                 ", name='" + name + '\'' +
                 ", format='" + format + '\'' +
                 ", size=" + size +

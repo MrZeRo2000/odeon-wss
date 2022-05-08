@@ -12,6 +12,7 @@ import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RepositoryArtifactTypeTest {
+
     @Autowired
     ArtifactTypeRepository artifactTypeRepository;
 

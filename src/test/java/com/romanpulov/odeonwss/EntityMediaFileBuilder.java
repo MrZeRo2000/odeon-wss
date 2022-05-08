@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss;
 
+import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.entity.MediaFile;
 
 public class EntityMediaFileBuilder {
@@ -7,6 +9,16 @@ public class EntityMediaFileBuilder {
 
     public EntityMediaFileBuilder() {
         mediaFile = new MediaFile();
+    }
+
+    public EntityMediaFileBuilder withArtifact(Artifact artifact) {
+        mediaFile.setArtifact(artifact);
+        return this;
+    }
+
+    public EntityMediaFileBuilder withComposition(Composition composition) {
+        mediaFile.setComposition(composition);
+        return this;
     }
 
     public EntityMediaFileBuilder withName(String name) {

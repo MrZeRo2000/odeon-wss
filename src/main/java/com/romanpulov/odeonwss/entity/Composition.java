@@ -34,20 +34,6 @@ public class Composition {
         this.artifact = artifact;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mdfl_id", referencedColumnName = "mdfl_id")
-    @Nullable
-    private MediaFile mediaFile;
-
-    @Nullable
-    public MediaFile getMediaFile() {
-        return mediaFile;
-    }
-
-    public void setMediaFile(@Nullable MediaFile mediaFile) {
-        this.mediaFile = mediaFile;
-    }
-
     @Column(name = "comp_title")
     @NotNull
     private String title;
@@ -117,7 +103,6 @@ public class Composition {
         return "Composition{" +
                 "id=" + id +
                 ", artifact=" + artifact +
-                ", mediaFile=" + mediaFile +
                 ", title='" + title + '\'' +
                 ", duration=" + duration +
                 ", diskNum=" + diskNum +

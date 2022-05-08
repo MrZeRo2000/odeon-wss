@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
 import org.hibernate.HibernateException;
@@ -72,7 +71,6 @@ public class RepositoryCompositionTests {
 
         //Composition 1
         Composition wrong_composition = new EntityCompositionBuilder()
-                .withArtifact(artifact)
                 .withTitle("Composition title")
                 .build();
         Assertions.assertThrows(Exception.class, () -> compositionRepository.save(wrong_composition));
@@ -80,7 +78,6 @@ public class RepositoryCompositionTests {
         //Composition 1
         Composition composition = new EntityCompositionBuilder()
                 .withArtifact(savedArtifact)
-                .withMediaFile(savedMediaFile)
                 .withTitle("Composition title")
                 .withDiskNum(1L)
                 .withNum(8L)
@@ -89,7 +86,6 @@ public class RepositoryCompositionTests {
         Composition savedComposition = compositionRepository.save(composition);
         Assertions.assertNotNull(savedComposition.getId());
         Assertions.assertEquals(savedComposition.getArtifact(), savedArtifact);
-        Assertions.assertEquals(savedComposition.getMediaFile(), savedMediaFile);
         Assertions.assertEquals("Composition title", savedComposition.getTitle());
         Assertions.assertEquals(1L, savedComposition.getDiskNum());
         Assertions.assertEquals(8, savedComposition.getNum());
@@ -98,7 +94,6 @@ public class RepositoryCompositionTests {
         //Composition 2
         Composition composition2 = new EntityCompositionBuilder()
                 .withArtifact(savedArtifact)
-                .withMediaFile(savedMediaFile)
                 .withTitle("Composition title 2")
                 .withDiskNum(2L)
                 .withNum(5L)
@@ -107,7 +102,6 @@ public class RepositoryCompositionTests {
         Composition savedComposition2 = compositionRepository.save(composition2);
         Assertions.assertNotNull(savedComposition2.getId());
         Assertions.assertEquals(savedComposition2.getArtifact(), savedArtifact);
-        Assertions.assertEquals(savedComposition2.getMediaFile(), savedMediaFile);
         Assertions.assertEquals("Composition title 2", savedComposition2.getTitle());
         Assertions.assertEquals(2, savedComposition2.getDiskNum());
         Assertions.assertEquals(5, savedComposition2.getNum());
