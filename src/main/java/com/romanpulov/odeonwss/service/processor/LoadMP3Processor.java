@@ -6,6 +6,9 @@ import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistTypes;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
+import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.utils.media.MediaFileParserInterface;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -27,9 +30,23 @@ public class LoadMP3Processor extends AbstractProcessor {
 
     private final ArtifactRepository artifactRepository;
 
-    public LoadMP3Processor(ArtistRepository artistRepository, ArtifactRepository artifactRepository) {
+    private final CompositionRepository compositionRepository;
+
+    private final MediaFileRepository mediaFileRepository;
+
+    private final MediaFileParserInterface mediaFileParser;
+
+    public LoadMP3Processor(
+            ArtistRepository artistRepository,
+            ArtifactRepository artifactRepository,
+            CompositionRepository compositionRepository,
+            MediaFileRepository mediaFileRepository,
+            MediaFileParserInterface mediaFileParser ) {
         this.artistRepository = artistRepository;
         this.artifactRepository = artifactRepository;
+        this.compositionRepository = compositionRepository;
+        this.mediaFileRepository = mediaFileRepository;
+        this.mediaFileParser = mediaFileParser;
     }
 
     @Override

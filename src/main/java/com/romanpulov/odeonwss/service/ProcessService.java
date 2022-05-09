@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Service
 public class ProcessService implements ProgressHandler {
 
-    private Logger logger = LoggerFactory.getLogger(ProcessService.class);
+    private final Logger logger = LoggerFactory.getLogger(ProcessService.class);
 
     private final ProcessorFactory processorFactory;
 
@@ -61,7 +61,7 @@ public class ProcessService implements ProgressHandler {
     }
 
     synchronized public void executeProcessor(ProcessorType processorType, String rootPath) throws Exception {
-        logger.debug("Starting execution: " + processorType + ", parameter path: " + Optional.ofNullable(rootPath).orElse("null"));
+        logger.debug("Starting execution: " + processorType + ", parameter path: " + rootPath);
 
         if (currentProcessor.get() != null) {
             throw new ProcessorException("Process already running");
