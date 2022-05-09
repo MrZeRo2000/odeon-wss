@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.entity;
 import javax.annotation.Nullable;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -83,6 +84,17 @@ public class Composition {
 
     public void setNum(@Nullable Long num) {
         this.num = num;
+    }
+
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "composition", fetch = FetchType.LAZY)
+    private List<MediaFile> mediaFiles;
+
+    public List<MediaFile> getMediaFiles() {
+        return mediaFiles;
+    }
+
+    public void setMediaFiles(List<MediaFile> mediaFiles) {
+        this.mediaFiles = mediaFiles;
     }
 
     @Override

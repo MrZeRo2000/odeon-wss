@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
 import org.hibernate.HibernateException;
@@ -59,16 +60,6 @@ public class RepositoryCompositionTests {
         Assertions.assertNotNull(savedArtifact.getId());
         Assertions.assertEquals(1982L, savedArtifact.getYear());
 
-        //MediaFile
-        MediaFile mediaFile = new EntityMediaFileBuilder()
-                .withName("Name 1.mp3")
-                .withFormat("MP3")
-                .withSize(423L)
-                .withDuration(6234L)
-                .withBitrate(320L)
-                .build();
-        MediaFile savedMediaFile = mediaFileRepository.save(mediaFile);
-
         //Composition 1
         Composition wrong_composition = new EntityCompositionBuilder()
                 .withTitle("Composition title")
@@ -115,16 +106,26 @@ public class RepositoryCompositionTests {
         List<Composition> compositionList = StreamSupport.stream(compositions.spliterator(), false).collect(Collectors.toList());
         Assertions.assertEquals(2, compositionList.size());
 
-        Artist artist = artistRepository.findAll().iterator().next();
-        Assertions.assertThrows(Exception.class, () -> artistRepository.delete(artist));
+        MediaFile mediaFile = new EntityMediaFileBuilder()
+                .withComposition(compositionList.get(0))
+                .withFormat("mp3")
+                .withName("File Name")
+                .withDuration(123456L)
+                .withBitrate(123L)
+                .withSize(77777L)
+                .build();
 
-        Artifact artifact = artifactRepository.findAll().iterator().next();
-        Assertions.assertNotNull(artifact);
+        //insert media file
+        mediaFileRepository.save(mediaFile);
+        Assertions.assertEquals(1, mediaFileRepository.findAllByComposition(compositionList.get(0)).size());
+        Assertions.assertEquals(1, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
 
-        artifactRepository.delete(artifact);
+        //delete composition
+        compositionRepository.delete(compositionList.get(0));
+        compositionList = StreamSupport.stream(compositionRepository.findAll().spliterator(), false).collect(Collectors.toList());
+        Assertions.assertEquals(1, compositionList.size());
 
-        Assertions.assertFalse(artifactRepository.findAll().iterator().hasNext());
-        // Assertions.assertFalse(compositionRepository.findAll().iterator().hasNext());
-
+        //media file deleted
+        Assertions.assertEquals(0, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
     }
 }
