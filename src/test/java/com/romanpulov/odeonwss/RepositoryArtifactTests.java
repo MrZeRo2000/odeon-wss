@@ -90,7 +90,9 @@ public class RepositoryArtifactTests {
         Artist artist = artistRepository.getAllByType(ArtistTypes.A.name()).get(0);
 
         Artifact loadedArtifact = artifactRepository.getArtifactsByArtist(artist).get(0);
-        Assertions.assertEquals(loadedArtifact.getArtist().getName(), artist.getName());
+        Artist loadedArtist = loadedArtifact.getArtist();
+        Assertions.assertNotNull(loadedArtist);
+        Assertions.assertEquals(loadedArtist, artist);
     }
 
     @Test
