@@ -10,11 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
+import javax.persistence.OneToMany;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceProcessLoadMP3Test {
+
+    private static final Logger log = Logger.getLogger(ServiceProcessLoadMP3Test.class.getSimpleName());
 
     @Autowired
     ProcessService service;
@@ -75,5 +80,22 @@ public class ServiceProcessLoadMP3Test {
         service.executeProcessor(ProcessorType.MP3_LOADER, "D:/Temp/wrong_artifact_title/");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getLastProcessingStatus());
         Assertions.assertTrue(service.getLastProgressInfo().getInfo().contains("Error parsing artifact name"));
+    }
+
+    @Test
+    @Order(4)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testOk() {
+        Arrays.asList("Aerosmith", "Kosheen").forEach(s ->
+                artistRepository.save(
+                        new EntityArtistBuilder()
+                                .withType(ArtistTypes.A.name())
+                                .withName(s)
+                                .build()
+                ));
+
+        log.info("Created artists");
+        Assertions.assertDoesNotThrow(() -> service.executeProcessor(ProcessorType.MP3_LOADER, "D:/Temp/ok/MP3 Music/"));
+        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getLastProcessingStatus());
     }
 }

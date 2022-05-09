@@ -90,6 +90,19 @@ public class Artifact {
         this.duration = duration;
     }
 
+    @Column(name = "artf_size")
+    @Nullable
+    private Long size;
+
+    @Nullable
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(@Nullable Long size) {
+        this.size = size;
+    }
+
     @Column(name = "artf_ins_date")
     @Convert(converter = DateConverter.class)
     @Nullable
@@ -140,7 +153,10 @@ public class Artifact {
                 ", title='" + title + '\'' +
                 ", year=" + year +
                 ", duration=" + duration +
+                ", size=" + size +
                 ", insertDate=" + insertDate +
+                ", compositions=" + compositions +
+                ", mediaFiles=" + mediaFiles +
                 '}';
     }
 }

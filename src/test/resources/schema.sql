@@ -30,6 +30,7 @@ CREATE TABLE artifacts (
     artf_title TEXT NOT NULL,
     artf_year INTEGER NULL,
     artf_duration INTEGER NULL,
+    artf_size INTEGER NULL,
     artf_ins_date INTEGER NULL
 );
 

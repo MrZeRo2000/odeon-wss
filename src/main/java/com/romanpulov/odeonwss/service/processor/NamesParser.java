@@ -27,9 +27,9 @@ public class NamesParser {
     }
 
     public static class NumberTitle {
-        private final int number;
+        private final long number;
 
-        public int getNumber() {
+        public long getNumber() {
             return number;
         }
 
