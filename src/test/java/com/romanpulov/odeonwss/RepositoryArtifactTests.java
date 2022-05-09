@@ -3,9 +3,11 @@ package com.romanpulov.odeonwss;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
+import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
+import com.romanpulov.odeonwss.repository.CompositionRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +19,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql({"/schema.sql", "/data.sql"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RepositoryArtifactTests {
 
@@ -32,8 +33,12 @@ public class RepositoryArtifactTests {
     @Autowired
     ArtifactRepository artifactRepository;
 
+    @Autowired
+    CompositionRepository compositionRepository;
+
     @Test
     @Order(1)
+    @Sql({"/schema.sql", "/data.sql"})
     void testDbState() {
         Assertions.assertFalse(artistRepository.findAll().iterator().hasNext());
         Assertions.assertTrue(artifactTypeRepository.findAll().iterator().hasNext());
@@ -75,5 +80,37 @@ public class RepositoryArtifactTests {
         log.info("Saved artifact summary:" + artifact);
 
         Assertions.assertEquals(1, artifactRepository.getArtifactsByArtist(artist).size());
+    }
+
+    @Test
+    @Order(3)
+    void testCascade() {
+        Artifact artifact = artifactRepository.findAll().iterator().next();
+        Assertions.assertNotNull(artifact);
+
+        Composition composition = new EntityCompositionBuilder()
+                .withArtifact(artifact)
+                .withTitle("Artifact title")
+                .withDiskNum(1L)
+                .withNum(1L)
+                .withDuration(12345L)
+                .build();
+
+        compositionRepository.save(composition);
+
+        composition = new EntityCompositionBuilder()
+                .withArtifact(artifact)
+                .withTitle("Artifact title 2")
+                .withDiskNum(1L)
+                .withNum(3L)
+                .withDuration(123458L)
+                .build();
+
+        compositionRepository.save(composition);
+
+        Assertions.assertEquals(2, compositionRepository.getCompositionsByArtifact(artifact).size());
+
+        artifactRepository.delete(artifact);
+        Assertions.assertEquals(0, compositionRepository.getCompositionsByArtifact(artifact).size());
     }
 }

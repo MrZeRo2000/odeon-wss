@@ -5,8 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 import java.util.Objects;
 
