@@ -105,12 +105,12 @@ public class LoadMP3Processor extends AbstractProcessor {
 
         if (existingArtifact.isEmpty()) {
 
-            Artifact savedArtifact = artifactRepository.save(artifact);
+            artifactRepository.save(artifact);
 
             try (Stream<Path> stream = Files.list(path)) {
                 for (Path p : stream.collect(Collectors.toList())) {
                     logger.debug("File:" + p.getFileName());
-                    processCompositionPath(p, savedArtifact);
+                    processCompositionPath(p, artifact);
                 }
             } catch (IOException e) {
                 throw new ProcessorException("Error processing files: " + e.getMessage());
@@ -125,7 +125,7 @@ public class LoadMP3Processor extends AbstractProcessor {
         }
 
         String compositionName = path.getFileName().toString();
-        if (compositionName.endsWith("mp3")) {
+        if (!compositionName.endsWith("mp3")) {
             errorHandler("Wrong file type: " + path.toAbsolutePath());
         }
 

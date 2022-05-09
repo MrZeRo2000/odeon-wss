@@ -16,14 +16,16 @@ import java.util.stream.Collectors;
 
 
 public class FFMPEGMediaFileParser implements MediaFileParserInterface {
+    private final static String FFPROBE_FILE_NAME = "ffprobe.exe";
+
     private final String executableFileName;
 
     public String getExecutableFileName() {
         return executableFileName;
     }
 
-    public FFMPEGMediaFileParser(String executableFileName) {
-        this.executableFileName = executableFileName;
+    public FFMPEGMediaFileParser(String ffprobePath) {
+        this.executableFileName = ffprobePath + FFPROBE_FILE_NAME;
     }
 
     @Override

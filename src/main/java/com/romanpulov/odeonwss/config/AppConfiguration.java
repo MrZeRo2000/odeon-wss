@@ -15,6 +15,8 @@ public class AppConfiguration {
 
     private final String mdbPath;
 
+    private final String ffprobePath;
+
     public String getDbUrl() {
         return dbUrl;
     }
@@ -31,10 +33,15 @@ public class AppConfiguration {
         return mdbPath;
     }
 
+    public String getFFProbePath() {
+        return ffprobePath;
+    }
+
     public AppConfiguration(ServletContext context) {
         dbUrl = context.getInitParameter("db-url");
         mp3Path = context.getInitParameter("mp3-path");
         laPath = context.getInitParameter("la-path");
         mdbPath = context.getInitParameter("mdb-path");
+        ffprobePath = context.getInitParameter("ffprobe-path");
     }
 }
