@@ -1,13 +1,7 @@
 package com.romanpulov.odeonwss;
 
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.Composition;
-import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
-import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.repository.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +11,8 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -35,6 +31,9 @@ public class RepositoryArtifactTests {
 
     @Autowired
     CompositionRepository compositionRepository;
+
+    @Autowired
+    MediaFileRepository mediaFileRepository;
 
     @Test
     @Order(1)
@@ -110,7 +109,24 @@ public class RepositoryArtifactTests {
 
         Assertions.assertEquals(2, compositionRepository.getCompositionsByArtifact(artifact).size());
 
+        //insert media file
+        Assertions.assertEquals(0, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
+        MediaFile mediaFile = new EntityMediaFileBuilder()
+                .withArtifact(artifact)
+                .withFormat("mp3")
+                .withName("File Name.mp3")
+                .withDuration(123456L)
+                .withSize(888888L)
+                .build();
+        mediaFileRepository.save(mediaFile);
+        Assertions.assertEquals(1, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
+
         artifactRepository.delete(artifact);
+
+        //compositions deleted
         Assertions.assertEquals(0, compositionRepository.getCompositionsByArtifact(artifact).size());
+
+        //media files deleted
+        Assertions.assertEquals(0, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
     }
 }
