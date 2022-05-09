@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -79,10 +80,21 @@ public class RepositoryArtifactTests {
         log.info("Saved artifact summary:" + artifact);
 
         Assertions.assertEquals(1, artifactRepository.getArtifactsByArtist(artist).size());
+
     }
 
     @Test
     @Order(3)
+    @Transactional
+    void testGetManyToOne() {
+        Artist artist = artistRepository.getAllByType(ArtistTypes.A.name()).get(0);
+
+        Artifact loadedArtifact = artifactRepository.getArtifactsByArtist(artist).get(0);
+        Assertions.assertEquals(loadedArtifact.getArtist().getName(), artist.getName());
+    }
+
+    @Test
+    @Order(4)
     void testCascade() {
         Artifact artifact = artifactRepository.findAll().iterator().next();
         Assertions.assertNotNull(artifact);
