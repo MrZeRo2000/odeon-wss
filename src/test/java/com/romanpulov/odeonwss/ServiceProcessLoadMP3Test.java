@@ -85,6 +85,21 @@ public class ServiceProcessLoadMP3Test {
     @Test
     @Order(4)
     @Sql({"/schema.sql", "/data.sql"})
+    void testOneArtistNotExists() {
+        artistRepository.save(
+                new EntityArtistBuilder()
+                        .withType(ArtistTypes.A.name())
+                        .withName("Kosheen")
+                        .build()
+        );
+        log.info("Created artist");
+        Assertions.assertDoesNotThrow(() -> service.executeProcessor(ProcessorType.MP3_LOADER, "D:/Temp/ok/MP3 Music/"));
+        Assertions.assertEquals(ProcessingStatus.WARNING, service.getLastProcessingStatus());
+    }
+
+    @Test
+    @Order(5)
+    @Sql({"/schema.sql", "/data.sql"})
     void testOk() {
         Arrays.asList("Aerosmith", "Kosheen").forEach(s ->
                 artistRepository.save(
@@ -99,18 +114,4 @@ public class ServiceProcessLoadMP3Test {
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getLastProcessingStatus());
     }
 
-    @Test
-    @Order(5)
-    @Sql({"/schema.sql", "/data.sql"})
-    void testOneArtistNotExists() {
-        artistRepository.save(
-                new EntityArtistBuilder()
-                        .withType(ArtistTypes.A.name())
-                        .withName("Kosheen")
-                        .build()
-        );
-        log.info("Created artist");
-        Assertions.assertDoesNotThrow(() -> service.executeProcessor(ProcessorType.MP3_LOADER, "D:/Temp/ok/MP3 Music/"));
-        Assertions.assertEquals(ProcessingStatus.WARNING, service.getLastProcessingStatus());
-    }
 }
