@@ -1,9 +1,8 @@
 package com.romanpulov.odeonwss;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
-import org.hibernate.HibernateException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,7 +37,7 @@ public class RepositoryCompositionTests {
     @Sql({"/schema.sql", "/data.sql"})
     void testInsertGet() {
         //ArtifactType
-        ArtifactType artifactType = artifactTypeRepository.findAllById(List.of(100L)).iterator().next();
+        ArtifactType artifactType = artifactTypeRepository.findAllById(List.of(ArtifactType.withMP3().getId())).iterator().next();
         Assertions.assertNotNull(artifactType);
 
         //Artist
@@ -59,6 +58,13 @@ public class RepositoryCompositionTests {
         Artifact savedArtifact = artifactRepository.save(artifact);
         Assertions.assertNotNull(savedArtifact.getId());
         Assertions.assertEquals(1982L, savedArtifact.getYear());
+
+        //validation DTO without composition
+        List<CompositionValidationDTO> compositionValidationList = compositionRepository.getCompositionValidationMusic(ArtifactType.withMP3());
+        Assertions.assertNotNull(compositionValidationList.get(0).getArtistName());
+        Assertions.assertNotNull(compositionValidationList.get(0).getArtifactTitle());
+        Assertions.assertNull(compositionValidationList.get(0).getCompositionNum());
+        Assertions.assertNull(compositionValidationList.get(0).getCompositionTitle());
 
         //Composition 1
         Composition wrong_composition = new EntityCompositionBuilder()
@@ -101,6 +107,14 @@ public class RepositoryCompositionTests {
 
     @Test
     @Order(2)
+    void testValidationDTO() {
+        List<CompositionValidationDTO> compositionValidationList = compositionRepository.getCompositionValidationMusic(ArtifactType.withMP3());
+        Assertions.assertEquals(2, compositionValidationList.size());
+        Assertions.assertEquals(1982, compositionValidationList.get(0).getArtifactYear());
+    }
+
+    @Test
+    @Order(3)
     void testCascade() {
         Iterable<Composition> compositions = compositionRepository.findAll();
         List<Composition> compositionList = StreamSupport.stream(compositions.spliterator(), false).collect(Collectors.toList());
