@@ -8,17 +8,25 @@ public class ProcessorFactory {
 
     private final AppConfiguration appConfiguration;
 
-    private final LoadMP3Processor loadMP3Processor;
+    private final MP3LoadProcessor mp3LoadProcessor;
+    private final MP3ValidateProcessor mp3ValidateProcessor;
 
-    public ProcessorFactory(AppConfiguration appConfiguration, LoadMP3Processor loadMP3Processor) {
+    public ProcessorFactory(AppConfiguration appConfiguration, MP3LoadProcessor mp3LoadProcessor, MP3ValidateProcessor mp3ValidateProcessor) {
         this.appConfiguration = appConfiguration;
-        this.loadMP3Processor = loadMP3Processor;
+        this.mp3LoadProcessor = mp3LoadProcessor;
+        this.mp3ValidateProcessor = mp3ValidateProcessor;
     }
 
     public AbstractProcessor fromProcessorType(ProcessorType processorType, ProgressHandler handler) {
+        AbstractProcessor processor;
         switch (processorType) {
             case MP3_LOADER:
-                AbstractProcessor processor = loadMP3Processor;
+                processor = mp3LoadProcessor;
+                processor.setProgressHandler(handler);
+                processor.setRootFolder(appConfiguration.getMp3Path());
+                return processor;
+            case MP3_VALIDATOR:
+                processor = mp3ValidateProcessor;
                 processor.setProgressHandler(handler);
                 processor.setRootFolder(appConfiguration.getMp3Path());
                 return processor;

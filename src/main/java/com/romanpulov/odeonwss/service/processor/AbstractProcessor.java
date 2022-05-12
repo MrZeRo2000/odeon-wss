@@ -21,7 +21,7 @@ public abstract class AbstractProcessor {
         this.rootFolder = rootFolder;
     }
 
-    abstract public void execute() throws Exception;
+    abstract public void execute() throws ProcessorException;
 
     protected void errorHandler(String errorMessage) {
         progressHandler.handleProgress(ProgressInfo.fromErrorMessage(errorMessage));

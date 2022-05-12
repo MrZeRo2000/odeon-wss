@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 public class NamesParser {
     private static final Pattern REGEXP_PATTERN_MUSIC_ARTIFACT = Pattern.compile("^((?:19|20)[0-9]{2})\\s(\\S.*)");
     private static final Pattern REGEXP_PATTERN_MUSIC_COMPOSITION = Pattern.compile("^([0-9][0-9])\\s-\\s(\\S.*)(?:\\.\\S{2,4})$");
+    private static final String FORMAT_MUSIC_ARTIFACT = "%d %s";
+    private static final String FORMAT_MUSIC_COMPOSITION = "%d - %s";
 
     public static class YearTitle {
         private final int year;
@@ -58,6 +60,10 @@ public class NamesParser {
         }
     }
 
+    public static String formatMusicArtifact(long year, String title) {
+        return String.format(FORMAT_MUSIC_ARTIFACT, year, title);
+    }
+
     public static boolean validateMusicComposition(String name) {
         return REGEXP_PATTERN_MUSIC_COMPOSITION.matcher(name).matches();
     }
@@ -71,4 +77,7 @@ public class NamesParser {
         }
     }
 
+    public static String formatMusicComposition(long num, String title) {
+        return String.format(FORMAT_MUSIC_COMPOSITION, num, title);
+    }
 }

@@ -23,9 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component
-public class LoadMP3Processor extends AbstractProcessor {
+public class MP3LoadProcessor extends AbstractFileSystemProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoadMP3Processor.class);
+    private static final Logger logger = LoggerFactory.getLogger(MP3LoadProcessor.class);
 
     private final ArtistRepository artistRepository;
 
@@ -42,7 +42,7 @@ public class LoadMP3Processor extends AbstractProcessor {
         private long size;
     }
 
-    public LoadMP3Processor(
+    public MP3LoadProcessor(
             ArtistRepository artistRepository,
             ArtifactRepository artifactRepository,
             CompositionRepository compositionRepository,
@@ -57,13 +57,7 @@ public class LoadMP3Processor extends AbstractProcessor {
 
     @Override
     public void execute() throws ProcessorException {
-        Path path = Path.of(Optional.ofNullable(
-                rootFolder).orElseThrow(() -> new ProcessorException("MP3 file not specified")
-        ));
-
-        if (Files.notExists(path)) {
-            throw new ProcessorException("Path not found:" + path);
-        }
+        Path path = validateAndGetPath();
 
         try (Stream<Path> stream = Files.list(path)){
             for (Path p : stream.collect(Collectors.toList())) {
@@ -71,13 +65,13 @@ public class LoadMP3Processor extends AbstractProcessor {
                 processArtistsPath(p);
             }
         } catch (IOException e) {
-            throw new ProcessorException("Exception:" + e.getMessage());
+            throw new ProcessorException(String.format(ProcessorMessages.ERROR_EXCEPTION,  e.getMessage()));
         }
     }
 
     private void processArtistsPath(Path path) throws ProcessorException {
         if (!Files.isDirectory(path)) {
-            errorHandler("Expected directory, found " + path.getFileName());
+            errorHandler(String.format(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, path.getFileName()));
             return;
         }
 
@@ -85,7 +79,7 @@ public class LoadMP3Processor extends AbstractProcessor {
 
         Optional<Artist> artist = artistRepository.findFirstByTypeAndName(ArtistTypes.A.name(), artistName);
         if (artist.isEmpty()) {
-            warningHandlerWithAddArtistAction(String.format("Artist %s not found", artistName), artistName);
+            warningHandlerWithAddArtistAction(String.format(ProcessorMessages.ERROR_ARTIST_NOT_FOUND, artistName), artistName);
             return;
         }
 
@@ -101,7 +95,7 @@ public class LoadMP3Processor extends AbstractProcessor {
 
     private void processArtifactsPath(Path path, Artist artist) throws ProcessorException {
         if (!Files.isDirectory(path)) {
-            errorHandler("Expected directory, found " + path.getFileName());
+            errorHandler(String.format(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, path.getFileName()));
             return;
         }
 
@@ -109,7 +103,7 @@ public class LoadMP3Processor extends AbstractProcessor {
 
         NamesParser.YearTitle yt = NamesParser.parseMusicArtifactTitle(artifactName);
         if (yt == null) {
-            errorHandler("Error parsing artifact name:" + path.toAbsolutePath().getFileName());
+            errorHandler(String.format(ProcessorMessages.ERROR_PARSING_ARTIFACT_NAME, path.toAbsolutePath().getFileName()));
             return;
         }
 
@@ -134,7 +128,7 @@ public class LoadMP3Processor extends AbstractProcessor {
             try (Stream<Path> stream = Files.list(path)) {
                 compositionPaths = stream.collect(Collectors.toList());
             } catch (IOException e) {
-                throw new ProcessorException("Error processing files: " + e.getMessage());
+                throw new ProcessorException(String.format(ProcessorMessages.ERROR_PROCESSING_FILES, e.getMessage()));
             }
 
             Map<String, NamesParser.NumberTitle> parsedCompositionFileNames = parseCompositionFileNames(compositionPaths);
@@ -157,19 +151,19 @@ public class LoadMP3Processor extends AbstractProcessor {
 
         for (Path path: compositionPaths) {
             if (Files.isDirectory(path)) {
-                errorHandler("Expected file, found: " + path.toAbsolutePath());
+                errorHandler(String.format(ProcessorMessages.ERROR_EXPECTED_FILE,  path.toAbsolutePath()));
                 return null;
             }
 
             String compositionFileName = path.getFileName().toString();
             if (!compositionFileName.endsWith("mp3")) {
-                errorHandler("Wrong file type: " + path.toAbsolutePath());
+                errorHandler(String.format(ProcessorMessages.ERROR_WRONG_FILE_TYPE, path.toAbsolutePath()));
                 return null;
             }
 
             NamesParser.NumberTitle nt = NamesParser.parseMusicComposition(compositionFileName);
             if (nt == null) {
-                errorHandler("Error parsing composition:" + path.toAbsolutePath().getFileName());
+                errorHandler(String.format(ProcessorMessages.ERROR_PARSING_COMPOSITION_NAME, path.toAbsolutePath().getFileName()));
                 return null;
             }
 
@@ -216,7 +210,7 @@ public class LoadMP3Processor extends AbstractProcessor {
                 result.put(futureData.getFirst(), futureData.getSecond());
             }
         } catch (ExecutionException | InterruptedException e) {
-            errorHandler("Error parsing file:" + e.getMessage());
+            errorHandler(String.format(ProcessorMessages.ERROR_PARSING_FILE, e.getMessage()));
             return null;
         }
 
@@ -238,7 +232,7 @@ public class LoadMP3Processor extends AbstractProcessor {
             NamesParser.NumberTitle nt = parsedCompositionNames.get(fileName);
             MediaFileInfo mediaFileInfo = parsedCompositionsMediaInfo.get(fileName);
             if ((nt == null) || (mediaFileInfo == null)) {
-                throw new ProcessorException("No data for " + fileName);
+                throw new ProcessorException(String.format(ProcessorMessages.ERROR_NO_DATA_FOR_FILE, fileName));
             } else {
                 Composition composition = new Composition();
                 composition.setArtifact(artifact);

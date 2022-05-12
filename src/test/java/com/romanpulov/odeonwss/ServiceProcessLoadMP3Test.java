@@ -65,7 +65,7 @@ public class ServiceProcessLoadMP3Test {
     void testDirectoryWithFiles() throws Exception {
         service.executeProcessor(ProcessorType.MP3_LOADER, "");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getLastProcessingStatus());
-        Assertions.assertTrue(service.getProgress().stream().anyMatch(p -> p.getInfo().contains("directory, found ")));
+        Assertions.assertTrue(service.getProgress().stream().anyMatch(p -> p.getInfo().contains("directory, found:")));
     }
 
     @Test
