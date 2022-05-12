@@ -60,6 +60,10 @@ public class ProcessService implements ProgressHandler {
         progress.add(progressInfo);
     }
 
+    public void executeProcessor(ProcessorType processorType) throws Exception {
+        executeProcessor(processorType, null);
+    }
+
     synchronized public void executeProcessor(ProcessorType processorType, String rootPath) throws Exception {
         logger.debug("Starting execution: " + processorType + ", parameter path: " + rootPath);
 
