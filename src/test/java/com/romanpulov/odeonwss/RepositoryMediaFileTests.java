@@ -1,24 +1,21 @@
 package com.romanpulov.odeonwss;
 
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
+import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
+import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
+import com.romanpulov.odeonwss.repository.CompositionRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql({"/schema.sql", "/data.sql"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RepositoryMediaFileTests {
 
@@ -31,9 +28,14 @@ public class RepositoryMediaFileTests {
     ArtifactRepository artifactRepository;
 
     @Autowired
+    CompositionRepository compositionRepository;
+
+    @Autowired
     MediaFileRepository mediaFileRepository;
 
     @Test
+    @Order(1)
+    @Sql({"/schema.sql", "/data.sql"})
     void testCreateGet() {
         Artist artist = new EntityArtistBuilder()
                 .withType("A")
@@ -52,8 +54,18 @@ public class RepositoryMediaFileTests {
 
         artifactRepository.save(artifact);
 
-        MediaFile mediaFile = new EntityMediaFileBuilder()
+        Composition composition = new EntityCompositionBuilder()
                 .withArtifact(artifact)
+                .withTitle("Composition title")
+                .withNum(1L)
+                .withDiskNum(1L)
+                .withDuration(123456L)
+                .build();
+
+        compositionRepository.save(composition);
+
+        MediaFile mediaFile = new EntityMediaFileBuilder()
+                .withComposition(composition)
                 .withName("AAA.mp3")
                 .withFormat("MP3")
                 .withSize(423L)
@@ -63,7 +75,7 @@ public class RepositoryMediaFileTests {
 
         MediaFile savedMediaFile = mediaFileRepository.save(mediaFile);
         Assertions.assertNotNull(savedMediaFile.getId());
-        Assertions.assertEquals(artifact, mediaFile.getArtifact());
+        Assertions.assertEquals(composition, mediaFile.getComposition());
         Assertions.assertEquals(savedMediaFile.getName(), mediaFile.getName());
         Assertions.assertEquals(savedMediaFile.getFormat(), mediaFile.getFormat());
         Assertions.assertEquals(savedMediaFile.getSize(), mediaFile.getSize());
@@ -71,5 +83,12 @@ public class RepositoryMediaFileTests {
         Assertions.assertEquals(savedMediaFile.getBitrate(), mediaFile.getBitrate());
 
         log.info("Saved MediaFile:" + savedMediaFile);
+    }
+
+    @Test
+    @Order(2)
+    void testDTO() {
+        List<MediaFileValidationDTO> mediaFileValidation = mediaFileRepository.getMediaFileValidationMusic(ArtifactType.withMP3());
+        Assertions.assertEquals(1, mediaFileValidation.size());
     }
 }
