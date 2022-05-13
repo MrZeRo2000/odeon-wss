@@ -36,6 +36,14 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor {
 
         if (validateArtistNames(pathValidation, dbValidation)) {
             infoHandler(ProcessorMessages.INFO_ARTISTS_VALIDATED);
+
+            if (validateArtifacts(pathValidation, dbValidation)) {
+                infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
+
+                if (validateCompositions(pathValidation, dbValidation)) {
+                    infoHandler(ProcessorMessages.INFO_COMPOSITIONS_VALIDATED);
+                }
+            }
         }
     }
 
@@ -129,26 +137,89 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor {
         }
     }
 
-    private boolean validateArtistNames(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
+    private boolean compareStringSets(
+            Set<String> pathStrings,
+            Set<String> dbStrings,
+            String pathErrorMessage,
+            String dbErrorMessage)
+    {
         boolean result = true;
 
-        Set<String> pathArtistNames = pathValidation.stream().map(CompositionValidationDTO::getArtistName).collect(Collectors.toUnmodifiableSet());
-        Set<String> dbArtistNames = dbValidation.stream().map(CompositionValidationDTO::getArtistName).collect(Collectors.toUnmodifiableSet());
-
-        Set<String> pathArtistNamesDiff = new HashSet<>(pathArtistNames);
-        pathArtistNamesDiff.removeAll(dbArtistNames);
-        if (!pathArtistNamesDiff.isEmpty()) {
-            errorHandler(String.format(ProcessorMessages.ERROR_ARTISTS_NOT_IN_DB, String.join(",", pathArtistNamesDiff)));
+        Set<String> pathStringsDiff = new HashSet<>(pathStrings);
+        pathStringsDiff.removeAll(dbStrings);
+        if (!pathStringsDiff.isEmpty()) {
+            errorHandler(String.format(dbErrorMessage, String.join(",", pathStringsDiff)));
             result = false;
         }
 
-        Set<String> dbArtistNamesDiff = new HashSet<>(dbArtistNames);
-        dbArtistNamesDiff.removeAll(pathArtistNames);
-        if (!dbArtistNamesDiff.isEmpty()) {
-            errorHandler(String.format(ProcessorMessages.ERROR_ARTISTS_NOT_IN_FILES, String.join(",", dbArtistNamesDiff)));
+        Set<String> dbStringsDiff = new HashSet<>(dbStrings);
+        dbStringsDiff.removeAll(pathStrings);
+        if (!dbStringsDiff.isEmpty()) {
+            errorHandler(String.format(pathErrorMessage, String.join(",", dbStringsDiff)));
             result = false;
         }
 
         return result;
+
     }
+
+    private boolean validateArtistNames(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
+
+        Set<String> pathArtistNames = pathValidation.stream().map(CompositionValidationDTO::getArtistName).collect(Collectors.toSet());
+        Set<String> dbArtistNames = dbValidation.stream().map(CompositionValidationDTO::getArtistName).collect(Collectors.toSet());
+
+        return compareStringSets(
+                pathArtistNames,
+                dbArtistNames,
+                ProcessorMessages.ERROR_ARTISTS_NOT_IN_FILES,
+                ProcessorMessages.ERROR_ARTISTS_NOT_IN_DB
+        );
+    }
+
+    private boolean validateArtifacts(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
+        Set<String> pathArtifacts = pathValidation.stream()
+                .map(d -> d.getArtistName() +
+                        ProcessorMessages.FORMAT_PATH_DELIMITER +
+                        NamesParser.formatMusicArtifact(d.getArtifactYear(), d.getArtifactTitle()))
+                .collect(Collectors.toSet());
+        Set<String> dbArtifacts = dbValidation.stream()
+                .map(d -> d.getArtistName() +
+                        ProcessorMessages.FORMAT_PATH_DELIMITER +
+                        NamesParser.formatMusicArtifact(d.getArtifactYear(), d.getArtifactTitle()))
+                .collect(Collectors.toSet());
+
+        return compareStringSets(
+                pathArtifacts,
+                dbArtifacts,
+                ProcessorMessages.ERROR_ARTIFACTS_NOT_IN_FILES,
+                ProcessorMessages.ERROR_ARTIFACTS_NOT_IN_DB
+        );
+    }
+
+    private boolean validateCompositions(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
+        Set<String> pathCompositions = pathValidation.stream()
+                .map(d ->
+                        d.getArtistName() +
+                        ProcessorMessages.FORMAT_PATH_DELIMITER +
+                        NamesParser.formatMusicArtifact(d.getArtifactYear(), d.getArtifactTitle()) +
+                        ProcessorMessages.FORMAT_PATH_DELIMITER +
+                        NamesParser.formatMusicCompositionWithFile(d.getCompositionNum(), d.getCompositionTitle(), d.getMediaFileName()))
+                .collect(Collectors.toSet());
+        Set<String> dbCompositions = dbValidation.stream()
+                .map(d ->
+                        d.getArtistName() +
+                        ProcessorMessages.FORMAT_PATH_DELIMITER +
+                        NamesParser.formatMusicArtifact(d.getArtifactYear(), d.getArtifactTitle()) +
+                        ProcessorMessages.FORMAT_PATH_DELIMITER +
+                        NamesParser.formatMusicCompositionWithFile(d.getCompositionNum(), d.getCompositionTitle(), d.getMediaFileName()))
+                .collect(Collectors.toSet());
+
+        return compareStringSets(
+                pathCompositions,
+                dbCompositions,
+                ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_FILES,
+                ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_DB
+        );
+    }
+
 }

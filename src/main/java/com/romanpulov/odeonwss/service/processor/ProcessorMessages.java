@@ -18,4 +18,14 @@ public class ProcessorMessages {
     static final String ERROR_ARTISTS_NOT_IN_FILES = "Artists not in files: %s";
     static final String INFO_ARTISTS_VALIDATED = "Artists validated";
 
+    static final String ERROR_ARTIFACTS_NOT_IN_DB = "Artifacts not in database: %s";
+    static final String ERROR_ARTIFACTS_NOT_IN_FILES = "Artifacts not in files: %s";
+    static final String INFO_ARTIFACTS_VALIDATED = "Artifacts validated";
+
+    static final String ERROR_COMPOSITIONS_NOT_IN_DB = "Compositions not in database: %s";
+    static final String ERROR_COMPOSITIONS_NOT_IN_FILES = "Compositions not in files: %s";
+    static final String INFO_COMPOSITIONS_VALIDATED = "Compositions validated";
+
+    static final String FORMAT_PATH_DELIMITER = " >> ";
+
 }

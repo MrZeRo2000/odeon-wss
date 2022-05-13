@@ -8,6 +8,7 @@ public class NamesParser {
     private static final Pattern REGEXP_PATTERN_MUSIC_COMPOSITION = Pattern.compile("^([0-9][0-9])\\s-\\s(\\S.*)(?:\\.\\S{2,4})$");
     private static final String FORMAT_MUSIC_ARTIFACT = "%d %s";
     private static final String FORMAT_MUSIC_COMPOSITION = "%d - %s";
+    private static final String FORMAT_MUSIC_WITH_FILE_NAME = "%d - %s (%s)";
 
     public static class YearTitle {
         private final int year;
@@ -79,5 +80,9 @@ public class NamesParser {
 
     public static String formatMusicComposition(long num, String title) {
         return String.format(FORMAT_MUSIC_COMPOSITION, num, title);
+    }
+
+    public static String formatMusicCompositionWithFile(long num, String title, String fileName) {
+        return String.format(FORMAT_MUSIC_WITH_FILE_NAME, num, title, fileName);
     }
 }
