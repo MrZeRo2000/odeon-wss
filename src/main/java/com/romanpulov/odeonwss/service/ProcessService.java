@@ -29,6 +29,10 @@ public class ProcessService implements ProgressHandler {
         return progress;
     }
 
+    synchronized public boolean isRunning() {
+        return currentProcessor.get() != null;
+    }
+
     public ProcessingStatus getLastProcessingStatus() {
         if (progress == null) {
             return ProcessingStatus.NOT_RUNNING;
@@ -85,9 +89,6 @@ public class ProcessService implements ProgressHandler {
 
             // get task status
             progress.add(ProgressInfo.createTaskStatus(progress));
-
-            // clear processor
-            currentProcessor.set(null);
         } catch (Exception e) {
             progress.add(ProgressInfo.fromException(e));
         } finally {

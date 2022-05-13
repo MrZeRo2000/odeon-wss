@@ -44,6 +44,10 @@ public class ProgressInfo {
         return fromErrorMessage(e.getMessage());
     }
 
+    public static ProgressInfo fromInfoMessage(String errorMessage) {
+        return new ProgressInfo(errorMessage, ProcessingStatus.INFO);
+    }
+
     public static ProgressInfo fromErrorMessage(String errorMessage) {
         return new ProgressInfo(errorMessage, ProcessingStatus.FAILURE);
     }

@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
+import com.romanpulov.odeonwss.dto.MediaFileValidationDTOBuilder;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import org.slf4j.Logger;
@@ -11,9 +12,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,10 +32,11 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor {
         Path path = validateAndGetPath();
 
         List<MediaFileValidationDTO> pathValidation = loadFromPath(path);
-        List<MediaFileValidationDTO> mediaFileValidation = mediaFileRepository.getMediaFileValidationMusic(ArtifactType.withMP3());
+        List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getMediaFileValidationMusic(ArtifactType.withMP3());
 
-        List<String> artistNames = mediaFileValidation.stream().map(CompositionValidationDTO::getArtifactTitle).distinct().collect(Collectors.toList());
-
+        if (validateArtistNames(pathValidation, dbValidation)) {
+            infoHandler(ProcessorMessages.INFO_ARTISTS_VALIDATED);
+        }
     }
 
     private List<MediaFileValidationDTO> loadFromPath(Path path) throws ProcessorException {
@@ -83,6 +83,11 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor {
         NamesParser.YearTitle yt = NamesParser.parseMusicArtifactTitle(artifactPath.getFileName().toString());
         if (yt == null) {
             errorHandler(String.format(ProcessorMessages.ERROR_PARSING_ARTIFACT_NAME, artifactPath.getFileName().toString()));
+            result.add(
+                    new MediaFileValidationDTOBuilder()
+                            .withArtistName(artistPath.getFileName().toString())
+                            .build()
+            );
         } else {
             try (Stream<Path> compositionPathStream = Files.list(artifactPath)) {
                 compositionPathStream.forEach(compositionPath -> {
@@ -96,6 +101,13 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor {
                         NamesParser.NumberTitle nt = NamesParser.parseMusicComposition(compositionFileName);
                         if (nt == null) {
                             errorHandler(String.format(ProcessorMessages.ERROR_PARSING_COMPOSITION_NAME, compositionPath.toAbsolutePath().getFileName()));
+                            result.add(
+                              new MediaFileValidationDTOBuilder()
+                                      .withArtistName(artistPath.getFileName().toString())
+                                      .withArtifactTitle(yt.getTitle())
+                                      .withArtifactYear(yt.getYear())
+                                      .build()
+                            );
                         } else {
                             result.add(new MediaFileValidationDTO(
                                     artistPath.getFileName().toString(),
@@ -115,5 +127,28 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor {
                 throw new ProcessorException(String.format(ProcessorMessages.ERROR_EXCEPTION, e.getMessage()));
             }
         }
+    }
+
+    private boolean validateArtistNames(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
+        boolean result = true;
+
+        Set<String> pathArtistNames = pathValidation.stream().map(CompositionValidationDTO::getArtistName).collect(Collectors.toUnmodifiableSet());
+        Set<String> dbArtistNames = dbValidation.stream().map(CompositionValidationDTO::getArtistName).collect(Collectors.toUnmodifiableSet());
+
+        Set<String> pathArtistNamesDiff = new HashSet<>(pathArtistNames);
+        pathArtistNamesDiff.removeAll(dbArtistNames);
+        if (!pathArtistNamesDiff.isEmpty()) {
+            errorHandler(String.format(ProcessorMessages.ERROR_ARTISTS_NOT_IN_DB, String.join(",", pathArtistNamesDiff)));
+            result = false;
+        }
+
+        Set<String> dbArtistNamesDiff = new HashSet<>(dbArtistNames);
+        dbArtistNamesDiff.removeAll(pathArtistNames);
+        if (!dbArtistNamesDiff.isEmpty()) {
+            errorHandler(String.format(ProcessorMessages.ERROR_ARTISTS_NOT_IN_FILES, String.join(",", dbArtistNamesDiff)));
+            result = false;
+        }
+
+        return result;
     }
 }

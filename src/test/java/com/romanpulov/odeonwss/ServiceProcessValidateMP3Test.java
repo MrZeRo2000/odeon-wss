@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss;
 
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistTypes;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.service.ProcessService;
@@ -33,5 +34,13 @@ public class ServiceProcessValidateMP3Test {
     void testOk() throws Exception {
         service.executeProcessor(ProcessorType.MP3_VALIDATOR);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getLastProcessingStatus());
+    }
+
+    @Test
+    @Order(3)
+    void testMissingFileArtist() throws Exception {
+        service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/wrong_artifact_title/");
+        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getLastProcessingStatus());
+        Assertions.assertTrue(service.getLastProgressInfo().getInfo().contains("Artists not in files"));
     }
 }

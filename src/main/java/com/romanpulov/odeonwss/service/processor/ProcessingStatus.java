@@ -6,6 +6,7 @@ package com.romanpulov.odeonwss.service.processor;
 public enum ProcessingStatus {
     IN_PROGRESS,
     SUCCESS,
+    INFO,
     FAILURE,
     WARNING,
     NOT_RUNNING

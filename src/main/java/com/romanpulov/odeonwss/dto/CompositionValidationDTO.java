@@ -3,34 +3,54 @@ package com.romanpulov.odeonwss.dto;
 import java.util.Objects;
 
 public class CompositionValidationDTO {
-    private final String artistName;
+    private String artistName;
 
     public String getArtistName() {
         return artistName;
     }
 
-    private final String artifactTitle;
+    public void setArtistName(String artistName) {
+        this.artistName = artistName;
+    }
+
+    private String artifactTitle;
 
     public String getArtifactTitle() {
         return artifactTitle;
     }
 
-    private final Long artifactYear;
+    public void setArtifactTitle(String artifactTitle) {
+        this.artifactTitle = artifactTitle;
+    }
+
+    private Long artifactYear;
 
     public Long getArtifactYear() {
         return artifactYear;
     }
 
-    private final Long compositionNum;
+    public void setArtifactYear(Long artifactYear) {
+        this.artifactYear = artifactYear;
+    }
+
+    private Long compositionNum;
 
     public Long getCompositionNum() {
         return compositionNum;
     }
 
-    private final String compositionTitle;
+    public void setCompositionNum(Long compositionNum) {
+        this.compositionNum = compositionNum;
+    }
+
+    private String compositionTitle;
 
     public String getCompositionTitle() {
         return compositionTitle;
+    }
+
+    public void setCompositionTitle(String compositionTitle) {
+        this.compositionTitle = compositionTitle;
     }
 
     public CompositionValidationDTO(String artistName, String artifactTitle, Long artifactYear, Long compositionNum, String compositionTitle) {
@@ -40,6 +60,8 @@ public class CompositionValidationDTO {
         this.compositionNum = compositionNum;
         this.compositionTitle = compositionTitle;
     }
+
+    public CompositionValidationDTO() {}
 
     @Override
     public boolean equals(Object o) {

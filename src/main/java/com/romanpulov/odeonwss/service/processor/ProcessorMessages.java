@@ -13,4 +13,9 @@ public class ProcessorMessages {
     static final String ERROR_PROCESSING_FILES = "Error processing files: %s";
     static final String ERROR_WRONG_FILE_TYPE = "Wrong file type: %s";
     static final String ERROR_NO_DATA_FOR_FILE = "No data for file: %s";
+
+    static final String ERROR_ARTISTS_NOT_IN_DB = "Artists not in database: %s";
+    static final String ERROR_ARTISTS_NOT_IN_FILES = "Artists not in files: %s";
+    static final String INFO_ARTISTS_VALIDATED = "Artists validated";
+
 }

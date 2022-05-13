@@ -3,16 +3,24 @@ package com.romanpulov.odeonwss.dto;
 import java.util.Objects;
 
 public class MediaFileValidationDTO extends CompositionValidationDTO {
-    private final String mediaFileName;
+    private String mediaFileName;
 
     public String getMediaFileName() {
         return mediaFileName;
     }
 
-    private final String mediaFileFormat;
+    public void setMediaFileName(String mediaFileName) {
+        this.mediaFileName = mediaFileName;
+    }
+
+    private String mediaFileFormat;
 
     public String getMediaFileFormat() {
         return mediaFileFormat;
+    }
+
+    public void setMediaFileFormat(String mediaFileFormat) {
+        this.mediaFileFormat = mediaFileFormat;
     }
 
     public MediaFileValidationDTO(String artistName, String artifactTitle, Long artifactYear, Long compositionNum, String compositionTitle, String mediaFileName, String mediaFileFormat) {
@@ -20,6 +28,8 @@ public class MediaFileValidationDTO extends CompositionValidationDTO {
         this.mediaFileName = mediaFileName;
         this.mediaFileFormat = mediaFileFormat;
     }
+
+    public MediaFileValidationDTO() {}
 
     @Override
     public boolean equals(Object o) {
