@@ -46,6 +46,9 @@ dependencies {
 	//json
 	implementation 'org.json:json:20220320'
 
+	//custom configuration
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
 	//test
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

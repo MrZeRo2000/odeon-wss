@@ -65,7 +65,7 @@ public class ProcessService implements ProgressHandler {
         progress.add(progressInfo);
     }
 
-    public void executeProcessor(ProcessorType processorType) throws Exception {
+    public void executeProcessor(ProcessorType processorType) {
         executeProcessor(processorType, null);
     }
 
@@ -97,5 +97,10 @@ public class ProcessService implements ProgressHandler {
         } finally {
             currentProcessor.set(null);
         }
+    }
+
+    @Async
+    public void executeProcessorAsync(ProcessorType processorType) throws Exception {
+        executeProcessor(processorType);
     }
 }

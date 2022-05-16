@@ -10,22 +10,22 @@ import java.util.Objects;
 
 @Component
 public class DatabaseConfiguration {
-    private final Environment env;
+    private final DatabaseConfigurationProperties databaseConfigurationProperties;
     private final AppConfiguration appConfiguration;
 
     @Autowired
-    public DatabaseConfiguration(Environment env, AppConfiguration appConfiguration) {
-        this.env = env;
+    public DatabaseConfiguration(AppConfiguration appConfiguration, DatabaseConfigurationProperties databaseConfigurationProperties) {
         this.appConfiguration = appConfiguration;
+        this.databaseConfigurationProperties = databaseConfigurationProperties;
     }
 
     @Bean
     public DataSource dataSource() {
         final DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(Objects.requireNonNull(env.getProperty("db.driverClassName")));
+        dataSource.setDriverClassName(Objects.requireNonNull(databaseConfigurationProperties.getDriverClassName()));
         dataSource.setUrl(appConfiguration.getDbUrl());
-        dataSource.setUsername(env.getProperty("db.username"));
-        dataSource.setPassword(env.getProperty("db.password"));
+        dataSource.setUsername(databaseConfigurationProperties.getUsername());
+        dataSource.setPassword(databaseConfigurationProperties.getPassword());
         return dataSource;
     }
 }
