@@ -1,19 +1,19 @@
-package com.romanpulov.odeonwss;
+package com.romanpulov.odeonwss.configuration;
 
-import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.utils.media.MediaFileParserInterface;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ConfigurationAppTest {
+public class ConfigurationMediaFileParserTest {
 
     @Autowired
-    AppConfiguration appConfiguration;
+    MediaFileParserInterface mediaFileParser;
 
     @Test
-    void test() {
-        Assertions.assertEquals("D:/Temp/ok/MP3 Music/", appConfiguration.getMp3Path());
+    void testParser() {
+        Assertions.assertNotNull(mediaFileParser);
     }
 }

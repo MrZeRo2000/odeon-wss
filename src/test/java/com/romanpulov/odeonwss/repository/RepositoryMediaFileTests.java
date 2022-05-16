@@ -1,12 +1,11 @@
-package com.romanpulov.odeonwss;
+package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.entity.*;
-import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
-import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.entitybuilder.EntityArtifactBuilder;
+import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
+import com.romanpulov.odeonwss.entitybuilder.EntityCompositionBuilder;
+import com.romanpulov.odeonwss.entitybuilder.EntityMediaFileBuilder;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

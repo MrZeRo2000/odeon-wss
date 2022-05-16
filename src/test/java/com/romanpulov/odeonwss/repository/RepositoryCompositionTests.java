@@ -1,7 +1,11 @@
-package com.romanpulov.odeonwss;
+package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
 import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.entitybuilder.EntityArtifactBuilder;
+import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
+import com.romanpulov.odeonwss.entitybuilder.EntityCompositionBuilder;
+import com.romanpulov.odeonwss.entitybuilder.EntityMediaFileBuilder;
 import com.romanpulov.odeonwss.repository.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;

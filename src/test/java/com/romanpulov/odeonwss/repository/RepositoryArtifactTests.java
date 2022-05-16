@@ -1,7 +1,10 @@
-package com.romanpulov.odeonwss;
+package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.entity.*;
-import com.romanpulov.odeonwss.repository.*;
+import com.romanpulov.odeonwss.entitybuilder.EntityArtifactBuilder;
+import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
+import com.romanpulov.odeonwss.entitybuilder.EntityCompositionBuilder;
+import com.romanpulov.odeonwss.entitybuilder.EntityMediaFileBuilder;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,10 +12,8 @@ import org.springframework.test.context.jdbc.Sql;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

@@ -1,8 +1,10 @@
-package com.romanpulov.odeonwss;
+package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
+import com.romanpulov.odeonwss.entitybuilder.EntityArtifactBuilder;
+import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import org.junit.jupiter.api.*;

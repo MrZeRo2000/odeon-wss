@@ -1,4 +1,4 @@
-package com.romanpulov.odeonwss;
+package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;

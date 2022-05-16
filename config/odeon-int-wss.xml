@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context>
+	<Parameter name="db-url" value="jdbc:sqlite:C:\prj\odeon-wss\db\database\odeon-test.db"/>
+	<Parameter name="mp3-path" value="D:/Temp/ok/MP3 Music/"/>
+	<Parameter name="ffprobe-path" value="D:/prj/ffmpeg/"/>
+	<Parameter name="spring.profiles.active" value="int"/>
+</Context>

@@ -1,4 +1,4 @@
-package com.romanpulov.odeonwss;
+package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
@@ -19,8 +19,12 @@ public class ServiceProcessValidateMP3Test {
     @Autowired
     ArtistRepository artistRepository;
 
-    @Autowired
     ProcessService service;
+
+    @Autowired
+    public ServiceProcessValidateMP3Test(ProcessService service) {
+        this.service = service;
+    }
 
     @Test
     @Order(1)

@@ -1,4 +1,4 @@
-package com.romanpulov.odeonwss;
+package com.romanpulov.odeonwss.configuration;
 
 import com.romanpulov.odeonwss.config.DatabaseConfiguration;
 import org.junit.jupiter.api.Assertions;

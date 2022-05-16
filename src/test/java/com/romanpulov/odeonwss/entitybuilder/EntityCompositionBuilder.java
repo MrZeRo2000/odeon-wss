@@ -1,8 +1,7 @@
-package com.romanpulov.odeonwss;
+package com.romanpulov.odeonwss.entitybuilder;
 
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.Composition;
-import com.romanpulov.odeonwss.entity.MediaFile;
 
 public class EntityCompositionBuilder {
     private final Composition composition;

@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.service;
 import com.romanpulov.odeonwss.service.processor.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -68,17 +69,19 @@ public class ProcessService implements ProgressHandler {
         executeProcessor(processorType, null);
     }
 
-    synchronized public void executeProcessor(ProcessorType processorType, String rootPath) throws Exception {
+    synchronized public void executeProcessor(ProcessorType processorType, String rootPath) {
         logger.debug("Starting execution: " + processorType + ", parameter path: " + rootPath);
 
-        if (currentProcessor.get() != null) {
-            throw new ProcessorException("Process already running");
-        }
-
-        progress = new ArrayList<>();
-
-        currentProcessor.set(processorFactory.fromProcessorType(processorType, this));
         try {
+
+            if (currentProcessor.get() != null) {
+                throw new ProcessorException("Process already running");
+            }
+
+            progress = new ArrayList<>();
+
+            currentProcessor.set(processorFactory.fromProcessorType(processorType, this));
+
             if (rootPath != null) {
                 currentProcessor.get().setRootFolder(rootPath);
             }

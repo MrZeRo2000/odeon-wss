@@ -5,6 +5,24 @@ plugins {
 	id 'war'
 }
 
+ext {
+	file_name_build = 'odeon-wss-build.war'
+	file_name_prod = 'odeon-wss.war'
+	file_name_int = 'odeon-int-wss.war'
+}
+
+ext {
+	if (project.hasProperty("tomcat_home")) {
+		tomcat_webapps = tomcat_home + '/webapps'
+	} else {
+		tomcat_webapps = 'D:/prj/apache-tomcat-9.0.24/webapps'
+	}
+}
+
+bootWar {
+	archiveFileName = file_name_build
+}
+
 group = 'com.romanpulov'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
@@ -35,4 +53,12 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.register('deployInt', Copy) {
+	dependsOn(bootWar)
+	from "build/libs"
+	into tomcat_webapps
+	include file_name_build
+	rename file_name_build, file_name_int
 }

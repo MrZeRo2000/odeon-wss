@@ -1,4 +1,4 @@
-package com.romanpulov.odeonwss;
+package com.romanpulov.odeonwss.unit;
 
 import com.romanpulov.odeonwss.utils.media.*;
 import org.junit.jupiter.api.Assertions;

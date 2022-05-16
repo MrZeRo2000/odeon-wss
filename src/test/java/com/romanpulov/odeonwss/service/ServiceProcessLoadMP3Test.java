@@ -1,16 +1,15 @@
-package com.romanpulov.odeonwss;
+package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistTypes;
+import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.service.ProcessService;
 import com.romanpulov.odeonwss.service.processor.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
-import javax.persistence.OneToMany;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
