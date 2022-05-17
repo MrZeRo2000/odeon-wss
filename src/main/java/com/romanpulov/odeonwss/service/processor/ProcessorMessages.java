@@ -1,6 +1,8 @@
 package com.romanpulov.odeonwss.service.processor;
 
 public class ProcessorMessages {
+    public static final String INFO_STARTED = "Started %s";
+
     static final String ERROR_ROOT_FOLDER_NOT_FOUND = "Root folder not found";
     static final String ERROR_PATH_NOT_FOUND = "Path not found: %s";
     static final String ERROR_EXCEPTION = "Exception: %s";

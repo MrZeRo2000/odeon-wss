@@ -24,18 +24,18 @@ public abstract class AbstractProcessor {
     abstract public void execute() throws ProcessorException;
 
     protected void infoHandler(String errorMessage) {
-        progressHandler.handleProgress(ProgressInfo.fromInfoMessage(errorMessage));
+        progressHandler.handleProgress(ProgressDetail.fromInfoMessage(errorMessage));
     }
 
     protected void errorHandler(String errorMessage) {
-        progressHandler.handleProgress(ProgressInfo.fromErrorMessage(errorMessage));
+        progressHandler.handleProgress(ProgressDetail.fromErrorMessage(errorMessage));
     }
 
     protected void warningHandler(String warningMessage) {
-        progressHandler.handleProgress(ProgressInfo.fromWarningMessage(warningMessage));
+        progressHandler.handleProgress(ProgressDetail.fromWarningMessage(warningMessage));
     }
 
     protected void warningHandlerWithAddArtistAction(String warningMessage, String artistName) {
-        progressHandler.handleProgress(ProgressInfo.fromWarningMessageWithAction(warningMessage, ProcessingActionType.ADD_ARTIST, artistName));
+        progressHandler.handleProgress(ProgressDetail.fromWarningMessageWithAction(warningMessage, ProcessingActionType.ADD_ARTIST, artistName));
     }
 }

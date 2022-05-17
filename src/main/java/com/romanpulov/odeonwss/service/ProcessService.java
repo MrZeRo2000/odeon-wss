@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Service
@@ -24,10 +23,10 @@ public class ProcessService implements ProgressHandler {
 
     AtomicReference<AbstractProcessor> currentProcessor = new AtomicReference<>();
 
-    private List<ProgressInfo> progress;
+    private List<ProgressDetail> progressDetails;
 
-    public List<ProgressInfo> getProgress() {
-        return progress;
+    public List<ProgressDetail> getProgressDetails() {
+        return progressDetails;
     }
 
     synchronized public boolean isRunning() {
@@ -35,34 +34,34 @@ public class ProcessService implements ProgressHandler {
     }
 
     public ProcessingStatus getLastProcessingStatus() {
-        if (progress == null) {
+        if (progressDetails == null) {
             return ProcessingStatus.NOT_RUNNING;
-        } else if (progress.size() == 0) {
+        } else if (progressDetails.size() == 0) {
             return ProcessingStatus.IN_PROGRESS;
         } else {
-            return progress.get(progress.size() - 1).getStatus();
+            return progressDetails.get(progressDetails.size() - 1).getStatus();
         }
     }
 
-    public ProgressInfo getLastProgressInfo() {
-        if (progress == null || progress.size() < 2) {
+    public ProgressDetail getLastProgressInfo() {
+        if (progressDetails == null || progressDetails.size() < 2) {
             return null;
         } else {
-            return progress.get(progress.size() - 2);
+            return progressDetails.get(progressDetails.size() - 2);
         }
     }
 
-    public ProgressInfo getFinalProgressInfo() {
-        if (progress == null || progress.size() == 0) {
+    public ProgressDetail getFinalProgressInfo() {
+        if (progressDetails == null || progressDetails.size() == 0) {
             return null;
         } else {
-            return progress.get(progress.size() - 1);
+            return progressDetails.get(progressDetails.size() - 1);
         }
     }
 
     @Override
-    public void handleProgress(ProgressInfo progressInfo) {
-        progress.add(progressInfo);
+    public void handleProgress(ProgressDetail progressDetail) {
+        progressDetails.add(progressDetail);
     }
 
     public void executeProcessor(ProcessorType processorType) {
@@ -78,7 +77,8 @@ public class ProcessService implements ProgressHandler {
                 throw new ProcessorException("Process already running");
             }
 
-            progress = new ArrayList<>();
+            progressDetails = new ArrayList<>();
+            progressDetails.add(ProgressDetail.fromInfoMessage(String.format(ProcessorMessages.INFO_STARTED, processorType.label)));
 
             currentProcessor.set(processorFactory.fromProcessorType(processorType, this));
 
@@ -91,9 +91,9 @@ public class ProcessService implements ProgressHandler {
             currentProcessor.get().execute();
 
             // get task status
-            progress.add(ProgressInfo.createTaskStatus(progress));
+            progressDetails.add(ProgressDetail.createTaskStatus(progressDetails));
         } catch (Exception e) {
-            progress.add(ProgressInfo.fromException(e));
+            progressDetails.add(ProgressDetail.fromException(e));
         } finally {
             currentProcessor.set(null);
         }

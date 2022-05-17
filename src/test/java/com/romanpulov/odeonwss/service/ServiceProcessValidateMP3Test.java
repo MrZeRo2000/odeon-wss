@@ -1,10 +1,7 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistTypes;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.service.ProcessService;
 import com.romanpulov.odeonwss.service.processor.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.ProcessorType;
 import org.junit.jupiter.api.*;
@@ -38,9 +35,9 @@ public class ServiceProcessValidateMP3Test {
     void testOk() throws Exception {
         service.executeProcessor(ProcessorType.MP3_VALIDATOR);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getLastProcessingStatus());
-        Assertions.assertTrue(service.getProgress().stream().anyMatch(p -> p.getInfo().contains("Artists validated")));
-        Assertions.assertTrue(service.getProgress().stream().anyMatch(p -> p.getInfo().contains("Artifacts validated")));
-        Assertions.assertTrue(service.getProgress().stream().anyMatch(p -> p.getInfo().contains("Compositions validated")));
+        Assertions.assertTrue(service.getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artists validated")));
+        Assertions.assertTrue(service.getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artifacts validated")));
+        Assertions.assertTrue(service.getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Compositions validated")));
     }
 
     @Test
