@@ -5,7 +5,7 @@ import java.util.Objects;
 public class MessageDTO {
     private String message;
 
-    public MessageDTO(String message) {
+    private MessageDTO(String message) {
         this.message = message;
     }
 
@@ -15,6 +15,14 @@ public class MessageDTO {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public static MessageDTO fromMessage(String message) {
+        return new MessageDTO(message);
+    }
+
+    public static MessageDTO fromMessage(String message, Object ...args) {
+        return fromMessage(String.format(message, args));
     }
 
     @Override

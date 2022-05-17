@@ -1,9 +1,9 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.dto.ErrorResponseDTO;
-import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
+import com.romanpulov.odeonwss.exception.DataNotFoundException;
 import com.romanpulov.odeonwss.exception.WrongParameterValueException;
-import org.springframework.data.crossstore.ChangeSetPersister;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class ControllerExceptionHandler {
 
-    @ExceptionHandler(CommonEntityNotFoundException.class)
-    public ResponseEntity<ErrorResponseDTO> handleNotFound(ChangeSetPersister.NotFoundException ex, HttpServletRequest request) {
+    @ExceptionHandler(DataNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleNotFound(DataNotFoundException ex, HttpServletRequest request) {
         return new ResponseEntity<>(new ErrorResponseDTO(ex.getMessage(), request.getRequestURI()), HttpStatus.NOT_FOUND);
     }
 

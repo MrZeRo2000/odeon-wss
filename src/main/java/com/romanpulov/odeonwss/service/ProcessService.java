@@ -27,6 +27,10 @@ public class ProcessService implements ProgressHandler {
         return processInfo;
     }
 
+    public void clearProcessInfo() {
+        this.processInfo = null;
+    }
+
     @Override
     public void handleProgress(ProgressDetail progressDetail) {
         processInfo.addProgressDetails(progressDetail);
@@ -73,7 +77,7 @@ public class ProcessService implements ProgressHandler {
     }
 
     @Async
-    public void executeProcessorAsync(ProcessorType processorType) throws Exception {
+    public void executeProcessorAsync(ProcessorType processorType) {
         executeProcessor(processorType);
     }
 }
