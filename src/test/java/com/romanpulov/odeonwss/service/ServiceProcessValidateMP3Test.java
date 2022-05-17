@@ -2,8 +2,8 @@ package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.entity.ArtistTypes;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.service.processor.ProcessingStatus;
-import com.romanpulov.odeonwss.service.processor.ProcessorType;
+import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
+import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,49 +34,49 @@ public class ServiceProcessValidateMP3Test {
     @Order(2)
     void testOk() throws Exception {
         service.executeProcessor(ProcessorType.MP3_VALIDATOR);
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getLastProcessingStatus());
-        Assertions.assertTrue(service.getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artists validated")));
-        Assertions.assertTrue(service.getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artifacts validated")));
-        Assertions.assertTrue(service.getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Compositions validated")));
+        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artists validated")));
+        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artifacts validated")));
+        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Compositions validated")));
     }
 
     @Test
     @Order(3)
     void testWrongTitleMissingFileArtist() throws Exception {
         service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/wrong_artifact_title/");
-        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getLastProcessingStatus());
-        Assertions.assertTrue(service.getLastProgressInfo().getInfo().contains("Artists not in files"));
+        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
+        Assertions.assertTrue(service.getProcessInfo().getLastProgressDetail().getInfo().contains("Artists not in files"));
     }
 
     @Test
     @Order(4)
     void testMissingFileArtist() throws Exception {
         service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/validation_mp3_missing_artist/");
-        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getLastProcessingStatus());
-        Assertions.assertTrue(service.getLastProgressInfo().getInfo().contains("Artists not in files"));
+        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
+        Assertions.assertTrue(service.getProcessInfo().getLastProgressDetail().getInfo().contains("Artists not in files"));
     }
 
     @Test
     @Order(5)
     void testAdditionalFileArtist() throws Exception {
         service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/validation_mp3_additional_artist/");
-        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getLastProcessingStatus());
-        Assertions.assertTrue(service.getLastProgressInfo().getInfo().contains("Artists not in database"));
+        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
+        Assertions.assertTrue(service.getProcessInfo().getLastProgressDetail().getInfo().contains("Artists not in database"));
     }
 
     @Test
     @Order(6)
     void testMissingFileArtifact() throws Exception {
         service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/validation_mp3_missing_artifact/");
-        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getLastProcessingStatus());
-        Assertions.assertTrue(service.getLastProgressInfo().getInfo().contains("Artifacts not in files"));
+        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
+        Assertions.assertTrue(service.getProcessInfo().getLastProgressDetail().getInfo().contains("Artifacts not in files"));
     }
 
     @Test
     @Order(7)
     void testMissingFileCompositions() throws Exception {
         service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/validation_mp3_missing_compositions/");
-        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getLastProcessingStatus());
-        Assertions.assertTrue(service.getLastProgressInfo().getInfo().contains("Compositions not in files"));
+        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
+        Assertions.assertTrue(service.getProcessInfo().getLastProgressDetail().getInfo().contains("Compositions not in files"));
     }
 }

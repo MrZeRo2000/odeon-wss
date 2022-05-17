@@ -1,4 +1,4 @@
-package com.romanpulov.odeonwss.service.processor;
+package com.romanpulov.odeonwss.service.processor.model;
 
 public enum ProcessorType {
     MP3_LOADER("MP3 Loader"),

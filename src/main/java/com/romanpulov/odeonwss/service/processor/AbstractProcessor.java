@@ -1,5 +1,8 @@
 package com.romanpulov.odeonwss.service.processor;
 
+import com.romanpulov.odeonwss.service.processor.model.ProcessingActionType;
+import com.romanpulov.odeonwss.service.processor.model.ProgressDetail;
+
 public abstract class AbstractProcessor {
     private ProgressHandler progressHandler;
 

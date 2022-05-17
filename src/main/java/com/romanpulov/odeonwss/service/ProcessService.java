@@ -1,13 +1,11 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.service.processor.*;
+import com.romanpulov.odeonwss.service.processor.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Service
@@ -23,45 +21,15 @@ public class ProcessService implements ProgressHandler {
 
     AtomicReference<AbstractProcessor> currentProcessor = new AtomicReference<>();
 
-    private List<ProgressDetail> progressDetails;
+    private ProcessInfo processInfo;
 
-    public List<ProgressDetail> getProgressDetails() {
-        return progressDetails;
-    }
-
-    synchronized public boolean isRunning() {
-        return currentProcessor.get() != null;
-    }
-
-    public ProcessingStatus getLastProcessingStatus() {
-        if (progressDetails == null) {
-            return ProcessingStatus.NOT_RUNNING;
-        } else if (progressDetails.size() == 0) {
-            return ProcessingStatus.IN_PROGRESS;
-        } else {
-            return progressDetails.get(progressDetails.size() - 1).getStatus();
-        }
-    }
-
-    public ProgressDetail getLastProgressInfo() {
-        if (progressDetails == null || progressDetails.size() < 2) {
-            return null;
-        } else {
-            return progressDetails.get(progressDetails.size() - 2);
-        }
-    }
-
-    public ProgressDetail getFinalProgressInfo() {
-        if (progressDetails == null || progressDetails.size() == 0) {
-            return null;
-        } else {
-            return progressDetails.get(progressDetails.size() - 1);
-        }
+    public ProcessInfo getProcessInfo() {
+        return processInfo;
     }
 
     @Override
     public void handleProgress(ProgressDetail progressDetail) {
-        progressDetails.add(progressDetail);
+        processInfo.addProgressDetails(progressDetail);
     }
 
     public void executeProcessor(ProcessorType processorType) {
@@ -77,10 +45,11 @@ public class ProcessService implements ProgressHandler {
                 throw new ProcessorException("Process already running");
             }
 
-            progressDetails = new ArrayList<>();
-            progressDetails.add(ProgressDetail.fromInfoMessage(String.format(ProcessorMessages.INFO_STARTED, processorType.label)));
-
             currentProcessor.set(processorFactory.fromProcessorType(processorType, this));
+
+            processInfo = new ProcessInfo(processorType);
+            processInfo.addProgressDetails(ProgressDetail.fromInfoMessage(ProcessorMessages.INFO_STARTED, processorType.label));
+
 
             if (rootPath != null) {
                 currentProcessor.get().setRootFolder(rootPath);
@@ -90,11 +59,15 @@ public class ProcessService implements ProgressHandler {
             logger.debug(String.format("Executing: %s with path: %s", processorType, currentProcessor.get().getRootFolder()));
             currentProcessor.get().execute();
 
-            // get task status
-            progressDetails.add(ProgressDetail.createTaskStatus(progressDetails));
         } catch (Exception e) {
-            progressDetails.add(ProgressDetail.fromException(e));
+            processInfo.addProgressDetails(ProgressDetail.fromException(e));
         } finally {
+            // final status
+            ProgressDetail finalProgressDetail = ProgressDetail.createFinalProgressDetail(processInfo.getProgressDetails());
+            processInfo.addProgressDetails(finalProgressDetail);
+            processInfo.setProcessingStatus(finalProgressDetail.getStatus());
+
+            //clean up processor
             currentProcessor.set(null);
         }
     }

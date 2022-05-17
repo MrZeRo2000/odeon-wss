@@ -4,7 +4,7 @@ import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistTypes;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.service.processor.*;
+import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,23 +34,22 @@ public class ServiceProcessLoadMP3Test {
 
         // warnings - no artists exist
         service.executeProcessor(ProcessorType.MP3_LOADER, null);
-        progressDetail = service.getProgressDetails();
+        progressDetail = service.getProcessInfo().getProgressDetails();
         Assertions.assertEquals(4, progressDetail.size());
-        Assertions.assertEquals(ProcessingStatus.WARNING, service.getLastProcessingStatus());
-        Assertions.assertEquals(ProcessingStatus.WARNING, service.getFinalProgressInfo().getStatus());
+        Assertions.assertEquals(ProcessingStatus.WARNING, service.getProcessInfo().getProcessingStatus());
 
         // error - path not exist
         service.executeProcessor(ProcessorType.MP3_LOADER, "non_existing_path");
-        progressDetail = service.getProgressDetails();
-        Assertions.assertEquals(2, progressDetail.size());
-        Assertions.assertEquals(ProcessingStatus.FAILURE, progressDetail.get(service.getProgressDetails().size() - 1).getStatus());
-        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getLastProcessingStatus());
+        progressDetail = service.getProcessInfo().getProgressDetails();
+        Assertions.assertEquals(3, progressDetail.size());
+        Assertions.assertEquals(ProcessingStatus.FAILURE, progressDetail.get(service.getProcessInfo().getProgressDetails().size() - 1).getStatus());
+        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
 
         // warning - no artists exist
         service.executeProcessor(ProcessorType.MP3_LOADER, null);
-        progressDetail = service.getProgressDetails();
+        progressDetail = service.getProcessInfo().getProgressDetails();
         Assertions.assertEquals(4, progressDetail.size());
-        Assertions.assertEquals(ProcessingStatus.WARNING, service.getLastProcessingStatus());
+        Assertions.assertEquals(ProcessingStatus.WARNING, service.getProcessInfo().getProcessingStatus());
 
         // check processing progress
         ProcessingAction pa = progressDetail.get(1).getProcessingAction();
@@ -63,8 +62,8 @@ public class ServiceProcessLoadMP3Test {
     @Order(2)
     void testDirectoryWithFiles() throws Exception {
         service.executeProcessor(ProcessorType.MP3_LOADER, "");
-        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getLastProcessingStatus());
-        Assertions.assertTrue(service.getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("directory, found:")));
+        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
+        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("directory, found:")));
     }
 
     @Test
@@ -77,8 +76,8 @@ public class ServiceProcessLoadMP3Test {
         artistRepository.save(artist);
 
         service.executeProcessor(ProcessorType.MP3_LOADER, "D:/Temp/wrong_artifact_title/");
-        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getLastProcessingStatus());
-        Assertions.assertTrue(service.getLastProgressInfo().getInfo().contains("Error parsing artifact name"));
+        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
+        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().get(service.getProcessInfo().getProgressDetails().size() - 2).getInfo().contains("Error parsing artifact name"));
     }
 
     @Test
@@ -93,7 +92,7 @@ public class ServiceProcessLoadMP3Test {
         );
         log.info("Created artist");
         Assertions.assertDoesNotThrow(() -> service.executeProcessor(ProcessorType.MP3_LOADER, "D:/Temp/ok/MP3 Music/"));
-        Assertions.assertEquals(ProcessingStatus.WARNING, service.getLastProcessingStatus());
+        Assertions.assertEquals(ProcessingStatus.WARNING, service.getProcessInfo().getProcessingStatus());
     }
 
     @Test
@@ -110,7 +109,7 @@ public class ServiceProcessLoadMP3Test {
 
         log.info("Created artists");
         Assertions.assertDoesNotThrow(() -> service.executeProcessor(ProcessorType.MP3_LOADER, "D:/Temp/ok/MP3 Music/"));
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getLastProcessingStatus());
+        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
     }
 
 }

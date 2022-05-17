@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 import org.springframework.stereotype.Component;
 
 @Component

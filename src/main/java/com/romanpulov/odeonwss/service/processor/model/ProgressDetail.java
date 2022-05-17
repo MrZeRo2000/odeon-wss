@@ -1,4 +1,4 @@
-package com.romanpulov.odeonwss.service.processor;
+package com.romanpulov.odeonwss.service.processor.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,19 +48,31 @@ public class ProgressDetail {
         return new ProgressDetail(errorMessage, ProcessingStatus.INFO);
     }
 
+    public static ProgressDetail fromInfoMessage(String errorMessage, Object ...args) {
+        return fromInfoMessage(String.format(errorMessage, args));
+    }
+
     public static ProgressDetail fromErrorMessage(String errorMessage) {
         return new ProgressDetail(errorMessage, ProcessingStatus.FAILURE);
+    }
+
+    public static ProgressDetail fromErrorMessage(String errorMessage, Object ...args) {
+        return fromErrorMessage(String.format(errorMessage, args));
     }
 
     public static ProgressDetail fromWarningMessage(String warningMessage) {
         return new ProgressDetail(warningMessage, ProcessingStatus.WARNING);
     }
 
+    public static ProgressDetail fromWarningMessage(String warningMessage, Object ...args) {
+        return fromWarningMessage(String.format(warningMessage, args));
+    }
+
     public static ProgressDetail fromWarningMessageWithAction(String warningMessage, ProcessingActionType processingActionType, String actionValue) {
         return new ProgressDetail(warningMessage, ProcessingStatus.WARNING, new ProcessingAction(processingActionType, actionValue));
     }
 
-    public static ProcessingStatus getProcessingStatus(List<ProgressDetail> progressDetails) {
+    public static ProcessingStatus getFinalProcessingStatus(List<ProgressDetail> progressDetails) {
         List<ProcessingStatus> processingStatuses = progressDetails.stream().map(p -> p.status).distinct().collect(Collectors.toList());
         if (processingStatuses.contains(ProcessingStatus.FAILURE)) {
             return ProcessingStatus.FAILURE;
@@ -71,7 +83,7 @@ public class ProgressDetail {
         }
     }
 
-    public static ProgressDetail createTaskStatus(List<ProgressDetail> progressDetails) {
-        return new ProgressDetail("Task status", getProcessingStatus(progressDetails));
+    public static ProgressDetail createFinalProgressDetail(List<ProgressDetail> progressDetails) {
+        return new ProgressDetail("Task status", getFinalProcessingStatus(progressDetails));
     }
 }

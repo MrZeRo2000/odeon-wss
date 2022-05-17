@@ -1,4 +1,4 @@
-package com.romanpulov.odeonwss.service.processor;
+package com.romanpulov.odeonwss.service.processor.model;
 
 public class ProcessingAction {
     private final ProcessingActionType actionType;
