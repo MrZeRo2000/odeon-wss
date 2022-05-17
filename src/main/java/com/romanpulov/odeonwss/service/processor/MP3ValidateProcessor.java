@@ -54,7 +54,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor {
             for (Path artistPath: artistPathStream.collect(Collectors.toList())) {
                 logger.debug("Artist path:" + artistPath.getFileName());
                 if (!Files.isDirectory(artistPath)) {
-                    errorHandler(String.format(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, artistPath.getFileName().toString()));
+                    errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, artistPath.getFileName().toString());
                 } else {
                     loadFromArtistPath(artistPath, result);
                 }
@@ -76,7 +76,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor {
             for (Path artifactPath: artifactPathStream.collect(Collectors.toList())) {
                 logger.debug("Artifact path:" + artifactPath.getFileName());
                 if (!Files.isDirectory(artifactPath)) {
-                    errorHandler(String.format(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, artistPath.getFileName().toString()));
+                    errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, artistPath.getFileName().toString());
                 } else {
                     loadFromArtifactPath(artistPath, artifactPath, result);
                 }
@@ -90,7 +90,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor {
             throws ProcessorException {
         NamesParser.YearTitle yt = NamesParser.parseMusicArtifactTitle(artifactPath.getFileName().toString());
         if (yt == null) {
-            errorHandler(String.format(ProcessorMessages.ERROR_PARSING_ARTIFACT_NAME, artifactPath.getFileName().toString()));
+            errorHandler(ProcessorMessages.ERROR_PARSING_ARTIFACT_NAME, artifactPath.getFileName().toString());
             result.add(
                     new MediaFileValidationDTOBuilder()
                             .withArtistName(artistPath.getFileName().toString())
@@ -102,13 +102,13 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor {
                     String compositionFileName = compositionPath.getFileName().toString();
 
                     if (Files.isDirectory(compositionPath)) {
-                        errorHandler(String.format(ProcessorMessages.ERROR_EXPECTED_FILE,  compositionPath.toAbsolutePath()));
+                        errorHandler(ProcessorMessages.ERROR_EXPECTED_FILE,  compositionPath.toAbsolutePath());
                     } else if (!compositionFileName.endsWith("mp3")) {
-                        errorHandler(String.format(ProcessorMessages.ERROR_WRONG_FILE_TYPE, compositionPath.toAbsolutePath()));
+                        errorHandler(ProcessorMessages.ERROR_WRONG_FILE_TYPE, compositionPath.toAbsolutePath());
                     } else {
                         NamesParser.NumberTitle nt = NamesParser.parseMusicComposition(compositionFileName);
                         if (nt == null) {
-                            errorHandler(String.format(ProcessorMessages.ERROR_PARSING_COMPOSITION_NAME, compositionPath.toAbsolutePath().getFileName()));
+                            errorHandler(ProcessorMessages.ERROR_PARSING_COMPOSITION_NAME, compositionPath.toAbsolutePath().getFileName());
                             result.add(
                               new MediaFileValidationDTOBuilder()
                                       .withArtistName(artistPath.getFileName().toString())
@@ -132,7 +132,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor {
 
 
             } catch (IOException e) {
-                throw new ProcessorException(String.format(ProcessorMessages.ERROR_EXCEPTION, e.getMessage()));
+                throw new ProcessorException(ProcessorMessages.ERROR_EXCEPTION, e.getMessage());
             }
         }
     }
@@ -148,14 +148,14 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor {
         Set<String> pathStringsDiff = new HashSet<>(pathStrings);
         pathStringsDiff.removeAll(dbStrings);
         if (!pathStringsDiff.isEmpty()) {
-            errorHandler(String.format(dbErrorMessage, String.join(",", pathStringsDiff)));
+            errorHandler(dbErrorMessage, String.join(",", pathStringsDiff));
             result = false;
         }
 
         Set<String> dbStringsDiff = new HashSet<>(dbStrings);
         dbStringsDiff.removeAll(pathStrings);
         if (!dbStringsDiff.isEmpty()) {
-            errorHandler(String.format(pathErrorMessage, String.join(",", dbStringsDiff)));
+            errorHandler(pathErrorMessage, String.join(",", dbStringsDiff));
             result = false;
         }
 

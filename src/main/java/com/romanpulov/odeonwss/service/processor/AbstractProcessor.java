@@ -30,8 +30,16 @@ public abstract class AbstractProcessor {
         progressHandler.handleProgress(ProgressDetail.fromInfoMessage(errorMessage));
     }
 
+    protected void infoHandler(String errorMessage, Object ...args) {
+        progressHandler.handleProgress(ProgressDetail.fromInfoMessage(errorMessage, args));
+    }
+
     protected void errorHandler(String errorMessage) {
         progressHandler.handleProgress(ProgressDetail.fromErrorMessage(errorMessage));
+    }
+
+    protected void errorHandler(String errorMessage, Object ...args) {
+        progressHandler.handleProgress(ProgressDetail.fromErrorMessage(errorMessage, args));
     }
 
     protected void warningHandler(String warningMessage) {

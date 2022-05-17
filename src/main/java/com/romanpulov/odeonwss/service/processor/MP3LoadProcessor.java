@@ -65,13 +65,13 @@ public class MP3LoadProcessor extends AbstractFileSystemProcessor {
                 processArtistsPath(p);
             }
         } catch (IOException e) {
-            throw new ProcessorException(String.format(ProcessorMessages.ERROR_EXCEPTION,  e.getMessage()));
+            throw new ProcessorException(ProcessorMessages.ERROR_EXCEPTION,  e.getMessage());
         }
     }
 
     private void processArtistsPath(Path path) throws ProcessorException {
         if (!Files.isDirectory(path)) {
-            errorHandler(String.format(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, path.getFileName()));
+            errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, path.getFileName());
             return;
         }
 
@@ -95,7 +95,7 @@ public class MP3LoadProcessor extends AbstractFileSystemProcessor {
 
     private void processArtifactsPath(Path path, Artist artist) throws ProcessorException {
         if (!Files.isDirectory(path)) {
-            errorHandler(String.format(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, path.getFileName()));
+            errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, path.getFileName());
             return;
         }
 
@@ -103,7 +103,7 @@ public class MP3LoadProcessor extends AbstractFileSystemProcessor {
 
         NamesParser.YearTitle yt = NamesParser.parseMusicArtifactTitle(artifactName);
         if (yt == null) {
-            errorHandler(String.format(ProcessorMessages.ERROR_PARSING_ARTIFACT_NAME, path.toAbsolutePath().getFileName()));
+            errorHandler(ProcessorMessages.ERROR_PARSING_ARTIFACT_NAME, path.toAbsolutePath().getFileName());
             return;
         }
 
@@ -128,7 +128,7 @@ public class MP3LoadProcessor extends AbstractFileSystemProcessor {
             try (Stream<Path> stream = Files.list(path)) {
                 compositionPaths = stream.collect(Collectors.toList());
             } catch (IOException e) {
-                throw new ProcessorException(String.format(ProcessorMessages.ERROR_PROCESSING_FILES, e.getMessage()));
+                throw new ProcessorException(ProcessorMessages.ERROR_PROCESSING_FILES, e.getMessage());
             }
 
             Map<String, NamesParser.NumberTitle> parsedCompositionFileNames = parseCompositionFileNames(compositionPaths);
@@ -151,19 +151,19 @@ public class MP3LoadProcessor extends AbstractFileSystemProcessor {
 
         for (Path path: compositionPaths) {
             if (Files.isDirectory(path)) {
-                errorHandler(String.format(ProcessorMessages.ERROR_EXPECTED_FILE,  path.toAbsolutePath()));
+                errorHandler(ProcessorMessages.ERROR_EXPECTED_FILE,  path.toAbsolutePath());
                 return null;
             }
 
             String compositionFileName = path.getFileName().toString();
             if (!compositionFileName.endsWith("mp3")) {
-                errorHandler(String.format(ProcessorMessages.ERROR_WRONG_FILE_TYPE, path.toAbsolutePath()));
+                errorHandler(ProcessorMessages.ERROR_WRONG_FILE_TYPE, path.toAbsolutePath());
                 return null;
             }
 
             NamesParser.NumberTitle nt = NamesParser.parseMusicComposition(compositionFileName);
             if (nt == null) {
-                errorHandler(String.format(ProcessorMessages.ERROR_PARSING_COMPOSITION_NAME, path.toAbsolutePath().getFileName()));
+                errorHandler(ProcessorMessages.ERROR_PARSING_COMPOSITION_NAME, path.toAbsolutePath().getFileName());
                 return null;
             }
 
@@ -210,7 +210,7 @@ public class MP3LoadProcessor extends AbstractFileSystemProcessor {
                 result.put(futureData.getFirst(), futureData.getSecond());
             }
         } catch (ExecutionException | InterruptedException e) {
-            errorHandler(String.format(ProcessorMessages.ERROR_PARSING_FILE, e.getMessage()));
+            errorHandler(ProcessorMessages.ERROR_PARSING_FILE, e.getMessage());
             return null;
         }
 
@@ -232,7 +232,7 @@ public class MP3LoadProcessor extends AbstractFileSystemProcessor {
             NamesParser.NumberTitle nt = parsedCompositionNames.get(fileName);
             MediaFileInfo mediaFileInfo = parsedCompositionsMediaInfo.get(fileName);
             if ((nt == null) || (mediaFileInfo == null)) {
-                throw new ProcessorException(String.format(ProcessorMessages.ERROR_NO_DATA_FOR_FILE, fileName));
+                throw new ProcessorException(ProcessorMessages.ERROR_NO_DATA_FOR_FILE, fileName);
             } else {
                 Composition composition = new Composition();
                 composition.setArtifact(artifact);
