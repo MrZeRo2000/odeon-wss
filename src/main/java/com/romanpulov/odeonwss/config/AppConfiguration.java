@@ -17,6 +17,8 @@ public class AppConfiguration {
 
     private final String ffprobePath;
 
+    private final String version;
+
     public String getDbUrl() {
         return dbUrl;
     }
@@ -37,11 +39,16 @@ public class AppConfiguration {
         return ffprobePath;
     }
 
-    public AppConfiguration(ServletContext context) {
+    public String getVersion() {
+        return version;
+    }
+
+    public AppConfiguration(ServletContext context, ProjectConfigurationProperties projectConfigurationProperties) {
         dbUrl = context.getInitParameter("db-url");
         mp3Path = context.getInitParameter("mp3-path");
         laPath = context.getInitParameter("la-path");
         mdbPath = context.getInitParameter("mdb-path");
         ffprobePath = context.getInitParameter("ffprobe-path");
+        version = projectConfigurationProperties.getVersion();
     }
 }

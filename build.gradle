@@ -19,6 +19,13 @@ ext {
 	}
 }
 
+tasks.named('processResources') {
+	filesMatching('project.properties') {
+		expand(project.properties)
+	}
+}
+
+
 bootWar {
 	archiveFileName = file_name_build
 }

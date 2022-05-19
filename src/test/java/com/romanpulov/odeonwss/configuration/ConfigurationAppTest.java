@@ -16,4 +16,9 @@ public class ConfigurationAppTest {
     void test() {
         Assertions.assertEquals("D:/Temp/ok/MP3 Music/", appConfiguration.getMp3Path());
     }
+
+    @Test
+    void testVersion() {
+        Assertions.assertEquals("0.0.1-SNAPSHOT", appConfiguration.getVersion());
+    }
 }
