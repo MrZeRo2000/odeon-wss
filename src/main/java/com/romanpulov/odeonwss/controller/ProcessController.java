@@ -23,7 +23,7 @@ public class ProcessController {
     }
 
     @PostMapping
-    ResponseEntity<MessageDTO> execute(@RequestParam ProcessorRequestDTO processorRequest) throws WrongParameterValueException {
+    ResponseEntity<MessageDTO> execute(@RequestBody ProcessorRequestDTO processorRequest) throws WrongParameterValueException {
         ProcessorType processorType = EnumUtils.getEnumFromString(ProcessorType.class, processorRequest.getProcessorType());
         if (processorType == null) {
             throw new WrongParameterValueException("Processor Type", processorRequest.getProcessorType());

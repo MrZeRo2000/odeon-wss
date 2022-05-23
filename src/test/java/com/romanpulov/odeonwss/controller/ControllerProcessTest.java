@@ -1,5 +1,8 @@
 package com.romanpulov.odeonwss.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.romanpulov.odeonwss.dto.ProcessorRequestDTO;
+import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -19,6 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class ControllerProcessTest {
 
+    final ObjectMapper mapper = new ObjectMapper();
+
     final static Logger logger = LoggerFactory.getLogger(ControllerProcessTest.class);
 
     @Autowired
@@ -26,8 +31,12 @@ public class ControllerProcessTest {
 
     @Test
     void shouldReturnErrorWrongParameter() throws Exception {
+
+        String json = mapper.writeValueAsString(ProcessorRequestDTO.fromProcessorType("SSS"));
+
         this.mockMvc.perform(post("/api/process")
-                        .param("processorRequest", "{processorType: \"SSS\"}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isBadRequest())
@@ -48,9 +57,11 @@ public class ControllerProcessTest {
                 .andReturn();
         logger.debug("Get result before execute: " + mvcResult.getResponse().getContentAsString());
 
+        String json = mapper.writeValueAsString(ProcessorRequestDTO.fromProcessorType("MP3_VALIDATOR"));
+
         this.mockMvc.perform(post("/api/process")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .queryParam("processorRequest", "MP3_VALIDATOR")
+                        .content(json)
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())

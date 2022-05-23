@@ -1,14 +1,22 @@
 package com.romanpulov.odeonwss.dto;
 
 public class ProcessorRequestDTO {
-    private final String processorType;
+    private String processorType;
 
     public String getProcessorType() {
         return processorType;
     }
 
-    public ProcessorRequestDTO(String processorType) {
+    public void setProcessorType(String processorType) {
         this.processorType = processorType;
+    }
+
+    public ProcessorRequestDTO() {}
+
+    public static ProcessorRequestDTO fromProcessorType(String processorType) {
+        ProcessorRequestDTO instance = new ProcessorRequestDTO();
+        instance.setProcessorType(processorType);
+        return instance;
     }
 
     @Override
