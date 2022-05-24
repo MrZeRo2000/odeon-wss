@@ -43,6 +43,7 @@ public class ProcessService implements ProgressHandler {
     synchronized public void executeProcessor(ProcessorType processorType, String rootPath) {
         logger.debug("Starting execution: " + processorType + ", parameter path: " + rootPath);
 
+        processInfo = new ProcessInfo(processorType);
         try {
 
             if (currentProcessor.get() != null) {
@@ -51,9 +52,7 @@ public class ProcessService implements ProgressHandler {
 
             currentProcessor.set(processorFactory.fromProcessorType(processorType, this));
 
-            processInfo = new ProcessInfo(processorType);
             processInfo.addProgressDetails(ProgressDetail.fromInfoMessage(ProcessorMessages.INFO_STARTED, processorType.label));
-
 
             if (rootPath != null) {
                 currentProcessor.get().setRootFolder(rootPath);

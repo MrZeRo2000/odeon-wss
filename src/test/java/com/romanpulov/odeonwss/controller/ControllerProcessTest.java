@@ -83,7 +83,33 @@ public class ControllerProcessTest {
                 .andExpect(jsonPath("$.progressDetails[0].info", Matchers.is("Started MP3 Validator")))
                 .andReturn();
         logger.debug("Get result after execute: " + mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    void testNotImplemented() throws Exception {
+        MvcResult mvcResult;
+
+        this.mockMvc.perform(delete("/api/process"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message", Matchers.is("Cleared")));
 
 
+        String json = mapper.writeValueAsString(ProcessorRequestDTO.fromProcessorType("LA_VALIDATOR"));
+
+        this.mockMvc.perform(post("/api/process")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message", Matchers.is("Started")));
+
+        Thread.sleep(1000L);
+
+        mvcResult = this.mockMvc.perform(get("/api/process"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.lastProgressDetail.info", Matchers.is("Unsupported operation")))
+                .andReturn();
+        logger.debug("Get result after not implemented execute: " + mvcResult.getResponse().getContentAsString());
     }
 }

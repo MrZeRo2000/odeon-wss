@@ -41,7 +41,7 @@ public class ProgressDetail {
     }
 
     public static ProgressDetail fromException(Exception e) {
-        return fromErrorMessage(e.getMessage());
+        return fromErrorMessage(e.getMessage() == null ? "Unsupported operation" : e.getMessage());
     }
 
     public static ProgressDetail fromInfoMessage(String errorMessage) {
