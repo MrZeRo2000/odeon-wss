@@ -52,10 +52,8 @@ public class RepositoryArtistCategoryTests {
     void testCascade() throws Exception {
         Artist artist = artistRepository.getAllByType("A").get(0);
 
-        // delete with child element throws
-        Assertions.assertThrows(JpaSystemException.class, () -> artistRepository.delete(artist));
-
-        artistCategoryRepository.deleteAllByArtist(artist);
+        // delete with child element works
         artistRepository.delete(artist);
+        Assertions.assertEquals(0, StreamSupport.stream(artistCategoryRepository.findAll().spliterator(), false).count());
     }
 }

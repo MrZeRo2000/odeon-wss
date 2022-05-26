@@ -72,7 +72,7 @@ public class Artist {
         this.artifacts = artifacts;
     }
 
-    @OneToMany(mappedBy = "artist", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "artist", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<ArtistCategory> artistCategories;
 
     public List<ArtistCategory> getArtistCategories() {
@@ -87,10 +87,6 @@ public class Artist {
     private void removeArtist() {
         if (artifacts != null && artifacts.size() > 0) {
             throw new HibernateException("Unable to delete " + this + " because it has child artifacts");
-        }
-
-        if (artistCategories != null && artistCategories.size() > 0) {
-            throw new HibernateException("Unable to delete " + this + " because it has child categories");
         }
     }
 
@@ -123,6 +119,8 @@ public class Artist {
                 ", type='" + type + '\'' +
                 ", name='" + name + '\'' +
                 ", migrationId=" + migrationId +
+                ", artifacts=" + artifacts +
+                ", artistCategories=" + artistCategories +
                 '}';
     }
 }
