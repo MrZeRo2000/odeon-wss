@@ -3,8 +3,10 @@ package com.romanpulov.odeonwss.repository;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
+import com.romanpulov.odeonwss.entity.ArtistCategory;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
+import com.romanpulov.odeonwss.entitybuilder.EntityArtistCategoryBuilder;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import org.junit.jupiter.api.*;
@@ -14,6 +16,7 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -26,6 +29,9 @@ public class RepositoryArtistTests {
 
     @Autowired
     ArtistRepository artistRepository;
+
+    @Autowired
+    ArtistCategoryRepository artistCategoryRepository;
 
     @Autowired
     ArtifactRepository artifactRepository;
@@ -92,4 +98,5 @@ public class RepositoryArtistTests {
         artistRepository.delete(artist);
         Assertions.assertThrows(NoSuchElementException.class, () -> artistRepository.findById(4L).orElseThrow());
     }
+
 }

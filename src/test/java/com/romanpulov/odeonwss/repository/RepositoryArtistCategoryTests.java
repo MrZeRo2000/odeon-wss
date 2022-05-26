@@ -1,6 +1,8 @@
 package com.romanpulov.odeonwss.repository;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.romanpulov.odeonwss.dto.ArtistCategoryArtistDTO;
+import com.romanpulov.odeonwss.dto.ArtistCategoryArtistListDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
@@ -11,6 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.StreamSupport;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -56,4 +61,55 @@ public class RepositoryArtistCategoryTests {
         artistRepository.delete(artist);
         Assertions.assertEquals(0, StreamSupport.stream(artistCategoryRepository.findAll().spliterator(), false).count());
     }
+
+    @Test
+    @Order(3)
+    void testWithCategories() throws Exception {
+        Artist artist1 = artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 1").build());
+        ArtistCategory artistCategory11 = artistCategoryRepository.save(
+                new EntityArtistCategoryBuilder().withType("G").withArtist(artist1).withName("Rock").build()
+        );
+        ArtistCategory artistCategory12 = artistCategoryRepository.save(
+                new EntityArtistCategoryBuilder().withType("S").withArtist(artist1).withName("Alternative Rock").build()
+        );
+        ArtistCategory artistCategory13 = artistCategoryRepository.save(
+                new EntityArtistCategoryBuilder().withType("S").withArtist(artist1).withName("Pop").build()
+        );
+
+        Artist artist2 = artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 2").build());
+        ArtistCategory artistCategory21 = artistCategoryRepository.save(
+                new EntityArtistCategoryBuilder().withType("G").withArtist(artist2).withName("Pop").build()
+        );
+        ArtistCategory artistCategory22 = artistCategoryRepository.save(
+                new EntityArtistCategoryBuilder().withType("S").withArtist(artist2).withName("Electronic").build()
+        );
+        ArtistCategory artistCategory23 = artistCategoryRepository.save(
+                new EntityArtistCategoryBuilder().withType("S").withArtist(artist2).withName("Rap").build()
+        );
+
+        List<Artist> artists = artistRepository.getAllByTypeOrderByName("A");
+        Assertions.assertEquals(2, artists.size());
+
+        List<ArtistCategory> artistCategories = artistCategoryRepository.findByOrderByArtistNameAsc();
+        Assertions.assertEquals(6, artistCategories.size());
+        Assertions.assertEquals("Name 1", artistCategories.get(0).getArtist().getName());
+
+        List<ArtistCategoryArtistDTO> acaDTOs = artistCategoryRepository.getAllWithArtistOrdered();
+        Assertions.assertEquals(6, acaDTOs.size());
+
+        List<ArtistCategoryArtistListDTO> acalDTO = new ArrayList<>();
+        acaDTOs.forEach(acaDTO -> {
+            if ((acalDTO.size() == 0) || (!Objects.equals(acalDTO.get(acalDTO.size() - 1).getId(), acaDTO.getId()))) {
+                acalDTO.add(new ArtistCategoryArtistListDTO(acaDTO.getId(), acaDTO.getArtistName()));
+            }
+            if (acaDTO.getCategoryTypeCode().equals("G")) {
+                acalDTO.get(acalDTO.size()-1).setGenre(acaDTO.getCategoryName());
+            } else {
+                acalDTO.get(acalDTO.size()-1).getStyles().add(acaDTO.getCategoryName());
+            }
+        });
+
+        Assertions.assertEquals(2, acalDTO.size());
+    }
+
 }

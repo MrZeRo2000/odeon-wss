@@ -118,9 +118,6 @@ public class Artist {
                 "id=" + id +
                 ", type='" + type + '\'' +
                 ", name='" + name + '\'' +
-                ", migrationId=" + migrationId +
-                ", artifacts=" + artifacts +
-                ", artistCategories=" + artistCategories +
                 '}';
     }
 }

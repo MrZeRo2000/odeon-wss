@@ -21,12 +21,11 @@ public class ArtistCategory {
         this.id = id;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "arts_id", referencedColumnName = "arts_id")
-    @Nullable
+    @NotNull
     private Artist artist;
 
-    @Nullable
     public Artist getArtist() {
         return artist;
     }
