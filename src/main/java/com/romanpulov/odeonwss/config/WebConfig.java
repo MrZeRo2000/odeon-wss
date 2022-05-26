@@ -5,7 +5,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * https://www.baeldung.com/spring-cors
+ * <a href="https://www.baeldung.com/spring-cors">...</a>
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {

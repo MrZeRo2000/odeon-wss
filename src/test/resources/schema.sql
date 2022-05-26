@@ -68,3 +68,15 @@ CREATE TABLE media_files (
 
 CREATE INDEX idx_media_files_artf ON media_files(artf_id);
 CREATE INDEX idx_media_files_comp ON media_files(comp_id);
+
+DROP TABLE IF EXISTS artist_categories;
+
+CREATE TABLE artist_categories (
+    atct_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    arts_id INTEGER NOT NULL,
+    atct_type_code TEXT NOT NULL,
+    atct_name TEXT NOT NULL,
+    atct_migration_id INTEGER NULL
+);
+
+CREATE INDEX idx_artist_categories_arts_id ON artist_categories(arts_id);
