@@ -89,7 +89,7 @@ CREATE TABLE artist_details (
     atdt_biography TEXT NOT NULL
 );
 
-CREATE INDEX idx_artist_details_arts_id ON artist_details(arts_id);
+CREATE UNIQUE INDEX idx_artist_details_arts_id ON artist_details(arts_id);
 
 DROP TABLE IF EXISTS artist_lyrics;
 

@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.romanpulov.odeonwss.dto.ArtistCategoryArtistDTO;
 import com.romanpulov.odeonwss.dto.ArtistCategoryArtistListDTO;
 import com.romanpulov.odeonwss.entity.Artist;
