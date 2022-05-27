@@ -65,18 +65,18 @@ public class RepositoryArtistCategoryTests {
     @Test
     @Order(3)
     void testWithCategories() throws Exception {
-        Artist artist1 = artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 1").build());
+        Artist artist1 = artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 3").build());
         ArtistCategory artistCategory11 = artistCategoryRepository.save(
                 new EntityArtistCategoryBuilder().withType("G").withArtist(artist1).withName("Rock").build()
         );
         ArtistCategory artistCategory12 = artistCategoryRepository.save(
-                new EntityArtistCategoryBuilder().withType("S").withArtist(artist1).withName("Alternative Rock").build()
-        );
-        ArtistCategory artistCategory13 = artistCategoryRepository.save(
                 new EntityArtistCategoryBuilder().withType("S").withArtist(artist1).withName("Pop").build()
         );
+        ArtistCategory artistCategory13 = artistCategoryRepository.save(
+                new EntityArtistCategoryBuilder().withType("S").withArtist(artist1).withName("Alternative Rock").build()
+        );
 
-        Artist artist2 = artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 2").build());
+        Artist artist2 = artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 1").build());
         ArtistCategory artistCategory21 = artistCategoryRepository.save(
                 new EntityArtistCategoryBuilder().withType("G").withArtist(artist2).withName("Pop").build()
         );
@@ -97,19 +97,28 @@ public class RepositoryArtistCategoryTests {
         List<ArtistCategoryArtistDTO> acaDTOs = artistCategoryRepository.getAllWithArtistOrdered();
         Assertions.assertEquals(6, acaDTOs.size());
 
-        List<ArtistCategoryArtistListDTO> acalDTO = new ArrayList<>();
+        List<ArtistCategoryArtistListDTO> acalDTOs = new ArrayList<>();
         acaDTOs.forEach(acaDTO -> {
-            if ((acalDTO.size() == 0) || (!Objects.equals(acalDTO.get(acalDTO.size() - 1).getId(), acaDTO.getId()))) {
-                acalDTO.add(new ArtistCategoryArtistListDTO(acaDTO.getId(), acaDTO.getArtistName()));
+            if ((acalDTOs.size() == 0) || (!Objects.equals(acalDTOs.get(acalDTOs.size() - 1).getId(), acaDTO.getId()))) {
+                acalDTOs.add(new ArtistCategoryArtistListDTO(acaDTO.getId(), acaDTO.getArtistName()));
             }
             if (acaDTO.getCategoryTypeCode().equals("G")) {
-                acalDTO.get(acalDTO.size()-1).setGenre(acaDTO.getCategoryName());
+                acalDTOs.get(acalDTOs.size()-1).setGenre(acaDTO.getCategoryName());
             } else {
-                acalDTO.get(acalDTO.size()-1).getStyles().add(acaDTO.getCategoryName());
+                acalDTOs.get(acalDTOs.size()-1).getStyles().add(acaDTO.getCategoryName());
             }
         });
 
-        Assertions.assertEquals(2, acalDTO.size());
+        Assertions.assertEquals(2, acalDTOs.size());
+        Assertions.assertEquals("Name 1", acalDTOs.get(0).getArtistName());
+        Assertions.assertEquals("Name 3", acalDTOs.get(1).getArtistName());
+        Assertions.assertEquals("Alternative Rock", acalDTOs.get(1).getStyles().get(0));
+        Assertions.assertEquals("Rock", acalDTOs.get(1).getGenre());
+
+        acaDTOs = artistCategoryRepository.getAllWithArtistByIdOrdered(artist1.getId());
+        Assertions.assertEquals(3, acaDTOs.size());
+
+        Assertions.assertEquals(0, artistCategoryRepository.getAllWithArtistByIdOrdered(777L).size());
     }
 
 }

@@ -80,3 +80,24 @@ CREATE TABLE artist_categories (
 );
 
 CREATE INDEX idx_artist_categories_arts_id ON artist_categories(arts_id);
+
+DROP TABLE IF EXISTS artist_details;
+
+CREATE TABLE artist_details (
+    atdt_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    arts_id INTEGER NOT NULL,
+    atdt_biography TEXT NOT NULL
+);
+
+CREATE INDEX idx_artist_details_arts_id ON artist_details(arts_id);
+
+DROP TABLE IF EXISTS artist_lyrics;
+
+CREATE TABLE artist_lyrics (
+    atlr_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    arts_id INTEGER NOT NULL,
+    atlr_title TEXT NOT NULL,
+    atlr_text TEXT NOT NULL
+);
+
+CREATE UNIQUE INDEX idx_artist_lyrics_arts_id_atlr_title ON artist_lyrics(arts_id, atlr_title);

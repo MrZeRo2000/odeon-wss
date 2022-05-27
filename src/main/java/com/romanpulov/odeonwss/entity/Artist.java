@@ -83,6 +83,28 @@ public class Artist {
         this.artistCategories = artistCategories;
     }
 
+    @OneToMany(mappedBy = "artist", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<ArtistDetail> artistDetails;
+
+    public List<ArtistDetail> getArtistDetails() {
+        return artistDetails;
+    }
+
+    public void setArtistDetails(List<ArtistDetail> artistDetails) {
+        this.artistDetails = artistDetails;
+    }
+
+    @OneToMany(mappedBy = "artist", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<ArtistLyrics> artistLyrics;
+
+    public List<ArtistLyrics> getArtistLyrics() {
+        return artistLyrics;
+    }
+
+    public void setArtistLyrics(List<ArtistLyrics> artistLyrics) {
+        this.artistLyrics = artistLyrics;
+    }
+
     @PreRemove
     private void removeArtist() {
         if (artifacts != null && artifacts.size() > 0) {
