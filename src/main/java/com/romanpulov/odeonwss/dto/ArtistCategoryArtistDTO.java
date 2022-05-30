@@ -5,6 +5,7 @@ public class ArtistCategoryArtistDTO {
     private String artistName;
     private String categoryTypeCode;
     private String categoryName;
+    public Long detailId;
 
     public Long getId() {
         return id;
@@ -38,11 +39,20 @@ public class ArtistCategoryArtistDTO {
         this.categoryName = categoryName;
     }
 
-    public ArtistCategoryArtistDTO(Long id, String artistName, String categoryTypeCode, String categoryName) {
+    public Long getDetailId() {
+        return detailId;
+    }
+
+    public void setDetailId(Long detailId) {
+        this.detailId = detailId;
+    }
+
+    public ArtistCategoryArtistDTO(Long id, String artistName, String categoryTypeCode, String categoryName, Long detailId) {
         this.id = id;
         this.artistName = artistName;
         this.categoryTypeCode = categoryTypeCode;
         this.categoryName = categoryName;
+        this.detailId = detailId;
     }
 
     public ArtistCategoryArtistDTO() {
@@ -55,6 +65,7 @@ public class ArtistCategoryArtistDTO {
                 ", artistName='" + artistName + '\'' +
                 ", categoryTypeCode='" + categoryTypeCode + '\'' +
                 ", categoryName='" + categoryName + '\'' +
+                ", detailId=" + detailId +
                 '}';
     }
 }

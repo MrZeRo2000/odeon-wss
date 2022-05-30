@@ -21,9 +21,11 @@ public interface ArtistCategoryRepository extends PagingAndSortingRepository<Art
             "ar.id, " +
             "ar.name, " +
             "ac.type, " +
-            "ac.name) " +
+            "ac.name, " +
+            "ad.id) " +
             "FROM Artist AS ar " +
             "LEFT OUTER JOIN ArtistCategory AS ac ON ac.artist = ar " +
+            "LEFT OUTER JOIN ArtistDetail AS ad ON ad.artist = ar " +
             "ORDER BY ar.name, ac.type, ac.name")
     List<ArtistCategoryArtistDTO> getAllWithArtistOrdered();
 
@@ -32,9 +34,11 @@ public interface ArtistCategoryRepository extends PagingAndSortingRepository<Art
             "ar.id, " +
             "ar.name, " +
             "ac.type, " +
-            "ac.name) " +
+            "ac.name, " +
+            "ad.id) " +
             "FROM Artist AS ar " +
             "LEFT OUTER JOIN ArtistCategory AS ac ON ac.artist = ar " +
+            "LEFT OUTER JOIN ArtistDetail AS ad ON ad.artist = ar " +
             "WHERE ar.id = :id " +
             "ORDER BY ar.name, ac.type, ac.name")
     List<ArtistCategoryArtistDTO> getAllWithArtistByIdOrdered(Long id);
