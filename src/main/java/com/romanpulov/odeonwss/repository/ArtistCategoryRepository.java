@@ -8,6 +8,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 public interface ArtistCategoryRepository extends PagingAndSortingRepository<ArtistCategory, Long> {
 
@@ -40,4 +41,6 @@ public interface ArtistCategoryRepository extends PagingAndSortingRepository<Art
 
     @Transactional
     void deleteAllByArtist(Artist artist);
+
+    Optional<ArtistCategory> findFirstByMigrationId(Long migrationId);
 }

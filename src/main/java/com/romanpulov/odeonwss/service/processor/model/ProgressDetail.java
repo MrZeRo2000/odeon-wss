@@ -86,4 +86,14 @@ public class ProgressDetail {
     public static ProgressDetail createFinalProgressDetail(List<ProgressDetail> progressDetails) {
         return new ProgressDetail("Task status", getFinalProcessingStatus(progressDetails));
     }
+
+    @Override
+    public String toString() {
+        return "ProgressDetail{" +
+                "time=" + time +
+                ", info='" + info + '\'' +
+                ", status=" + status +
+                ", processingAction=" + processingAction +
+                '}';
+    }
 }

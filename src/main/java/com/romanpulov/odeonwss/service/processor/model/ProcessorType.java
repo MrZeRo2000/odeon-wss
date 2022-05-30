@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.service.processor.model;
 
 public enum ProcessorType {
+    ARTISTS_IMPORTER("Artists importer"),
     MP3_LOADER("MP3 Loader"),
     MP3_VALIDATOR("MP3 Validator"),
     LA_LOADER("LA Loader"),

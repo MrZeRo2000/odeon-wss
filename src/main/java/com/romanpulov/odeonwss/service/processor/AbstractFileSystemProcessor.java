@@ -11,7 +11,7 @@ public abstract class AbstractFileSystemProcessor extends AbstractProcessor {
         ));
 
         if (Files.notExists(path)) {
-            throw new ProcessorException(String.format(ProcessorMessages.ERROR_PATH_NOT_FOUND, path.toAbsolutePath().toString()));
+            throw new ProcessorException(ProcessorMessages.ERROR_PATH_NOT_FOUND, path.toAbsolutePath().toString());
         }
 
         return path;

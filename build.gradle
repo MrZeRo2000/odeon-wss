@@ -50,6 +50,9 @@ dependencies {
 	//sqlite
 	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
 
+	// ms access
+	implementation 'com.healthmarketscience.jackcess:jackcess:4.0.1'
+
 	//json
 	implementation 'org.json:json:20220320'
 

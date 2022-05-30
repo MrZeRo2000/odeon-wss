@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class ProcessInfo {
     private final ProcessorType processorType;
@@ -77,7 +78,7 @@ public class ProcessInfo {
                 "processorType=" + processorType +
                 ", processingStatus=" + processingStatus +
                 ", lastUpdated=" + lastUpdated +
-                ", progressDetails=" + progressDetails +
+                ", progressDetails=" + progressDetails.stream().map(Object::toString).collect(Collectors.joining("-", "{", "}")) +
                 '}';
     }
 }

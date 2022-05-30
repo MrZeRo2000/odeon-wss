@@ -5,6 +5,7 @@ public class ProcessorMessages {
 
     static final String ERROR_ROOT_FOLDER_NOT_FOUND = "Root folder not found";
     static final String ERROR_PATH_NOT_FOUND = "Path not found: %s";
+    static final String ERROR_FILE_NOT_FOUND = "File not found: %s";
     static final String ERROR_EXCEPTION = "Exception: %s";
     static final String ERROR_EXPECTED_DIRECTORY = "Expected directory, found: %s";
     static final String ERROR_EXPECTED_FILE = "Expected file, found: %s";
@@ -16,9 +17,17 @@ public class ProcessorMessages {
     static final String ERROR_WRONG_FILE_TYPE = "Wrong file type: %s";
     static final String ERROR_NO_DATA_FOR_FILE = "No data for file: %s";
 
+    static final String ERROR_OPENING_MDB_DATABASE = "Error opening MDB database: %s";
+    static final String ERROR_OPENING_MDB_TABLE = "Error opening MDB table %s: %s";
+    static final String ERROR_PROCESSING_MDB_DATABASE = "Error processing MDB database: %s";
+
     static final String ERROR_ARTISTS_NOT_IN_DB = "Artists not in database: %s";
     static final String ERROR_ARTISTS_NOT_IN_FILES = "Artists not in files: %s";
     static final String INFO_ARTISTS_VALIDATED = "Artists validated";
+
+    static final String INFO_ARTISTS_IMPORTED = "Artists imported: %d";
+    static final String INFO_ARTIST_DETAILS_IMPORTED = "Artist details imported: %d";
+    static final String INFO_ARTIST_CATEGORIES_IMPORTED = "Artist categories imported: %d";
 
     static final String ERROR_ARTIFACTS_NOT_IN_DB = "Artifacts not in database: %s";
     static final String ERROR_ARTIFACTS_NOT_IN_FILES = "Artifacts not in files: %s";
