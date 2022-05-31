@@ -8,6 +8,7 @@ public class ArtistCategoryArtistListDTO {
     private final String artistName;
     private String genre;
     private final List<String> styles = new ArrayList<>();
+    private final Long detailId;
 
     public Long getId() {
         return id;
@@ -29,8 +30,13 @@ public class ArtistCategoryArtistListDTO {
         return styles;
     }
 
-    public ArtistCategoryArtistListDTO(Long id, String artistName) {
+    public Long getDetailId() {
+        return detailId;
+    }
+
+    public ArtistCategoryArtistListDTO(Long id, String artistName, Long detailId) {
         this.id = id;
         this.artistName = artistName;
+        this.detailId = detailId;
     }
 }

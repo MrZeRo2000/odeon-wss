@@ -2,12 +2,10 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.healthmarketscience.jackcess.Row;
 import com.healthmarketscience.jackcess.Table;
-import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.ArtistCategory;
-import com.romanpulov.odeonwss.entity.ArtistDetail;
-import com.romanpulov.odeonwss.entity.ArtistTypes;
+import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.ArtistCategoryRepository;
 import com.romanpulov.odeonwss.repository.ArtistDetailRepository;
+import com.romanpulov.odeonwss.repository.ArtistLyricsRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,14 +28,18 @@ public class ArtistsMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private final ArtistCategoryRepository artistCategoryRepository;
 
+    private final ArtistLyricsRepository artistLyricsRepository;
+
     public ArtistsMDBImportProcessor(
             ArtistRepository artistRepository,
             ArtistDetailRepository artistDetailRepository,
-            ArtistCategoryRepository artistCategoryRepository
+            ArtistCategoryRepository artistCategoryRepository,
+            ArtistLyricsRepository artistLyricsRepository
     ) {
         this.artistRepository = artistRepository;
         this.artistDetailRepository = artistDetailRepository;
         this.artistCategoryRepository = artistCategoryRepository;
+        this.artistLyricsRepository = artistLyricsRepository;
     }
 
     @Override
@@ -48,6 +50,7 @@ public class ArtistsMDBImportProcessor extends AbstractMDBImportProcessor {
             infoHandler(ProcessorMessages.INFO_ARTISTS_IMPORTED, importArtists(mdbReader));
             infoHandler(ProcessorMessages.INFO_ARTIST_DETAILS_IMPORTED, importArtistDetails(mdbReader));
             infoHandler(ProcessorMessages.INFO_ARTIST_CATEGORIES_IMPORTED, importArtistCategories(mdbReader));
+            infoHandler(ProcessorMessages.INFO_ARTIST_LYRICS_IMPORTED, importArtistLyrics(mdbReader));
 
         } catch (IOException e) {
             throw new ProcessorException(ERROR_PROCESSING_MDB_DATABASE, e.getMessage());
@@ -139,5 +142,38 @@ public class ArtistsMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private String cleanseArtistCategory(String title) {
         return title.replace("/ ", "/");
+    }
+
+    private int importArtistLyrics(MDBReader mdbReader) throws ProcessorException {
+        Table table = mdbReader.getTable(ARTISTLYRICS_TABLE_NAME);
+        AtomicInteger counter = new AtomicInteger(0);
+
+        for (Row row: table) {
+            long artistMigrationId = row.getInt(ARTISTLIST_ID_COLUMN_NAME).longValue();
+            artistRepository.findFirstByMigrationId(artistMigrationId).ifPresent(artist -> {
+               String songName = row.getString(SONGNAME_COLUMN_NAME);
+               String lyricsText = row.getString(LYRICSTEXT_COLUMN_NAME);
+
+               if (songName != null && lyricsText != null) {
+                   artistLyricsRepository.findFirstByArtistAndTitle(artist, songName).ifPresentOrElse(
+                           artistLyrics -> {
+                               artistLyrics.setText(lyricsText);
+                               artistLyricsRepository.save(artistLyrics);
+                           },
+                           () -> {
+                               ArtistLyrics artistLyrics = new ArtistLyrics();
+                               artistLyrics.setArtist(artist);
+                               artistLyrics.setTitle(songName);
+                               artistLyrics.setText(lyricsText);
+
+                               artistLyricsRepository.save(artistLyrics);
+                               counter.getAndIncrement();
+                           }
+                   );
+               }
+            });
+        }
+
+        return counter.get();
     }
 }

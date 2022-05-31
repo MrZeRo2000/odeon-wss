@@ -17,6 +17,7 @@ public abstract class AbstractMDBImportProcessor extends AbstractFileSystemProce
 
     protected static final String ARTISTLIST_TABLE_NAME = "ArtistList";
     protected static final String ARTISTLISTCAT_TABLE_NAME = "ArtistListCat";
+    protected static final String ARTISTLYRICS_TABLE_NAME = "ArtistLyrics";
 
     protected static final String ARTISTLIST_ID_COLUMN_NAME = "ArtistListID";
     protected static final String TITLE_COLUMN_NAME = "Title";
@@ -24,6 +25,9 @@ public abstract class AbstractMDBImportProcessor extends AbstractFileSystemProce
     protected static final String SOURCE_COLUMN_NAME = "Source";
     protected static final String ARTISTLISTCAT_ID_COLUMN_NAME = "ArtistListCatID";
     protected static final String CAT_ID_COLUMN_NAME = "CatID";
+    protected static final String ARTISTLYRICS_ID_COLUMN_NAME = "ArtistLyricsID";
+    protected static final String SONGNAME_COLUMN_NAME = "SongName";
+    protected static final String LYRICSTEXT_COLUMN_NAME = "LyricsText";
 
     protected static class MDBReader implements Closeable {
         private final Database database;

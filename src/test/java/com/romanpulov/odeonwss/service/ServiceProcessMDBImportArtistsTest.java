@@ -29,6 +29,7 @@ public class ServiceProcessMDBImportArtistsTest {
         Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artists imported")));
         Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artist details imported")));
         Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artist categories imported")));
+        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artist lyrics imported")));
         log.info("Processing info: " + service.getProcessInfo());
     }
 }
