@@ -1,0 +1,28 @@
+package com.romanpulov.odeonwss.controller;
+
+import com.romanpulov.odeonwss.entity.ArtistDetail;
+import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
+import com.romanpulov.odeonwss.repository.ArtistDetailRepository;
+import com.romanpulov.odeonwss.view.BiographyView;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping(value = "/api/artist-detail", produces = MediaType.APPLICATION_JSON_VALUE)
+public class ArtistDetailController {
+
+    private final ArtistDetailRepository artistDetailRepository;
+
+    public ArtistDetailController(ArtistDetailRepository artistDetailRepository) {
+        this.artistDetailRepository = artistDetailRepository;
+    }
+
+    @GetMapping()
+    ResponseEntity<BiographyView> get(@RequestParam("artistId") Long artistId) throws CommonEntityNotFoundException {
+        return ResponseEntity.ok(
+                artistDetailRepository.findArtistDetailByArtistId(artistId).orElseThrow(() ->
+                        new CommonEntityNotFoundException("ArtistDetail", artistId))
+        );
+    }
+}

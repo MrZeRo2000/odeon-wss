@@ -36,6 +36,7 @@ sourceCompatibility = '11'
 
 repositories {
 	mavenCentral()
+	mavenLocal()
 }
 
 dependencies {
@@ -50,7 +51,7 @@ dependencies {
 	//sqlite
 	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
 
-	// ms access
+	//ms access
 	implementation 'com.healthmarketscience.jackcess:jackcess:4.0.1'
 
 	//json
