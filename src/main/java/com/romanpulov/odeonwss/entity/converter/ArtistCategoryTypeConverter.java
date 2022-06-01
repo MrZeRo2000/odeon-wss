@@ -18,10 +18,7 @@ public class ArtistCategoryTypeConverter implements AttributeConverter<ArtistCat
         if (dbData == null) {
             return null;
         } else {
-            return Stream.of(ArtistCategoryType.values())
-                    .filter(artistCategoryType -> artistCategoryType.getCode().equals(dbData))
-                    .findFirst()
-                    .orElseThrow(IllegalArgumentException::new);
+            return ArtistCategoryType.fromCode(dbData);
         }
     }
 }

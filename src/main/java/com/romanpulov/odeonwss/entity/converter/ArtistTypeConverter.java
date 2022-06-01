@@ -19,10 +19,7 @@ public class ArtistTypeConverter implements AttributeConverter<ArtistType, Strin
         if (dbData == null) {
             return null;
         } else {
-            return Stream.of(ArtistType.values())
-                    .filter(artistType -> artistType.getCode().equals(dbData))
-                    .findFirst()
-                    .orElseThrow(IllegalArgumentException::new);
+            return ArtistType.fromCode(dbData);
         }
     }
 }
