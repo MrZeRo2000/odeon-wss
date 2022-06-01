@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.entity;
 
+import com.romanpulov.odeonwss.entity.converter.ArtistCategoryTypeConverter;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
@@ -36,13 +37,14 @@ public class ArtistCategory {
 
     @Column(name = "atct_type_code")
     @NotNull
-    private String type;
+    @Convert(converter = ArtistCategoryTypeConverter.class)
+    private ArtistCategoryType type;
 
-    public String getType() {
+    public ArtistCategoryType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(ArtistCategoryType type) {
         this.type = type;
     }
 

@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistDetail;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistDetailBuilder;
 import com.romanpulov.odeonwss.repository.ArtistDetailRepository;
@@ -39,7 +40,7 @@ public class ControllerArtistDetailTest {
     @Test
     @Sql({"/schema.sql", "/data.sql"})
     void shouldBeOk() throws Exception {
-        Artist artist = artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 1").build());
+        Artist artist = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 1").build());
         ArtistDetail artistDetail = artistDetailRepository.save(new EntityArtistDetailBuilder().withArtist(artist).withBiography("My bio").build());
 
         this.mockMvc.perform(get("/api/artist-detail?artistId=999")

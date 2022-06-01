@@ -1,9 +1,11 @@
 package com.romanpulov.odeonwss.dto;
 
+import com.romanpulov.odeonwss.entity.ArtistCategoryType;
+
 public class ArtistCategoryArtistDTO {
     private Long id;
     private String artistName;
-    private String categoryTypeCode;
+    private ArtistCategoryType categoryType;
     private String categoryName;
     public Long detailId;
 
@@ -23,12 +25,12 @@ public class ArtistCategoryArtistDTO {
         this.artistName = artistName;
     }
 
-    public String getCategoryTypeCode() {
-        return categoryTypeCode;
+    public ArtistCategoryType getCategoryType() {
+        return categoryType;
     }
 
-    public void setCategoryTypeCode(String categoryTypeCode) {
-        this.categoryTypeCode = categoryTypeCode;
+    public void setCategoryType(ArtistCategoryType categoryType) {
+        this.categoryType = categoryType;
     }
 
     public String getCategoryName() {
@@ -47,10 +49,10 @@ public class ArtistCategoryArtistDTO {
         this.detailId = detailId;
     }
 
-    public ArtistCategoryArtistDTO(Long id, String artistName, String categoryTypeCode, String categoryName, Long detailId) {
+    public ArtistCategoryArtistDTO(Long id, String artistName, ArtistCategoryType categoryType, String categoryName, Long detailId) {
         this.id = id;
         this.artistName = artistName;
-        this.categoryTypeCode = categoryTypeCode;
+        this.categoryType = categoryType;
         this.categoryName = categoryName;
         this.detailId = detailId;
     }
@@ -63,7 +65,7 @@ public class ArtistCategoryArtistDTO {
         return "ArtistCategoryArtistDTO{" +
                 "id=" + id +
                 ", artistName='" + artistName + '\'' +
-                ", categoryTypeCode='" + categoryTypeCode + '\'' +
+                ", categoryTypeCode='" + categoryType + '\'' +
                 ", categoryName='" + categoryName + '\'' +
                 ", detailId=" + detailId +
                 '}';

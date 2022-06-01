@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.entity.ArtistTypes;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 import org.junit.jupiter.api.*;

@@ -3,11 +3,12 @@ package com.romanpulov.odeonwss.entity.converter;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
-@Component
+@Converter
 public class DateConverter implements AttributeConverter<LocalDate, Long> {
     @Override
     public Long convertToDatabaseColumn(LocalDate attribute) {

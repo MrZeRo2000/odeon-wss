@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistDetail;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistDetailBuilder;
 import org.hibernate.JDBCException;
@@ -27,13 +28,13 @@ public class RepositoryArtistDetailTests {
     @Order(1)
     @Sql(value = {"/schema.sql", "/data.sql"})
     void testCRUD() throws Exception {
-        Artist artist1 = artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 1").build());
+        Artist artist1 = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 1").build());
         artistDetailRepository.save(new EntityArtistDetailBuilder().withArtist(artist1).withBiography("Bio 1").build());
 
         // no duplicate with same artist
         Assertions.assertThrows(JpaSystemException.class, () -> artistDetailRepository.save(new EntityArtistDetailBuilder().withArtist(artist1).withBiography("Bio 2").build()));
 
-        Artist artist2 = artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 2").build());
+        Artist artist2 = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 2").build());
         artistDetailRepository.save(new EntityArtistDetailBuilder().withArtist(artist2).withBiography("Bio 2").build());
 
         ArtistDetail artistDetail = artistDetailRepository.findArtistDetailByArtist(artist2).orElseThrow();

@@ -1,6 +1,6 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.entity.ArtistTypes;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
@@ -27,7 +27,7 @@ public class ServiceProcessValidateMP3Test {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql", "/main_artists.sql", "/main_artifacts.sql", "/main_compositions.sql", "/main_media_files.sql"})
     void testLoad() {
-        Assertions.assertEquals(2, artistRepository.getAllByType(ArtistTypes.A.name()).size());
+        Assertions.assertEquals(2, artistRepository.getAllByType(ArtistType.ARTIST).size());
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistLyrics;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistLyricsBuilder;
 import org.junit.jupiter.api.*;
@@ -24,7 +25,7 @@ public class RepositoryArtistLyricsTests {
     @Order(1)
     @Sql(value = {"/schema.sql", "/data.sql"})
     void testCRUD() throws Exception {
-        Artist artist1 = artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 1").build());
+        Artist artist1 = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 1").build());
 
         artistLyricsRepository.save(new EntityArtistLyricsBuilder().withArtist(artist1).withTitle("Title 2").withText("Text 2").build());
         artistLyricsRepository.save(new EntityArtistLyricsBuilder().withArtist(artist1).withTitle("Title 1").withText("Text 1").build());

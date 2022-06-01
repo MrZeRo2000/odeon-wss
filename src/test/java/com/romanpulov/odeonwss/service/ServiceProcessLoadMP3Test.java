@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.ArtistTypes;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
@@ -70,7 +70,7 @@ public class ServiceProcessLoadMP3Test {
     @Order(3)
     void testWrongArtifactTitle() throws Exception {
         Artist artist = new Artist();
-        artist.setType(ArtistTypes.A.name());
+        artist.setType(ArtistType.ARTIST);
         artist.setName("Aerosmith");
 
         artistRepository.save(artist);
@@ -86,7 +86,7 @@ public class ServiceProcessLoadMP3Test {
     void testOneArtistNotExists() {
         artistRepository.save(
                 new EntityArtistBuilder()
-                        .withType(ArtistTypes.A.name())
+                        .withType(ArtistType.ARTIST)
                         .withName("Kosheen")
                         .build()
         );
@@ -102,7 +102,7 @@ public class ServiceProcessLoadMP3Test {
         Arrays.asList("Aerosmith", "Kosheen").forEach(s ->
                 artistRepository.save(
                         new EntityArtistBuilder()
-                                .withType(ArtistTypes.A.name())
+                                .withType(ArtistType.ARTIST)
                                 .withName(s)
                                 .build()
                 ));

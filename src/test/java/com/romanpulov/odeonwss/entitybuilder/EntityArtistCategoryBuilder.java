@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.entitybuilder;
 
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
+import com.romanpulov.odeonwss.entity.ArtistCategoryType;
 
 public class EntityArtistCategoryBuilder {
     private final ArtistCategory artistCategory;
@@ -15,7 +16,7 @@ public class EntityArtistCategoryBuilder {
         return this;
     }
 
-    public EntityArtistCategoryBuilder withType(String type) {
+    public EntityArtistCategoryBuilder withType(ArtistCategoryType type) {
         artistCategory.setType(type);
         return this;
     }

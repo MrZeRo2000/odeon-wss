@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.entitybuilder;
 
 import com.romanpulov.odeonwss.entity.Artist;
+import com.romanpulov.odeonwss.entity.ArtistType;
 
 public class EntityArtistBuilder {
     private final Artist artist;
@@ -14,7 +15,7 @@ public class EntityArtistBuilder {
         return this;
     }
 
-    public EntityArtistBuilder withType(String type) {
+    public EntityArtistBuilder withType(ArtistType type) {
         artist.setType(type);
         return this;
     }

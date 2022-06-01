@@ -54,7 +54,7 @@ public class RepositoryArtifactTests {
         Assertions.assertNotNull(artifactType);
 
         //Artist
-        Artist artist = new EntityArtistBuilder().withType("A").withName("Name1").build();
+        Artist artist = new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name1").build();
         artistRepository.save(artist);
         Assertions.assertNotNull(artist);
         Assertions.assertNotNull(artist.getId());
@@ -88,7 +88,7 @@ public class RepositoryArtifactTests {
     @Order(3)
     @Transactional
     void testGetManyToOne() {
-        Artist artist = artistRepository.getAllByType(ArtistTypes.A.name()).get(0);
+        Artist artist = artistRepository.getAllByType(ArtistType.ARTIST).get(0);
 
         Artifact loadedArtifact = artifactRepository.getArtifactsByArtist(artist).get(0);
         Artist loadedArtist = loadedArtifact.getArtist();

@@ -1,9 +1,6 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.ArtistCategory;
+import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistCategoryBuilder;
@@ -40,38 +37,38 @@ public class RepositoryArtistTests {
     @Order(1)
     @Sql(value = {"/schema.sql", "/data.sql"})
     void testAutoIncrement() throws Exception {
-        List<Artist> artists = artistRepository.getAllByType("A");
+        List<Artist> artists = artistRepository.getAllByType(ArtistType.ARTIST);
         artistRepository.deleteAll(artists);
 
-        artists = artistRepository.getAllByType("A");
+        artists = artistRepository.getAllByType(ArtistType.ARTIST);
         Assertions.assertEquals(0, artists.size());
 
-        artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 1").build());
+        artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 1").build());
 
-        artists = artistRepository.getAllByType("A");
+        artists = artistRepository.getAllByType(ArtistType.ARTIST);
         Assertions.assertEquals(1, artists.size());
         Assertions.assertEquals(1L, artists.get(0).getId());
 
-        Artist artist = artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 2").build());
-        artists = artistRepository.getAllByType("A");
+        Artist artist = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 2").build());
+        artists = artistRepository.getAllByType(ArtistType.ARTIST);
         Assertions.assertEquals(2, artists.size());
         Assertions.assertEquals(2L, artist.getId());
 
         artistRepository.delete(artist);
-        artists = artistRepository.getAllByType("A");
+        artists = artistRepository.getAllByType(ArtistType.ARTIST);
         Assertions.assertEquals(1, artists.size());
-        artist = artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 3").build());
+        artist = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 3").build());
         Assertions.assertEquals(3L, artist.getId());
     }
 
     @Test
     @Order(2)
     void testAutoIncrement1() {
-        Assertions.assertEquals(2, artistRepository.getAllByType("A").size());
+        Assertions.assertEquals(2, artistRepository.getAllByType(ArtistType.ARTIST).size());
         artistRepository.deleteAll();
-        Assertions.assertEquals(0, artistRepository.getAllByType("A").size());
+        Assertions.assertEquals(0, artistRepository.getAllByType(ArtistType.ARTIST).size());
 
-        Artist artist = new Artist(10L, "A", "Name 10");
+        Artist artist = new Artist(10L, ArtistType.ARTIST, "Name 10");
         Artist savedArtist = artistRepository.save(artist);
         Assertions.assertEquals(4, savedArtist.getId());
     }

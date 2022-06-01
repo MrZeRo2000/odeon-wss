@@ -45,7 +45,7 @@ public class RepositoryCompositionTests {
         Assertions.assertNotNull(artifactType);
 
         //Artist
-        Artist artist = new EntityArtistBuilder().withType("A").withName("Name1").build();
+        Artist artist = new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name1").build();
         Artist savedArtist = artistRepository.save(artist);
         Assertions.assertNotNull(savedArtist);
         Assertions.assertNotNull(savedArtist.getId());

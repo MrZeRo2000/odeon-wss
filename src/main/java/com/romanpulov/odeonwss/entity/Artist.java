@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.entity;
 
+import com.romanpulov.odeonwss.entity.converter.ArtistTypeConverter;
 import org.hibernate.HibernateException;
 import org.springframework.lang.Nullable;
 
@@ -26,13 +27,14 @@ public class Artist {
 
     @Column(name = "arts_type_code")
     @NotNull
-    private String type;
+    @Convert(converter = ArtistTypeConverter.class)
+    private ArtistType type;
 
-    public String getType() {
+    public ArtistType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(ArtistType type) {
         this.type = type;
     }
 
@@ -115,7 +117,7 @@ public class Artist {
     public Artist() {
     }
 
-    public Artist(Long id, String type, String name) {
+    public Artist(Long id, ArtistType type, String name) {
         this.id = id;
         this.type = type;
         this.name = name;

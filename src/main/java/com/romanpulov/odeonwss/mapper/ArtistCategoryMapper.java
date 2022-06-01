@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.mapper;
 
 import com.romanpulov.odeonwss.dto.ArtistCategoryArtistDTO;
 import com.romanpulov.odeonwss.dto.ArtistCategoryArtistListDTO;
+import com.romanpulov.odeonwss.entity.ArtistCategoryType;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public class ArtistCategoryMapper {
             if ((result.size() == 0) || (!Objects.equals(result.get(result.size() - 1).getId(), aca.getId()))) {
                 result.add(new ArtistCategoryArtistListDTO(aca.getId(), aca.getArtistName(), aca.getDetailId()));
             }
-            if (aca.getCategoryTypeCode() != null &&  aca.getCategoryName() != null && aca.getCategoryTypeCode().equals("G")) {
+            if (aca.getCategoryType() != null &&  aca.getCategoryName() != null && aca.getCategoryType().equals(ArtistCategoryType.GENRE)) {
                 result.get(result.size()-1).setGenre(aca.getCategoryName());
             } else {
                 result.get(result.size()-1).getStyles().add(aca.getCategoryName());

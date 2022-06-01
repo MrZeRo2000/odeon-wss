@@ -77,7 +77,7 @@ public class MP3LoadProcessor extends AbstractFileSystemProcessor {
 
         String artistName = path.getFileName().toString();
 
-        Optional<Artist> artist = artistRepository.findFirstByTypeAndName(ArtistTypes.A.name(), artistName);
+        Optional<Artist> artist = artistRepository.findFirstByTypeAndName(ArtistType.ARTIST, artistName);
         if (artist.isEmpty()) {
             warningHandlerWithAddArtistAction(String.format(ProcessorMessages.ERROR_ARTIST_NOT_FOUND, artistName), artistName);
             return;

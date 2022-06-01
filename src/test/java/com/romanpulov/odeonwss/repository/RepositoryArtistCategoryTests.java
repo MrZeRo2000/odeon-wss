@@ -4,12 +4,13 @@ import com.romanpulov.odeonwss.dto.ArtistCategoryArtistDTO;
 import com.romanpulov.odeonwss.dto.ArtistCategoryArtistListDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
+import com.romanpulov.odeonwss.entity.ArtistCategoryType;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistCategoryBuilder;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.ArrayList;
@@ -31,21 +32,21 @@ public class RepositoryArtistCategoryTests {
     @Order(1)
     @Sql(value = {"/schema.sql", "/data.sql"})
     void testCRUD() throws Exception {
-        Artist artist = artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 1").build());
+        Artist artist = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 1").build());
         ArtistCategory artistCategory = artistCategoryRepository.save(
-                new EntityArtistCategoryBuilder().withType("G").withArtist(artist).withName("Rock").build()
+                new EntityArtistCategoryBuilder().withType(ArtistCategoryType.GENRE).withArtist(artist).withName("Rock").build()
         );
 
         ArtistCategory savedArtistCategory = artistCategoryRepository.getArtistCategoriesByArtistOrderByName(artist).get(0);
         Assertions.assertEquals("Rock", savedArtistCategory.getName());
-        Assertions.assertEquals("G", savedArtistCategory.getType());
+        Assertions.assertEquals(ArtistCategoryType.GENRE, savedArtistCategory.getType());
 
         artistCategory.setName("Pop");
         artistCategoryRepository.save(artistCategory);
         Assertions.assertEquals("Pop", artistCategoryRepository.getArtistCategoriesByArtistOrderByName(artist).get(0).getName());
 
         artistCategoryRepository.save(
-                new EntityArtistCategoryBuilder().withType("S").withArtist(artist).withName("Alternative Rock").build()
+                new EntityArtistCategoryBuilder().withType(ArtistCategoryType.STYLE).withArtist(artist).withName("Alternative Rock").build()
         );
 
         Assertions.assertEquals(2, StreamSupport.stream(artistCategoryRepository.findAll().spliterator(), false).count());
@@ -54,7 +55,7 @@ public class RepositoryArtistCategoryTests {
     @Test
     @Order(2)
     void testCascade() throws Exception {
-        Artist artist = artistRepository.getAllByType("A").get(0);
+        Artist artist = artistRepository.getAllByType(ArtistType.ARTIST).get(0);
 
         // delete with child element works
         artistRepository.delete(artist);
@@ -64,29 +65,29 @@ public class RepositoryArtistCategoryTests {
     @Test
     @Order(3)
     void testWithCategories() throws Exception {
-        Artist artist1 = artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 3").build());
+        Artist artist1 = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 3").build());
         ArtistCategory artistCategory11 = artistCategoryRepository.save(
-                new EntityArtistCategoryBuilder().withType("G").withArtist(artist1).withName("Rock").build()
+                new EntityArtistCategoryBuilder().withType(ArtistCategoryType.GENRE).withArtist(artist1).withName("Rock").build()
         );
         ArtistCategory artistCategory12 = artistCategoryRepository.save(
-                new EntityArtistCategoryBuilder().withType("S").withArtist(artist1).withName("Pop").build()
+                new EntityArtistCategoryBuilder().withType(ArtistCategoryType.STYLE).withArtist(artist1).withName("Pop").build()
         );
         ArtistCategory artistCategory13 = artistCategoryRepository.save(
-                new EntityArtistCategoryBuilder().withType("S").withArtist(artist1).withName("Alternative Rock").build()
+                new EntityArtistCategoryBuilder().withType(ArtistCategoryType.STYLE).withArtist(artist1).withName("Alternative Rock").build()
         );
 
-        Artist artist2 = artistRepository.save(new EntityArtistBuilder().withType("A").withName("Name 1").build());
+        Artist artist2 = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 1").build());
         ArtistCategory artistCategory21 = artistCategoryRepository.save(
-                new EntityArtistCategoryBuilder().withType("G").withArtist(artist2).withName("Pop").build()
+                new EntityArtistCategoryBuilder().withType(ArtistCategoryType.GENRE).withArtist(artist2).withName("Pop").build()
         );
         ArtistCategory artistCategory22 = artistCategoryRepository.save(
-                new EntityArtistCategoryBuilder().withType("S").withArtist(artist2).withName("Electronic").build()
+                new EntityArtistCategoryBuilder().withType(ArtistCategoryType.STYLE).withArtist(artist2).withName("Electronic").build()
         );
         ArtistCategory artistCategory23 = artistCategoryRepository.save(
-                new EntityArtistCategoryBuilder().withType("S").withArtist(artist2).withName("Rap").build()
+                new EntityArtistCategoryBuilder().withType(ArtistCategoryType.STYLE).withArtist(artist2).withName("Rap").build()
         );
 
-        List<Artist> artists = artistRepository.getAllByTypeOrderByName("A");
+        List<Artist> artists = artistRepository.getAllByTypeOrderByName(ArtistType.ARTIST);
         Assertions.assertEquals(2, artists.size());
 
         List<ArtistCategory> artistCategories = artistCategoryRepository.findByOrderByArtistNameAsc();
@@ -101,7 +102,7 @@ public class RepositoryArtistCategoryTests {
             if ((acalDTOs.size() == 0) || (!Objects.equals(acalDTOs.get(acalDTOs.size() - 1).getId(), acaDTO.getId()))) {
                 acalDTOs.add(new ArtistCategoryArtistListDTO(acaDTO.getId(), acaDTO.getArtistName(), acaDTO.getDetailId()));
             }
-            if (acaDTO.getCategoryTypeCode().equals("G")) {
+            if (acaDTO.getCategoryType().equals(ArtistCategoryType.GENRE)) {
                 acalDTOs.get(acalDTOs.size()-1).setGenre(acaDTO.getCategoryName());
             } else {
                 acalDTOs.get(acalDTOs.size()-1).getStyles().add(acaDTO.getCategoryName());

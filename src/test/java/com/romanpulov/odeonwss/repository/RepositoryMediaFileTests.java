@@ -37,7 +37,7 @@ public class RepositoryMediaFileTests {
     @Sql({"/schema.sql", "/data.sql"})
     void testCreateGet() {
         Artist artist = new EntityArtistBuilder()
-                .withType("A")
+                .withType(ArtistType.ARTIST)
                 .withName("Artist 1")
                 .build();
 

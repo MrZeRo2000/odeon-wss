@@ -62,7 +62,7 @@ public class ArtistsMDBImportProcessor extends AbstractMDBImportProcessor {
         AtomicInteger counter = new AtomicInteger(0);
 
         for (Row row: table) {
-            String artistType = row.getInt(SOURCE_COLUMN_NAME) == 5 ? ArtistTypes.C.name() : ArtistTypes.A.name();
+            ArtistType artistType = row.getInt(SOURCE_COLUMN_NAME) == 5 ? ArtistType.CLASSICS : ArtistType.ARTIST;
             String artistName = row.getString(TITLE_COLUMN_NAME);
             long migrationId = row.getInt(ARTISTLIST_ID_COLUMN_NAME).longValue();
             artistRepository.findFirstByTypeAndName(artistType, artistName).ifPresentOrElse(
@@ -124,7 +124,7 @@ public class ArtistsMDBImportProcessor extends AbstractMDBImportProcessor {
                     artistCategoryRepository.findFirstByMigrationId(migrationId).orElseGet(() -> {
                         ArtistCategory artistCategory = new ArtistCategory();
                         artistCategory.setArtist(artist);
-                        artistCategory.setType(row.getShort(CAT_ID_COLUMN_NAME) == 0 ? "G" : "S");
+                        artistCategory.setType(row.getShort(CAT_ID_COLUMN_NAME) == 0 ? ArtistCategoryType.GENRE : ArtistCategoryType.STYLE);
                         artistCategory.setName(cleanseArtistCategory(title));
                         artistCategory.setMigrationId(migrationId);
 
