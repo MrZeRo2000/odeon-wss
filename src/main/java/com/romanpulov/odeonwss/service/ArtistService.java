@@ -4,7 +4,7 @@ import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
 import com.romanpulov.odeonwss.dto.ArtistCategoryDetailDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
-import com.romanpulov.odeonwss.entity.ArtistCategoryType;
+import com.romanpulov.odeonwss.entity.ArtistDetail;
 import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.ArtistCategoryMapper;
@@ -15,10 +15,10 @@ import com.romanpulov.odeonwss.repository.ArtistDetailRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,17 +58,74 @@ public class ArtistService {
         }
 
         // save artist
-        Artist artist = artistRepository.save(ArtistMapper.fromArtistCategoriesDetailDTO(acd));
+        Artist artist = artistRepository.save(ArtistMapper.createFromArtistCategoriesDetailDTO(acd));
 
         // save artist detail
-        artistDetailRepository.save(ArtistDetailMapper.fromArtistCategoriesDetailDTO(artist, acd));
+        artistDetailRepository.save(ArtistDetailMapper.createFromArtistCategoriesDetailDTO(artist, acd));
 
         // save artist categories
-        List<ArtistCategory> artistCategories = ArtistCategoryMapper.fromArtistCategoriesDetailDTO(artist, acd);
+        List<ArtistCategory> artistCategories = ArtistCategoryMapper.createFromArtistCategoriesDetailDTO(artist, acd);
         if (artistCategories.size() > 0) {
             artistCategoryRepository.saveAll(artistCategories);
         }
 
         return getACDById(artist.getId());
+    }
+
+    @Transactional
+    public ArtistCategoriesDetailDTO updateACD(ArtistCategoriesDetailDTO acd)
+            throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException {
+        // check existing artist
+        Optional<Artist> existingArtist = artistRepository.findById(acd.getId());
+        if (existingArtist.isPresent()) {
+            Artist artist = existingArtist.get();
+
+            // check for artist after name change
+            Optional<Artist> newArtist = artistRepository.findFirstByName(acd.getArtistName());
+            if (newArtist.isPresent() && !newArtist.get().getId().equals(artist.getId())) {
+                throw new CommonEntityAlreadyExistsException(acd.getArtistName(), newArtist.get().getId());
+            }
+
+            // save artist
+            artistRepository.save(ArtistMapper.updateFromArtistCategoriesDetailDTO(artist, acd));
+
+            // save artist detail
+            Optional<ArtistDetail> existingArtistDetail = artistDetailRepository.findArtistDetailByArtist(artist);
+            if (existingArtistDetail.isPresent()) {
+                artistDetailRepository.save(ArtistDetailMapper.updateFromArtistCategoriesDetailDTO(existingArtistDetail.get(), acd));
+            } else {
+                artistDetailRepository.save(ArtistDetailMapper.createFromArtistCategoriesDetailDTO(artist, acd));
+            }
+
+            // get artist categories
+            List<ArtistCategory> existingCategories = artistCategoryRepository.getArtistCategoriesByArtistOrderByTypeAscNameAsc(artist);
+            List<ArtistCategory> categories = ArtistCategoryMapper.createFromArtistCategoriesDetailDTO(artist, acd);
+
+            // merge new with existing
+            Pair<List<ArtistCategory>, List<ArtistCategory>> mergedCategories = ArtistCategoryMapper.mergeCategories(existingCategories, categories);
+
+            // artist categories deleted
+            if (mergedCategories.getSecond().size() > 0) {
+                artistCategoryRepository.deleteAll(mergedCategories.getSecond());
+            }
+
+            // artist categories created
+            if (mergedCategories.getFirst().size() > 0) {
+                artistCategoryRepository.saveAll(mergedCategories.getFirst());
+            }
+
+            return getACDById(artist.getId());
+        } else {
+            throw new CommonEntityNotFoundException("Artist", acd.getId());
+        }
+    }
+
+    public void deleteById(Long id) throws CommonEntityNotFoundException {
+        Optional<Artist> existingArtist = artistRepository.findById(id);
+        if (existingArtist.isPresent()) {
+            artistRepository.delete(existingArtist.get());
+        } else {
+            throw new CommonEntityNotFoundException("Artist", id);
+        }
     }
 }

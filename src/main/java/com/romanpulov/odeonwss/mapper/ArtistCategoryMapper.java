@@ -7,6 +7,7 @@ import com.romanpulov.odeonwss.dto.ArtistCategoryDetailDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
 import com.romanpulov.odeonwss.entity.ArtistCategoryType;
+import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ public class ArtistCategoryMapper {
         return result;
     }
 
-    public static List<ArtistCategory> fromArtistCategoriesDetailDTO(Artist artist, ArtistCategoriesDetailDTO acd) {
+    public static List<ArtistCategory> createFromArtistCategoriesDetailDTO(Artist artist, ArtistCategoriesDetailDTO acd) {
         List<ArtistCategory> artistCategories = new ArrayList<>();
 
         // artist category genre
@@ -66,7 +67,7 @@ public class ArtistCategoryMapper {
             artistCategories.add(artistCategory);
         }
 
-        for (String style: acd.getStyles().stream().sorted().collect(Collectors.toList())) {
+        for (String style: acd.getStyles().stream().distinct().sorted().collect(Collectors.toList())) {
             ArtistCategory artistCategory = new ArtistCategory();
             artistCategory.setArtist(artist);
             artistCategory.setType(ArtistCategoryType.STYLE);
@@ -76,5 +77,32 @@ public class ArtistCategoryMapper {
         }
 
         return artistCategories;
+    }
+
+    public static boolean categoryValueEquals(ArtistCategory category1, ArtistCategory category2) {
+        return (category1.getType() == category2.getType() && Objects.equals(category1.getName(), category2.getName()));
+    }
+
+    public static Pair<List<ArtistCategory>, List<ArtistCategory>> mergeCategories(List<ArtistCategory> oldCategories, List<ArtistCategory> newCategories) {
+        List<ArtistCategory> createdCategories = new ArrayList<>();
+        List<ArtistCategory> deletedCategories = new ArrayList<>();
+
+        // get new
+        for (ArtistCategory artistCategory: newCategories) {
+            oldCategories.stream().filter(o -> categoryValueEquals(artistCategory, o)).findFirst().ifPresentOrElse(
+                    category -> {},
+                    () -> createdCategories.add(artistCategory)
+            );
+        }
+
+        // get deleted
+        for (ArtistCategory artistCategory: oldCategories) {
+            newCategories.stream().filter(n -> categoryValueEquals(artistCategory, n)).findFirst().ifPresentOrElse(
+                    category -> {},
+                    () -> deletedCategories.add(artistCategory)
+            );
+        }
+
+        return Pair.of(createdCategories, deletedCategories);
     }
 }

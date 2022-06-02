@@ -37,13 +37,13 @@ public class RepositoryArtistCategoryTests {
                 new EntityArtistCategoryBuilder().withType(ArtistCategoryType.GENRE).withArtist(artist).withName("Rock").build()
         );
 
-        ArtistCategory savedArtistCategory = artistCategoryRepository.getArtistCategoriesByArtistOrderByName(artist).get(0);
+        ArtistCategory savedArtistCategory = artistCategoryRepository.getArtistCategoriesByArtistOrderByTypeAscNameAsc(artist).get(0);
         Assertions.assertEquals("Rock", savedArtistCategory.getName());
         Assertions.assertEquals(ArtistCategoryType.GENRE, savedArtistCategory.getType());
 
         artistCategory.setName("Pop");
         artistCategoryRepository.save(artistCategory);
-        Assertions.assertEquals("Pop", artistCategoryRepository.getArtistCategoriesByArtistOrderByName(artist).get(0).getName());
+        Assertions.assertEquals("Pop", artistCategoryRepository.getArtistCategoriesByArtistOrderByTypeAscNameAsc(artist).get(0).getName());
 
         artistCategoryRepository.save(
                 new EntityArtistCategoryBuilder().withType(ArtistCategoryType.STYLE).withArtist(artist).withName("Alternative Rock").build()

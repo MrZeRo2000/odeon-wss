@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public interface ArtistCategoryRepository extends PagingAndSortingRepository<ArtistCategory, Long> {
 
-    List<ArtistCategory> getArtistCategoriesByArtistOrderByName(Artist artist);
+    List<ArtistCategory> getArtistCategoriesByArtistOrderByTypeAscNameAsc(Artist artist);
 
     List<ArtistCategory> findByOrderByArtistNameAsc();
 
