@@ -16,17 +16,15 @@ import java.util.List;
 public class ArtistCategoryController {
 
     private final ArtistCategoryRepository artistCategoryRepository;
-    private final ArtistCategoryMapper artistCategoryMapper;
 
-    public ArtistCategoryController(ArtistCategoryRepository artistCategoryRepository, ArtistCategoryMapper artistCategoryMapper) {
+    public ArtistCategoryController(ArtistCategoryRepository artistCategoryRepository) {
         this.artistCategoryRepository = artistCategoryRepository;
-        this.artistCategoryMapper = artistCategoryMapper;
     }
 
     @GetMapping("/all-with-artists")
     ResponseEntity<List<ArtistCategoryArtistListDTO>> getAllWithArtists() {
         return ResponseEntity.ok(
-                artistCategoryMapper.transformArtistCategoryArtistsDTO(
+                ArtistCategoryMapper.fromArtistCategoryArtistsDTO(
                         artistCategoryRepository.getAllWithArtistOrdered()
                 )
         );

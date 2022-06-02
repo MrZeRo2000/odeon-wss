@@ -4,16 +4,17 @@ import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
 import com.romanpulov.odeonwss.dto.ArtistCategoryArtistDTO;
 import com.romanpulov.odeonwss.dto.ArtistCategoryArtistListDTO;
 import com.romanpulov.odeonwss.dto.ArtistCategoryDetailDTO;
+import com.romanpulov.odeonwss.entity.Artist;
+import com.romanpulov.odeonwss.entity.ArtistCategory;
 import com.romanpulov.odeonwss.entity.ArtistCategoryType;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
-@Component
 public class ArtistCategoryMapper {
-    public List<ArtistCategoryArtistListDTO> transformArtistCategoryArtistsDTO(List<ArtistCategoryArtistDTO> acaList) {
+    public static List<ArtistCategoryArtistListDTO> fromArtistCategoryArtistsDTO(List<ArtistCategoryArtistDTO> acaList) {
         List<ArtistCategoryArtistListDTO> result = new ArrayList<>();
 
         acaList.forEach(aca -> {
@@ -30,7 +31,7 @@ public class ArtistCategoryMapper {
         return result;
     }
 
-    public ArtistCategoriesDetailDTO transformArtistCategoryDetailDTO(List<ArtistCategoryDetailDTO> acdList) {
+    public static ArtistCategoriesDetailDTO fromArtistCategoryDetailDTO(List<ArtistCategoryDetailDTO> acdList) {
         ArtistCategoriesDetailDTO result = null;
 
         for (ArtistCategoryDetailDTO acd: acdList) {
@@ -50,5 +51,30 @@ public class ArtistCategoryMapper {
         }
 
         return result;
+    }
+
+    public static List<ArtistCategory> fromArtistCategoriesDetailDTO(Artist artist, ArtistCategoriesDetailDTO acd) {
+        List<ArtistCategory> artistCategories = new ArrayList<>();
+
+        // artist category genre
+        if (acd.getGenre() != null) {
+            ArtistCategory artistCategory = new ArtistCategory();
+            artistCategory.setArtist(artist);
+            artistCategory.setType(ArtistCategoryType.GENRE);
+            artistCategory.setName(acd.getGenre());
+
+            artistCategories.add(artistCategory);
+        }
+
+        for (String style: acd.getStyles().stream().sorted().collect(Collectors.toList())) {
+            ArtistCategory artistCategory = new ArtistCategory();
+            artistCategory.setArtist(artist);
+            artistCategory.setType(ArtistCategoryType.STYLE);
+            artistCategory.setName(style);
+
+            artistCategories.add(artistCategory);
+        }
+
+        return artistCategories;
     }
 }

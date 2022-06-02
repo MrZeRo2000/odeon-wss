@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.dto.ErrorResponseDTO;
+import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.DataNotFoundException;
 import com.romanpulov.odeonwss.exception.WrongParameterValueException;
 
@@ -22,6 +23,11 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(WrongParameterValueException.class)
     public ResponseEntity<ErrorResponseDTO> handleBadPatchRequest(WrongParameterValueException ex, HttpServletRequest request) {
         return new ResponseEntity<>(new ErrorResponseDTO(ex.getMessage(), request.getRequestURI()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CommonEntityAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAlreadyExists(CommonEntityAlreadyExistsException ex, HttpServletRequest request) {
+        return new ResponseEntity<>(new ErrorResponseDTO(ex.getMessage(), request.getRequestURI()), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(RuntimeException.class)

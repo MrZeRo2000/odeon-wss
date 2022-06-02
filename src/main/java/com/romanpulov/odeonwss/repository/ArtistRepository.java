@@ -17,5 +17,7 @@ public interface ArtistRepository extends PagingAndSortingRepository<Artist, Lon
 
     Optional<Artist> findFirstByTypeAndName(ArtistType type, String name);
 
+    Optional<Artist> findFirstByName(String name);
+
     Optional<Artist> findFirstByMigrationId(Long migrationId);
 }
