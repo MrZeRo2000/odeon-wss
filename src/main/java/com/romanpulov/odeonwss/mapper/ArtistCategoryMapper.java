@@ -44,9 +44,9 @@ public class ArtistCategoryMapper {
 
                 result.setArtistBiography(acd.getArtistBiography());
             }
-            if (acd.getCategoryType().equals(ArtistCategoryType.GENRE)) {
+            if (ArtistCategoryType.GENRE.equals(acd.getCategoryType())) {
                 result.setGenre(acd.getCategoryName());
-            } else if (acd.getCategoryType().equals(ArtistCategoryType.STYLE)) {
+            } else if (ArtistCategoryType.STYLE.equals(acd.getCategoryType())) {
                 result.getStyles().add(acd.getCategoryName());
             }
         }

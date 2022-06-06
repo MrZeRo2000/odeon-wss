@@ -1,5 +1,8 @@
 package com.romanpulov.odeonwss.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
+import com.romanpulov.odeonwss.dtobuilder.ArtistCategoriesDetailDTOBuilder;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategoryType;
 import com.romanpulov.odeonwss.entity.ArtistDetail;
@@ -10,6 +13,7 @@ import com.romanpulov.odeonwss.entitybuilder.EntityArtistDetailBuilder;
 import com.romanpulov.odeonwss.repository.ArtistCategoryRepository;
 import com.romanpulov.odeonwss.repository.ArtistDetailRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
+import com.romanpulov.odeonwss.service.ArtistService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -24,8 +28,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -47,6 +55,12 @@ public class ControllerArtistCategoryDetailsTest {
 
     @Autowired
     private ArtistCategoryRepository artistCategoryRepository;
+
+    @Autowired
+    private ArtistService artistService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Test
     @Sql({"/schema.sql", "/data.sql"})
@@ -82,5 +96,142 @@ public class ControllerArtistCategoryDetailsTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", Matchers.containsString("not found")))
         ;
+    }
+
+    @Test
+    @Order(3)
+    void postWithSameNameShouldFailConflict() throws Exception {
+        ArtistCategoriesDetailDTO acd = new ArtistCategoriesDetailDTOBuilder()
+                .withArtistName("Name 1")
+                .withArtistType(ArtistType.ARTIST)
+                .withArtistBiography("Bio 3")
+                .withGenre("Rock")
+                .build();
+
+        String json = mapper.writeValueAsString(acd);
+
+        this.mockMvc.perform(post("/api/artist-category-details")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message", Matchers.containsString("already exists")));
+    }
+
+    @Test
+    @Order(4)
+    void postWithDifferentNameShouldBeOk() throws Exception {
+        ArtistCategoriesDetailDTO acd = new ArtistCategoriesDetailDTOBuilder()
+                .withArtistName("Name 3")
+                .withArtistType(ArtistType.ARTIST)
+                .withArtistBiography("Bio 3")
+                .withGenre("Rock")
+                .build();
+
+        String json = mapper.writeValueAsString(acd);
+
+        this.mockMvc.perform(post("/api/artist-category-details")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.artistName", Matchers.containsString("Name 3")));
+    }
+
+    @Test
+    @Order(5)
+    void putWithNewBiographyShouldBeOk() throws Exception {
+        ArtistCategoriesDetailDTO acd = artistService.getACDById(2L);
+        acd.setArtistBiography("Bio 3 changed");
+
+        String json = mapper.writeValueAsString(acd);
+
+        this.mockMvc.perform(put("/api/artist-category-details")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.artistBiography", Matchers.containsString("Bio 3 changed")));
+    }
+
+    @Test
+    @Order(6)
+    void putWithGenreAndStylesShouldBeOk() throws Exception {
+        ArtistCategoriesDetailDTO acd = artistService.getACDById(2L);
+        acd.setGenre("Rock");
+        acd.setStyles(List.of("Rap", "Alternative Rock"));
+
+        String json = mapper.writeValueAsString(acd);
+
+        this.mockMvc.perform(put("/api/artist-category-details")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.genre", Matchers.containsString("Rock")))
+                .andExpect(jsonPath("$.styles[0]", Matchers.containsString("Alternative Rock")))
+                .andExpect(jsonPath("$.styles[1]", Matchers.containsString("Rap")))
+        ;
+    }
+
+    @Test
+    @Order(7)
+    void putWithRemovedGenreAndStylesShouldBeOk() throws Exception {
+        ArtistCategoriesDetailDTO acd = artistService.getACDById(2L);
+        acd.setGenre(null);
+        acd.setStyles(List.of());
+
+        String json = mapper.writeValueAsString(acd);
+
+        this.mockMvc.perform(put("/api/artist-category-details")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.genre").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.styles", Matchers.empty()))
+        ;
+    }
+
+    @Test
+    @Order(8)
+    void putNotExistingArtistShouldFail() throws Exception {
+        ArtistCategoriesDetailDTO acd = artistService.getACDById(2L);
+        acd.setId(777L);
+
+        String json = mapper.writeValueAsString(acd);
+
+        this.mockMvc.perform(put("/api/artist-category-details")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", Matchers.containsString("not found")));
+    }
+
+    @Test
+    @Order(9)
+    void deleteNotExistingArtistShouldFail() throws Exception {
+        this.mockMvc.perform(delete("/api/artist-category-details/777"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", Matchers.containsString("not found")));
+    }
+
+    @Test
+    @Order(10)
+    void deleteExistingArtistShouldBeOk() throws Exception {
+        this.mockMvc.perform(get("/api/artist-category-details/2")
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk());
+
+        this.mockMvc.perform(delete("/api/artist-category-details/2"))
+                .andExpect(status().isOk());
+
+        this.mockMvc.perform(get("/api/artist-category-details/2")
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", Matchers.containsString("not found")));
     }
 }
