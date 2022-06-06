@@ -11,4 +11,6 @@ public interface ArtistDetailRepository extends CrudRepository<ArtistDetail, Lon
     Optional<ArtistDetail> findArtistDetailByArtist(Artist artist);
 
     Optional<BiographyView> findArtistDetailByArtistId(Long id);
+
+    Optional<BiographyView> findArtistDetailById(Long id);
 }

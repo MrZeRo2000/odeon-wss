@@ -18,11 +18,11 @@ public class ArtistDetailController {
         this.artistDetailRepository = artistDetailRepository;
     }
 
-    @GetMapping()
-    ResponseEntity<BiographyView> get(@RequestParam("artistId") Long artistId) throws CommonEntityNotFoundException {
+    @GetMapping("/{id}")
+    ResponseEntity<BiographyView> get(@PathVariable Long id) throws CommonEntityNotFoundException {
         return ResponseEntity.ok(
-                artistDetailRepository.findArtistDetailByArtistId(artistId).orElseThrow(() ->
-                        new CommonEntityNotFoundException("ArtistDetail", artistId))
+                artistDetailRepository.findArtistDetailById(id).orElseThrow(() ->
+                        new CommonEntityNotFoundException("ArtistDetail", id))
         );
     }
 }

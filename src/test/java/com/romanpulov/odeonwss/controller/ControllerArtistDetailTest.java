@@ -43,13 +43,13 @@ public class ControllerArtistDetailTest {
         Artist artist = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 1").build());
         ArtistDetail artistDetail = artistDetailRepository.save(new EntityArtistDetailBuilder().withArtist(artist).withBiography("My bio").build());
 
-        this.mockMvc.perform(get("/api/artist-detail?artistId=999")
+        this.mockMvc.perform(get("/api/artist-detail/999")
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(Matchers.containsString("not found")));
 
-        MvcResult mvcResult = this.mockMvc.perform(get("/api/artist-detail?artistId=" + artist.getId())
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/artist-detail/" + artist.getId())
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
