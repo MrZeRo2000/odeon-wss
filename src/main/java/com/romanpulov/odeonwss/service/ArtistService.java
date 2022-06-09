@@ -89,16 +89,20 @@ public class ArtistService {
             }
 
             // save artist
-            if ((acd.getArtistBiography() != null) && !acd.getArtistBiography().isBlank()) {
-                artistRepository.save(ArtistMapper.updateFromArtistCategoriesDetailDTO(artist, acd));
-            }
+            artistRepository.save(ArtistMapper.updateFromArtistCategoriesDetailDTO(artist, acd));
 
             // save artist detail
             Optional<ArtistDetail> existingArtistDetail = artistDetailRepository.findArtistDetailByArtist(artist);
             if (existingArtistDetail.isPresent()) {
-                artistDetailRepository.save(ArtistDetailMapper.updateFromArtistCategoriesDetailDTO(existingArtistDetail.get(), acd));
+                if ((acd.getArtistBiography() != null) && !acd.getArtistBiography().isBlank()) {
+                    artistDetailRepository.save(ArtistDetailMapper.updateFromArtistCategoriesDetailDTO(existingArtistDetail.get(), acd));
+                } else {
+                    artistDetailRepository.delete(existingArtistDetail.get());
+                }
             } else {
-                artistDetailRepository.save(ArtistDetailMapper.createFromArtistCategoriesDetailDTO(artist, acd));
+                if ((acd.getArtistBiography() != null) && !acd.getArtistBiography().isBlank()) {
+                    artistDetailRepository.save(ArtistDetailMapper.createFromArtistCategoriesDetailDTO(artist, acd));
+                }
             }
 
             // get artist categories

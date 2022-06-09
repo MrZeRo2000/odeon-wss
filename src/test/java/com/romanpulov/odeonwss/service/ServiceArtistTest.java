@@ -131,6 +131,23 @@ public class ServiceArtistTest {
                         .withGenre("Pop")
                         .build()
         );
+
+        acd.setArtistName("Name 99");
+        acd = artistService.updateACD(acd);
+
+        Assertions.assertNull(acd.getArtistBiography());
+
+        acd.setArtistBiography("Bio 99");
+        acd = artistService.updateACD(acd);
+        Assertions.assertEquals("Bio 99", acd.getArtistBiography());
+
+        acd.setArtistBiography("Bio 999");
+        acd = artistService.updateACD(acd);
+        Assertions.assertEquals("Bio 999", acd.getArtistBiography());
+
+        acd.setArtistBiography(null);
+        acd = artistService.updateACD(acd);
+        Assertions.assertNull(acd.getArtistBiography());
     }
 
 }
