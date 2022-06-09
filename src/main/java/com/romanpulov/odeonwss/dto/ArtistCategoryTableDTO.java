@@ -3,9 +3,10 @@ package com.romanpulov.odeonwss.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArtistCategoryArtistListDTO {
+public class ArtistCategoryTableDTO {
     private final Long id;
     private final String artistName;
+    private final String artistType;
     private String genre;
     private final List<String> styles = new ArrayList<>();
     private final Long detailId;
@@ -16,6 +17,10 @@ public class ArtistCategoryArtistListDTO {
 
     public String getArtistName() {
         return artistName;
+    }
+
+    public String getArtistType() {
+        return artistType;
     }
 
     public String getGenre() {
@@ -34,9 +39,10 @@ public class ArtistCategoryArtistListDTO {
         return detailId;
     }
 
-    public ArtistCategoryArtistListDTO(Long id, String artistName, Long detailId) {
+    public ArtistCategoryTableDTO(Long id, String artistName, String artistType, Long detailId) {
         this.id = id;
         this.artistName = artistName;
+        this.artistType = artistType;
         this.detailId = detailId;
     }
 }

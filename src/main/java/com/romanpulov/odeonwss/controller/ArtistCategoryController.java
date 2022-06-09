@@ -1,6 +1,6 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.romanpulov.odeonwss.dto.ArtistCategoryArtistListDTO;
+import com.romanpulov.odeonwss.dto.ArtistCategoryTableDTO;
 import com.romanpulov.odeonwss.mapper.ArtistCategoryMapper;
 import com.romanpulov.odeonwss.repository.ArtistCategoryRepository;
 import org.springframework.http.MediaType;
@@ -22,7 +22,7 @@ public class ArtistCategoryController {
     }
 
     @GetMapping("/all-with-artists")
-    ResponseEntity<List<ArtistCategoryArtistListDTO>> getAllWithArtists() {
+    ResponseEntity<List<ArtistCategoryTableDTO>> getAllWithArtists() {
         return ResponseEntity.ok(
                 ArtistCategoryMapper.fromArtistCategoryArtistsDTO(
                         artistCategoryRepository.getAllWithArtistOrdered()

@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.dto.ArtistCategoryArtistDTO;
-import com.romanpulov.odeonwss.dto.ArtistCategoryArtistListDTO;
+import com.romanpulov.odeonwss.dto.ArtistCategoryTableDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
 import com.romanpulov.odeonwss.entity.ArtistCategoryType;
@@ -97,10 +97,10 @@ public class RepositoryArtistCategoryTests {
         List<ArtistCategoryArtistDTO> acaDTOs = artistCategoryRepository.getAllWithArtistOrdered();
         Assertions.assertEquals(6, acaDTOs.size());
 
-        List<ArtistCategoryArtistListDTO> acalDTOs = new ArrayList<>();
+        List<ArtistCategoryTableDTO> acalDTOs = new ArrayList<>();
         acaDTOs.forEach(acaDTO -> {
             if ((acalDTOs.size() == 0) || (!Objects.equals(acalDTOs.get(acalDTOs.size() - 1).getId(), acaDTO.getId()))) {
-                acalDTOs.add(new ArtistCategoryArtistListDTO(acaDTO.getId(), acaDTO.getArtistName(), acaDTO.getDetailId()));
+                acalDTOs.add(new ArtistCategoryTableDTO(acaDTO.getId(), acaDTO.getArtistName(), acaDTO.getArtistType().getCode(), acaDTO.getDetailId()));
             }
             if (acaDTO.getCategoryType().equals(ArtistCategoryType.GENRE)) {
                 acalDTOs.get(acalDTOs.size()-1).setGenre(acaDTO.getCategoryName());

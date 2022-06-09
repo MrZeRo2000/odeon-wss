@@ -21,6 +21,7 @@ public interface ArtistCategoryRepository extends PagingAndSortingRepository<Art
             "new com.romanpulov.odeonwss.dto.ArtistCategoryArtistDTO(" +
             "ar.id, " +
             "ar.name, " +
+            "ar.type, " +
             "ac.type, " +
             "ac.name, " +
             "ad.id) " +
@@ -34,6 +35,7 @@ public interface ArtistCategoryRepository extends PagingAndSortingRepository<Art
             "new com.romanpulov.odeonwss.dto.ArtistCategoryArtistDTO(" +
             "ar.id, " +
             "ar.name, " +
+            "ar.type, " +
             "ac.type, " +
             "ac.name, " +
             "ad.id) " +

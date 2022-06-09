@@ -2,7 +2,7 @@ package com.romanpulov.odeonwss.mapper;
 
 import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
 import com.romanpulov.odeonwss.dto.ArtistCategoryArtistDTO;
-import com.romanpulov.odeonwss.dto.ArtistCategoryArtistListDTO;
+import com.romanpulov.odeonwss.dto.ArtistCategoryTableDTO;
 import com.romanpulov.odeonwss.dto.ArtistCategoryDetailDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
@@ -15,12 +15,12 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ArtistCategoryMapper {
-    public static List<ArtistCategoryArtistListDTO> fromArtistCategoryArtistsDTO(List<ArtistCategoryArtistDTO> acaList) {
-        List<ArtistCategoryArtistListDTO> result = new ArrayList<>();
+    public static List<ArtistCategoryTableDTO> fromArtistCategoryArtistsDTO(List<ArtistCategoryArtistDTO> acaList) {
+        List<ArtistCategoryTableDTO> result = new ArrayList<>();
 
         acaList.forEach(aca -> {
             if ((result.size() == 0) || (!Objects.equals(result.get(result.size() - 1).getId(), aca.getId()))) {
-                result.add(new ArtistCategoryArtistListDTO(aca.getId(), aca.getArtistName(), aca.getDetailId()));
+                result.add(new ArtistCategoryTableDTO(aca.getId(), aca.getArtistName(), aca.getArtistType().getCode(), aca.getDetailId()));
             }
             if (aca.getCategoryType() != null &&  aca.getCategoryName() != null && aca.getCategoryType().equals(ArtistCategoryType.GENRE)) {
                 result.get(result.size()-1).setGenre(aca.getCategoryName());
