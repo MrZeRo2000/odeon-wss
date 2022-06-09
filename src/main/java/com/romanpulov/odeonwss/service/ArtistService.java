@@ -89,7 +89,9 @@ public class ArtistService {
             }
 
             // save artist
-            artistRepository.save(ArtistMapper.updateFromArtistCategoriesDetailDTO(artist, acd));
+            if ((acd.getArtistBiography() != null) && !acd.getArtistBiography().isBlank()) {
+                artistRepository.save(ArtistMapper.updateFromArtistCategoriesDetailDTO(artist, acd));
+            }
 
             // save artist detail
             Optional<ArtistDetail> existingArtistDetail = artistDetailRepository.findArtistDetailByArtist(artist);
