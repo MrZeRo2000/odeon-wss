@@ -120,4 +120,17 @@ public class ServiceArtistTest {
     void deleteExistingShouldBeOk() throws Exception {
         artistService.deleteById(2L);
     }
+
+    @Test
+    @Order(9)
+    void saveWithoutBiographyShouldBeOk() throws Exception {
+        ArtistCategoriesDetailDTO acd = artistService.insertACD(
+                new ArtistCategoriesDetailDTOBuilder()
+                        .withArtistName("Name 9")
+                        .withArtistType(ArtistType.ARTIST)
+                        .withGenre("Pop")
+                        .build()
+        );
+    }
+
 }

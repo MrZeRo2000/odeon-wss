@@ -61,7 +61,9 @@ public class ArtistService {
         Artist artist = artistRepository.save(ArtistMapper.createFromArtistCategoriesDetailDTO(acd));
 
         // save artist detail
-        artistDetailRepository.save(ArtistDetailMapper.createFromArtistCategoriesDetailDTO(artist, acd));
+        if ((acd.getArtistBiography() != null) && !acd.getArtistBiography().isBlank()) {
+            artistDetailRepository.save(ArtistDetailMapper.createFromArtistCategoriesDetailDTO(artist, acd));
+        }
 
         // save artist categories
         List<ArtistCategory> artistCategories = ArtistCategoryMapper.createFromArtistCategoriesDetailDTO(artist, acd);
