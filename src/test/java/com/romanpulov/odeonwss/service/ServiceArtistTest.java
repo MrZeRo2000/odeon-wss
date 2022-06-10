@@ -150,4 +150,18 @@ public class ServiceArtistTest {
         Assertions.assertNull(acd.getArtistBiography());
     }
 
+    @Test
+    @Order(10)
+    void saveWithNameOnlyShouldBeOk() throws Exception {
+        ArtistCategoriesDetailDTO acd = artistService.insertACD(
+                new ArtistCategoriesDetailDTOBuilder()
+                        .withArtistName("Name 10")
+                        .build()
+        );
+
+        acd.setArtistName("Name 10 1");
+        acd = artistService.updateACD(acd);
+        Assertions.assertEquals("Name 10 1", acd.getArtistName());
+    }
+
 }
