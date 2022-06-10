@@ -6,6 +6,7 @@ import com.romanpulov.odeonwss.exception.DataNotFoundException;
 import com.romanpulov.odeonwss.exception.WrongParameterValueException;
 import com.romanpulov.odeonwss.service.ProcessService;
 import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
+import com.romanpulov.odeonwss.service.processor.model.ProcessingAction;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 import com.romanpulov.odeonwss.utils.EnumUtils;
 import org.springframework.http.MediaType;
@@ -46,5 +47,11 @@ public class ProcessController {
     ResponseEntity<MessageDTO> clearProcessInfo() {
         processService.clearProcessInfo();
         return ResponseEntity.ok(MessageDTO.fromMessage("Cleared"));
+    }
+
+    @PostMapping("/resolve")
+    ResponseEntity<ProcessInfo> resolveAction(@RequestBody ProcessingAction processingAction) {
+        processService.getProcessInfo().resolveAction(processingAction);
+        return ResponseEntity.ok(processService.getProcessInfo());
     }
 }

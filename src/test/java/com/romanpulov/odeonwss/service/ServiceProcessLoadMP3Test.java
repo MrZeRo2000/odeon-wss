@@ -112,4 +112,36 @@ public class ServiceProcessLoadMP3Test {
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
     }
 
+    @Test
+    @Order(6)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testNoArtistResolving() {
+        List<ProgressDetail> progressDetail;
+
+        service.executeProcessor(ProcessorType.MP3_LOADER, null);
+        progressDetail = service.getProcessInfo().getProgressDetails();
+        Assertions.assertEquals(4, progressDetail.size());
+        Assertions.assertEquals(ProcessingStatus.WARNING, service.getProcessInfo().getProcessingStatus());
+
+        Assertions.assertEquals(4, progressDetail.size());
+
+        // find first action
+        ProcessingAction processingAction = progressDetail.get(1).getProcessingAction();
+        Assertions.assertNotNull(processingAction);
+
+        // resolve first action
+        service.getProcessInfo().resolveAction(processingAction);
+        Assertions.assertEquals(3, progressDetail.size());
+        Assertions.assertEquals(ProcessingStatus.WARNING,
+                service.getProcessInfo().getProgressDetails().get(service.getProcessInfo().getProgressDetails().size() - 1).getStatus());
+
+        // find second action
+        processingAction = progressDetail.get(1).getProcessingAction();
+        Assertions.assertNotNull(processingAction);
+
+        // resolve second action
+        service.getProcessInfo().resolveAction(processingAction);
+        Assertions.assertEquals(2, progressDetail.size());
+    }
+
 }

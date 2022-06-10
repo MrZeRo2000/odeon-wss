@@ -48,6 +48,13 @@ public class ProcessInfo {
         }
     }
 
+    public void resolveAction(ProcessingAction processingAction) {
+        progressDetails.stream()
+                .filter(d -> processingAction.equals(d.getProcessingAction()))
+                .findFirst()
+                .ifPresent(progressDetails::remove);
+    }
+
     public ProcessInfo(ProcessorType processorType) {
         this.processorType = processorType;
         this.processingStatus = ProcessingStatus.IN_PROGRESS;
