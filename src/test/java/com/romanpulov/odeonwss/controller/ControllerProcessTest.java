@@ -22,9 +22,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class ControllerProcessTest {
 
-    final ObjectMapper mapper = new ObjectMapper();
-
     final static Logger logger = LoggerFactory.getLogger(ControllerProcessTest.class);
+
+    final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private MockMvc mockMvc;
@@ -78,7 +78,7 @@ public class ControllerProcessTest {
         mvcResult = this.mockMvc.perform(get("/api/process"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.processorType", Matchers.is("MP3_VALIDATOR")))
-                .andExpect(jsonPath("$.processingStatus", Matchers.is("FAILURE")))
+                .andExpect(jsonPath("$.processingStatus", Matchers.is("SUCCESS")))
                 .andExpect(jsonPath("$.progressDetails").isArray())
                 .andExpect(jsonPath("$.progressDetails[0].info", Matchers.is("Started MP3 Validator")))
                 .andReturn();

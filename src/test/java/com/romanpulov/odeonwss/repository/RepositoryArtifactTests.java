@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.dto.ArtifactTableDTO;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
@@ -50,7 +51,7 @@ public class RepositoryArtifactTests {
     @Order(2)
     void testInsertGet() {
         //ArtifactType
-        ArtifactType artifactType = artifactTypeRepository.findAllById(List.of(100L)).iterator().next();
+        ArtifactType artifactType = artifactTypeRepository.findAllById(List.of(101L)).iterator().next();
         Assertions.assertNotNull(artifactType);
 
         //Artist
@@ -60,7 +61,7 @@ public class RepositoryArtifactTests {
         Assertions.assertNotNull(artist.getId());
 
         Artifact artifact = new EntityArtifactBuilder()
-                .withArtifactType(artifactType)
+                .withArtifactType(ArtifactType.withMP3())
                 .withArtist(artist)
                 .withTitle("Title 1")
                 .withYear(2000L)
@@ -73,7 +74,7 @@ public class RepositoryArtifactTests {
         Assertions.assertNotNull(artifact);
         Assertions.assertNotNull(artifact.getId());
         Assertions.assertEquals(artist, artifact.getArtist());
-        Assertions.assertEquals(artifactType, artifact.getArtifactType());
+        Assertions.assertEquals(artifactType, ArtifactType.withMP3());
         Assertions.assertEquals("Title 1", artifact.getTitle());
         Assertions.assertEquals(2000L, artifact.getYear());
         Assertions.assertEquals(54334L, artifact.getDuration());
@@ -98,6 +99,30 @@ public class RepositoryArtifactTests {
 
     @Test
     @Order(4)
+    void testArtifactTable() {
+        List<ArtifactTableDTO> at = artifactRepository.getArtifactTableByArtistTypeAndArtifactTypes(
+                ArtistType.ARTIST,
+                List.of(ArtifactType.withMP3(), ArtifactType.withLA())
+        );
+        Assertions.assertEquals(1, at.size());
+
+        Assertions.assertEquals(0,
+            artifactRepository.getArtifactTableByArtistTypeAndArtifactTypes(
+                    ArtistType.ARTIST,
+                    List.of(ArtifactType.withLA())
+            ).size()
+        );
+
+        Assertions.assertEquals(0,
+                artifactRepository.getArtifactTableByArtistTypeAndArtifactTypes(
+                        ArtistType.CLASSICS,
+                        List.of(ArtifactType.withMP3())
+                ).size()
+        );
+    }
+
+    @Test
+    @Order(10)
     void testCascade() {
         Artifact artifact = artifactRepository.findAll().iterator().next();
         Assertions.assertNotNull(artifact);

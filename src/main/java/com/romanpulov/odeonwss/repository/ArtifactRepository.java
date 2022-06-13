@@ -1,9 +1,13 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.dto.ArtifactTableDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
+import com.romanpulov.odeonwss.entity.ArtistType;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +21,24 @@ public interface ArtifactRepository extends PagingAndSortingRepository<Artifact,
             String title,
             Long year
     );
+
+    @Query(
+        "SELECT new com.romanpulov.odeonwss.dto.ArtifactTableDTO(" +
+                "a.id," +
+                "at.name," +
+                "ar.name, " +
+                "a.title, " +
+                "a.year," +
+                "a.duration," +
+                "a.size," +
+                "a.insertDate" +
+                ") " +
+                "FROM Artifact as a " +
+                "INNER JOIN ArtifactType as at ON a.artifactType = at " +
+                "INNER JOIN Artist as ar ON a.artist = ar " +
+                "WHERE ar.type=:artistType " +
+                "AND a.artifactType IN (:artifactTypes) " +
+                "ORDER BY ar.name, a.year, a.title"
+    )
+    List<ArtifactTableDTO> getArtifactTableByArtistTypeAndArtifactTypes(@Param("artistType") ArtistType artistType, @Param("artifactTypes") List<ArtifactType> artifactTypes);
 }
