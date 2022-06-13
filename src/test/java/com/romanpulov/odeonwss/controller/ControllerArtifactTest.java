@@ -100,7 +100,7 @@ public class ControllerArtifactTest {
     void testGetTableMP3LA() throws Exception {
         this.mockMvc.perform(get("/api/artifact/table")
                         .queryParam("artistTypeCode", "A")
-                        .queryParam("artifactTypeNames", "MP3", "LA")
+                        .queryParam("artifactTypeCodes", "101", "102")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -113,7 +113,7 @@ public class ControllerArtifactTest {
     void testGetTableMP3() throws Exception {
         this.mockMvc.perform(get("/api/artifact/table")
                         .queryParam("artistTypeCode", "A")
-                        .queryParam("artifactTypeNames", "MP3")
+                        .queryParam("artifactTypeCodes", "101")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -126,7 +126,7 @@ public class ControllerArtifactTest {
     void testGetTableLA() throws Exception {
         this.mockMvc.perform(get("/api/artifact/table")
                         .queryParam("artistTypeCode", "A")
-                        .queryParam("artifactTypeNames", "LA")
+                        .queryParam("artifactTypeCodes", "102")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -139,7 +139,7 @@ public class ControllerArtifactTest {
     void testGetTableClassics() throws Exception {
         this.mockMvc.perform(get("/api/artifact/table")
                         .queryParam("artistTypeCode", "C")
-                        .queryParam("artifactTypeNames", "LA")
+                        .queryParam("artifactTypeCodes", "102")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -162,7 +162,7 @@ public class ControllerArtifactTest {
     void testGetTableWrongArtist() throws Exception {
         this.mockMvc.perform(get("/api/artifact/table")
                         .queryParam("artistTypeCode", "D")
-                        .queryParam("artifactTypeNames", "LA")
+                        .queryParam("artifactTypeCodes", "LA")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
         ;

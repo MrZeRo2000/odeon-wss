@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/artifact", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -28,9 +29,9 @@ public class ArtifactController {
     }
 
     @GetMapping("/table")
-    ResponseEntity<List<ArtifactTableDTO>> getTable(@RequestParam String artistTypeCode, @RequestParam List<String> artifactTypeNames) {
+    ResponseEntity<List<ArtifactTableDTO>> getTable(@RequestParam String artistTypeCode, @RequestParam List<String> artifactTypeCodes) {
         ArtistType artistType = ArtistType.fromCode(artistTypeCode);
-        List<ArtifactType> artifactTypes = artifactTypeRepository.getAllByNameIsIn(artifactTypeNames);
+        List<ArtifactType> artifactTypes = artifactTypeRepository.getAllByIdIsIn(artifactTypeCodes.stream().map(Long::valueOf).collect(Collectors.toList()));
 
         return ResponseEntity.ok(artifactRepository.getArtifactTableByArtistTypeAndArtifactTypes(artistType, artifactTypes));
     }

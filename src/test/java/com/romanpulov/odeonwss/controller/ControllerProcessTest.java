@@ -78,7 +78,7 @@ public class ControllerProcessTest {
         mvcResult = this.mockMvc.perform(get("/api/process"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.processorType", Matchers.is("MP3_VALIDATOR")))
-                .andExpect(jsonPath("$.processingStatus", Matchers.is("SUCCESS")))
+                .andExpect(jsonPath("$.processingStatus", Matchers.is("FAILURE")))
                 .andExpect(jsonPath("$.progressDetails").isArray())
                 .andExpect(jsonPath("$.progressDetails[0].info", Matchers.is("Started MP3 Validator")))
                 .andReturn();

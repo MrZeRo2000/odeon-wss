@@ -26,8 +26,8 @@ public class RepositoryArtifactTypeTest {
 
     @Test
     void testByNameIn() {
-        Assertions.assertEquals(2, artifactTypeRepository.getAllByNameIsIn(List.of("MP3", "LA")).size());
-        Assertions.assertEquals(1, artifactTypeRepository.getAllByNameIsIn(List.of("MP3", "LA1")).size());
-        Assertions.assertEquals(0, artifactTypeRepository.getAllByNameIsIn(List.of("Stuff")).size());
+        Assertions.assertEquals(2, artifactTypeRepository.getAllByIdIsIn(List.of(101L, 102L)).size());
+        Assertions.assertEquals(1, artifactTypeRepository.getAllByIdIsIn(List.of(101L, 88L)).size());
+        Assertions.assertEquals(0, artifactTypeRepository.getAllByIdIsIn(List.of(777L)).size());
     }
 }

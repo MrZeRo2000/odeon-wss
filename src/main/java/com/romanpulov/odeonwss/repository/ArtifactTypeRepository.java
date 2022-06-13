@@ -11,5 +11,5 @@ public interface ArtifactTypeRepository extends CrudRepository<ArtifactType, Lon
     List<ArtifactType> getAllByName(String name);
 
     @Cacheable("artifactTypes")
-    List<ArtifactType> getAllByNameIsIn(List<String> names);
+    List<ArtifactType> getAllByIdIsIn(List<Long> ids);
 }
