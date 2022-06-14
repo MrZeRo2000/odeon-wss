@@ -1,0 +1,59 @@
+package com.romanpulov.odeonwss.service;
+
+import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
+import com.romanpulov.odeonwss.mapper.ArtifactMapper;
+import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
+import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.util.Optional;
+
+@Service
+public class ArtifactService {
+
+    private final ArtifactRepository artifactRepository;
+
+    public ArtifactService(ArtifactRepository artifactRepository) {
+        this.artifactRepository = artifactRepository;
+    }
+
+    public ArtifactEditDTO getAEById(Long id) throws CommonEntityNotFoundException {
+        Optional<ArtifactEditDTO> existingAED = artifactRepository.getArtifactEditById(id);
+        if (existingAED.isPresent()) {
+            return existingAED.get();
+        } else {
+            throw new CommonEntityNotFoundException("Artifact", id);
+        }
+    }
+
+    @Transactional
+    public ArtifactEditDTO insertAED(ArtifactEditDTO aed) throws CommonEntityNotFoundException {
+        Artifact artifact = ArtifactMapper.createFromArtifactEditDTO(aed);
+        artifactRepository.save(artifact);
+        return getAEById(artifact.getId());
+    }
+
+    @Transactional
+    public ArtifactEditDTO updateAED(ArtifactEditDTO aed) throws CommonEntityNotFoundException {
+        Optional<Artifact> existingArtifact = artifactRepository.findById(aed.getId());
+        if (existingArtifact.isPresent()) {
+            Artifact artifact = ArtifactMapper.createFromArtifactEditDTO(aed);
+            artifact.setInsertDate(existingArtifact.get().getInsertDate());
+            artifactRepository.save(artifact);
+            return getAEById(artifact.getId());
+        } else {
+            throw new CommonEntityNotFoundException("Artifact", aed.getId());
+        }
+    }
+
+    public void deleteById(Long id) throws CommonEntityNotFoundException {
+        Optional<Artifact> existingArtifact = artifactRepository.findById(id);
+        if (existingArtifact.isPresent()) {
+            artifactRepository.delete(existingArtifact.get());
+        } else {
+            throw new CommonEntityNotFoundException("Artifact", id);
+        }
+    }
+}

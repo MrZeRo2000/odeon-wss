@@ -1,16 +1,16 @@
 package com.romanpulov.odeonwss.controller;
 
+import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
 import com.romanpulov.odeonwss.dto.ArtifactTableDTO;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
+import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
+import com.romanpulov.odeonwss.service.ArtifactService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,9 +23,13 @@ public class ArtifactController {
 
     private final ArtifactTypeRepository artifactTypeRepository;
 
-    public ArtifactController(ArtifactRepository artifactRepository, ArtifactTypeRepository artifactTypeRepository) {
+    private final ArtifactService artifactService;
+
+
+    public ArtifactController(ArtifactRepository artifactRepository, ArtifactTypeRepository artifactTypeRepository, ArtifactService artifactService) {
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
+        this.artifactService = artifactService;
     }
 
     @GetMapping("/table")
@@ -34,5 +38,21 @@ public class ArtifactController {
         List<ArtifactType> artifactTypes = artifactTypeRepository.getAllByIdIsIn(artifactTypeCodes.stream().map(Long::valueOf).collect(Collectors.toList()));
 
         return ResponseEntity.ok(artifactRepository.getArtifactTableByArtistTypeAndArtifactTypes(artistType, artifactTypes));
+    }
+
+    @PostMapping
+    ResponseEntity<ArtifactEditDTO> post(@RequestBody ArtifactEditDTO aed) throws CommonEntityNotFoundException  {
+        return ResponseEntity.ok(artifactService.insertAED(aed));
+    }
+
+    @PutMapping
+    ResponseEntity<ArtifactEditDTO> put(@RequestBody ArtifactEditDTO aed) throws CommonEntityNotFoundException  {
+        return ResponseEntity.ok(artifactService.updateAED(aed));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) throws CommonEntityNotFoundException {
+        artifactService.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

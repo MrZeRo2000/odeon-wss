@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
 import com.romanpulov.odeonwss.dto.ArtifactTableDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
@@ -41,4 +42,19 @@ public interface ArtifactRepository extends PagingAndSortingRepository<Artifact,
                 "ORDER BY ar.name, a.year, a.title"
     )
     List<ArtifactTableDTO> getArtifactTableByArtistTypeAndArtifactTypes(@Param("artistType") ArtistType artistType, @Param("artifactTypes") List<ArtifactType> artifactTypes);
+
+    @Query(
+            "SELECT new com.romanpulov.odeonwss.dto.ArtifactEditDTO(" +
+                    "a.id, " +
+                    "a.artifactType.id, " +
+                    "a.artist.id, " +
+                    "a.title, " +
+                    "a.year, " +
+                    "a.duration, " +
+                    "a.size" +
+                    ") " +
+                    "FROM Artifact as a " +
+                    "WHERE a.id = :id"
+    )
+    Optional<ArtifactEditDTO> getArtifactEditById(Long id);
 }
