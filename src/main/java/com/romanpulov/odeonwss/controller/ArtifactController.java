@@ -40,6 +40,11 @@ public class ArtifactController {
         return ResponseEntity.ok(artifactRepository.getArtifactTableByArtistTypeAndArtifactTypes(artistType, artifactTypes));
     }
 
+    @GetMapping("/{id}")
+    ResponseEntity<ArtifactEditDTO> get(@PathVariable Long id) throws CommonEntityNotFoundException {
+        return ResponseEntity.ok(artifactService.getAEById(id));
+    }
+
     @PostMapping
     ResponseEntity<ArtifactEditDTO> post(@RequestBody ArtifactEditDTO aed) throws CommonEntityNotFoundException  {
         return ResponseEntity.ok(artifactService.insertAED(aed));
