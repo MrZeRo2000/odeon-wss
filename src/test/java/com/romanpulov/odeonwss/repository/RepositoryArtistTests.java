@@ -1,11 +1,9 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.dto.ArtistIdNameDTO;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.entitybuilder.EntityArtistCategoryBuilder;
-import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.ArtistRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,7 +11,6 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -94,6 +91,19 @@ public class RepositoryArtistTests {
         artifactRepository.delete(artifact);
         artistRepository.delete(artist);
         Assertions.assertThrows(NoSuchElementException.class, () -> artistRepository.findById(4L).orElseThrow());
+    }
+
+    @Test
+    @Order(4)
+    void testAllIdName() {
+        artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("zzz").build());
+        artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("aaa").build());
+        artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("nnn").build());
+
+        List<ArtistIdNameDTO> artists = artistRepository.getAllIdName();
+        Assertions.assertEquals("zzz", artists.get(2).getName());
+        Assertions.assertEquals("nnn", artists.get(1).getName());
+        Assertions.assertEquals("aaa", artists.get(0).getName());
     }
 
 }
