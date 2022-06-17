@@ -48,12 +48,14 @@ public interface ArtifactRepository extends PagingAndSortingRepository<Artifact,
                     "a.id, " +
                     "a.artifactType.id, " +
                     "a.artist.id, " +
+                    "ar.name, " +
                     "a.title, " +
                     "a.year, " +
                     "a.duration, " +
                     "a.size" +
                     ") " +
                     "FROM Artifact as a " +
+                    "INNER JOIN Artist as ar ON a.artist = ar " +
                     "WHERE a.id = :id"
     )
     Optional<ArtifactEditDTO> getArtifactEditById(Long id);

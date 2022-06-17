@@ -4,6 +4,7 @@ public class ArtifactEditDTO {
     private Long id;
     private Long artifactTypeId;
     private Long artistId;
+    private String artistName;
     private String title;
     private Long year;
     private Long duration;
@@ -31,6 +32,14 @@ public class ArtifactEditDTO {
 
     public void setArtistId(Long artistId) {
         this.artistId = artistId;
+    }
+
+    public String getArtistName() {
+        return artistName;
+    }
+
+    public void setArtistName(String artistName) {
+        this.artistName = artistName;
     }
 
     public String getTitle() {
@@ -65,10 +74,11 @@ public class ArtifactEditDTO {
         this.size = size;
     }
 
-    public ArtifactEditDTO(Long id, Long artifactTypeId, Long artistId, String title, Long year, Long duration, Long size) {
+    public ArtifactEditDTO(Long id, Long artifactTypeId, Long artistId, String artistName, String title, Long year, Long duration, Long size) {
         this.id = id;
         this.artifactTypeId = artifactTypeId;
         this.artistId = artistId;
+        this.artistName = artistName;
         this.title = title;
         this.year = year;
         this.duration = duration;
@@ -76,5 +86,19 @@ public class ArtifactEditDTO {
     }
 
     public ArtifactEditDTO() {
+    }
+
+    @Override
+    public String toString() {
+        return "ArtifactEditDTO{" +
+                "id=" + id +
+                ", artifactTypeId=" + artifactTypeId +
+                ", artistId=" + artistId +
+                ", artistName='" + artistName + '\'' +
+                ", title='" + title + '\'' +
+                ", year=" + year +
+                ", duration=" + duration +
+                ", size=" + size +
+                '}';
     }
 }
