@@ -11,7 +11,7 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
-public class ArtifactService {
+public class ArtifactService implements EditableObjectService<ArtifactEditDTO> {
 
     private final ArtifactRepository artifactRepository;
 
@@ -19,7 +19,8 @@ public class ArtifactService {
         this.artifactRepository = artifactRepository;
     }
 
-    public ArtifactEditDTO getAEById(Long id) throws CommonEntityNotFoundException {
+    @Override
+    public ArtifactEditDTO getById(Long id) throws CommonEntityNotFoundException {
         Optional<ArtifactEditDTO> existingAED = artifactRepository.getArtifactEditById(id);
         if (existingAED.isPresent()) {
             return existingAED.get();
@@ -28,26 +29,29 @@ public class ArtifactService {
         }
     }
 
+    @Override
     @Transactional
-    public ArtifactEditDTO insertAED(ArtifactEditDTO aed) throws CommonEntityNotFoundException {
+    public ArtifactEditDTO insert(ArtifactEditDTO aed) throws CommonEntityNotFoundException {
         Artifact artifact = ArtifactMapper.createFromArtifactEditDTO(aed);
         artifactRepository.save(artifact);
-        return getAEById(artifact.getId());
+        return getById(artifact.getId());
     }
 
+    @Override
     @Transactional
-    public ArtifactEditDTO updateAED(ArtifactEditDTO aed) throws CommonEntityNotFoundException {
+    public ArtifactEditDTO update(ArtifactEditDTO aed) throws CommonEntityNotFoundException {
         Optional<Artifact> existingArtifact = artifactRepository.findById(aed.getId());
         if (existingArtifact.isPresent()) {
             Artifact artifact = ArtifactMapper.createFromArtifactEditDTO(aed);
             artifact.setInsertDate(existingArtifact.get().getInsertDate());
             artifactRepository.save(artifact);
-            return getAEById(artifact.getId());
+            return getById(artifact.getId());
         } else {
             throw new CommonEntityNotFoundException("Artifact", aed.getId());
         }
     }
 
+    @Override
     public void deleteById(Long id) throws CommonEntityNotFoundException {
         Optional<Artifact> existingArtifact = artifactRepository.findById(id);
         if (existingArtifact.isPresent()) {

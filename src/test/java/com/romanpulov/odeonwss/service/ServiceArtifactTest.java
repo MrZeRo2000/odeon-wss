@@ -29,7 +29,7 @@ public class ServiceArtifactTest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     void testInsertShouldBeOk() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.insertACD(
+        ArtistCategoriesDetailDTO acd = artistService.insert(
                 new ArtistCategoriesDetailDTOBuilder()
                         .withArtistName("Name 1")
                         .withArtistType(ArtistType.ARTIST)
@@ -45,7 +45,7 @@ public class ServiceArtifactTest {
                 .withTitle("Title 1")
                 .build();
 
-        aed = artifactService.insertAED(aed);
+        aed = artifactService.insert(aed);
 
         Assertions.assertEquals(1, aed.getId());
     }
@@ -54,7 +54,7 @@ public class ServiceArtifactTest {
     @Order(2)
     void testInsertWithoutArtistShouldFail() {
         Assertions.assertThrows(Exception.class, () -> {
-            artifactService.insertAED(new ArtifactEditDTOBuilder()
+            artifactService.insert(new ArtifactEditDTOBuilder()
                     .withArtifactTypeId(ArtifactType.withMP3().getId())
                     .withTitle("Title 2")
                     .build()
@@ -66,7 +66,7 @@ public class ServiceArtifactTest {
     @Order(3)
     void testInsertWithoutTitleShouldFail() {
         Assertions.assertThrows(Exception.class, () -> {
-            artifactService.insertAED(new ArtifactEditDTOBuilder()
+            artifactService.insert(new ArtifactEditDTOBuilder()
                     .withArtistId(1L)
                     .withArtifactTypeId(ArtifactType.withMP3().getId())
                     .build()
@@ -77,9 +77,9 @@ public class ServiceArtifactTest {
     @Test
     @Order(4)
     void testUpdateYearShouldBeOk() throws Exception {
-        ArtifactEditDTO aed = artifactService.getAEById(1L);
+        ArtifactEditDTO aed = artifactService.getById(1L);
         aed.setYear(2000L);
-        aed = artifactService.updateAED(aed);
+        aed = artifactService.update(aed);
 
         Assertions.assertEquals(2000, aed.getYear());
     }
@@ -90,6 +90,6 @@ public class ServiceArtifactTest {
         ArtifactEditDTO aed = new ArtifactEditDTOBuilder()
                 .withId(888L)
                 .build();
-        Assertions.assertThrows(CommonEntityNotFoundException.class, () -> artifactService.updateAED(aed));
+        Assertions.assertThrows(CommonEntityNotFoundException.class, () -> artifactService.update(aed));
     }
 }

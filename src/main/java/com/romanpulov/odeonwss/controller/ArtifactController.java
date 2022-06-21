@@ -43,17 +43,17 @@ public class ArtifactController {
 
     @GetMapping("/{id}")
     ResponseEntity<ArtifactEditDTO> get(@PathVariable Long id) throws CommonEntityNotFoundException {
-        return ResponseEntity.ok(artifactService.getAEById(id));
+        return ResponseEntity.ok(artifactService.getById(id));
     }
 
     @PostMapping
     ResponseEntity<ArtifactEditDTO> post(@RequestBody ArtifactEditDTO aed) throws CommonEntityNotFoundException  {
-        return ResponseEntity.ok(artifactService.insertAED(aed));
+        return ResponseEntity.ok(artifactService.insert(aed));
     }
 
     @PutMapping
     ResponseEntity<ArtifactEditDTO> put(@RequestBody ArtifactEditDTO aed) throws CommonEntityNotFoundException  {
-        return ResponseEntity.ok(artifactService.updateAED(aed));
+        return ResponseEntity.ok(artifactService.update(aed));
     }
 
     @DeleteMapping("/{id}")

@@ -28,7 +28,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
@@ -141,7 +140,7 @@ public class ControllerArtistCategoryDetailsTest {
     @Test
     @Order(5)
     void putWithNewBiographyShouldBeOk() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.getACDById(2L);
+        ArtistCategoriesDetailDTO acd = artistService.getById(2L);
         acd.setArtistBiography("Bio 3 changed");
 
         String json = mapper.writeValueAsString(acd);
@@ -157,7 +156,7 @@ public class ControllerArtistCategoryDetailsTest {
     @Test
     @Order(6)
     void putWithGenreAndStylesShouldBeOk() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.getACDById(2L);
+        ArtistCategoriesDetailDTO acd = artistService.getById(2L);
         acd.setGenre("Rock");
         acd.setStyles(List.of("Rap", "Alternative Rock"));
 
@@ -177,7 +176,7 @@ public class ControllerArtistCategoryDetailsTest {
     @Test
     @Order(7)
     void putWithRemovedGenreAndStylesShouldBeOk() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.getACDById(2L);
+        ArtistCategoriesDetailDTO acd = artistService.getById(2L);
         acd.setGenre(null);
         acd.setStyles(List.of());
 
@@ -196,7 +195,7 @@ public class ControllerArtistCategoryDetailsTest {
     @Test
     @Order(8)
     void putNotExistingArtistShouldFail() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.getACDById(2L);
+        ArtistCategoriesDetailDTO acd = artistService.getById(2L);
         acd.setId(777L);
 
         String json = mapper.writeValueAsString(acd);

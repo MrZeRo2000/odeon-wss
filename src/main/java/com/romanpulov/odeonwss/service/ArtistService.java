@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ArtistService {
+public class ArtistService implements EditableObjectService<ArtistCategoriesDetailDTO> {
     private final Logger logger = LoggerFactory.getLogger(ArtistService.class);
 
     private final ArtistCategoryRepository artistCategoryRepository;
@@ -38,7 +38,8 @@ public class ArtistService {
         this.artistRepository = artistRepository;
     }
 
-    public ArtistCategoriesDetailDTO getACDById(Long id) throws CommonEntityNotFoundException {
+    @Override
+    public ArtistCategoriesDetailDTO getById(Long id) throws CommonEntityNotFoundException {
         List<ArtistCategoryDetailDTO> acdList = artistCategoryRepository.getArtistCategoryDetailsByArtistId(id);
         if (acdList.size() == 0) {
             throw new CommonEntityNotFoundException("Artist Category Details", id);
@@ -47,8 +48,9 @@ public class ArtistService {
         }
     }
 
+    @Override
     @Transactional
-    public ArtistCategoriesDetailDTO insertACD(ArtistCategoriesDetailDTO acd)
+    public ArtistCategoriesDetailDTO insert(ArtistCategoriesDetailDTO acd)
             throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException
     {
         // check artist
@@ -71,11 +73,12 @@ public class ArtistService {
             artistCategoryRepository.saveAll(artistCategories);
         }
 
-        return getACDById(artist.getId());
+        return getById(artist.getId());
     }
 
+    @Override
     @Transactional
-    public ArtistCategoriesDetailDTO updateACD(ArtistCategoriesDetailDTO acd)
+    public ArtistCategoriesDetailDTO update(ArtistCategoriesDetailDTO acd)
             throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException {
         // check existing artist
         Optional<Artist> existingArtist = artistRepository.findById(acd.getId());
@@ -122,12 +125,13 @@ public class ArtistService {
                 artistCategoryRepository.saveAll(mergedCategories.getFirst());
             }
 
-            return getACDById(artist.getId());
+            return getById(artist.getId());
         } else {
             throw new CommonEntityNotFoundException("Artist", acd.getId());
         }
     }
 
+    @Override
     public void deleteById(Long id) throws CommonEntityNotFoundException {
         Optional<Artist> existingArtist = artistRepository.findById(id);
         if (existingArtist.isPresent()) {

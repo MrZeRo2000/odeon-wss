@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.dto.CompositionEditDTO;
+import com.romanpulov.odeonwss.dto.CompositionTableDTO;
 import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
@@ -8,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CompositionRepository extends CrudRepository<Composition, Long> {
     void deleteCompositionByArtifact(Artifact artifact);
@@ -28,4 +31,37 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
             "ORDER BY ar.name, af.year, af.title, c.num"
     )
     List<CompositionValidationDTO> getCompositionValidationMusic(ArtifactType artifactType);
+
+    @Query("SELECT new com.romanpulov.odeonwss.dto.CompositionTableDTO(" +
+            "c.id, " +
+            "c.diskNum, " +
+            "c.num, " +
+            "c.title, " +
+            "c.duration, " +
+            "m.size, " +
+            "m.bitrate, " +
+            "m.name " +
+            ") " +
+            "FROM Composition c " +
+            "LEFT OUTER JOIN MediaFile m ON m.composition = c " +
+            "WHERE c.artifact = :artifact " +
+            "ORDER BY c.diskNum, c.num, c.title")
+    List<CompositionTableDTO> getCompositionTableByArtifact(Artifact artifact);
+
+    @Query("SELECT new com.romanpulov.odeonwss.dto.CompositionEditDTO(" +
+            "c.id, " +
+            "c.diskNum, " +
+            "c.num, " +
+            "c.title, " +
+            "c.duration, " +
+            "m.name," +
+            "m.format," +
+            "m.size," +
+            "m.bitrate," +
+            "m.duration " +
+            ") " +
+            "FROM Composition c " +
+            "LEFT OUTER JOIN MediaFile m ON m.composition = c " +
+            "WHERE c.id = :id")
+    Optional<CompositionEditDTO> getCompositionEditById(Long id);
 }
