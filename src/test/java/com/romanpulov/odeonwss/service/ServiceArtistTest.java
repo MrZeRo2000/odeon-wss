@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
-import com.romanpulov.odeonwss.dtobuilder.ArtistCategoriesDetailDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.ArtistCategoriesDetailDTOBuilder;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;

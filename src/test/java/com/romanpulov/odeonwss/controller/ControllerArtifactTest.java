@@ -1,13 +1,11 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
-import com.romanpulov.odeonwss.dtobuilder.ArtistCategoriesDetailDTOBuilder;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import org.hamcrest.Matchers;

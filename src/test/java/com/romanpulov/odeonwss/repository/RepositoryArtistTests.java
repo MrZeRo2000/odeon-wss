@@ -2,8 +2,8 @@ package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.dto.ArtistIdNameDTO;
 import com.romanpulov.odeonwss.entity.*;
-import com.romanpulov.odeonwss.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package com.romanpulov.odeonwss.entitybuilder;
+package com.romanpulov.odeonwss.builder.entitybuilder;
 
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;

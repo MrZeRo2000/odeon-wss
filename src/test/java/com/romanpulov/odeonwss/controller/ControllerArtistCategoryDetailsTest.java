@@ -2,14 +2,14 @@ package com.romanpulov.odeonwss.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
-import com.romanpulov.odeonwss.dtobuilder.ArtistCategoriesDetailDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.ArtistCategoriesDetailDTOBuilder;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategoryType;
 import com.romanpulov.odeonwss.entity.ArtistDetail;
 import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.entitybuilder.EntityArtistCategoryBuilder;
-import com.romanpulov.odeonwss.entitybuilder.EntityArtistDetailBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistCategoryBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistDetailBuilder;
 import com.romanpulov.odeonwss.repository.ArtistCategoryRepository;
 import com.romanpulov.odeonwss.repository.ArtistDetailRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;

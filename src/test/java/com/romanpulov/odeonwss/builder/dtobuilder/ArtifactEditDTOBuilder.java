@@ -1,51 +1,46 @@
-package com.romanpulov.odeonwss.dtobuilder;
+package com.romanpulov.odeonwss.builder.dtobuilder;
 
+import com.romanpulov.odeonwss.builder.AbstractClassBuilder;
 import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
 
-public class ArtifactEditDTOBuilder {
-    private final ArtifactEditDTO artifactEditDTO;
+public class ArtifactEditDTOBuilder extends AbstractClassBuilder<ArtifactEditDTO> {
 
     public ArtifactEditDTOBuilder() {
-        artifactEditDTO = new ArtifactEditDTO();
+        super(ArtifactEditDTO.class);
     }
 
     public ArtifactEditDTOBuilder withId(long id) {
-        artifactEditDTO.setId(id);
+        instance.setId(id);
         return this;
     }
 
     public ArtifactEditDTOBuilder withArtifactTypeId(long id) {
-        artifactEditDTO.setArtifactTypeId(id);
+        instance.setArtifactTypeId(id);
         return this;
     }
 
     public ArtifactEditDTOBuilder withArtistId(long id) {
-        artifactEditDTO.setArtistId(id);
+        instance.setArtistId(id);
         return this;
     }
 
     public ArtifactEditDTOBuilder withTitle(String title) {
-        artifactEditDTO.setTitle(title);
+        instance.setTitle(title);
         return this;
     }
 
     public ArtifactEditDTOBuilder withYear(long year) {
-        artifactEditDTO.setYear(year);
+        instance.setYear(year);
         return this;
     }
 
     public ArtifactEditDTOBuilder withDuration(long duration) {
-        artifactEditDTO.setDuration(duration);
+        instance.setDuration(duration);
         return this;
     }
 
     public ArtifactEditDTOBuilder withSize(long size) {
-        artifactEditDTO.setSize(size);
+        instance.setSize(size);
         return this;
     }
-
-    public ArtifactEditDTO build() {
-        return artifactEditDTO;
-    }
-
 }

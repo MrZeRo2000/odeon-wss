@@ -1,10 +1,9 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.entitybuilder.EntityArtistBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
