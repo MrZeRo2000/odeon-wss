@@ -3,6 +3,8 @@ package com.romanpulov.odeonwss.dto;
 public class CompositionEditDTO {
     private Long id;
 
+    private Long artifactId;
+
     private Long diskNum;
 
     private Long num;
@@ -27,6 +29,14 @@ public class CompositionEditDTO {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getArtifactId() {
+        return artifactId;
+    }
+
+    public void setArtifactId(Long artifactId) {
+        this.artifactId = artifactId;
     }
 
     public Long getDiskNum() {
@@ -101,8 +111,9 @@ public class CompositionEditDTO {
         this.mediaDuration = mediaDuration;
     }
 
-    public CompositionEditDTO(Long id, Long diskNum, Long num, String title, Long duration, String mediaName, String mediaFormat, Long mediaSize, Long mediaBitrate, Long mediaDuration) {
+    public CompositionEditDTO(Long id, Long artifactId, Long diskNum, Long num, String title, Long duration, String mediaName, String mediaFormat, Long mediaSize, Long mediaBitrate, Long mediaDuration) {
         this.id = id;
+        this.artifactId = artifactId;
         this.diskNum = diskNum;
         this.num = num;
         this.title = title;
@@ -121,6 +132,7 @@ public class CompositionEditDTO {
     public String toString() {
         return "CompositionEditDTO{" +
                 "id=" + id +
+                ", artifactId=" + artifactId +
                 ", diskNum=" + diskNum +
                 ", num=" + num +
                 ", title='" + title + '\'' +

@@ -10,9 +10,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MediaFileRepository extends CrudRepository<MediaFile, Long> {
     List<MediaFile> findAllByComposition(Composition composition);
+
+    Optional<MediaFile> findFirstByComposition(Composition composition);
 
     List<MediaFile> findAllByArtifact(Artifact artifact);
 
