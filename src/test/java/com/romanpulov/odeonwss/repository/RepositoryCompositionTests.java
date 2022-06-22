@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.romanpulov.odeonwss.dto.CompositionTableDTO;
 import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
@@ -9,6 +11,7 @@ import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
@@ -62,6 +65,18 @@ public class RepositoryCompositionTests {
         Assertions.assertNotNull(savedArtifact.getId());
         Assertions.assertEquals(1982L, savedArtifact.getYear());
 
+        //Artifact 2
+        artifactRepository.save(
+                new EntityArtifactBuilder()
+                        .withArtifactType(artifactType)
+                        .withArtist(artist)
+                        .withTitle("Title 2")
+                        .withYear(1983L)
+                        .withDuration(73556L)
+                        .withInsertDate(LocalDate.now().minusDays(5))
+                        .build()
+        );
+
         //validation DTO without composition
         List<CompositionValidationDTO> compositionValidationList = compositionRepository.getCompositionValidationMusic(ArtifactType.withMP3());
         Assertions.assertNotNull(compositionValidationList.get(0).getArtistName());
@@ -112,12 +127,39 @@ public class RepositoryCompositionTests {
     @Order(2)
     void testValidationDTO() {
         List<CompositionValidationDTO> compositionValidationList = compositionRepository.getCompositionValidationMusic(ArtifactType.withMP3());
-        Assertions.assertEquals(2, compositionValidationList.size());
+        Assertions.assertEquals(3, compositionValidationList.size());
         Assertions.assertEquals(1982, compositionValidationList.get(0).getArtifactYear());
     }
 
     @Test
     @Order(3)
+    void testCompositionTableDTO() {
+        List<CompositionTableDTO> compositions = compositionRepository.getCompositionTableByArtifactId(1L);
+        Assertions.assertEquals(2, compositions.size());
+        Assertions.assertEquals(0, compositionRepository.getCompositionTableByArtifactId(2L).size());
+        Assertions.assertEquals(0, compositionRepository.getCompositionTableByArtifactId(3L).size());
+    }
+
+    @Test
+    @Order(4)
+    void testInsertWithSameDiskAndNumShouldFail() {
+        Artifact artifact = artifactRepository.findById(1L).orElseThrow();
+
+        Assertions.assertThrows(JpaSystemException.class, () -> {
+            compositionRepository.save(
+                    new EntityCompositionBuilder()
+                            .withArtifact(artifact)
+                            .withTitle("Composition title 22")
+                            .withDiskNum(2L)
+                            .withNum(5L)
+                            .withDuration(757L)
+                            .build()
+            );
+        });
+    }
+
+    @Test
+    @Order(5)
     void testCascade() {
         Iterable<Composition> compositions = compositionRepository.findAll();
         List<Composition> compositionList = StreamSupport.stream(compositions.spliterator(), false).collect(Collectors.toList());

@@ -53,6 +53,8 @@ CREATE TABLE compositions (
 
 CREATE INDEX idx_composition_artf ON compositions(artf_id);
 
+CREATE UNIQUE INDEX idx_composition_artf_id_disk_num_num ON compositions(artf_id, comp_disk_num, comp_num);
+
 DROP TABLE IF EXISTS media_files;
 
 CREATE TABLE media_files (

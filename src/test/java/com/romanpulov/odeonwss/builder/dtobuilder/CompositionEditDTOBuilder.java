@@ -9,53 +9,53 @@ public class CompositionEditDTOBuilder extends AbstractClassBuilder<CompositionE
         super(CompositionEditDTO.class);
     }
 
-    public CompositionEditDTO withArtifact(Artifact artifact) {
+    public CompositionEditDTOBuilder withArtifact(Artifact artifact) {
         instance.setArtifactId(artifact.getId());
-        return instance;
+        return this;
     }
 
-    public CompositionEditDTO withTitle(String title) {
+    public CompositionEditDTOBuilder withTitle(String title) {
         instance.setTitle(title);
-        return instance;
+        return this;
     }
 
-    public CompositionEditDTO withDuration(long duration) {
+    public CompositionEditDTOBuilder withDuration(long duration) {
         instance.setDuration(duration);
-        return instance;
+        return this;
     }
 
-    public CompositionEditDTO withDiskNum(long diskNum) {
+    public CompositionEditDTOBuilder withDiskNum(long diskNum) {
         instance.setDiskNum(diskNum);
-        return instance;
+        return this;
     }
 
-    public CompositionEditDTO withNum(long num) {
+    public CompositionEditDTOBuilder withNum(long num) {
         instance.setNum(num);
-        return instance;
+        return this;
     }
 
-    public CompositionEditDTO withMediaName(String mediaName) {
+    public CompositionEditDTOBuilder withMediaName(String mediaName) {
         instance.setMediaName(mediaName);
-        return instance;
+        return this;
     }
 
-    public CompositionEditDTO withMediaFormat(String mediaFormat) {
+    public CompositionEditDTOBuilder withMediaFormat(String mediaFormat) {
         instance.setMediaFormat(mediaFormat);
-        return instance;
+        return this;
     }
 
-    public CompositionEditDTO withMediaSize(long mediaSize) {
+    public CompositionEditDTOBuilder withMediaSize(long mediaSize) {
         instance.setMediaSize(mediaSize);
-        return instance;
+        return this;
     }
 
-    public CompositionEditDTO withMediaBitrate(long mediaBitrate) {
+    public CompositionEditDTOBuilder withMediaBitrate(long mediaBitrate) {
         instance.setMediaBitrate(mediaBitrate);
-        return instance;
+        return this;
     }
 
-    public CompositionEditDTO withMediaDuration(long mediaDuration) {
+    public CompositionEditDTOBuilder withMediaDuration(long mediaDuration) {
         instance.setMediaDuration(mediaDuration);
-        return instance;
+        return this;
     }
 }
