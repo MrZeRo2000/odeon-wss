@@ -26,8 +26,8 @@ public class CompositionController {
         this.compositionService = compositionService;
     }
 
-    @GetMapping("/table")
-    ResponseEntity<List<CompositionTableDTO>> getTable(Long artifactId) {
+    @GetMapping("/table/{artifactId}")
+    ResponseEntity<List<CompositionTableDTO>> getTable(@PathVariable Long artifactId) {
         return ResponseEntity.ok(compositionRepository.getCompositionTableByArtifactId(artifactId));
     }
 
