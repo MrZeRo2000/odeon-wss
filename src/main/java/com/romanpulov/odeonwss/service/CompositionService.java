@@ -13,6 +13,7 @@ import com.romanpulov.odeonwss.repository.CompositionRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
@@ -41,6 +42,7 @@ public class CompositionService implements EditableObjectService<CompositionEdit
     }
 
     @Override
+    @Transactional
     public CompositionEditDTO insert(CompositionEditDTO o) throws CommonEntityNotFoundException {
         Artifact artifact = artifactRepository.findById(o.getArtifactId())
                 .orElseThrow(() -> new CommonEntityNotFoundException("Artifact", o.getArtifactId()));
@@ -48,12 +50,15 @@ public class CompositionService implements EditableObjectService<CompositionEdit
         compositionRepository.save(composition);
 
         MediaFile mediaFile = MediaFileMapper.fromCompositionEditDTO(o, composition);
-        mediaFileRepository.save(mediaFile);
+        if ((mediaFile.getName() != null) && !mediaFile.getName().isBlank()) {
+            mediaFileRepository.save(mediaFile);
+        }
 
         return getById(composition.getId());
     }
 
     @Override
+    @Transactional
     public CompositionEditDTO update(CompositionEditDTO o) throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException {
         Artifact artifact = artifactRepository.findById(o.getArtifactId())
                 .orElseThrow(() -> new CommonEntityNotFoundException("Artifact", o.getArtifactId()));
@@ -80,6 +85,7 @@ public class CompositionService implements EditableObjectService<CompositionEdit
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) throws CommonEntityNotFoundException {
         Optional<Composition> existingComposition = compositionRepository.findById(id);
         if (existingComposition.isPresent()) {
