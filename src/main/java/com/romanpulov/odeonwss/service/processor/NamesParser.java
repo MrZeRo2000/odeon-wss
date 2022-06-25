@@ -9,6 +9,7 @@ public class NamesParser {
     private static final String FORMAT_MUSIC_ARTIFACT = "%d %s";
     private static final String FORMAT_MUSIC_COMPOSITION = "%d - %s";
     private static final String FORMAT_MUSIC_WITH_FILE_NAME = "%d - %s (%s)";
+    private static final String FORMAT_MUSIC_WITHOUT_FILE_NAME = "%d - %s (no file name)";
 
     public static class YearTitle {
         private final int year;
@@ -83,6 +84,10 @@ public class NamesParser {
     }
 
     public static String formatMusicCompositionWithFile(long num, String title, String fileName) {
-        return String.format(FORMAT_MUSIC_WITH_FILE_NAME, num, title, fileName);
+        if (fileName == null) {
+            return String.format(FORMAT_MUSIC_WITHOUT_FILE_NAME, num, title);
+        } else {
+            return String.format(FORMAT_MUSIC_WITH_FILE_NAME, num, title, fileName);
+        }
     }
 }
