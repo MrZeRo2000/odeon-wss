@@ -29,4 +29,21 @@ public class UnitCueParserTest {
         Assertions.assertEquals(new CueParser.CueTrack("air.flac", 12, "Lost and Found", 2621), tracks.get(11));
         Assertions.assertEquals(new CueParser.CueTrack("air.flac", 13, "Asleep", 2937), tracks.get(12));
     }
+
+    @Test
+    void testManyFilesManyTracks() {
+        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of("D:/temp/ok/Lossless/Abigail Williams/2010 In The Absence Of Light/In The Absence Of Light.cue"));
+
+        Assertions.assertEquals(8, tracks.size());
+
+        Assertions.assertEquals(new CueParser.CueTrack("01 Hope The Great Betrayal.flac", 1, "Hope The Great Betrayal", 0), tracks.get(0));
+        Assertions.assertEquals(new CueParser.CueTrack("02 Final Destiny Of The Gods.flac", 2, "Final Destiny Of The Gods", 0), tracks.get(1));
+        Assertions.assertEquals(new CueParser.CueTrack("03 The Mysteries That Bind The Flesh.flac", 3, "The Mysteries That Bind The Flesh", 0), tracks.get(2));
+        Assertions.assertEquals(new CueParser.CueTrack("04 Infernal Divide.flac", 4, "Infernal Divide", 0), tracks.get(3));
+        Assertions.assertEquals(new CueParser.CueTrack("05 In Death Comes The Great Silence.flac", 5, "In Death Comes The Great Silence", 0), tracks.get(4));
+        Assertions.assertEquals(new CueParser.CueTrack("06 What Hells Await Me.flac", 6, "What Hells Await Me", 0), tracks.get(5));
+        Assertions.assertEquals(new CueParser.CueTrack("07 An Echo In Our Legends.flac", 7, "An Echo In Our Legends", 0), tracks.get(6));
+        Assertions.assertEquals(new CueParser.CueTrack("08 Malediction.flac", 8, "Malediction", 0), tracks.get(7));
+
+    }
 }
