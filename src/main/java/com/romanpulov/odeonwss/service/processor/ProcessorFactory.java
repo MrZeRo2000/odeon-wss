@@ -12,17 +12,20 @@ public class ProcessorFactory {
     private final ArtistsMDBImportProcessor artistsMDBImportProcessor;
     private final MP3LoadProcessor mp3LoadProcessor;
     private final MP3ValidateProcessor mp3ValidateProcessor;
+    private final LALoadProcessor laLoadProcessor;
 
     public ProcessorFactory(
             AppConfiguration appConfiguration,
             ArtistsMDBImportProcessor artistsMDBImportProcessor,
             MP3LoadProcessor mp3LoadProcessor,
-            MP3ValidateProcessor mp3ValidateProcessor)
+            MP3ValidateProcessor mp3ValidateProcessor,
+            LALoadProcessor laLoadProcessor)
     {
         this.appConfiguration = appConfiguration;
         this.artistsMDBImportProcessor = artistsMDBImportProcessor;
         this.mp3LoadProcessor = mp3LoadProcessor;
         this.mp3ValidateProcessor = mp3ValidateProcessor;
+        this.laLoadProcessor = laLoadProcessor;
     }
 
     public AbstractProcessor fromProcessorType(ProcessorType processorType, ProgressHandler handler) {
@@ -42,6 +45,11 @@ public class ProcessorFactory {
                 processor = mp3ValidateProcessor;
                 processor.setProgressHandler(handler);
                 processor.setRootFolder(appConfiguration.getMp3Path());
+                return processor;
+            case LA_LOADER:
+                processor = laLoadProcessor;
+                processor.setProgressHandler(handler);
+                processor.setRootFolder(appConfiguration.getLaPath());
                 return processor;
             default:
                 throw new UnsupportedOperationException();

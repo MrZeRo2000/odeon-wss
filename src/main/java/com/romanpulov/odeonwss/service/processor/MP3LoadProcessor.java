@@ -23,13 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component
-public class MP3LoadProcessor extends AbstractFileSystemProcessor {
+public class MP3LoadProcessor extends AbstractArtistProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(MP3LoadProcessor.class);
-
-    private final ArtistRepository artistRepository;
-
-    private final ArtifactRepository artifactRepository;
 
     private final CompositionRepository compositionRepository;
 
@@ -37,111 +33,38 @@ public class MP3LoadProcessor extends AbstractFileSystemProcessor {
 
     private final MediaFileParserInterface mediaFileParser;
 
-    private static class CompositionsSummary {
-        private long duration;
-        private long size;
-    }
-
     public MP3LoadProcessor(
             ArtistRepository artistRepository,
             ArtifactRepository artifactRepository,
             CompositionRepository compositionRepository,
             MediaFileRepository mediaFileRepository,
-            MediaFileParserInterface mediaFileParser ) {
-        this.artistRepository = artistRepository;
-        this.artifactRepository = artifactRepository;
+            MediaFileParserInterface mediaFileParser )
+    {
+        super(artistRepository, artifactRepository);
         this.compositionRepository = compositionRepository;
         this.mediaFileRepository = mediaFileRepository;
         this.mediaFileParser = mediaFileParser;
     }
 
     @Override
-    public void execute() throws ProcessorException {
-        Path path = validateAndGetPath();
-
-        try (Stream<Path> stream = Files.list(path)){
-            for (Path p : stream.collect(Collectors.toList())) {
-                logger.debug("Path:" + p.getFileName());
-                processArtistsPath(p);
-            }
+    protected void processCompositionsPath(Path path, Artifact artifact) throws ProcessorException {
+        List<Path> compositionPaths;
+        try (Stream<Path> stream = Files.list(path)) {
+            compositionPaths = stream.collect(Collectors.toList());
         } catch (IOException e) {
-            throw new ProcessorException(ProcessorMessages.ERROR_EXCEPTION,  e.getMessage());
-        }
-    }
-
-    private void processArtistsPath(Path path) throws ProcessorException {
-        if (!Files.isDirectory(path)) {
-            errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, path.getFileName());
-            return;
+            throw new ProcessorException(ProcessorMessages.ERROR_PROCESSING_FILES, e.getMessage());
         }
 
-        String artistName = path.getFileName().toString();
+        Map<String, NamesParser.NumberTitle> parsedCompositionFileNames = parseCompositionFileNames(compositionPaths);
+        if (parsedCompositionFileNames != null) {
+            Map<String, MediaFileInfo> parsedCompositionMediaInfo = parseCompositionsMediaInfo(compositionPaths);
+            if (parsedCompositionMediaInfo != null) {
+                CompositionsSummary summary = saveCompositionsAndMediaFiles(artifact, compositionPaths, parsedCompositionFileNames, parsedCompositionMediaInfo);
 
-        Optional<Artist> artist = artistRepository.findFirstByTypeAndName(ArtistType.ARTIST, artistName);
-        if (artist.isEmpty()) {
-            warningHandlerWithAddArtistAction(String.format(ProcessorMessages.ERROR_ARTIST_NOT_FOUND, artistName), artistName);
-            return;
-        }
-
-        try (Stream<Path> stream = Files.list(path)){
-            for (Path p: stream.collect(Collectors.toList())) {
-                logger.debug("File:" + p.getFileName());
-                processArtifactsPath(p, artist.get());
-            }
-        } catch (IOException e) {
-            throw new ProcessorException("Error processing files: " + e.getMessage());
-        }
-    }
-
-    private void processArtifactsPath(Path path, Artist artist) throws ProcessorException {
-        if (!Files.isDirectory(path)) {
-            errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, path.getFileName());
-            return;
-        }
-
-        String artifactName = path.getFileName().toString();
-
-        NamesParser.YearTitle yt = NamesParser.parseMusicArtifactTitle(artifactName);
-        if (yt == null) {
-            errorHandler(ProcessorMessages.ERROR_PARSING_ARTIFACT_NAME, path.toAbsolutePath().getFileName());
-            return;
-        }
-
-        Artifact artifact = new Artifact();
-        artifact.setArtifactType(ArtifactType.withMP3());
-        artifact.setArtist(artist);
-        artifact.setTitle(yt.getTitle());
-        artifact.setYear((long) yt.getYear());
-
-        Optional<Artifact> existingArtifact = artifactRepository.findFirstByArtifactTypeAndArtistAndTitleAndYear(
-                artifact.getArtifactType(),
-                artifact.getArtist(),
-                artifact.getTitle(),
-                artifact.getYear()
-        );
-
-        if (existingArtifact.isEmpty()) {
-
-            artifactRepository.save(artifact);
-
-            List<Path> compositionPaths;
-            try (Stream<Path> stream = Files.list(path)) {
-                compositionPaths = stream.collect(Collectors.toList());
-            } catch (IOException e) {
-                throw new ProcessorException(ProcessorMessages.ERROR_PROCESSING_FILES, e.getMessage());
-            }
-
-            Map<String, NamesParser.NumberTitle> parsedCompositionFileNames = parseCompositionFileNames(compositionPaths);
-            if (parsedCompositionFileNames != null) {
-                Map<String, MediaFileInfo> parsedCompositionMediaInfo = parseCompositionsMediaInfo(compositionPaths);
-                if (parsedCompositionMediaInfo != null) {
-                    CompositionsSummary summary = saveCompositionsAndMediaFiles(artifact, compositionPaths, parsedCompositionFileNames, parsedCompositionMediaInfo);
-
-                    artifact.setDuration(summary.duration);
-                    artifact.setSize(summary.size);
-                    artifact.setInsertDate(LocalDate.now());
-                    artifactRepository.save(artifact);
-                }
+                artifact.setDuration(summary.duration);
+                artifact.setSize(summary.size);
+                artifact.setInsertDate(LocalDate.now());
+                artifactRepository.save(artifact);
             }
         }
     }
