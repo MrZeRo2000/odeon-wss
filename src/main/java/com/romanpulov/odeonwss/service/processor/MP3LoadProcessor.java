@@ -6,8 +6,6 @@ import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.repository.CompositionRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
-import com.romanpulov.odeonwss.utils.media.MediaFileParserInterface;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -15,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,19 +28,19 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
 
     private final MediaFileRepository mediaFileRepository;
 
-    private final MediaFileParserInterface mediaFileParser;
+    private final MediaParser mediaParser;
 
     public MP3LoadProcessor(
             ArtistRepository artistRepository,
             ArtifactRepository artifactRepository,
             CompositionRepository compositionRepository,
             MediaFileRepository mediaFileRepository,
-            MediaFileParserInterface mediaFileParser )
+            MediaParser mediaParser )
     {
         super(artistRepository, artifactRepository);
         this.compositionRepository = compositionRepository;
         this.mediaFileRepository = mediaFileRepository;
-        this.mediaFileParser = mediaFileParser;
+        this.mediaParser = mediaParser;
     }
 
     @Override
@@ -57,7 +54,7 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
 
         Map<String, NamesParser.NumberTitle> parsedCompositionFileNames = parseCompositionFileNames(compositionPaths);
         if (parsedCompositionFileNames != null) {
-            Map<String, MediaFileInfo> parsedCompositionMediaInfo = parseCompositionsMediaInfo(compositionPaths);
+            Map<String, MediaFileInfo> parsedCompositionMediaInfo = mediaParser.parseCompositions(compositionPaths);
             if (parsedCompositionMediaInfo != null) {
                 CompositionsSummary summary = saveCompositionsAndMediaFiles(artifact, compositionPaths, parsedCompositionFileNames, parsedCompositionMediaInfo);
 
@@ -91,50 +88,6 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
             }
 
             result.put(compositionFileName, nt);
-        }
-
-        return result;
-    }
-
-    private Map<String, MediaFileInfo> parseCompositionsMediaInfo(List<Path> compositionPaths)
-            throws ProcessorException {
-        List<Callable<Pair<String, MediaFileInfo>>> callables = new ArrayList<>();
-
-        for (Path path: compositionPaths) {
-            Callable<Pair<String, MediaFileInfo>> callable = () -> {
-                MediaFileInfo mediafileInfo = mediaFileParser.parseMediaFile(path);
-                return Pair.of(path.getFileName().toString(), mediafileInfo);
-            };
-            callables.add(callable);
-        }
-
-        List<Future<Pair<String, MediaFileInfo>>> futures;
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
-        try {
-            futures = executorService.invokeAll(callables);
-        } catch (InterruptedException e) {
-            throw new ProcessorException("Error executing callables for media file info retrieval:" + e.getMessage());
-        }
-
-        executorService.shutdown();
-        try {
-            if (!executorService.awaitTermination(1000, TimeUnit.MILLISECONDS)) {
-                executorService.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
-        }
-
-        Map<String, MediaFileInfo> result = new HashMap<>();
-
-        try {
-            for (Future<Pair<String, MediaFileInfo>> future : futures) {
-                Pair<String, MediaFileInfo> futureData = future.get();
-                result.put(futureData.getFirst(), futureData.getSecond());
-            }
-        } catch (ExecutionException | InterruptedException e) {
-            errorHandler(ProcessorMessages.ERROR_PARSING_FILE, e.getMessage());
-            return null;
         }
 
         return result;

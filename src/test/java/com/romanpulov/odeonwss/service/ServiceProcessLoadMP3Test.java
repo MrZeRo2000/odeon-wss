@@ -37,6 +37,11 @@ public class ServiceProcessLoadMP3Test {
         progressDetail = service.getProcessInfo().getProgressDetails();
         Assertions.assertEquals(4, progressDetail.size());
         Assertions.assertEquals(ProcessingStatus.WARNING, service.getProcessInfo().getProcessingStatus());
+        // check processing progress
+        ProcessingAction pa = progressDetail.get(1).getProcessingAction();
+        Assertions.assertNotNull(pa);
+        Assertions.assertEquals(ProcessingActionType.ADD_ARTIST, pa.getActionType());
+        Assertions.assertTrue(pa.getValue().contains("Aerosmith") || pa.getValue().contains("Kosheen"));
 
         // error - path not exist
         service.executeProcessor(ProcessorType.MP3_LOADER, "non_existing_path");
@@ -44,12 +49,6 @@ public class ServiceProcessLoadMP3Test {
         Assertions.assertEquals(3, progressDetail.size());
         Assertions.assertEquals(ProcessingStatus.FAILURE, progressDetail.get(service.getProcessInfo().getProgressDetails().size() - 1).getStatus());
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
-
-        // check processing progress
-        ProcessingAction pa = progressDetail.get(1).getProcessingAction();
-        Assertions.assertNotNull(pa);
-        Assertions.assertEquals(ProcessingActionType.ADD_ARTIST, pa.getActionType());
-        Assertions.assertTrue(pa.getValue().contains("Aerosmith") || pa.getValue().contains("Kosheen"));
     }
 
     @Test
