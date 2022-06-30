@@ -167,24 +167,15 @@ public class CueParser {
 
                             //create new track
                             track = new CueTrack();
-                        }
 
-                        if (track.fileName == null) {
-                            //transfer previous file name if available
-                            if (prevTrack != null) {
+                            if (track.fileName == null) {
+                                //transfer previous file name if available
                                 track.fileName = prevTrack.fileName;
                             }
                         }
-                    } else {
-                        //create new track
-                        track = new CueTrack();
-                        //transfer previous file name if available
-                        if (prevTrack != null) {
-                            track.fileName = prevTrack.fileName;
-                        }
+                        track.num = trackNum;
                     }
 
-                    track.num = trackNum;
                 } else if (state.state == CUE_STATE.ST_TRACK_INDEX) {
                     if ((track != null) && (track.num > 0)) {
                         track.section = Integer.parseInt(state.matcher.group(1)) * 60 + Integer.parseInt(state.matcher.group(2));
