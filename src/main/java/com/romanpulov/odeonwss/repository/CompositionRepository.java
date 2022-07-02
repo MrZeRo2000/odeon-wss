@@ -43,7 +43,8 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
             "m.name " +
             ") " +
             "FROM Composition c " +
-            "LEFT OUTER JOIN MediaFile m ON m.composition = c " +
+            "LEFT OUTER JOIN CompositionMediaFile cm ON cm.compositionId = c.id " +
+            "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
             "WHERE c.artifact.id = :id " +
             "ORDER BY c.diskNum, c.num, c.title")
     List<CompositionTableDTO> getCompositionTableByArtifactId(Long id);
@@ -62,7 +63,8 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
             "m.duration " +
             ") " +
             "FROM Composition c " +
-            "LEFT OUTER JOIN MediaFile m ON m.composition = c " +
+            "LEFT OUTER JOIN CompositionMediaFile cm ON cm.compositionId = c.id " +
+            "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
             "WHERE c.id = :id")
     Optional<CompositionEditDTO> getCompositionEditById(Long id);
 }

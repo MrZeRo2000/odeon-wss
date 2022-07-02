@@ -110,17 +110,8 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
             if ((nt == null) || (mediaFileInfo == null)) {
                 throw new ProcessorException(ProcessorMessages.ERROR_NO_DATA_FOR_FILE, fileName);
             } else {
-                Composition composition = new Composition();
-                composition.setArtifact(artifact);
-                composition.setTitle(nt.getTitle());
-                composition.setDiskNum(1L);
-                composition.setNum(nt.getNumber());
-                composition.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
-
-                compositionRepository.save(composition);
-
                 MediaFile mediaFile = new MediaFile();
-                mediaFile.setComposition(composition);
+                mediaFile.setArtifact(artifact);
                 mediaFile.setName(fileName);
                 mediaFile.setFormat(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getFormatName());
                 mediaFile.setSize(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
@@ -128,6 +119,16 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
                 mediaFile.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
 
                 mediaFileRepository.save(mediaFile);
+
+                Composition composition = new Composition();
+                composition.setArtifact(artifact);
+                composition.setTitle(nt.getTitle());
+                composition.setDiskNum(1L);
+                composition.setNum(nt.getNumber());
+                composition.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
+                composition.getMediaFiles().add(mediaFile);
+
+                compositionRepository.save(composition);
 
                 summary.duration += mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration();
                 summary.size += mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize();

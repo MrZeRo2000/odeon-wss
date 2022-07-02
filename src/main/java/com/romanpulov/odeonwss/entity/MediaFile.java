@@ -2,8 +2,10 @@ package com.romanpulov.odeonwss.entity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "media_files")
@@ -33,16 +35,15 @@ public class MediaFile {
         this.artifact = artifact;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comp_id", referencedColumnName = "comp_id")
-    private Composition composition;
+    @ManyToMany(mappedBy = "mediaFiles")
+    private Set<Composition> compositions = new HashSet<>();
 
-    public Composition getComposition() {
-        return composition;
+    public Set<Composition> getCompositions() {
+        return compositions;
     }
 
-    public void setComposition(Composition composition) {
-        this.composition = composition;
+    public void setCompositions(Set<Composition> compositions) {
+        this.compositions = compositions;
     }
 
     @Column(name = "mdfl_name")
@@ -122,7 +123,6 @@ public class MediaFile {
         return "MediaFile{" +
                 "id=" + id +
                 ", artifact=" + artifact +
-                ", composition=" + composition +
                 ", name='" + name + '\'' +
                 ", format='" + format + '\'' +
                 ", size=" + size +

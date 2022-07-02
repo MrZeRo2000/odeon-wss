@@ -53,6 +53,15 @@ public class RepositoryMediaFileTests {
 
         artifactRepository.save(artifact);
 
+        MediaFile mediaFile = new EntityMediaFileBuilder()
+                .withArtifact(artifact)
+                .withName("AAA.mp3")
+                .withFormat("MP3")
+                .withSize(423L)
+                .withDuration(6234L)
+                .withBitrate(320L)
+                .build();
+
         Composition composition = new EntityCompositionBuilder()
                 .withArtifact(artifact)
                 .withTitle("Composition title")
@@ -63,18 +72,9 @@ public class RepositoryMediaFileTests {
 
         compositionRepository.save(composition);
 
-        MediaFile mediaFile = new EntityMediaFileBuilder()
-                .withComposition(composition)
-                .withName("AAA.mp3")
-                .withFormat("MP3")
-                .withSize(423L)
-                .withDuration(6234L)
-                .withBitrate(320L)
-                .build();
-
         MediaFile savedMediaFile = mediaFileRepository.save(mediaFile);
         Assertions.assertNotNull(savedMediaFile.getId());
-        Assertions.assertEquals(composition, mediaFile.getComposition());
+        Assertions.assertEquals(artifact, mediaFile.getArtifact());
         Assertions.assertEquals(savedMediaFile.getName(), mediaFile.getName());
         Assertions.assertEquals(savedMediaFile.getFormat(), mediaFile.getFormat());
         Assertions.assertEquals(savedMediaFile.getSize(), mediaFile.getSize());

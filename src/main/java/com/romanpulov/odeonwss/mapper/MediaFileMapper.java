@@ -1,14 +1,18 @@
 package com.romanpulov.odeonwss.mapper;
 
 import com.romanpulov.odeonwss.dto.CompositionEditDTO;
+import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.entity.MediaFile;
 
 public class MediaFileMapper {
-    public static MediaFile fromCompositionEditDTO(CompositionEditDTO editDTO, Composition composition) {
+    public static MediaFile fromCompositionEditDTO(CompositionEditDTO editDTO) {
         MediaFile mediaFile = new MediaFile();
 
-        mediaFile.setComposition(composition);
+        Artifact artifact = new Artifact();
+        artifact.setId(editDTO.getArtifactId());
+
+        mediaFile.setArtifact(artifact);
         mediaFile.setName(editDTO.getMediaName());
         mediaFile.setFormat(editDTO.getMediaFormat());
         mediaFile.setSize(editDTO.getMediaSize());
@@ -18,8 +22,8 @@ public class MediaFileMapper {
         return mediaFile;
     }
 
-    public static MediaFile fromCompositionEditDTO(CompositionEditDTO editDTO, MediaFile mediaFile, Composition composition) {
-        MediaFile updatedMediaFile = MediaFileMapper.fromCompositionEditDTO(editDTO, composition);
+    public static MediaFile fromCompositionEditDTO(CompositionEditDTO editDTO, MediaFile mediaFile) {
+        MediaFile updatedMediaFile = MediaFileMapper.fromCompositionEditDTO(editDTO);
         updatedMediaFile.setId(mediaFile.getId());
 
         return updatedMediaFile;

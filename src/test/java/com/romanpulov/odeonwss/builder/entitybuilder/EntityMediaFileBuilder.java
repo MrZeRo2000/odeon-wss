@@ -16,11 +16,6 @@ public class EntityMediaFileBuilder {
         return this;
     }
 
-    public EntityMediaFileBuilder withComposition(Composition composition) {
-        mediaFile.setComposition(composition);
-        return this;
-    }
-
     public EntityMediaFileBuilder withName(String name) {
         mediaFile.setName(name);
         return this;

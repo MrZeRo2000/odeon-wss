@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MediaFileRepository extends CrudRepository<MediaFile, Long> {
-    List<MediaFile> findAllByComposition(Composition composition);
+    Optional<MediaFile> findFirstByArtifact(Artifact artifact);
 
-    Optional<MediaFile> findFirstByComposition(Composition composition);
+    Optional<MediaFile> findFirstByArtifactAndName(Artifact artifact, String name);
 
     List<MediaFile> findAllByArtifact(Artifact artifact);
 
@@ -26,12 +26,13 @@ public interface MediaFileRepository extends CrudRepository<MediaFile, Long> {
             "af.year, " +
             "c.num, " +
             "c.title, " +
-            "mf.name, " +
-            "mf.format) " +
+            "m.name, " +
+            "m.format) " +
             "FROM Artist AS ar " +
             "INNER JOIN Artifact af ON af.artist = ar " +
             "LEFT OUTER JOIN Composition c ON c.artifact = af " +
-            "LEFT OUTER JOIN MediaFile mf ON mf.composition = c " +
+            "LEFT OUTER JOIN CompositionMediaFile cm ON cm.compositionId = c.id " +
+            "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
             "WHERE af.artifactType = ?1 " +
             "ORDER BY ar.name, af.year, af.title, c.num"
     )

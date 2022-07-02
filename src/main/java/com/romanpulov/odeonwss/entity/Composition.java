@@ -3,8 +3,10 @@ package com.romanpulov.odeonwss.entity;
 import javax.annotation.Nullable;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "compositions")
@@ -86,14 +88,18 @@ public class Composition {
         this.num = num;
     }
 
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "composition", fetch = FetchType.LAZY)
-    private List<MediaFile> mediaFiles;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "compositions_media_files",
+            joinColumns = @JoinColumn(name = "comp_id"),
+            inverseJoinColumns = @JoinColumn(name = "mdfl_id")
+    )
+    private Set<MediaFile> mediaFiles = new HashSet<>();
 
-    public List<MediaFile> getMediaFiles() {
+    public Set<MediaFile> getMediaFiles() {
         return mediaFiles;
     }
 
-    public void setMediaFiles(List<MediaFile> mediaFiles) {
+    public void setMediaFiles(Set<MediaFile> mediaFiles) {
         this.mediaFiles = mediaFiles;
     }
 

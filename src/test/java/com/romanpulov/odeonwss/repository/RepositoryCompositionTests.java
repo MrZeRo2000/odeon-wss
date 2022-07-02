@@ -12,10 +12,13 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -160,13 +163,68 @@ public class RepositoryCompositionTests {
 
     @Test
     @Order(5)
+    @Transactional
+    @Rollback(false)
+    void testUpdateComposition() {
+        Composition composition = compositionRepository.findById(1L).orElseThrow();
+        composition.setTitle("Composition updated title");
+        compositionRepository.save(composition);
+    }
+
+    @Test
+    @Order(6)
+    @Transactional
+    @Rollback(false)
+    void testInsertWithMediaFileShouldBeOk() throws Exception {
+        MediaFile mediaFile = new EntityMediaFileBuilder()
+                .withArtifact(artifactRepository.findById(1L).orElseThrow())
+                .withFormat("mp3")
+                .withName("Composition.mp3")
+                .withDuration(75L)
+                .withSize(5234L)
+                .withBitrate(128L)
+                .build();
+
+        mediaFileRepository.save(mediaFile);
+
+        Composition composition = compositionRepository.findById(1L).orElseThrow();
+        Assertions.assertEquals(0, composition.getMediaFiles().size());
+
+        Set<MediaFile> mediaFiles = composition.getMediaFiles();
+        mediaFiles.add(mediaFile);
+        composition.setMediaFiles(mediaFiles);
+        composition.setTitle("Composition title updated");
+
+        compositionRepository.save(composition);
+
+        composition = compositionRepository.findById(composition.getId()).orElseThrow();
+        Assertions.assertEquals(1, composition.getMediaFiles().size());
+    }
+
+    @Test
+    @Order(7)
+    @Transactional
+    @Rollback(false)
+    void testDeleteMediaFileShouldBeOk() throws Exception {
+        Composition composition = compositionRepository.findById(1L).orElseThrow();
+        Assertions.assertEquals(1, composition.getMediaFiles().size());
+
+        composition.getMediaFiles().clear();
+        compositionRepository.save(composition);
+
+        Assertions.assertEquals(0, composition.getMediaFiles().size());
+    }
+
+    @Test
+    @Order(100)
+    @Disabled("Not actual after DB structure change, to delete")
     void testCascade() {
         Iterable<Composition> compositions = compositionRepository.findAll();
         List<Composition> compositionList = StreamSupport.stream(compositions.spliterator(), false).collect(Collectors.toList());
         Assertions.assertEquals(2, compositionList.size());
 
         MediaFile mediaFile = new EntityMediaFileBuilder()
-                .withComposition(compositionList.get(0))
+                .withArtifact(artifactRepository.findById(1L).orElseThrow())
                 .withFormat("mp3")
                 .withName("File Name")
                 .withDuration(123456L)
@@ -176,7 +234,7 @@ public class RepositoryCompositionTests {
 
         //insert media file
         mediaFileRepository.save(mediaFile);
-        Assertions.assertEquals(1, mediaFileRepository.findAllByComposition(compositionList.get(0)).size());
+        Assertions.assertEquals(1, mediaFileRepository.findAllByArtifact(artifactRepository.findById(1L).orElseThrow()).size());
         Assertions.assertEquals(1, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
 
         //delete composition

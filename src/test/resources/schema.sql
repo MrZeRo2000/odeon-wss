@@ -60,7 +60,6 @@ DROP TABLE IF EXISTS media_files;
 CREATE TABLE media_files (
     mdfl_id INTEGER PRIMARY KEY AUTOINCREMENT,
     artf_id INTEGER NULL,
-    comp_id INTEGER NULL,
     mdfl_name TEXT NOT NULL,
     mdfl_format_code TEXT NOT NULL,
     mdfl_size INTEGER NOT NULL,
@@ -68,8 +67,15 @@ CREATE TABLE media_files (
     mdfl_duration INTEGER NULL
 );
 
-CREATE INDEX idx_media_files_artf ON media_files(artf_id);
-CREATE INDEX idx_media_files_comp ON media_files(comp_id);
+CREATE UNIQUE INDEX idx_media_files_artf_name ON media_files(artf_id, mdfl_name);
+
+DROP TABLE IF EXISTS compositions_media_files;
+
+CREATE TABLE compositions_media_files(
+    comp_id INTEGER NOT NULL,
+    mdfl_id INTEGER NOT NULL,
+    PRIMARY KEY (comp_id, mdfl_id)
+);
 
 DROP TABLE IF EXISTS artist_categories;
 

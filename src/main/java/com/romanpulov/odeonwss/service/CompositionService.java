@@ -14,7 +14,9 @@ import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class CompositionService implements EditableObjectService<CompositionEditDTO>{
@@ -41,18 +43,29 @@ public class CompositionService implements EditableObjectService<CompositionEdit
         }
     }
 
+    private Set<MediaFile> getOrCreateMediaFiles(CompositionEditDTO o) {
+        Set<MediaFile> mediaFiles = new HashSet<>();
+
+        if (!o.isMediaEmpty()) {
+            MediaFile mediaFile = MediaFileMapper.fromCompositionEditDTO(o);
+            if (mediaFileRepository.findFirstByArtifactAndName(mediaFile.getArtifact(), mediaFile.getName()).isEmpty()) {
+                mediaFileRepository.save(mediaFile);
+                mediaFiles.add(mediaFile);
+            }
+        }
+
+        return mediaFiles;
+    }
+
     @Override
     @Transactional
     public CompositionEditDTO insert(CompositionEditDTO o) throws CommonEntityNotFoundException {
         Artifact artifact = artifactRepository.findById(o.getArtifactId())
                 .orElseThrow(() -> new CommonEntityNotFoundException("Artifact", o.getArtifactId()));
-        Composition composition = CompositionMapper.fromEditDTO(o, artifact);
-        compositionRepository.save(composition);
 
-        MediaFile mediaFile = MediaFileMapper.fromCompositionEditDTO(o, composition);
-        if ((mediaFile.getName() != null) && !mediaFile.getName().isBlank()) {
-            mediaFileRepository.save(mediaFile);
-        }
+        Composition composition = CompositionMapper.fromEditDTO(o, artifact);
+        composition.setMediaFiles(getOrCreateMediaFiles(o));
+        compositionRepository.save(composition);
 
         return getById(composition.getId());
     }
@@ -66,9 +79,13 @@ public class CompositionService implements EditableObjectService<CompositionEdit
                 .orElseThrow(() -> new CommonEntityNotFoundException("Composition", o.getId()));
 
         Composition composition = CompositionMapper.fromEditDTO(o, artifact);
+        composition.setMediaFiles(getOrCreateMediaFiles(o));
         compositionRepository.save(composition);
 
-        Optional<MediaFile> existingMediaFile = mediaFileRepository.findFirstByComposition(composition);
+        /*
+        TODO Rework
+
+        Optional<MediaFile> existingMediaFile = mediaFileRepository.findFirstByCompositions(Set.of(composition));
         if (existingMediaFile.isPresent()) {
             if ((o.getMediaName() != null) && !o.getMediaName().isBlank()) {
                 mediaFileRepository.save(MediaFileMapper.fromCompositionEditDTO(o, existingMediaFile.get(), composition));
@@ -80,6 +97,8 @@ public class CompositionService implements EditableObjectService<CompositionEdit
                 mediaFileRepository.save(MediaFileMapper.fromCompositionEditDTO(o, composition));
             }
         }
+
+         */
 
         return getById(o.getId());
     }

@@ -111,6 +111,10 @@ public class CompositionEditDTO {
         this.mediaDuration = mediaDuration;
     }
 
+    public boolean isMediaEmpty() {
+        return (mediaName == null) || mediaName.isBlank();
+    }
+
     public CompositionEditDTO(Long id, Long artifactId, Long diskNum, Long num, String title, Long duration, String mediaName, String mediaFormat, Long mediaSize, Long mediaBitrate, Long mediaDuration) {
         this.id = id;
         this.artifactId = artifactId;
