@@ -3,8 +3,7 @@ package com.romanpulov.odeonwss.service.processor;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
-import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.service.CompositionService;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
 import org.springframework.stereotype.Component;
 
@@ -24,22 +23,18 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(MP3LoadProcessor.class);
 
-    private final CompositionRepository compositionRepository;
-
-    private final MediaFileRepository mediaFileRepository;
+    private final CompositionService compositionService;
 
     private final MediaParser mediaParser;
 
     public MP3LoadProcessor(
             ArtistRepository artistRepository,
             ArtifactRepository artifactRepository,
-            CompositionRepository compositionRepository,
-            MediaFileRepository mediaFileRepository,
+            CompositionService compositionService,
             MediaParser mediaParser )
     {
         super(artistRepository, artifactRepository);
-        this.compositionRepository = compositionRepository;
-        this.mediaFileRepository = mediaFileRepository;
+        this.compositionService = compositionService;
         this.mediaParser = mediaParser;
     }
 
@@ -118,17 +113,14 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
                 mediaFile.setBitrate(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getBitRate());
                 mediaFile.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
 
-                mediaFileRepository.save(mediaFile);
-
                 Composition composition = new Composition();
                 composition.setArtifact(artifact);
                 composition.setTitle(nt.getTitle());
                 composition.setDiskNum(1L);
                 composition.setNum(nt.getNumber());
                 composition.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
-                composition.getMediaFiles().add(mediaFile);
 
-                compositionRepository.save(composition);
+                compositionService.saveCompositionWithMedia(composition, mediaFile);
 
                 summary.duration += mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration();
                 summary.size += mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize();

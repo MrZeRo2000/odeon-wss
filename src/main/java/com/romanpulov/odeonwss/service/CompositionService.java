@@ -113,4 +113,11 @@ public class CompositionService implements EditableObjectService<CompositionEdit
             throw new CommonEntityNotFoundException("Composition", id);
         }
     }
+
+    @Transactional
+    public void saveCompositionWithMedia(Composition composition, MediaFile mediaFile) {
+        mediaFileRepository.save(mediaFile);
+        composition.setMediaFiles(Set.of(mediaFile));
+        compositionRepository.save(composition);
+    }
 }
