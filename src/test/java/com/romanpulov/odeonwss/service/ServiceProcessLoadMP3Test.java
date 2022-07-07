@@ -1,15 +1,20 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
+import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
+import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
+import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
@@ -25,6 +30,15 @@ public class ServiceProcessLoadMP3Test {
 
     @Autowired
     ArtistRepository artistRepository;
+
+    @Autowired
+    ArtifactRepository artifactRepository;
+
+    @Autowired
+    CompositionRepository compositionRepository;
+
+    @Autowired
+    MediaFileRepository mediaFileRepository;
 
     @Test
     @Order(1)
@@ -103,6 +117,12 @@ public class ServiceProcessLoadMP3Test {
         log.info("Created artists");
         Assertions.assertDoesNotThrow(() -> service.executeProcessor(ProcessorType.MP3_LOADER, "D:/Temp/ok/MP3 Music/"));
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+
+        Artist aerosmithArtist = artistRepository.findFirstByName("Aerosmith").orElseThrow();
+        Artist kosheenArtist = artistRepository.findFirstByName("Kosheen").orElseThrow();
+
+        Artifact honkinArtifact = artifactRepository.getArtifactsByArtist(aerosmithArtist).get(0);
+        Assertions.assertEquals(compositionRepository.findAllByArtifact(honkinArtifact).size(), mediaFileRepository.findAllByArtifact(honkinArtifact).size());
     }
 
     @Test

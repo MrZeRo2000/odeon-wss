@@ -25,8 +25,10 @@ public class ServiceProcessValidateMP3Test {
 
     @Test
     @Order(1)
-    @Sql({"/schema.sql", "/data.sql", "/main_artists.sql", "/main_artifacts.sql", "/main_compositions.sql", "/main_media_files.sql"})
+    @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
     void testLoad() {
+        service.executeProcessor(ProcessorType.MP3_LOADER);
+        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
         Assertions.assertEquals(2, artistRepository.getAllByType(ArtistType.ARTIST).size());
     }
 

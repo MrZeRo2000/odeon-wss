@@ -147,7 +147,7 @@ public class RepositoryArtifactTests {
 
         compositionRepository.save(composition);
 
-        Assertions.assertEquals(2, compositionRepository.getCompositionsByArtifact(artifact).size());
+        Assertions.assertEquals(2, compositionRepository.findAllByArtifact(artifact).size());
 
         //insert media file
         Assertions.assertEquals(0, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
@@ -164,7 +164,7 @@ public class RepositoryArtifactTests {
         artifactRepository.delete(artifact);
 
         //compositions deleted
-        Assertions.assertEquals(0, compositionRepository.getCompositionsByArtifact(artifact).size());
+        Assertions.assertEquals(0, compositionRepository.findAllByArtifact(artifact).size());
 
         //media files deleted
         Assertions.assertEquals(0, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());

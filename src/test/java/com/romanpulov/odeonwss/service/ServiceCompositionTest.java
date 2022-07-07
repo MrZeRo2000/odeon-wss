@@ -20,7 +20,6 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.transaction.Transactional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -175,10 +174,10 @@ public class ServiceCompositionTest {
     void testDelete() throws Exception {
         Assertions.assertThrows(CommonEntityNotFoundException.class, () -> compositionService.deleteById(5L));
 
-        Assertions.assertEquals(2, compositionRepository.getCompositionsByArtifact(artifactRepository.findById(1L).orElseThrow()).size());
+        Assertions.assertEquals(2, compositionRepository.findAllByArtifact(artifactRepository.findById(1L).orElseThrow()).size());
         compositionService.deleteById(1L);
         //TODO orphan deletion procedure
         //Assertions.assertEquals(1, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
-        Assertions.assertEquals(1, compositionRepository.getCompositionsByArtifact(artifactRepository.findById(1L).orElseThrow()).size());
+        Assertions.assertEquals(1, compositionRepository.findAllByArtifact(artifactRepository.findById(1L).orElseThrow()).size());
     }
 }

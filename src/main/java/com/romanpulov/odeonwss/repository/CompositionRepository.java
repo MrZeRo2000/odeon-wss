@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface CompositionRepository extends CrudRepository<Composition, Long> {
     void deleteCompositionByArtifact(Artifact artifact);
 
-    List<Composition> getCompositionsByArtifact(Artifact artifact);
+    List<Composition> findAllByArtifact(Artifact artifact);
 
     @Query("SELECT " +
             "new com.romanpulov.odeonwss.dto.CompositionValidationDTO(" +
