@@ -115,8 +115,10 @@ public class FFMPEGMediaFileParser implements MediaFileParserInterface {
                 throw new MediaInfoParsingException("Unknown media type:" + mediaTypeString);
             }
 
-            long duration = Math.round(streamObject.getDouble("duration"));
-            long bitRate = Math.round(streamObject.getInt("bit_rate") / 1000.0);
+            // for flac there may be no bitrate
+            // https://trac.ffmpeg.org/ticket/4195
+            long duration = Math.round(streamObject.optDouble("duration", 0));
+            long bitRate = Math.round(streamObject.optInt("bit_rate", 0) / 1000.0);
 
             result.add(new MediaStreamInfo(mediaType, duration, bitRate));
         }

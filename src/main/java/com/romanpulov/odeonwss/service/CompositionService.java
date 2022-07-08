@@ -115,9 +115,19 @@ public class CompositionService implements EditableObjectService<CompositionEdit
     }
 
     @Transactional
-    public void saveCompositionWithMedia(Composition composition, MediaFile mediaFile) {
-        mediaFileRepository.save(mediaFile);
+    public void insertCompositionWithMedia(Composition composition, MediaFile mediaFile) {
+        if (mediaFile.getId() == null) {
+            mediaFileRepository.save(mediaFile);
+        } else {
+            mediaFile = mediaFileRepository.findById(mediaFile.getId()).orElseThrow();
+        }
         composition.setMediaFiles(Set.of(mediaFile));
         compositionRepository.save(composition);
+    }
+
+    @Transactional
+    public void insertCompositionsWithMedia(Iterable<Composition> compositions, Iterable<MediaFile> mediaFiles) {
+        mediaFileRepository.saveAll(mediaFiles);
+        compositionRepository.saveAll(compositions);
     }
 }

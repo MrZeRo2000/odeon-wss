@@ -16,6 +16,9 @@ public class ProcessorMessages {
     static final String ERROR_PROCESSING_FILES = "Error processing files: %s";
     static final String ERROR_WRONG_FILE_TYPE = "Wrong file type: %s";
     static final String ERROR_NO_DATA_FOR_FILE = "No data for file: %s";
+    static final String ERROR_NO_DATA_FOR_FOLDER = "No data for folder: %s";
+    static final String ERROR_FOLDER_WITH_DISK_NUMBERS_CONTAINS_OTHER = "Folder %s with disk numbers contains other items";
+    static final String ERROR_FILES_IN_CUE_NOT_FOUND = "Files in Cue not found in %s";
 
     static final String ERROR_OPENING_MDB_DATABASE = "Error opening MDB database: %s";
     static final String ERROR_OPENING_MDB_TABLE = "Error opening MDB table %s: %s";

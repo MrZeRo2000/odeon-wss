@@ -86,4 +86,25 @@ public class UnitNamesParserTest {
             log.info("Group 2:" + matcher.group(2));
         }
     }
+
+    @Test
+    void testDiskNumFromFileName() {
+        Assertions.assertEquals(1, NamesParser.getDiskNumFromFileName("Name without digits.cue"));
+        Assertions.assertEquals(1, NamesParser.getDiskNumFromFileName("Something CD1.cue"));
+        Assertions.assertEquals(2, NamesParser.getDiskNumFromFileName("Something CD2.cue"));
+        Assertions.assertEquals(2, NamesParser.getDiskNumFromFileName("Something 2013 CD2.cue"));
+        Assertions.assertEquals(1, NamesParser.getDiskNumFromFileName("Something 2022.cue"));
+        Assertions.assertEquals(1, NamesParser.getDiskNumFromFileName("Something CD2"));
+    }
+
+    @Test
+    void testDiskNumFromFolderName() {
+        Assertions.assertEquals(0, NamesParser.getDiskNumFromFolderName("Name without digits"));
+        Assertions.assertEquals(0, NamesParser.getDiskNumFromFolderName("Name without digits CD1"));
+        Assertions.assertEquals(1, NamesParser.getDiskNumFromFolderName("CD1"));
+        Assertions.assertEquals(2, NamesParser.getDiskNumFromFolderName("CD2"));
+        Assertions.assertEquals(0, NamesParser.getDiskNumFromFolderName("CD2x"));
+        Assertions.assertEquals(0, NamesParser.getDiskNumFromFolderName("CD2.exe"));
+        Assertions.assertEquals(12, NamesParser.getDiskNumFromFolderName("CD12"));
+    }
 }

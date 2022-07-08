@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.service.CompositionService;
@@ -17,6 +18,8 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.transaction.Transactional;
 
 @Component
 public class MP3LoadProcessor extends AbstractArtistProcessor {
@@ -105,13 +108,9 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
             if ((nt == null) || (mediaFileInfo == null)) {
                 throw new ProcessorException(ProcessorMessages.ERROR_NO_DATA_FOR_FILE, fileName);
             } else {
-                MediaFile mediaFile = new MediaFile();
+                MediaFile mediaFile = MediaFileMapper.fromMediaFileInfo(mediaFileInfo);
                 mediaFile.setArtifact(artifact);
                 mediaFile.setName(fileName);
-                mediaFile.setFormat(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getFormatName());
-                mediaFile.setSize(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
-                mediaFile.setBitrate(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getBitRate());
-                mediaFile.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
 
                 Composition composition = new Composition();
                 composition.setArtifact(artifact);
@@ -120,7 +119,7 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
                 composition.setNum(nt.getNumber());
                 composition.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
 
-                compositionService.saveCompositionWithMedia(composition, mediaFile);
+                compositionService.insertCompositionWithMedia(composition, mediaFile);
 
                 summary.duration += mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration();
                 summary.size += mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize();

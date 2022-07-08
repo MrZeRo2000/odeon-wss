@@ -4,6 +4,8 @@ import com.romanpulov.odeonwss.dto.CompositionEditDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
+import com.romanpulov.odeonwss.utils.media.MediaFormatInfo;
 
 public class MediaFileMapper {
     public static MediaFile fromCompositionEditDTO(CompositionEditDTO editDTO) {
@@ -27,6 +29,20 @@ public class MediaFileMapper {
         updatedMediaFile.setId(mediaFile.getId());
 
         return updatedMediaFile;
+    }
+
+    public static MediaFile fromMediaFileInfo(MediaFileInfo mediaFileInfo) {
+        MediaFormatInfo mediaFormatInfo = mediaFileInfo.getMediaContentInfo().getMediaFormatInfo();
+
+        MediaFile mediaFile = new MediaFile();
+
+        mediaFile.setName(mediaFileInfo.getFileName());
+        mediaFile.setFormat(mediaFormatInfo.getFormatName());
+        mediaFile.setSize(mediaFormatInfo.getSize());
+        mediaFile.setBitrate(mediaFormatInfo.getBitRate());
+        mediaFile.setDuration(mediaFormatInfo.getDuration());
+
+        return mediaFile;
     }
 
 }

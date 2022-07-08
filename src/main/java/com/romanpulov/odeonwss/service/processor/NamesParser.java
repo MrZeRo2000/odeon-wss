@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 public class NamesParser {
     private static final Pattern REGEXP_PATTERN_MUSIC_ARTIFACT = Pattern.compile("^((?:19|20)[0-9]{2})\\s(\\S.*)");
     private static final Pattern REGEXP_PATTERN_MUSIC_COMPOSITION = Pattern.compile("^([0-9][0-9])\\s-\\s(\\S.*)(?:\\.\\S{2,4})$");
+    private static final Pattern REGEXP_PATTERN_FOLDER_NAME_DISK_NUM = Pattern.compile("^(?:CD)(\\d+)$");
+    private static final Pattern REGEXP_PATTERN_FILE_NAME_DISK_NUM = Pattern.compile("(?:CD)(\\d+)\\.");
     private static final String FORMAT_MUSIC_ARTIFACT = "%d %s";
     private static final String FORMAT_MUSIC_COMPOSITION = "%d - %s";
     private static final String FORMAT_MUSIC_WITH_FILE_NAME = "%d - %s (%s)";
@@ -88,6 +90,24 @@ public class NamesParser {
             return String.format(FORMAT_MUSIC_WITHOUT_FILE_NAME, num, title);
         } else {
             return String.format(FORMAT_MUSIC_WITH_FILE_NAME, num, title, fileName);
+        }
+    }
+
+    public static int getDiskNumFromFileName(String fileName) {
+        Matcher matcher = REGEXP_PATTERN_FILE_NAME_DISK_NUM.matcher(fileName);
+        if (matcher.find() && matcher.groupCount() == 1) {
+            return Integer.parseInt(matcher.group(1));
+        } else {
+            return 1;
+        }
+    }
+
+    public static int getDiskNumFromFolderName(String folderName) {
+        Matcher matcher = REGEXP_PATTERN_FOLDER_NAME_DISK_NUM.matcher(folderName);
+        if (matcher.find() && matcher.groupCount() == 1) {
+            return Integer.parseInt(matcher.group(1));
+        } else {
+            return 0;
         }
     }
 }
