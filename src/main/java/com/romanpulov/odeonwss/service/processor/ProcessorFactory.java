@@ -13,19 +13,22 @@ public class ProcessorFactory {
     private final MP3LoadProcessor mp3LoadProcessor;
     private final MP3ValidateProcessor mp3ValidateProcessor;
     private final LALoadProcessor laLoadProcessor;
+    private final LAValidateProcessor laValidateProcessor;
 
     public ProcessorFactory(
             AppConfiguration appConfiguration,
             ArtistsMDBImportProcessor artistsMDBImportProcessor,
             MP3LoadProcessor mp3LoadProcessor,
             MP3ValidateProcessor mp3ValidateProcessor,
-            LALoadProcessor laLoadProcessor)
+            LALoadProcessor laLoadProcessor,
+            LAValidateProcessor laValidateProcessor)
     {
         this.appConfiguration = appConfiguration;
         this.artistsMDBImportProcessor = artistsMDBImportProcessor;
         this.mp3LoadProcessor = mp3LoadProcessor;
         this.mp3ValidateProcessor = mp3ValidateProcessor;
         this.laLoadProcessor = laLoadProcessor;
+        this.laValidateProcessor = laValidateProcessor;
     }
 
     public AbstractProcessor fromProcessorType(ProcessorType processorType, ProgressHandler handler) {
@@ -48,6 +51,11 @@ public class ProcessorFactory {
                 return processor;
             case LA_LOADER:
                 processor = laLoadProcessor;
+                processor.setProgressHandler(handler);
+                processor.setRootFolder(appConfiguration.getLaPath());
+                return processor;
+            case LA_VALIDATOR:
+                processor = laValidateProcessor;
                 processor.setProgressHandler(handler);
                 processor.setRootFolder(appConfiguration.getLaPath());
                 return processor;
