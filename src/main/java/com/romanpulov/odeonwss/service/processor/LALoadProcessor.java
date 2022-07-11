@@ -210,6 +210,8 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                 composition.setDuration(duration);
                 summary.duration += duration;
 
+                composition.getMediaFiles().add(mediaFile);
+
                 compositions.add(composition);
             }
         }
@@ -253,6 +255,8 @@ public class LALoadProcessor extends AbstractArtistProcessor {
 
                 composition.setNum(compositionFile.getValue().getNumber());
                 composition.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
+
+                composition.getMediaFiles().add(mediaFile);
 
                 compositions.add(composition);
 
