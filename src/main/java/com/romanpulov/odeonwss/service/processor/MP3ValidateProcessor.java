@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.service.processor;
 
-import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTOBuilder;
 import com.romanpulov.odeonwss.entity.ArtifactType;
@@ -32,7 +31,7 @@ public class MP3ValidateProcessor extends AbstractValidateProcessor {
         Path path = validateAndGetPath();
 
         List<MediaFileValidationDTO> pathValidation = loadFromPath(path);
-        List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getMediaFileValidationMusic(ArtifactType.withMP3());
+        List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getCompositionMediaFileValidationMusic(ArtifactType.withMP3());
 
         if (validateArtistNames(pathValidation, dbValidation)) {
             infoHandler(ProcessorMessages.INFO_ARTISTS_VALIDATED);
@@ -111,6 +110,18 @@ public class MP3ValidateProcessor extends AbstractValidateProcessor {
                 throw new ProcessorException(ProcessorMessages.ERROR_EXCEPTION, e.getMessage());
             }
         }
+    }
+
+    private boolean validateCompositions(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
+        Set<String> pathCompositions = MediaFileValidationDTO.getCompositions(pathValidation);
+        Set<String> dbCompositions = MediaFileValidationDTO.getCompositions(dbValidation);
+
+        return compareStringSets(
+                pathCompositions,
+                dbCompositions,
+                ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_FILES,
+                ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_DB
+        );
     }
 
 }

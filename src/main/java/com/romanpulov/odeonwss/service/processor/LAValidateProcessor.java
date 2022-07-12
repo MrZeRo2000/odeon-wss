@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,7 +33,7 @@ public class LAValidateProcessor extends AbstractValidateProcessor {
     public void execute() throws ProcessorException {
         Path path = validateAndGetPath();
 
-        List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getMediaFileValidationMusic(ArtifactType.withLA());
+        List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getCompositionMediaFileValidationMusic(ArtifactType.withLA());
         mediaFormats = dbValidation.stream().map(MediaFileValidationDTO::getMediaFileFormat).collect(Collectors.toSet());
 
         List<MediaFileValidationDTO> pathValidation = loadFromPath(path);
@@ -45,6 +43,12 @@ public class LAValidateProcessor extends AbstractValidateProcessor {
 
             if (validateArtifacts(pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
+
+                if (validateCompositions(pathValidation, dbValidation)) {
+                    infoHandler(ProcessorMessages.INFO_COMPOSITIONS_VALIDATED);
+                }
+
+                dbValidation = mediaFileRepository.getMediaFileValidationMusic(ArtifactType.withLA());
 
                 if (validateMediaFiles(pathValidation, dbValidation)) {
                     infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
@@ -122,6 +126,18 @@ public class LAValidateProcessor extends AbstractValidateProcessor {
                 }
             }
         }
+    }
+
+    private boolean validateCompositions(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
+        Set<String> pathMediaFiles = MediaFileValidationDTO.getMediaFiles(pathValidation);
+        Set<String> dbMediaFiles = MediaFileValidationDTO.getMediaFiles(dbValidation);
+
+        return compareStringSets(
+                pathMediaFiles,
+                dbMediaFiles,
+                ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_FILES,
+                ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_DB
+        );
     }
 
     private boolean validateMediaFiles(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {

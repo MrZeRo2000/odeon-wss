@@ -87,7 +87,7 @@ public class RepositoryMediaFileTests {
     @Test
     @Order(2)
     void testDTO() {
-        List<MediaFileValidationDTO> mediaFileValidation = mediaFileRepository.getMediaFileValidationMusic(ArtifactType.withMP3());
+        List<MediaFileValidationDTO> mediaFileValidation = mediaFileRepository.getCompositionMediaFileValidationMusic(ArtifactType.withMP3());
         Assertions.assertEquals(1, mediaFileValidation.size());
     }
 }

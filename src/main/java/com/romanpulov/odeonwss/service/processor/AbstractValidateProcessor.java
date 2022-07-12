@@ -99,17 +99,4 @@ abstract public class AbstractValidateProcessor extends AbstractFileSystemProces
         );
     }
 
-    protected boolean validateCompositions(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
-        Set<String> pathCompositions = MediaFileValidationDTO.getCompositions(pathValidation);
-        Set<String> dbCompositions = MediaFileValidationDTO.getCompositions(dbValidation);
-
-        return compareStringSets(
-                pathCompositions,
-                dbCompositions,
-                ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_FILES,
-                ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_DB
-        );
-    }
-
-
 }

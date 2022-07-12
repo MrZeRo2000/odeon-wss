@@ -36,6 +36,12 @@ public class MediaFileValidationDTO extends CompositionValidationDTO {
         this.mediaFileFormat = mediaFileFormat;
     }
 
+    public MediaFileValidationDTO(String artistName, String artifactTitle, Long artifactYear, String mediaFileName, String mediaFileFormat) {
+        super(artistName, artifactTitle, artifactYear, null, null);
+        this.mediaFileName = mediaFileName;
+        this.mediaFileFormat = mediaFileFormat;
+    }
+
     public MediaFileValidationDTO() {}
 
     public static Set<String> getMediaFiles(List<MediaFileValidationDTO> data) {

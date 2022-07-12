@@ -1,10 +1,8 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -35,6 +33,21 @@ public interface MediaFileRepository extends CrudRepository<MediaFile, Long> {
             "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
             "WHERE af.artifactType = ?1 " +
             "ORDER BY ar.name, af.year, af.title, c.num"
+    )
+    List<MediaFileValidationDTO> getCompositionMediaFileValidationMusic(ArtifactType artifactType);
+
+    @Query("SELECT " +
+            "new com.romanpulov.odeonwss.dto.MediaFileValidationDTO(" +
+            "ar.name, " +
+            "af.title, " +
+            "af.year, " +
+            "m.name, " +
+            "m.format) " +
+            "FROM Artist AS ar " +
+            "INNER JOIN Artifact af ON af.artist = ar " +
+            "LEFT OUTER JOIN MediaFile m ON m.artifact = af " +
+            "WHERE af.artifactType = ?1 " +
+            "ORDER BY ar.name, af.year, af.title, m.name"
     )
     List<MediaFileValidationDTO> getMediaFileValidationMusic(ArtifactType artifactType);
 }
