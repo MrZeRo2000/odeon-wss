@@ -9,8 +9,11 @@ import com.romanpulov.odeonwss.service.processor.model.ProgressDetail;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -22,6 +25,9 @@ public class ServiceProcessValidateLATest {
 
     @Autowired
     ProcessService processService;
+
+    @Autowired
+    EntityManager em;
 
     @Test
     @Order(1)
@@ -45,6 +51,31 @@ public class ServiceProcessValidateLATest {
     void testOk() throws Exception {
         processService.executeProcessor(ProcessorType.LA_VALIDATOR);
         List<ProgressDetail> progressDetail = processService.getProcessInfo().getProgressDetails();
+        Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
+    }
+
+    @Test
+    @Order(3)
+    @Transactional
+    void testNoCompositionMediaFileShouldFail() throws Exception {
+        em.createNativeQuery("delete from compositions_media_files WHERE comp_id = 1").executeUpdate();
+        processService.executeProcessor(ProcessorType.LA_VALIDATOR);
+        Assertions.assertEquals(ProcessingStatus.FAILURE, processService.getProcessInfo().getProcessingStatus());
+    }
+
+    @Test
+    @Order(4)
+    @Transactional
+    void testNoCompositionShouldFail() throws Exception {
+        em.createNativeQuery("delete from compositions WHERE comp_id = 1").executeUpdate();
+        processService.executeProcessor(ProcessorType.LA_VALIDATOR);
+        Assertions.assertEquals(ProcessingStatus.FAILURE, processService.getProcessInfo().getProcessingStatus());
+    }
+
+    @Test
+    @Order(5)
+    void testOkAgain() throws Exception {
+        processService.executeProcessor(ProcessorType.LA_VALIDATOR);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
     }
 }
