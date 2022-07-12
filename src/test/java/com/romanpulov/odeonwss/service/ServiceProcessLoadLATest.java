@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.logging.Logger;
@@ -22,6 +23,9 @@ import java.util.stream.Collectors;
 public class ServiceProcessLoadLATest {
 
     private static final Logger log = Logger.getLogger(ServiceProcessLoadLATest.class.getSimpleName());
+
+    @Autowired
+    EntityManager em;
 
     @Autowired
     private ProcessService processService;
@@ -82,8 +86,6 @@ public class ServiceProcessLoadLATest {
 
         List<Composition> compositions = compositionRepository.findAllByArtifact(artifacts.get(0));
         Assertions.assertEquals(compositionCount, compositions.size());
-
-        compositions.forEach(c -> Assertions.assertEquals(1, c.getMediaFiles().size()));
 
         Assertions.assertEquals(
                 compositions.stream().map(Composition::getDuration).reduce(0L, (a, b) -> a != null && b != null ? Long.sum(a, b) : 0),

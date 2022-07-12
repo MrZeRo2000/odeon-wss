@@ -1,7 +1,10 @@
 package com.romanpulov.odeonwss.service.processor;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.springframework.data.mapping.Alias.ofNullable;
 
 public class NamesParser {
     private static final Pattern REGEXP_PATTERN_MUSIC_ARTIFACT = Pattern.compile("^((?:19|20)[0-9]{2})\\s(\\S.*)");
@@ -10,8 +13,8 @@ public class NamesParser {
     private static final Pattern REGEXP_PATTERN_FILE_NAME_DISK_NUM = Pattern.compile("(?:CD)(\\d+)\\.");
     private static final String FORMAT_MUSIC_ARTIFACT = "%d %s";
     private static final String FORMAT_MUSIC_COMPOSITION = "%d - %s";
-    private static final String FORMAT_MUSIC_WITH_FILE_NAME = "%d - %s (%s)";
-    private static final String FORMAT_MUSIC_WITHOUT_FILE_NAME = "%d - %s (no file name)";
+    private static final String FORMAT_MUSIC_WITH_FILE_NAME = "%s - %s (%s)";
+    private static final String FORMAT_MUSIC_WITHOUT_FILE_NAME = "%s - %s (no file name)";
 
     public static class YearTitle {
         private final int year;
@@ -85,11 +88,11 @@ public class NamesParser {
         return String.format(FORMAT_MUSIC_COMPOSITION, num, title);
     }
 
-    public static String formatMusicCompositionWithFile(long num, String title, String fileName) {
+    public static String formatMusicCompositionWithFile(Long num, String title, String fileName) {
         if (fileName == null) {
-            return String.format(FORMAT_MUSIC_WITHOUT_FILE_NAME, num, title);
+            return String.format(FORMAT_MUSIC_WITHOUT_FILE_NAME, Objects.toString(num, "-"), Objects.toString(title, "-"));
         } else {
-            return String.format(FORMAT_MUSIC_WITH_FILE_NAME, num, title, fileName);
+            return String.format(FORMAT_MUSIC_WITH_FILE_NAME, Objects.toString(num, "-"), Objects.toString(title, "-"), fileName);
         }
     }
 

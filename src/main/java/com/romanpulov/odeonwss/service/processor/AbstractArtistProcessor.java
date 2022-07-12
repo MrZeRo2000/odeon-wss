@@ -34,6 +34,8 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
         this.artifactRepository = artifactRepository;
     }
 
+    protected abstract ArtifactType getArtifactType();
+
     @Override
     public void execute() throws ProcessorException {
         Path path = validateAndGetPath();
@@ -87,7 +89,7 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
         }
 
         Artifact artifact = new Artifact();
-        artifact.setArtifactType(ArtifactType.withMP3());
+        artifact.setArtifactType(getArtifactType());
         artifact.setArtist(artist);
         artifact.setTitle(yt.getTitle());
         artifact.setYear((long) yt.getYear());

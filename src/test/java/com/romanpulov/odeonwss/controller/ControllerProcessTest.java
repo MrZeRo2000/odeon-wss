@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -44,6 +45,7 @@ public class ControllerProcessTest {
     }
 
     @Test
+    @Sql({"/schema.sql", "/data.sql"})
     void getResult() throws Exception {
         MvcResult mvcResult;
 
@@ -68,14 +70,10 @@ public class ControllerProcessTest {
                 .andExpect(jsonPath("$.message", Matchers.is("Started")));
 
         // to make sure it starts async
-        /*
-        TODO: Think how to make it work
         this.mockMvc.perform(get("/api/process"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", Matchers.is("Progress data not available")))
                 .andReturn();
-
-         */
 
         Thread.sleep(1000L);
 
@@ -87,33 +85,5 @@ public class ControllerProcessTest {
                 .andExpect(jsonPath("$.progressDetails[0].info", Matchers.is("Started MP3 Validator")))
                 .andReturn();
         logger.debug("Get result after execute: " + mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
-    void testNotImplemented() throws Exception {
-        MvcResult mvcResult;
-
-        this.mockMvc.perform(delete("/api/process"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message", Matchers.is("Cleared")));
-
-
-        String json = mapper.writeValueAsString(ProcessorRequestDTO.fromProcessorType("LA_VALIDATOR"));
-
-        this.mockMvc.perform(post("/api/process")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json)
-                        .accept(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message", Matchers.is("Started")));
-
-        Thread.sleep(1000L);
-
-        mvcResult = this.mockMvc.perform(get("/api/process"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.lastProgressDetail.info", Matchers.is("Unsupported operation")))
-                .andReturn();
-        logger.debug("Get result after not implemented execute: " + mvcResult.getResponse().getContentAsString());
     }
 }

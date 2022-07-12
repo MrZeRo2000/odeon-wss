@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
@@ -46,6 +47,11 @@ public class LALoadProcessor extends AbstractArtistProcessor {
         this.mediaFileRepository = mediaFileRepository;
         this.compositionService = compositionService;
         this.mediaParser = mediaParser;
+    }
+
+    @Override
+    protected ArtifactType getArtifactType() {
+        return ArtifactType.withLA();
     }
 
     @Override

@@ -42,6 +42,11 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
     }
 
     @Override
+    protected ArtifactType getArtifactType() {
+        return ArtifactType.withMP3();
+    }
+
+    @Override
     protected void processCompositionsPath(Path path, Artifact artifact) throws ProcessorException {
         List<Path> compositionPaths;
         try (Stream<Path> stream = Files.list(path)) {

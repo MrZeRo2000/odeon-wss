@@ -1,8 +1,15 @@
 package com.romanpulov.odeonwss.dto;
 
+import com.romanpulov.odeonwss.service.processor.NamesParser;
+
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MediaFileValidationDTO extends CompositionValidationDTO {
+    private static final String FORMAT_DELIMITER = " >> ";
+
     private String mediaFileName;
 
     public String getMediaFileName() {
@@ -31,6 +38,28 @@ public class MediaFileValidationDTO extends CompositionValidationDTO {
 
     public MediaFileValidationDTO() {}
 
+    public static Set<String> getMediaFiles(List<MediaFileValidationDTO> data) {
+        return data.stream()
+                .map(d ->
+                        d.getArtistName() +
+                                FORMAT_DELIMITER +
+                                d.getArtifactYear() + " " + d.getArtifactTitle() +
+                                FORMAT_DELIMITER +
+                                d.getMediaFileName())
+                .collect(Collectors.toSet());
+    }
+
+    public static Set<String> getCompositions(List<MediaFileValidationDTO> data) {
+        return data.stream()
+                .map(d ->
+                d.getArtistName() +
+                        FORMAT_DELIMITER +
+                        NamesParser.formatMusicArtifact(d.getArtifactYear(), d.getArtifactTitle()) +
+                        FORMAT_DELIMITER +
+                        NamesParser.formatMusicCompositionWithFile(d.getCompositionNum(), d.getCompositionTitle(), d.getMediaFileName()))
+                .collect(Collectors.toSet());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -48,7 +77,12 @@ public class MediaFileValidationDTO extends CompositionValidationDTO {
     @Override
     public String toString() {
         return "MediaFileValidationDTO{" +
-                "mediaFileName='" + mediaFileName + '\'' +
+                "artistName='" + getArtistName() + '\'' +
+                ", artifactTitle='" + getArtifactTitle() + '\'' +
+                ", artifactYear=" + getArtifactYear() +
+                ", compositionNum=" + getCompositionNum() +
+                ", compositionTitle='" + getCompositionTitle() + '\'' +
+                ", mediaFileName='" + mediaFileName + '\'' +
                 ", mediaFileFormat='" + mediaFileFormat + '\'' +
                 '}';
     }

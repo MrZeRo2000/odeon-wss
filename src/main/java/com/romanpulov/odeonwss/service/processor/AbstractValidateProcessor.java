@@ -63,22 +63,7 @@ abstract public class AbstractValidateProcessor extends AbstractFileSystemProces
         return result;
     }
 
-    protected void loadFromArtistPath(Path artistPath, List<MediaFileValidationDTO> result)
-            throws ProcessorException {
-        try (Stream<Path> artifactPathStream = Files.list(artistPath)) {
-            for (Path artifactPath: artifactPathStream.collect(Collectors.toList())) {
-                if (!Files.isDirectory(artifactPath)) {
-                    errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, artistPath.getFileName().toString());
-                } else {
-                    loadFromArtifactPath(artistPath, artifactPath, result);
-                }
-            }
-        } catch (IOException e) {
-            throw new ProcessorException("Exception:" + e.getMessage());
-        }
-    }
-
-    abstract protected void loadFromArtifactPath(Path artistPath, Path artifactPath, List<MediaFileValidationDTO> result)
+    abstract protected void loadFromArtistPath(Path artistPath, List<MediaFileValidationDTO> result)
             throws ProcessorException;
 
     protected boolean validateArtistNames(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
@@ -113,5 +98,18 @@ abstract public class AbstractValidateProcessor extends AbstractFileSystemProces
                 ProcessorMessages.ERROR_ARTIFACTS_NOT_IN_DB
         );
     }
+
+    protected boolean validateCompositions(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
+        Set<String> pathCompositions = MediaFileValidationDTO.getCompositions(pathValidation);
+        Set<String> dbCompositions = MediaFileValidationDTO.getCompositions(dbValidation);
+
+        return compareStringSets(
+                pathCompositions,
+                dbCompositions,
+                ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_FILES,
+                ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_DB
+        );
+    }
+
 
 }

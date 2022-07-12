@@ -47,8 +47,22 @@ public class MP3ValidateProcessor extends AbstractValidateProcessor {
         }
     }
 
-    @Override
-    protected void loadFromArtifactPath(Path artistPath, Path artifactPath, List<MediaFileValidationDTO> result)
+    protected void loadFromArtistPath(Path artistPath, List<MediaFileValidationDTO> result)
+            throws ProcessorException {
+        try (Stream<Path> artifactPathStream = Files.list(artistPath)) {
+            for (Path artifactPath: artifactPathStream.collect(Collectors.toList())) {
+                if (!Files.isDirectory(artifactPath)) {
+                    errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, artistPath.getFileName().toString());
+                } else {
+                    loadFromArtifactPath(artistPath, artifactPath, result);
+                }
+            }
+        } catch (IOException e) {
+            throw new ProcessorException("Exception:" + e.getMessage());
+        }
+    }
+
+    private void loadFromArtifactPath(Path artistPath, Path artifactPath, List<MediaFileValidationDTO> result)
             throws ProcessorException {
         NamesParser.YearTitle yt = NamesParser.parseMusicArtifactTitle(artifactPath.getFileName().toString());
         if (yt == null) {
@@ -97,32 +111,6 @@ public class MP3ValidateProcessor extends AbstractValidateProcessor {
                 throw new ProcessorException(ProcessorMessages.ERROR_EXCEPTION, e.getMessage());
             }
         }
-    }
-
-    private boolean validateCompositions(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
-        Set<String> pathCompositions = pathValidation.stream()
-                .map(d ->
-                        d.getArtistName() +
-                        ProcessorMessages.FORMAT_PATH_DELIMITER +
-                        NamesParser.formatMusicArtifact(d.getArtifactYear(), d.getArtifactTitle()) +
-                        ProcessorMessages.FORMAT_PATH_DELIMITER +
-                        NamesParser.formatMusicCompositionWithFile(d.getCompositionNum(), d.getCompositionTitle(), d.getMediaFileName()))
-                .collect(Collectors.toSet());
-        Set<String> dbCompositions = dbValidation.stream()
-                .map(d ->
-                        d.getArtistName() +
-                        ProcessorMessages.FORMAT_PATH_DELIMITER +
-                        NamesParser.formatMusicArtifact(d.getArtifactYear(), d.getArtifactTitle()) +
-                        ProcessorMessages.FORMAT_PATH_DELIMITER +
-                        NamesParser.formatMusicCompositionWithFile(d.getCompositionNum(), d.getCompositionTitle(), d.getMediaFileName()))
-                .collect(Collectors.toSet());
-
-        return compareStringSets(
-                pathCompositions,
-                dbCompositions,
-                ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_FILES,
-                ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_DB
-        );
     }
 
 }
