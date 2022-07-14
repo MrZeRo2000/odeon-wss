@@ -115,8 +115,7 @@ public class ControllerMediaFileTest {
     @Test
     @Order(2)
     void testGetTableArtifact1() throws Exception {
-        this.mockMvc.perform(get("/api/media-file/table")
-                        .queryParam("artifactId", "1")
+        this.mockMvc.perform(get("/api/media-file/table/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -128,8 +127,7 @@ public class ControllerMediaFileTest {
     @Test
     @Order(2)
     void testGetTableArtifact2() throws Exception {
-        this.mockMvc.perform(get("/api/media-file/table")
-                        .queryParam("artifactId", "2")
+        this.mockMvc.perform(get("/api/media-file/table/2")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -142,8 +140,7 @@ public class ControllerMediaFileTest {
     @Test
     @Order(3)
     void testGetTableWrongArtifact() throws Exception {
-        this.mockMvc.perform(get("/api/media-file/table")
-                        .queryParam("artifactId", "8")
+        this.mockMvc.perform(get("/api/media-file/table/8")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
         ;

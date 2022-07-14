@@ -23,8 +23,8 @@ public class MediaFileController {
         this.mediaFileService = mediaFileService;
     }
 
-    @GetMapping("/table")
-    ResponseEntity<List<MediaFileTableDTO>> getTable(@RequestParam Long artifactId) throws CommonEntityNotFoundException {
+    @GetMapping("/table/{artifactId}")
+    ResponseEntity<List<MediaFileTableDTO>> getTable(@PathVariable Long artifactId) throws CommonEntityNotFoundException {
         return ResponseEntity.ok(mediaFileService.getTable(artifactId));
     }
 
