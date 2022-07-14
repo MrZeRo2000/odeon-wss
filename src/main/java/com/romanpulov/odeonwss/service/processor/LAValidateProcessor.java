@@ -109,18 +109,21 @@ public class LAValidateProcessor extends AbstractValidateProcessor {
                             .filter(f -> f.contains("."))
                             .filter(f -> mediaFormats.contains(f.substring(f.lastIndexOf(".") + 1)))
                             .collect(Collectors.toList());
-
-                    compositionFileNames.forEach(compositionFileName -> {
-                        result.add(new MediaFileValidationDTO(
-                                artistPath.getFileName().toString(),
-                                yt.getTitle(),
-                                (long) yt.getYear(),
-                                null,
-                                null,
-                                compositionFileName,
-                                null
-                        ));
-                    });
+                    if (compositionFileNames.size() == 0) {
+                        errorHandler(ProcessorMessages.ERROR_COMPOSITIONS_NOT_FOUND_FOR_ARTIFACT, artifactPath.getFileName().toString());
+                    } else {
+                        compositionFileNames.forEach(compositionFileName -> {
+                            result.add(new MediaFileValidationDTO(
+                                    artistPath.getFileName().toString(),
+                                    yt.getTitle(),
+                                    (long) yt.getYear(),
+                                    null,
+                                    null,
+                                    compositionFileName,
+                                    null
+                            ));
+                        });
+                    }
                 }  catch (IOException e) {
                     throw new ProcessorException(ProcessorMessages.ERROR_EXCEPTION, e.getMessage());
                 }

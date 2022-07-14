@@ -32,12 +32,23 @@ public class ServiceProcessValidateLATest {
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
-    void testLoad() {
+    void testEmptyShouldFail() {
         List.of("Evanescence", "Pink Floyd", "Therapy", "Tori Amos", "Abigail Williams", "Agua De Annique", "Christina Aguilera")
                 .forEach(s -> artistRepository.save(
                         new EntityArtistBuilder().withType(ArtistType.ARTIST).withName(s).build()
                 ));
 
+        List<ProgressDetail> progressDetail;
+
+        processService.executeProcessor(ProcessorType.LA_VALIDATOR, null);
+        progressDetail = processService.getProcessInfo().getProgressDetails();
+
+        Assertions.assertEquals(ProcessingStatus.FAILURE, processService.getProcessInfo().getProcessingStatus());
+    }
+
+    @Test
+    @Order(2)
+    void testLoad() {
         List<ProgressDetail> progressDetail;
 
         processService.executeProcessor(ProcessorType.LA_LOADER, null);
@@ -47,7 +58,7 @@ public class ServiceProcessValidateLATest {
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     void testOk() throws Exception {
         processService.executeProcessor(ProcessorType.LA_VALIDATOR);
         List<ProgressDetail> progressDetail = processService.getProcessInfo().getProgressDetails();
@@ -55,7 +66,7 @@ public class ServiceProcessValidateLATest {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     @Transactional
     void testNoCompositionMediaFileShouldFail() throws Exception {
         em.createNativeQuery("delete from compositions_media_files WHERE comp_id = 1").executeUpdate();
@@ -64,7 +75,7 @@ public class ServiceProcessValidateLATest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     @Transactional
     void testNoCompositionShouldFail() throws Exception {
         em.createNativeQuery("delete from compositions WHERE comp_id = 1").executeUpdate();
@@ -73,7 +84,7 @@ public class ServiceProcessValidateLATest {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     void testOkAgain() throws Exception {
         processService.executeProcessor(ProcessorType.LA_VALIDATOR);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());

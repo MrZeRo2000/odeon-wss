@@ -72,6 +72,7 @@ public class MP3ValidateProcessor extends AbstractValidateProcessor {
                             .build()
             );
         } else {
+            int oldResultSize = result.size();
             try (Stream<Path> compositionPathStream = Files.list(artifactPath)) {
                 compositionPathStream.forEach(compositionPath -> {
                     String compositionFileName = compositionPath.getFileName().toString();
@@ -105,9 +106,12 @@ public class MP3ValidateProcessor extends AbstractValidateProcessor {
                     }
                 });
 
-
             } catch (IOException e) {
                 throw new ProcessorException(ProcessorMessages.ERROR_EXCEPTION, e.getMessage());
+            }
+
+            if (result.size() == oldResultSize) {
+                errorHandler(ProcessorMessages.ERROR_COMPOSITIONS_NOT_FOUND_FOR_ARTIFACT, artifactPath.getFileName().toString());
             }
         }
     }

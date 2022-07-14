@@ -23,8 +23,17 @@ public class ServiceProcessValidateMP3Test {
         this.service = service;
     }
 
+
     @Test
     @Order(1)
+    @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
+    void testLoadEmptyShouldFail() {
+        service.executeProcessor(ProcessorType.MP3_VALIDATOR);
+        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
+    }
+
+    @Test
+    @Order(2)
     @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
     void testLoad() {
         service.executeProcessor(ProcessorType.MP3_LOADER);
@@ -33,7 +42,7 @@ public class ServiceProcessValidateMP3Test {
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     void testOk() throws Exception {
         service.executeProcessor(ProcessorType.MP3_VALIDATOR);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
@@ -43,7 +52,7 @@ public class ServiceProcessValidateMP3Test {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void testWrongTitleMissingFileArtist() throws Exception {
         service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/wrong_artifact_title/");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
@@ -51,7 +60,7 @@ public class ServiceProcessValidateMP3Test {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void testMissingFileArtist() throws Exception {
         service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/validation_mp3_missing_artist/");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
@@ -59,7 +68,7 @@ public class ServiceProcessValidateMP3Test {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     void testAdditionalFileArtist() throws Exception {
         service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/validation_mp3_additional_artist/");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
@@ -67,7 +76,7 @@ public class ServiceProcessValidateMP3Test {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     void testMissingFileArtifact() throws Exception {
         service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/validation_mp3_missing_artifact/");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
@@ -75,7 +84,7 @@ public class ServiceProcessValidateMP3Test {
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     void testMissingFileCompositions() throws Exception {
         service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/validation_mp3_missing_compositions/");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
