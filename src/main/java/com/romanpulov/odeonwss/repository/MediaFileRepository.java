@@ -1,5 +1,8 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
+import com.romanpulov.odeonwss.dto.MediaFileEditDTO;
+import com.romanpulov.odeonwss.dto.MediaFileTableDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
@@ -50,4 +53,34 @@ public interface MediaFileRepository extends CrudRepository<MediaFile, Long> {
             "ORDER BY ar.name, af.year, af.title, m.name"
     )
     List<MediaFileValidationDTO> getMediaFileValidationMusic(ArtifactType artifactType);
+
+    @Query(
+            "SELECT new com.romanpulov.odeonwss.dto.MediaFileEditDTO(" +
+                    "mf.id, " +
+                    "mf.artifact.id, " +
+                    "mf.name, " +
+                    "mf.format, " +
+                    "mf.size, " +
+                    "mf.bitrate, " +
+                    "mf.duration" +
+                    ") " +
+                    "FROM MediaFile as mf " +
+                    "WHERE mf.id = :id"
+    )
+    Optional<MediaFileEditDTO> getMediaFileEditById(Long id);
+
+    @Query(
+            "SELECT new com.romanpulov.odeonwss.dto.MediaFileTableDTO(" +
+                    "mf.id, " +
+                    "mf.name, " +
+                    "mf.format, " +
+                    "mf.size, " +
+                    "mf.bitrate, " +
+                    "mf.duration" +
+                    ") " +
+                    "FROM MediaFile as mf " +
+                    "WHERE mf.artifact = :artifact " +
+                    "ORDER BY mf.name"
+    )
+    List<MediaFileTableDTO> getMediaFileTableByArtifact(Artifact artifact);
 }

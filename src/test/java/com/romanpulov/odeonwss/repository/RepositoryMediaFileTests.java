@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.dto.MediaFileEditDTO;
+import com.romanpulov.odeonwss.dto.MediaFileTableDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
@@ -82,12 +84,48 @@ public class RepositoryMediaFileTests {
         Assertions.assertEquals(savedMediaFile.getBitrate(), mediaFile.getBitrate());
 
         log.info("Saved MediaFile:" + savedMediaFile);
+
+        mediaFile = new EntityMediaFileBuilder()
+                .withArtifact(artifact)
+                .withName("BBB.mp3")
+                .withFormat("MP3")
+                .withSize(323L)
+                .withDuration(7234L)
+                .withBitrate(320L)
+                .build();
+        mediaFileRepository.save(mediaFile);
     }
 
     @Test
     @Order(2)
-    void testDTO() {
+    void testCompositionValidation() {
         List<MediaFileValidationDTO> mediaFileValidation = mediaFileRepository.getCompositionMediaFileValidationMusic(ArtifactType.withMP3());
         Assertions.assertEquals(1, mediaFileValidation.size());
+    }
+
+    @Test
+    @Order(2)
+    void testMediaFileValidation() {
+        List<MediaFileValidationDTO> mediaFileValidation = mediaFileRepository.getMediaFileValidationMusic(ArtifactType.withMP3());
+        Assertions.assertEquals(2, mediaFileValidation.size());
+    }
+
+    @Test
+    @Order(3)
+    void testMediaFileEditDTO() {
+        MediaFileEditDTO dto = mediaFileRepository.getMediaFileEditById(1L).orElseThrow();
+        Assertions.assertEquals(1L, dto.getId());
+        Assertions.assertEquals("AAA.mp3", dto.getName());
+    }
+
+    @Test
+    @Order(4)
+    void testMediaFileTableDTO() {
+        List<MediaFileTableDTO> dtoList = mediaFileRepository.getMediaFileTableByArtifact(
+                new EntityArtifactBuilder().withId(1L).build()
+        );
+        Assertions.assertEquals(2, dtoList.size());
+        Assertions.assertEquals("AAA.mp3", dtoList.get(0).getName());
+        Assertions.assertEquals("BBB.mp3", dtoList.get(1).getName());
     }
 }

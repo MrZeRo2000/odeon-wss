@@ -13,6 +13,11 @@ public class EntityArtifactBuilder {
         artifact = new Artifact();
     }
 
+    public EntityArtifactBuilder withId(Long id) {
+        artifact.setId(id);
+        return this;
+    }
+
     public EntityArtifactBuilder withArtifactType(ArtifactType artifactType) {
         artifact.setArtifactType(artifactType);
         return this;
