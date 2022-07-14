@@ -134,6 +134,7 @@ public class ControllerMediaFileTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].size").exists())
         ;
 
     }
@@ -145,6 +146,21 @@ public class ControllerMediaFileTest {
                         .queryParam("artifactId", "8")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    @Order(4)
+    void testGetTableIdName() throws Exception {
+        this.mockMvc.perform(get("/api/media-file/table-id-name")
+                        .queryParam("artifactId", "1")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].id", Matchers.is(1)))
+                .andExpect(jsonPath("$[0].name", Matchers.is("Name 11")))
+                .andExpect(jsonPath("$[0].size").doesNotExist())
         ;
     }
 }

@@ -2,12 +2,10 @@ package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.dto.MediaFileEditDTO;
 import com.romanpulov.odeonwss.dto.MediaFileTableDTO;
-import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
-import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.MediaFileService;
+import com.romanpulov.odeonwss.view.IdNameView;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +26,11 @@ public class MediaFileController {
     @GetMapping("/table")
     ResponseEntity<List<MediaFileTableDTO>> getTable(@RequestParam Long artifactId) throws CommonEntityNotFoundException {
         return ResponseEntity.ok(mediaFileService.getTable(artifactId));
+    }
+
+    @GetMapping("/table-id-name")
+    ResponseEntity<List<IdNameView>> getTableIdName(@RequestParam Long artifactId) throws CommonEntityNotFoundException {
+        return ResponseEntity.ok(mediaFileService.getTableIdName(artifactId));
     }
 
     @GetMapping("/{id}")

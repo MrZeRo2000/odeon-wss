@@ -8,6 +8,7 @@ import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityCompositionBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
+import com.romanpulov.odeonwss.view.IdNameView;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -127,5 +128,16 @@ public class RepositoryMediaFileTests {
         Assertions.assertEquals(2, dtoList.size());
         Assertions.assertEquals("AAA.mp3", dtoList.get(0).getName());
         Assertions.assertEquals("BBB.mp3", dtoList.get(1).getName());
+    }
+
+    @Test
+    @Order(5)
+    void testGetIdName() {
+        List<IdNameView> idNames = mediaFileRepository.findByArtifactOrderByName(
+                new EntityArtifactBuilder().withId(1L).build()
+        );
+        Assertions.assertEquals(2, idNames.size());
+        Assertions.assertEquals("AAA.mp3", idNames.get(0).getName());
+        Assertions.assertEquals("BBB.mp3", idNames.get(1).getName());
     }
 }

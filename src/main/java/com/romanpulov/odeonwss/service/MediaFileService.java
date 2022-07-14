@@ -9,9 +9,9 @@ import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.view.IdNameView;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +31,15 @@ public class MediaFileService implements EditableObjectService <MediaFileEditDTO
         Optional<Artifact> existingArtifact = artifactRepository.findById(artifactId);
         if (existingArtifact.isPresent()) {
             return mediaFileRepository.getMediaFileTableByArtifact(existingArtifact.get());
+        } else {
+            throw new CommonEntityNotFoundException("Artifact", artifactId);
+        }
+    }
+
+    public List<IdNameView> getTableIdName(Long artifactId) throws CommonEntityNotFoundException {
+        Optional<Artifact> existingArtifact = artifactRepository.findById(artifactId);
+        if (existingArtifact.isPresent()) {
+            return mediaFileRepository.findByArtifactOrderByName(existingArtifact.get());
         } else {
             throw new CommonEntityNotFoundException("Artifact", artifactId);
         }

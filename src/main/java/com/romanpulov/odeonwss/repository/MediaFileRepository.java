@@ -7,6 +7,7 @@ import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.view.IdNameView;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -19,6 +20,8 @@ public interface MediaFileRepository extends CrudRepository<MediaFile, Long> {
     Optional<MediaFile> findFirstByArtifactAndName(Artifact artifact, String name);
 
     List<MediaFile> findAllByArtifact(Artifact artifact);
+
+    List<IdNameView> findByArtifactOrderByName(Artifact artifact);
 
     @Query("SELECT " +
             "new com.romanpulov.odeonwss.dto.MediaFileValidationDTO(" +
