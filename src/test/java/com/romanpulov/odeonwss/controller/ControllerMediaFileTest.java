@@ -149,8 +149,7 @@ public class ControllerMediaFileTest {
     @Test
     @Order(4)
     void testGetTableIdName() throws Exception {
-        this.mockMvc.perform(get("/api/media-file/table-id-name")
-                        .queryParam("artifactId", "1")
+        this.mockMvc.perform(get("/api/media-file/table-id-name/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())

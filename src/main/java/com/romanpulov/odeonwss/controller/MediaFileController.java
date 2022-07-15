@@ -28,8 +28,8 @@ public class MediaFileController {
         return ResponseEntity.ok(mediaFileService.getTable(artifactId));
     }
 
-    @GetMapping("/table-id-name")
-    ResponseEntity<List<IdNameView>> getTableIdName(@RequestParam Long artifactId) throws CommonEntityNotFoundException {
+    @GetMapping("/table-id-name/{artifactId}")
+    ResponseEntity<List<IdNameView>> getTableIdName(@PathVariable Long artifactId) throws CommonEntityNotFoundException {
         return ResponseEntity.ok(mediaFileService.getTableIdName(artifactId));
     }
 
