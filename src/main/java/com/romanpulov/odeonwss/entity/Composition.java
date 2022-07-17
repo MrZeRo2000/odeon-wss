@@ -88,7 +88,7 @@ public class Composition {
         this.num = num;
     }
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.MERGE})
     @JoinTable(name = "compositions_media_files",
             joinColumns = @JoinColumn(name = "comp_id"),
             inverseJoinColumns = @JoinColumn(name = "mdfl_id")

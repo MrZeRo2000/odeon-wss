@@ -3,6 +3,11 @@ package com.romanpulov.odeonwss.builder.dtobuilder;
 import com.romanpulov.odeonwss.builder.AbstractClassBuilder;
 import com.romanpulov.odeonwss.dto.CompositionEditDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.entity.MediaFile;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 public class CompositionEditDTOBuilder extends AbstractClassBuilder<CompositionEditDTO> {
     public CompositionEditDTOBuilder() {
@@ -34,28 +39,8 @@ public class CompositionEditDTOBuilder extends AbstractClassBuilder<CompositionE
         return this;
     }
 
-    public CompositionEditDTOBuilder withMediaName(String mediaName) {
-        instance.setMediaName(mediaName);
-        return this;
-    }
-
-    public CompositionEditDTOBuilder withMediaFormat(String mediaFormat) {
-        instance.setMediaFormat(mediaFormat);
-        return this;
-    }
-
-    public CompositionEditDTOBuilder withMediaSize(long mediaSize) {
-        instance.setMediaSize(mediaSize);
-        return this;
-    }
-
-    public CompositionEditDTOBuilder withMediaBitrate(long mediaBitrate) {
-        instance.setMediaBitrate(mediaBitrate);
-        return this;
-    }
-
-    public CompositionEditDTOBuilder withMediaDuration(long mediaDuration) {
-        instance.setMediaDuration(mediaDuration);
+    public CompositionEditDTOBuilder withMediaFileIds(Collection<Long> mediaFileIds) {
+        instance.setMediaFiles(new HashSet<>(mediaFileIds));
         return this;
     }
 }

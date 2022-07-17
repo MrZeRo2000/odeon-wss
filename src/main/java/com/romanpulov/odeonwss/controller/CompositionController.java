@@ -17,18 +17,15 @@ import java.util.List;
 @RequestMapping(value = "/api/composition", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CompositionController {
 
-    private final CompositionRepository compositionRepository;
-
     private final CompositionService compositionService;
 
-    public CompositionController(CompositionRepository compositionRepository, CompositionService compositionService) {
-        this.compositionRepository = compositionRepository;
+    public CompositionController(CompositionService compositionService) {
         this.compositionService = compositionService;
     }
 
     @GetMapping("/table/{artifactId}")
-    ResponseEntity<List<CompositionTableDTO>> getTable(@PathVariable Long artifactId) {
-        return ResponseEntity.ok(compositionRepository.getCompositionTableByArtifactId(artifactId));
+    ResponseEntity<List<CompositionTableDTO>> getTable(@PathVariable Long artifactId) throws CommonEntityNotFoundException {
+        return ResponseEntity.ok(compositionService.getTable(artifactId));
     }
 
     @GetMapping("/{id}")

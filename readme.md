@@ -12,3 +12,6 @@ $env:java_home = 'D:/WinApp/jdk-12.0.2'
 
 # Deploy Int D
 ./gradlew clean build deployInt -x test -Ptomcat_home=D:/prj/apache-tomcat-9.0.62
+
+# Run one test to create DEV database
+./gradlew test --tests *OdeonWssApplicationTests*

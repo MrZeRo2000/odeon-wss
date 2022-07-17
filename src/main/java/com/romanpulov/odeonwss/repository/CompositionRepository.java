@@ -49,22 +49,21 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
             "ORDER BY c.diskNum, c.num, c.title")
     List<CompositionTableDTO> getCompositionTableByArtifactId(Long id);
 
-    @Query("SELECT new com.romanpulov.odeonwss.dto.CompositionEditDTO(" +
+    @Query("SELECT new com.romanpulov.odeonwss.dto.CompositionTableDTO(" +
             "c.id, " +
-            "c.artifact.id, " +
             "c.diskNum, " +
             "c.num, " +
             "c.title, " +
             "c.duration, " +
-            "m.name," +
-            "m.format," +
-            "m.size," +
-            "m.bitrate," +
-            "m.duration " +
+            "m.size, " +
+            "m.bitrate, " +
+            "m.name " +
             ") " +
             "FROM Composition c " +
             "LEFT OUTER JOIN CompositionMediaFile cm ON cm.compositionId = c.id " +
             "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
-            "WHERE c.id = :id")
-    Optional<CompositionEditDTO> getCompositionEditById(Long id);
+            "WHERE c.artifact = :artifact " +
+            "ORDER BY c.diskNum, c.num, c.title")
+    List<CompositionTableDTO> getCompositionTableByArtifact(Artifact artifact);
+
 }

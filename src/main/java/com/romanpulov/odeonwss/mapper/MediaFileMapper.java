@@ -14,13 +14,7 @@ public class MediaFileMapper {
 
         Artifact artifact = new Artifact();
         artifact.setId(editDTO.getArtifactId());
-
         mediaFile.setArtifact(artifact);
-        mediaFile.setName(editDTO.getMediaName());
-        mediaFile.setFormat(editDTO.getMediaFormat());
-        mediaFile.setSize(editDTO.getMediaSize());
-        mediaFile.setBitrate(editDTO.getMediaBitrate());
-        mediaFile.setDuration(editDTO.getMediaDuration());
 
         return mediaFile;
     }

@@ -1,11 +1,9 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.builder.dtobuilder.CompositionEditDTOBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
 import com.romanpulov.odeonwss.dto.CompositionEditDTO;
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.ArtistType;
+import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
@@ -20,6 +18,10 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -79,6 +81,17 @@ public class ServiceCompositionTest {
                         .build()
         );
 
+        MediaFile mediaFile11 = mediaFileRepository.save(
+                new EntityMediaFileBuilder()
+                        .withArtifact(artifact1)
+                        .withName("Comp 1-1.mp3")
+                        .withFormat("mp3")
+                        .withBitrate(320L)
+                        .withSize(777L)
+                        .withDuration(123L)
+                        .build()
+        );
+
         CompositionEditDTO comp11 = compositionService.insert(
             new CompositionEditDTOBuilder()
                     .withArtifact(artifact1)
@@ -86,11 +99,7 @@ public class ServiceCompositionTest {
                     .withDiskNum(1L)
                     .withNum(4L)
                     .withDuration(1234L)
-                    .withMediaName("Comp 1-1.mp3")
-                    .withMediaFormat("mp3")
-                    .withMediaBitrate(320L)
-                    .withMediaSize(777L)
-                    .withMediaDuration(123L)
+                    .withMediaFileIds(Stream.of(mediaFile11).map(MediaFile::getId).collect(Collectors.toSet()))
                     .build()
         );
 
@@ -100,11 +109,16 @@ public class ServiceCompositionTest {
         Assertions.assertEquals(4, comp11.getNum());
         Assertions.assertEquals(1234, comp11.getDuration());
 
-        Assertions.assertEquals("Comp 1-1.mp3", comp11.getMediaName());
-        Assertions.assertEquals("mp3", comp11.getMediaFormat());
-        Assertions.assertEquals(320, comp11.getMediaBitrate());
-        Assertions.assertEquals(777, comp11.getMediaSize());
-        Assertions.assertEquals(123, comp11.getMediaDuration());
+        MediaFile mediaFile12 = mediaFileRepository.save(
+                new EntityMediaFileBuilder()
+                        .withArtifact(artifact1)
+                        .withName("Comp 1-2.mp3")
+                        .withFormat("mp3")
+                        .withBitrate(256L)
+                        .withSize(776L)
+                        .withDuration(1232L)
+                        .build()
+        );
 
         CompositionEditDTO comp12 = compositionService.insert(
                 new CompositionEditDTOBuilder()
@@ -113,11 +127,7 @@ public class ServiceCompositionTest {
                         .withDiskNum(1L)
                         .withNum(5L)
                         .withDuration(12L)
-                        .withMediaName("Comp 1-2.mp3")
-                        .withMediaFormat("mp3")
-                        .withMediaBitrate(256L)
-                        .withMediaSize(776L)
-                        .withMediaDuration(1232L)
+                        .withMediaFileIds(Stream.of(mediaFile12).map(MediaFile::getId).collect(Collectors.toSet()))
                         .build()
         );
 
@@ -132,25 +142,14 @@ public class ServiceCompositionTest {
         Assertions.assertEquals(2, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
 
         CompositionEditDTO dto = compositionService.getById(1L);
-        Assertions.assertNotNull(dto.getMediaName());
-        Assertions.assertNotNull(dto.getMediaFormat());
-        Assertions.assertNotNull(dto.getMediaBitrate());
-        Assertions.assertNotNull(dto.getMediaDuration());
-        Assertions.assertNotNull(dto.getMediaSize());
-
         Assertions.assertEquals(1, compositionRepository.findById(1L).orElseThrow().getMediaFiles().size());
 
-        dto.setMediaName(null);
+        dto.getMediaFileIds().clear();
         dto = compositionService.update(dto);
 
-        Assertions.assertNull(dto.getMediaName());
-        Assertions.assertNull(dto.getMediaFormat());
-        Assertions.assertNull(dto.getMediaBitrate());
-        Assertions.assertNull(dto.getMediaDuration());
-        Assertions.assertNull(dto.getMediaSize());
-
-        Assertions.assertEquals(0, compositionRepository.findById(1L).orElseThrow().getMediaFiles().size());
+        Assertions.assertEquals(0, dto.getMediaFileIds().size());
     }
+
 
     @Test
     @Order(3)
@@ -158,17 +157,23 @@ public class ServiceCompositionTest {
     @Rollback(value = false)
     void testInsertMediaFile() throws Exception {
         Assertions.assertEquals(0, compositionRepository.findById(1L).orElseThrow().getMediaFiles().size());
-
         CompositionEditDTO dto = compositionService.getById(1L);
-        dto.setMediaName("Comp new.mp3");
-        dto.setMediaFormat("mp3");
-        dto.setMediaSize(666L);
-        dto = compositionService.update(dto);
 
-        Assertions.assertEquals("Comp new.mp3", dto.getMediaName());
+        MediaFile mediaFile = mediaFileRepository.save(
+                new EntityMediaFileBuilder()
+                        .withArtifact(artifactRepository.findById(1L).orElseThrow())
+                        .withName("Comp new.mp3")
+                        .withFormat("mp3")
+                        .withBitrate(320L)
+                        .withDuration(12355L)
+                        .withSize(44433L)
+                        .build()
+        );
+
+        dto.setMediaFiles(Set.of(mediaFile.getId()));
+        dto = compositionService.update(dto);
         Assertions.assertEquals(1, compositionRepository.findById(1L).orElseThrow().getMediaFiles().size());
     }
-
     @Test
     @Order(4)
     void testDelete() throws Exception {

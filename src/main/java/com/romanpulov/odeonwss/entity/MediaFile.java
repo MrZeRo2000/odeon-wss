@@ -105,6 +105,13 @@ public class MediaFile {
     public MediaFile() {
     }
 
+    public static MediaFile fromId(Long id) {
+        MediaFile mediaFile = new MediaFile();
+        mediaFile.setId(id);
+
+        return mediaFile;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

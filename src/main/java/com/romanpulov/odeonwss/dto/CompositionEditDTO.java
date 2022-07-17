@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.dto;
 
+import java.util.Set;
+
 public class CompositionEditDTO {
     private Long id;
 
@@ -13,15 +15,7 @@ public class CompositionEditDTO {
 
     private Long duration;
 
-    private String mediaName;
-
-    private String mediaFormat;
-
-    private Long mediaSize;
-
-    private Long mediaBitrate;
-
-    private Long mediaDuration;
+    private Set<Long> mediaFileIds;
 
     public Long getId() {
         return id;
@@ -71,62 +65,22 @@ public class CompositionEditDTO {
         this.duration = duration;
     }
 
-    public String getMediaName() {
-        return mediaName;
+    public Set<Long> getMediaFileIds() {
+        return mediaFileIds;
     }
 
-    public void setMediaName(String mediaName) {
-        this.mediaName = mediaName;
+    public void setMediaFiles(Set<Long> mediaFileIds) {
+        this.mediaFileIds = mediaFileIds;
     }
 
-    public String getMediaFormat() {
-        return mediaFormat;
-    }
-
-    public void setMediaFormat(String mediaFormat) {
-        this.mediaFormat = mediaFormat;
-    }
-
-    public Long getMediaSize() {
-        return mediaSize;
-    }
-
-    public void setMediaSize(Long mediaSize) {
-        this.mediaSize = mediaSize;
-    }
-
-    public Long getMediaBitrate() {
-        return mediaBitrate;
-    }
-
-    public void setMediaBitrate(Long mediaBitrate) {
-        this.mediaBitrate = mediaBitrate;
-    }
-
-    public Long getMediaDuration() {
-        return mediaDuration;
-    }
-
-    public void setMediaDuration(Long mediaDuration) {
-        this.mediaDuration = mediaDuration;
-    }
-
-    public boolean isMediaEmpty() {
-        return (mediaName == null) || mediaName.isBlank();
-    }
-
-    public CompositionEditDTO(Long id, Long artifactId, Long diskNum, Long num, String title, Long duration, String mediaName, String mediaFormat, Long mediaSize, Long mediaBitrate, Long mediaDuration) {
+    public CompositionEditDTO(Long id, Long artifactId, Long diskNum, Long num, String title, Long duration, Set<Long> mediaFileIds) {
         this.id = id;
         this.artifactId = artifactId;
         this.diskNum = diskNum;
         this.num = num;
         this.title = title;
         this.duration = duration;
-        this.mediaName = mediaName;
-        this.mediaFormat = mediaFormat;
-        this.mediaSize = mediaSize;
-        this.mediaBitrate = mediaBitrate;
-        this.mediaDuration = mediaDuration;
+        this.mediaFileIds = mediaFileIds;
     }
 
     public CompositionEditDTO() {
@@ -141,11 +95,7 @@ public class CompositionEditDTO {
                 ", num=" + num +
                 ", title='" + title + '\'' +
                 ", duration=" + duration +
-                ", mediaName='" + mediaName + '\'' +
-                ", mediaFormat='" + mediaFormat + '\'' +
-                ", mediaSize=" + mediaSize +
-                ", mediaBitrate=" + mediaBitrate +
-                ", mediaDuration=" + mediaDuration +
+                ", mediaFileIds='" + mediaFileIds + '\'' +
                 '}';
     }
 }
