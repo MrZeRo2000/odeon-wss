@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.dto.ArtistLyricsEditDTO;
 import com.romanpulov.odeonwss.dto.ArtistLyricsTableDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistLyrics;
@@ -9,6 +10,7 @@ import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistLyricsBuilder;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
@@ -36,6 +38,10 @@ public class RepositoryArtistLyricsTests {
         artistLyricsRepository.save(new EntityArtistLyricsBuilder().withArtist(artist2).withTitle("Title 23").withText("Text 23").build());
         artistLyricsRepository.save(new EntityArtistLyricsBuilder().withArtist(artist2).withTitle("Title 24").withText("Text 24").build());
 
+        Assertions.assertThrows(JpaSystemException.class, () -> {
+                artistLyricsRepository.save(new EntityArtistLyricsBuilder().withArtist(artist2).withTitle("Title 24").withText("Text 24").build());
+        });
+
         List<ArtistLyrics> artistLyricsList1 = artistLyricsRepository.findAllByArtistOrderByTitle(artist1);
         Assertions.assertEquals(2, artistLyricsList1.size());
         Assertions.assertEquals("Title 11", artistLyricsList1.get(0).getTitle());
@@ -58,6 +64,16 @@ public class RepositoryArtistLyricsTests {
         Assertions.assertEquals("Title 11", table.get(0).getTitle());
         Assertions.assertEquals("Name 2", table.get(4).getArtistName());
         Assertions.assertEquals("Title 27", table.get(4).getTitle());
+    }
+
+    @Test
+    @Order(2)
+    void testEditDTO() {
+        ArtistLyricsEditDTO editDTO = artistLyricsRepository.getArtistListEditById(1L).orElseThrow();
+        Assertions.assertEquals(1, editDTO.getId());
+        Assertions.assertEquals(1, editDTO.getArtistId());
+        Assertions.assertEquals("Title 12", editDTO.getTitle());
+        Assertions.assertEquals("Text 12", editDTO.getText());
     }
 
     @Test

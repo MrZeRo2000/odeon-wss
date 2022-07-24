@@ -35,7 +35,7 @@ public class ControllerArtistTest {
         artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name76").build());
         artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name55").build());
 
-        mockMvc.perform(get("/api/artist"))
+        mockMvc.perform(get("/api/artist/artists/table-id-name"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(3)))

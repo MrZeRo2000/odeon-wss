@@ -39,7 +39,7 @@ public class MediaFileController {
     }
 
     @PostMapping
-    ResponseEntity<MediaFileEditDTO> post(@RequestBody MediaFileEditDTO dto) throws CommonEntityNotFoundException  {
+    ResponseEntity<MediaFileEditDTO> post(@RequestBody MediaFileEditDTO dto) throws CommonEntityNotFoundException {
         return ResponseEntity.ok(mediaFileService.insert(dto));
     }
 
