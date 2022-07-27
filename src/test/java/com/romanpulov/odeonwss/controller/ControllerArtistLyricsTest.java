@@ -102,6 +102,37 @@ public class ControllerArtistLyricsTest {
 
     @Test
     @Order(2)
+    void testGetTableById() throws Exception {
+        this.mockMvc.perform(get("/api/artist-lyrics/table/1")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].artistName", Matchers.is("Artist 1")))
+                .andExpect(jsonPath("$[0].title", Matchers.is("Title 1")))
+                .andExpect(jsonPath("$[1].artistName", Matchers.is("Artist 1")))
+                .andExpect(jsonPath("$[1].title", Matchers.is("Title 2")))
+        ;
+
+        this.mockMvc.perform(get("/api/artist-lyrics/table/2")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].artistName", Matchers.is("Artist 2")))
+                .andExpect(jsonPath("$[0].title", Matchers.is("Title 200")))
+        ;
+
+        this.mockMvc.perform(get("/api/artist-lyrics/table/3")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(0)))
+        ;
+    }
+
+    @Test
+    @Order(2)
     void testGetText() throws Exception {
         this.mockMvc.perform(get("/api/artist-lyrics/text/555")
                 .accept(MediaType.APPLICATION_JSON))

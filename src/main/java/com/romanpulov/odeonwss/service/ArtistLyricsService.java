@@ -31,6 +31,10 @@ public class ArtistLyricsService implements EditableObjectService <ArtistLyricsE
         return artistLyricsRepository.getArtistLyricsTableDTO();
     }
 
+    public List<ArtistLyricsTableDTO> getTable(Long artistId) {
+        return artistLyricsRepository.getArtistLyricsTableByArtistDTO(artistId);
+    }
+
     public TextView getText(Long id) throws CommonEntityNotFoundException {
         Optional<TextView> textView = artistLyricsRepository.findArtistLyricsById(id);
         if (textView.isPresent()) {

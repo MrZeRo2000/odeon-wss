@@ -22,6 +22,17 @@ public interface ArtistLyricsRepository extends CrudRepository<ArtistLyrics, Lon
             "ORDER BY ar.name, al.title")
     List<ArtistLyricsTableDTO> getArtistLyricsTableDTO();
 
+    @Query("SELECT new com.romanpulov.odeonwss.dto.ArtistLyricsTableDTO (" +
+            "al.id, " +
+            "ar.name, " +
+            "al.title " +
+            ") " +
+            "FROM ArtistLyrics al " +
+            "INNER JOIN Artist ar ON al.artist = ar " +
+            "WHERE ar.id = :artistId " +
+            "ORDER BY al.title")
+    List<ArtistLyricsTableDTO> getArtistLyricsTableByArtistDTO(Long artistId);
+
     @Query("SELECT new com.romanpulov.odeonwss.dto.ArtistLyricsEditDTO (" +
             "al.id, " +
             "al.artist.id, " +

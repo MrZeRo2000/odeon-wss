@@ -27,6 +27,11 @@ public class ArtistLyricsController {
         return ResponseEntity.ok(artistLyricsService.getTable());
     }
 
+    @GetMapping("/table/{id}")
+    ResponseEntity<List<ArtistLyricsTableDTO>> getTable(@PathVariable Long id) {
+        return ResponseEntity.ok(artistLyricsService.getTable(id));
+    }
+
     @GetMapping("/text/{id}")
     ResponseEntity<TextView> getText(@PathVariable Long id) throws CommonEntityNotFoundException {
         return ResponseEntity.ok(artistLyricsService.getText(id));
