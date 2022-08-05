@@ -28,6 +28,7 @@ public interface ArtifactRepository extends PagingAndSortingRepository<Artifact,
                 "a.id," +
                 "at.name," +
                 "ar.name, " +
+                "par.name, " +
                 "a.title, " +
                 "a.year," +
                 "a.duration," +
@@ -37,6 +38,7 @@ public interface ArtifactRepository extends PagingAndSortingRepository<Artifact,
                 "FROM Artifact as a " +
                 "INNER JOIN ArtifactType as at ON a.artifactType = at " +
                 "INNER JOIN Artist as ar ON a.artist = ar " +
+                "LEFT OUTER JOIN Artist as par ON a.performerArtist = par " +
                 "WHERE ar.type=:artistType " +
                 "AND a.artifactType IN (:artifactTypes) " +
                 "ORDER BY ar.name, a.year, a.title"
@@ -49,6 +51,8 @@ public interface ArtifactRepository extends PagingAndSortingRepository<Artifact,
                     "a.artifactType.id, " +
                     "a.artist.id, " +
                     "ar.name, " +
+                    "a.performerArtist.id, " +
+                    "par.name, " +
                     "a.title, " +
                     "a.year, " +
                     "a.duration, " +
@@ -56,6 +60,7 @@ public interface ArtifactRepository extends PagingAndSortingRepository<Artifact,
                     ") " +
                     "FROM Artifact as a " +
                     "INNER JOIN Artist as ar ON a.artist = ar " +
+                    "LEFT OUTER JOIN Artist as par ON a.performerArtist = par " +
                     "WHERE a.id = :id"
     )
     Optional<ArtifactEditDTO> getArtifactEditById(Long id);

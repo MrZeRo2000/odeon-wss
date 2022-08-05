@@ -62,6 +62,13 @@ public class ControllerArtifactTest {
                         .build()
         );
 
+        Artist performerArtist1 = artistRepository.save(
+                new EntityArtistBuilder()
+                        .withType(ArtistType.CLASSICS)
+                        .withName("Performer Artist 1")
+                        .build()
+        );
+
         artifactRepository.save(
                 new EntityArtifactBuilder()
                         .withArtist(artist1)
@@ -91,6 +98,18 @@ public class ControllerArtifactTest {
                         .withDuration(5555L)
                         .build()
         );
+
+        artifactRepository.save(
+                new EntityArtifactBuilder()
+                        .withArtist(classics1)
+                        .withPerformerArtist(performerArtist1)
+                        .withArtifactType(ArtifactType.withClassics())
+                        .withTitle("Classics Artist 1 Classics Title 1")
+                        .withYear(1975L)
+                        .withDuration(46534L)
+                        .build()
+        );
+
     }
 
     @Test
@@ -137,11 +156,13 @@ public class ControllerArtifactTest {
     void testGetTableClassics() throws Exception {
         this.mockMvc.perform(get("/api/artifact/table")
                         .queryParam("artistTypeCode", "C")
-                        .queryParam("artifactTypeCodes", "102")
+                        .queryParam("artifactTypeCodes", "103")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$", Matchers.hasSize(0)))
+                .andExpect(jsonPath("$", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0].artistName", Matchers.equalTo("Classics 1")))
+                .andExpect(jsonPath("$[0].performerArtistName", Matchers.equalTo("Performer Artist 1")))
         ;
     }
 

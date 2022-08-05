@@ -5,6 +5,8 @@ public class ArtifactEditDTO {
     private Long artifactTypeId;
     private Long artistId;
     private String artistName;
+    private Long performerArtistId;
+    private String performerArtistName;
     private String title;
     private Long year;
     private Long duration;
@@ -42,6 +44,22 @@ public class ArtifactEditDTO {
         this.artistName = artistName;
     }
 
+    public Long getPerformerArtistId() {
+        return performerArtistId;
+    }
+
+    public void setPerformerArtistId(Long performerArtistId) {
+        this.performerArtistId = performerArtistId;
+    }
+
+    public String getPerformerArtistName() {
+        return performerArtistName;
+    }
+
+    public void setPerformerArtistName(String performerArtistName) {
+        this.performerArtistName = performerArtistName;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -74,11 +92,13 @@ public class ArtifactEditDTO {
         this.size = size;
     }
 
-    public ArtifactEditDTO(Long id, Long artifactTypeId, Long artistId, String artistName, String title, Long year, Long duration, Long size) {
+    public ArtifactEditDTO(Long id, Long artifactTypeId, Long artistId, String artistName, Long performerArtistId, String performerArtistName, String title, Long year, Long duration, Long size) {
         this.id = id;
         this.artifactTypeId = artifactTypeId;
         this.artistId = artistId;
         this.artistName = artistName;
+        this.performerArtistId = performerArtistId;
+        this.performerArtistName = performerArtistName;
         this.title = title;
         this.year = year;
         this.duration = duration;
@@ -95,6 +115,8 @@ public class ArtifactEditDTO {
                 ", artifactTypeId=" + artifactTypeId +
                 ", artistId=" + artistId +
                 ", artistName='" + artistName + '\'' +
+                ", performerArtistId=" + performerArtistId +
+                ", performerArtistName='" + performerArtistName + '\'' +
                 ", title='" + title + '\'' +
                 ", year=" + year +
                 ", duration=" + duration +

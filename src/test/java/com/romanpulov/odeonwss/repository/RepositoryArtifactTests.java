@@ -60,9 +60,16 @@ public class RepositoryArtifactTests {
         Assertions.assertNotNull(artist);
         Assertions.assertNotNull(artist.getId());
 
+        Artist performerArtist = new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Performer Name1").build();
+        artistRepository.save(performerArtist);
+        Assertions.assertNotNull(performerArtist);
+        Assertions.assertNotNull(performerArtist.getId());
+
+
         Artifact artifact = new EntityArtifactBuilder()
                 .withArtifactType(ArtifactType.withMP3())
                 .withArtist(artist)
+                .withPerformerArtist(performerArtist)
                 .withTitle("Title 1")
                 .withYear(2000L)
                 .withDuration(54334L)
@@ -74,6 +81,7 @@ public class RepositoryArtifactTests {
         Assertions.assertNotNull(artifact);
         Assertions.assertNotNull(artifact.getId());
         Assertions.assertEquals(artist, artifact.getArtist());
+        Assertions.assertEquals(performerArtist.getName(), artifact.getPerformerArtist().getName());
         Assertions.assertEquals(artifactType, ArtifactType.withMP3());
         Assertions.assertEquals("Title 1", artifact.getTitle());
         Assertions.assertEquals(2000L, artifact.getYear());

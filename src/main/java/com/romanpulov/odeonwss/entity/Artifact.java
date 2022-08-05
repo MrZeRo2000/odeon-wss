@@ -52,6 +52,20 @@ public class Artifact {
         this.artist = artist;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "perf_arts_id", referencedColumnName = "arts_id")
+    @Nullable
+    private Artist performerArtist;
+
+    @Nullable
+    public Artist getPerformerArtist() {
+        return performerArtist;
+    }
+
+    public void setPerformerArtist(@Nullable Artist performerArtist) {
+        this.performerArtist = performerArtist;
+    }
+
     @Column(name = "artf_title")
     @NotNull
     private String title;

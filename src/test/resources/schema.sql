@@ -27,6 +27,7 @@ CREATE TABLE artifacts (
     artf_id INTEGER PRIMARY KEY AUTOINCREMENT,
     attp_id INTEGER NOT NULL,
     arts_id INTEGER NULL,
+    perf_arts_id INTEGER NULL,
     artf_title TEXT NOT NULL,
     artf_year INTEGER NULL,
     artf_duration INTEGER NULL,

@@ -9,6 +9,8 @@ public class ArtifactTableDTO {
 
     private String artistName;
 
+    private String performerArtistName;
+
     private String title;
 
     private Long year;
@@ -41,6 +43,14 @@ public class ArtifactTableDTO {
 
     public void setArtistName(String artistName) {
         this.artistName = artistName;
+    }
+
+    public String getPerformerArtistName() {
+        return performerArtistName;
+    }
+
+    public void setPerformerArtistName(String performerArtistName) {
+        this.performerArtistName = performerArtistName;
     }
 
     public String getTitle() {
@@ -83,10 +93,11 @@ public class ArtifactTableDTO {
         this.insertDate = insertDate;
     }
 
-    public ArtifactTableDTO(Long id, String artifactTypeName, String artistName, String title, Long year, Long duration, Long size, LocalDate insertDate) {
+    public ArtifactTableDTO(Long id, String artifactTypeName, String artistName, String performerArtistName, String title, Long year, Long duration, Long size, LocalDate insertDate) {
         this.id = id;
         this.artifactTypeName = artifactTypeName;
         this.artistName = artistName;
+        this.performerArtistName = performerArtistName;
         this.title = title;
         this.year = year;
         this.duration = duration;
@@ -95,5 +106,20 @@ public class ArtifactTableDTO {
     }
 
     public ArtifactTableDTO() {
+    }
+
+    @Override
+    public String toString() {
+        return "ArtifactTableDTO{" +
+                "id=" + id +
+                ", artifactTypeName='" + artifactTypeName + '\'' +
+                ", artistName='" + artistName + '\'' +
+                ", performerArtistName='" + performerArtistName + '\'' +
+                ", title='" + title + '\'' +
+                ", year=" + year +
+                ", duration=" + duration +
+                ", size=" + size +
+                ", insertDate=" + insertDate +
+                '}';
     }
 }

@@ -28,6 +28,11 @@ public class EntityArtifactBuilder {
         return this;
     }
 
+    public EntityArtifactBuilder withPerformerArtist(Artist performerArtist) {
+        artifact.setPerformerArtist(performerArtist);
+        return this;
+    }
+
     public EntityArtifactBuilder withTitle(String title) {
         artifact.setTitle(title);
         return this;
