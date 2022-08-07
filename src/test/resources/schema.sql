@@ -46,6 +46,7 @@ DROP TABLE IF EXISTS compositions;
 CREATE TABLE compositions (
     comp_id INTEGER PRIMARY KEY AUTOINCREMENT,
     artf_id INTEGER NOT NULL,
+    arts_id INTEGER NULL,
     comp_title TEXT NOT NULL,
     comp_duration INTEGER NULL,
     comp_disk_num INTEGER NULL,

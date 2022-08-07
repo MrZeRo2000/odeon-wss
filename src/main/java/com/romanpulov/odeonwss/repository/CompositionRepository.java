@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.dto.CompositionEditDTO;
 import com.romanpulov.odeonwss.dto.CompositionTableDTO;
 import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
@@ -10,10 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CompositionRepository extends CrudRepository<Composition, Long> {
-    void deleteCompositionByArtifact(Artifact artifact);
 
     List<Composition> findAllByArtifact(Artifact artifact);
 
@@ -36,6 +33,8 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
             "c.id, " +
             "c.diskNum, " +
             "c.num, " +
+            "ar.id, " +
+            "ar.name, " +
             "c.title, " +
             "c.duration, " +
             "m.size, " +
@@ -45,14 +44,17 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
             "FROM Composition c " +
             "LEFT OUTER JOIN CompositionMediaFile cm ON cm.compositionId = c.id " +
             "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
+            "LEFT OUTER JOIN Artist ar ON ar = c.artist " +
             "WHERE c.artifact.id = :id " +
-            "ORDER BY c.diskNum, c.num, c.title")
+            "ORDER BY c.diskNum, c.num, ar.name, c.title")
     List<CompositionTableDTO> getCompositionTableByArtifactId(Long id);
 
     @Query("SELECT new com.romanpulov.odeonwss.dto.CompositionTableDTO(" +
             "c.id, " +
             "c.diskNum, " +
             "c.num, " +
+            "ar.id, " +
+            "ar.name, " +
             "c.title, " +
             "c.duration, " +
             "m.size, " +
@@ -62,8 +64,9 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
             "FROM Composition c " +
             "LEFT OUTER JOIN CompositionMediaFile cm ON cm.compositionId = c.id " +
             "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
+            "LEFT OUTER JOIN Artist ar ON ar = c.artist " +
             "WHERE c.artifact = :artifact " +
-            "ORDER BY c.diskNum, c.num, c.title")
+            "ORDER BY c.diskNum, c.num, ar.name, c.title")
     List<CompositionTableDTO> getCompositionTableByArtifact(Artifact artifact);
 
 }

@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.builder.entitybuilder;
 
 import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.entity.MediaFile;
 
@@ -13,6 +14,11 @@ public class EntityCompositionBuilder {
 
     public EntityCompositionBuilder withArtifact(Artifact artifact) {
         composition.setArtifact(artifact);
+        return this;
+    }
+
+    public EntityCompositionBuilder withArtist(Artist artist) {
+        composition.setArtist(artist);
         return this;
     }
 

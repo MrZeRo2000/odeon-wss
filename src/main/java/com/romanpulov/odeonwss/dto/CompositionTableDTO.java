@@ -7,6 +7,10 @@ public class CompositionTableDTO {
 
     private Long num;
 
+    private Long artistId;
+
+    private String artistName;
+
     private String title;
 
     private Long duration;
@@ -39,6 +43,22 @@ public class CompositionTableDTO {
 
     public void setNum(Long num) {
         this.num = num;
+    }
+
+    public String getArtistName() {
+        return artistName;
+    }
+
+    public Long getArtistId() {
+        return artistId;
+    }
+
+    public void setArtistId(Long artistId) {
+        this.artistId = artistId;
+    }
+
+    public void setArtistName(String artistName) {
+        this.artistName = artistName;
     }
 
     public String getTitle() {
@@ -81,10 +101,12 @@ public class CompositionTableDTO {
         this.fileName = fileName;
     }
 
-    public CompositionTableDTO(Long id, Long diskNum, Long num, String title, Long duration, Long size, Long bitrate, String fileName) {
+    public CompositionTableDTO(Long id, Long diskNum, Long num, Long artistId, String artistName, String title, Long duration, Long size, Long bitrate, String fileName) {
         this.id = id;
         this.diskNum = diskNum;
         this.num = num;
+        this.artistId = artistId;
+        this.artistName = artistName;
         this.title = title;
         this.duration = duration;
         this.size = size;
@@ -101,6 +123,8 @@ public class CompositionTableDTO {
                 "id=" + id +
                 ", diskNum=" + diskNum +
                 ", num=" + num +
+                ", artistId=" + artistId +
+                ", artistName='" + artistName + '\'' +
                 ", title='" + title + '\'' +
                 ", duration=" + duration +
                 ", size=" + size +

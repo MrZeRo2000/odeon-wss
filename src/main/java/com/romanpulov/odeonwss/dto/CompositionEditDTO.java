@@ -11,6 +11,10 @@ public class CompositionEditDTO {
 
     private Long num;
 
+    private Long artistId;
+
+    private String artistName;
+
     private String title;
 
     private Long duration;
@@ -49,6 +53,22 @@ public class CompositionEditDTO {
         this.num = num;
     }
 
+    public Long getArtistId() {
+        return artistId;
+    }
+
+    public void setArtistId(Long artistId) {
+        this.artistId = artistId;
+    }
+
+    public String getArtistName() {
+        return artistName;
+    }
+
+    public void setArtistName(String artistName) {
+        this.artistName = artistName;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -73,11 +93,13 @@ public class CompositionEditDTO {
         this.mediaFileIds = mediaFileIds;
     }
 
-    public CompositionEditDTO(Long id, Long artifactId, Long diskNum, Long num, String title, Long duration, Set<Long> mediaFileIds) {
+    public CompositionEditDTO(Long id, Long artifactId, Long diskNum, Long num, Long artistId, String artistName, String title, Long duration, Set<Long> mediaFileIds) {
         this.id = id;
         this.artifactId = artifactId;
         this.diskNum = diskNum;
         this.num = num;
+        this.artistId = artistId;
+        this.artistName = artistName;
         this.title = title;
         this.duration = duration;
         this.mediaFileIds = mediaFileIds;
@@ -93,9 +115,11 @@ public class CompositionEditDTO {
                 ", artifactId=" + artifactId +
                 ", diskNum=" + diskNum +
                 ", num=" + num +
+                ", artistId=" + artistId +
+                ", artistName='" + artistName + '\'' +
                 ", title='" + title + '\'' +
                 ", duration=" + duration +
-                ", mediaFileIds='" + mediaFileIds + '\'' +
+                ", mediaFileIds=" + mediaFileIds +
                 '}';
     }
 }

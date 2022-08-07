@@ -96,6 +96,7 @@ public class RepositoryCompositionTests {
         //Composition 1
         Composition composition = new EntityCompositionBuilder()
                 .withArtifact(savedArtifact)
+                .withArtist(artist)
                 .withTitle("Composition title")
                 .withDiskNum(1L)
                 .withNum(8L)
@@ -104,6 +105,8 @@ public class RepositoryCompositionTests {
         Composition savedComposition = compositionRepository.save(composition);
         Assertions.assertNotNull(savedComposition.getId());
         Assertions.assertEquals(savedComposition.getArtifact(), savedArtifact);
+        assert savedComposition.getArtist() != null;
+        Assertions.assertEquals("Name1", savedComposition.getArtist().getName());
         Assertions.assertEquals("Composition title", savedComposition.getTitle());
         Assertions.assertEquals(1L, savedComposition.getDiskNum());
         Assertions.assertEquals(8, savedComposition.getNum());

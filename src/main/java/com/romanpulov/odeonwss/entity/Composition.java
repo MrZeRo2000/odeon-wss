@@ -37,6 +37,20 @@ public class Composition {
         this.artifact = artifact;
     }
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "arts_id", referencedColumnName = "arts_id")
+    @org.springframework.lang.Nullable
+    private Artist artist;
+
+    @org.springframework.lang.Nullable
+    public Artist getArtist() {
+        return artist;
+    }
+
+    public void setArtist(@Nullable Artist artist) {
+        this.artist = artist;
+    }
+
     @Column(name = "comp_title")
     @NotNull
     private String title;
