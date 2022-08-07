@@ -43,18 +43,11 @@ public class ArtistsMDBImportProcessor extends AbstractMDBImportProcessor {
     }
 
     @Override
-    public void execute() throws ProcessorException {
-        Path path = validateAndGetPath();
-
-        try (MDBReader mdbReader = new MDBReader(path.toFile())) {
-            infoHandler(ProcessorMessages.INFO_ARTISTS_IMPORTED, importArtists(mdbReader));
-            infoHandler(ProcessorMessages.INFO_ARTIST_DETAILS_IMPORTED, importArtistDetails(mdbReader));
-            infoHandler(ProcessorMessages.INFO_ARTIST_CATEGORIES_IMPORTED, importArtistCategories(mdbReader));
-            infoHandler(ProcessorMessages.INFO_ARTIST_LYRICS_IMPORTED, importArtistLyrics(mdbReader));
-
-        } catch (IOException e) {
-            throw new ProcessorException(ERROR_PROCESSING_MDB_DATABASE, e.getMessage());
-        }
+    protected void importMDB(MDBReader mdbReader) throws ProcessorException {
+        infoHandler(ProcessorMessages.INFO_ARTISTS_IMPORTED, importArtists(mdbReader));
+        infoHandler(ProcessorMessages.INFO_ARTIST_DETAILS_IMPORTED, importArtistDetails(mdbReader));
+        infoHandler(ProcessorMessages.INFO_ARTIST_CATEGORIES_IMPORTED, importArtistCategories(mdbReader));
+        infoHandler(ProcessorMessages.INFO_ARTIST_LYRICS_IMPORTED, importArtistLyrics(mdbReader));
     }
 
     private int importArtists(MDBReader mdbReader) throws ProcessorException {

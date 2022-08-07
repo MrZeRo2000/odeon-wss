@@ -18,6 +18,7 @@ public abstract class AbstractMDBImportProcessor extends AbstractFileSystemProce
     protected static final String ARTISTLIST_TABLE_NAME = "ArtistList";
     protected static final String ARTISTLISTCAT_TABLE_NAME = "ArtistListCat";
     protected static final String ARTISTLYRICS_TABLE_NAME = "ArtistLyrics";
+    protected static final String CLASSICS_TABLE_NAME = "CLCont";
 
     protected static final String ARTISTLIST_ID_COLUMN_NAME = "ArtistListID";
     protected static final String TITLE_COLUMN_NAME = "Title";
@@ -28,6 +29,12 @@ public abstract class AbstractMDBImportProcessor extends AbstractFileSystemProce
     protected static final String ARTISTLYRICS_ID_COLUMN_NAME = "ArtistLyricsID";
     protected static final String SONGNAME_COLUMN_NAME = "SongName";
     protected static final String LYRICSTEXT_COLUMN_NAME = "LyricsText";
+    protected static final String CLASSICS_ID_COLUMN_NAME = "CLContID";
+    protected static final String PERFORMER_ARTISTLIST_ID_COLUMN_NAME = "PerArtistListID";
+    protected static final String YEAR_COLUMN_NAME = "Year";
+    protected static final String REC_ID_COLUMN_NAME = "RecID";
+    protected static final String DIR_NAME_COLUMN_NAME = "DirName";
+
 
     protected static class MDBReader implements Closeable {
         private final Database database;
@@ -53,6 +60,20 @@ public abstract class AbstractMDBImportProcessor extends AbstractFileSystemProce
             this.database.close();
         }
     }
+
+    @Override
+    public void execute() throws ProcessorException {
+        Path path = validateAndGetPath();
+
+        try (MDBReader mdbReader = new MDBReader(path.toFile())) {
+            importMDB(mdbReader);
+
+        } catch (IOException e) {
+            throw new ProcessorException(ERROR_PROCESSING_MDB_DATABASE, e.getMessage());
+        }
+    }
+
+    protected abstract void importMDB(MDBReader mdbReader) throws ProcessorException;
 
     @Override
     protected Path validateAndGetPath() throws ProcessorException {

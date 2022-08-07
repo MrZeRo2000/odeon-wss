@@ -10,6 +10,7 @@ public class ProcessorFactory {
     private final AppConfiguration appConfiguration;
 
     private final ArtistsMDBImportProcessor artistsMDBImportProcessor;
+    private final ClassicsMDBImportProcessor classicsMDBImportProcessor;
     private final MP3LoadProcessor mp3LoadProcessor;
     private final MP3ValidateProcessor mp3ValidateProcessor;
     private final LALoadProcessor laLoadProcessor;
@@ -18,6 +19,7 @@ public class ProcessorFactory {
     public ProcessorFactory(
             AppConfiguration appConfiguration,
             ArtistsMDBImportProcessor artistsMDBImportProcessor,
+            ClassicsMDBImportProcessor classicsMDBImportProcessor,
             MP3LoadProcessor mp3LoadProcessor,
             MP3ValidateProcessor mp3ValidateProcessor,
             LALoadProcessor laLoadProcessor,
@@ -25,6 +27,7 @@ public class ProcessorFactory {
     {
         this.appConfiguration = appConfiguration;
         this.artistsMDBImportProcessor = artistsMDBImportProcessor;
+        this.classicsMDBImportProcessor = classicsMDBImportProcessor;
         this.mp3LoadProcessor = mp3LoadProcessor;
         this.mp3ValidateProcessor = mp3ValidateProcessor;
         this.laLoadProcessor = laLoadProcessor;
@@ -36,6 +39,11 @@ public class ProcessorFactory {
         switch (processorType) {
             case ARTISTS_IMPORTER:
                 processor = artistsMDBImportProcessor;
+                processor.setProgressHandler(handler);
+                processor.setRootFolder(appConfiguration.getMdbPath());
+                return processor;
+            case CLASSICS_IMPORTER:
+                processor = classicsMDBImportProcessor;
                 processor.setProgressHandler(handler);
                 processor.setRootFolder(appConfiguration.getMdbPath());
                 return processor;
