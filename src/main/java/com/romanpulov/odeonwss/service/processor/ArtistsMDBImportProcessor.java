@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.ERROR_PROCESSING_MDB_DATABASE;
@@ -29,6 +31,8 @@ public class ArtistsMDBImportProcessor extends AbstractMDBImportProcessor {
     private final ArtistCategoryRepository artistCategoryRepository;
 
     private final ArtistLyricsRepository artistLyricsRepository;
+
+    private Map<Long, Artist> migratedArtists;
 
     public ArtistsMDBImportProcessor(
             ArtistRepository artistRepository,
@@ -53,6 +57,7 @@ public class ArtistsMDBImportProcessor extends AbstractMDBImportProcessor {
     private int importArtists(MDBReader mdbReader) throws ProcessorException {
         Table table = mdbReader.getTable(ARTISTLIST_TABLE_NAME);
         AtomicInteger counter = new AtomicInteger(0);
+        migratedArtists = new HashMap<>();
 
         for (Row row: table) {
             ArtistType artistType = row.getInt(SOURCE_COLUMN_NAME) == 5 ? ArtistType.CLASSICS : ArtistType.ARTIST;
@@ -61,6 +66,7 @@ public class ArtistsMDBImportProcessor extends AbstractMDBImportProcessor {
             artistRepository.findFirstByTypeAndName(artistType, artistName).ifPresentOrElse(
                     artist -> {
                         artist.setMigrationId(migrationId);
+                        migratedArtists.put(migrationId, artist);
                     },
                     () -> {
                         Artist artist = new Artist();
@@ -69,6 +75,7 @@ public class ArtistsMDBImportProcessor extends AbstractMDBImportProcessor {
                         artist.setMigrationId(migrationId);
 
                         artistRepository.save(artist);
+                        migratedArtists.put(migrationId, artist);
                         counter.getAndIncrement();
                     });
         }
@@ -82,19 +89,18 @@ public class ArtistsMDBImportProcessor extends AbstractMDBImportProcessor {
         for (Row row: table) {
             long artistMigrationId = row.getInt(ARTISTLIST_ID_COLUMN_NAME).longValue();
             String biography = row.getString(NOTES_COLUMN_NAME);
+            Artist artist;
 
-            if (biography != null) {
-                artistRepository.findFirstByMigrationId(artistMigrationId).ifPresent(artist -> {
-                    artistDetailRepository.findArtistDetailByArtist(artist).orElseGet(() -> {
-                        ArtistDetail artistDetail = new ArtistDetail();
-                        artistDetail.setArtist(artist);
-                        artistDetail.setBiography(biography);
+            if ((biography != null) && ((artist = migratedArtists.get(artistMigrationId)) != null)) {
+                artistDetailRepository.findArtistDetailByArtist(artist).orElseGet(() -> {
+                    ArtistDetail artistDetail = new ArtistDetail();
+                    artistDetail.setArtist(artist);
+                    artistDetail.setBiography(biography);
 
-                        artistDetailRepository.save(artistDetail);
-                        counter.getAndIncrement();
+                    artistDetailRepository.save(artistDetail);
+                    counter.getAndIncrement();
 
-                        return artistDetail;
-                    });
+                    return artistDetail;
                 });
             }
         }
@@ -108,7 +114,9 @@ public class ArtistsMDBImportProcessor extends AbstractMDBImportProcessor {
 
         for (Row row: table) {
             long artistMigrationId = row.getInt(ARTISTLIST_ID_COLUMN_NAME).longValue();
-            artistRepository.findFirstByMigrationId(artistMigrationId).ifPresent(artist -> {
+            Artist artist = migratedArtists.get(artistMigrationId);
+
+            if (artist != null) {
                 long migrationId = row.getInt(ARTISTLISTCAT_ID_COLUMN_NAME).longValue();
                 Short catId = row.getShort(CAT_ID_COLUMN_NAME);
                 String title = row.getString(TITLE_COLUMN_NAME);
@@ -127,7 +135,7 @@ public class ArtistsMDBImportProcessor extends AbstractMDBImportProcessor {
                         return artistCategory;
                     });
                 }
-            });
+            }
         }
 
         return counter.get();
@@ -143,28 +151,30 @@ public class ArtistsMDBImportProcessor extends AbstractMDBImportProcessor {
 
         for (Row row: table) {
             long artistMigrationId = row.getInt(ARTISTLIST_ID_COLUMN_NAME).longValue();
-            artistRepository.findFirstByMigrationId(artistMigrationId).ifPresent(artist -> {
-               String songName = row.getString(SONGNAME_COLUMN_NAME);
-               String lyricsText = row.getString(LYRICSTEXT_COLUMN_NAME);
+            Artist artist = migratedArtists.get(artistMigrationId);
 
-               if (songName != null && lyricsText != null) {
-                   artistLyricsRepository.findFirstByArtistAndTitle(artist, songName).ifPresentOrElse(
-                           artistLyrics -> {
-                               artistLyrics.setText(lyricsText);
-                               artistLyricsRepository.save(artistLyrics);
-                           },
-                           () -> {
-                               ArtistLyrics artistLyrics = new ArtistLyrics();
-                               artistLyrics.setArtist(artist);
-                               artistLyrics.setTitle(songName);
-                               artistLyrics.setText(lyricsText);
+            if (artist != null) {
+                String songName = row.getString(SONGNAME_COLUMN_NAME);
+                String lyricsText = row.getString(LYRICSTEXT_COLUMN_NAME);
 
-                               artistLyricsRepository.save(artistLyrics);
-                               counter.getAndIncrement();
-                           }
-                   );
-               }
-            });
+                if (songName != null && lyricsText != null) {
+                    artistLyricsRepository.findFirstByArtistAndTitle(artist, songName).ifPresentOrElse(
+                            artistLyrics -> {
+                                artistLyrics.setText(lyricsText);
+                                artistLyricsRepository.save(artistLyrics);
+                            },
+                            () -> {
+                                ArtistLyrics artistLyrics = new ArtistLyrics();
+                                artistLyrics.setArtist(artist);
+                                artistLyrics.setTitle(songName);
+                                artistLyrics.setText(lyricsText);
+
+                                artistLyricsRepository.save(artistLyrics);
+                                counter.getAndIncrement();
+                            }
+                    );
+                }
+            }
         }
 
         return counter.get();
