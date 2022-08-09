@@ -10,8 +10,11 @@ import com.romanpulov.odeonwss.repository.ArtistRepository;
 import static com.romanpulov.odeonwss.service.processor.MDBConst.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class ArtistsMDBImporter {
 
@@ -66,14 +69,16 @@ public class ArtistsMDBImporter {
                             migratedArtists.put(migrationId, artist);
                         },
                         () -> {
-                            Artist artist = new Artist();
-                            artist.setType(rowArtistType);
-                            artist.setName(artistName);
-                            artist.setMigrationId(migrationId);
+                            if (artistRepository.findFirstByMigrationId(migrationId).isEmpty()) {
+                                Artist artist = new Artist();
+                                artist.setType(rowArtistType);
+                                artist.setName(artistName);
+                                artist.setMigrationId(migrationId);
 
-                            artistRepository.save(artist);
-                            migratedArtists.put(migrationId, artist);
-                            counter.getAndIncrement();
+                                artistRepository.save(artist);
+                                migratedArtists.put(migrationId, artist);
+                                counter.getAndIncrement();
+                            }
                         });
             }
         }

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CompositionRepository extends CrudRepository<Composition, Long> {
 
@@ -75,4 +76,5 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
             "ORDER BY c.diskNum, c.num, ar.name, c.title")
     List<CompositionTableDTO> getCompositionTableByArtifact(Artifact artifact);
 
+    Optional<Composition> findCompositionByArtifactAndTitle(Artifact artifact, String title);
 }

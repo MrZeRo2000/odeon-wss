@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ArtifactRepository extends PagingAndSortingRepository<Artifact, Long> {
+    List<Artifact> getAllByArtifactType(ArtifactType artifactType);
+
     List<Artifact> getArtifactsByArtist(Artist artist);
 
     Optional<Artifact> findFirstByArtifactTypeAndArtistAndTitleAndYear(
@@ -64,4 +66,9 @@ public interface ArtifactRepository extends PagingAndSortingRepository<Artifact,
                     "WHERE a.id = :id"
     )
     Optional<ArtifactEditDTO> getArtifactEditById(Long id);
+
+    Optional<Artifact> findArtifactByArtifactTypeAndTitle(ArtifactType artifactType, String title);
+
+    @Query("SELECT a FROM Artifact a JOIN FETCH a.artist WHERE a.artifactType = :artifactType AND a.title = :title")
+    Optional<Artifact> getArtifactWithArtistByArtifactTypeAndTitle(ArtifactType artifactType, String title);
 }
