@@ -16,10 +16,9 @@ import java.util.stream.Collectors;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-//@Disabled
-public class ServiceProcessMDBImportArtistsTest {
+public class ServiceProcessMDBImportClassicsTest {
 
-    private static final Logger log = Logger.getLogger(ServiceProcessMDBImportArtistsTest.class.getSimpleName());
+    private static final Logger log = Logger.getLogger(ServiceProcessMDBImportClassicsTest.class.getSimpleName());
 
     @Autowired
     ProcessService service;
@@ -31,21 +30,18 @@ public class ServiceProcessMDBImportArtistsTest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     void testLoad() {
-        service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
+        service.executeProcessor(ProcessorType.CLASSICS_IMPORTER);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
-        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artists imported")));
-        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artist details imported")));
-        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artist categories imported")));
-        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artist lyrics imported")));
+
         log.info("Processing info: " + service.getProcessInfo());
     }
 
     @Test
     @Order(2)
     void testValidate() {
-        Assertions.assertEquals(0, artistRepository.getAllByType(ArtistType.CLASSICS).size());
+        Assertions.assertEquals(0, artistRepository.getAllByType(ArtistType.ARTIST).size());
 
-        List<Artist> artists = artistRepository.getAllByType(ArtistType.ARTIST);
+        List<Artist> artists = artistRepository.getAllByType(ArtistType.CLASSICS);
         Assertions.assertTrue(artists.size() > 0);
         Assertions.assertEquals(artists.size(), artists.stream().map(Artist::getMigrationId).collect(Collectors.toSet()).size());
     }
