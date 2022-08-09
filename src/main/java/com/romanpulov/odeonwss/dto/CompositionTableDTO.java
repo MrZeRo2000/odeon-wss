@@ -11,6 +11,10 @@ public class CompositionTableDTO {
 
     private String artistName;
 
+    private Long performerArtistId;
+
+    private String performerArtistName;
+
     private String title;
 
     private Long duration;
@@ -61,6 +65,22 @@ public class CompositionTableDTO {
         this.artistName = artistName;
     }
 
+    public Long getPerformerArtistId() {
+        return performerArtistId;
+    }
+
+    public void setPerformerArtistId(Long performerArtistId) {
+        this.performerArtistId = performerArtistId;
+    }
+
+    public String getPerformerArtistName() {
+        return performerArtistName;
+    }
+
+    public void setPerformerArtistName(String performerArtistName) {
+        this.performerArtistName = performerArtistName;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -101,12 +121,14 @@ public class CompositionTableDTO {
         this.fileName = fileName;
     }
 
-    public CompositionTableDTO(Long id, Long diskNum, Long num, Long artistId, String artistName, String title, Long duration, Long size, Long bitrate, String fileName) {
+    public CompositionTableDTO(Long id, Long diskNum, Long num, Long artistId, String artistName, Long performerArtistId, String performerArtistName, String title, Long duration, Long size, Long bitrate, String fileName) {
         this.id = id;
         this.diskNum = diskNum;
         this.num = num;
         this.artistId = artistId;
         this.artistName = artistName;
+        this.performerArtistId = performerArtistId;
+        this.performerArtistName = performerArtistName;
         this.title = title;
         this.duration = duration;
         this.size = size;
@@ -125,6 +147,8 @@ public class CompositionTableDTO {
                 ", num=" + num +
                 ", artistId=" + artistId +
                 ", artistName='" + artistName + '\'' +
+                ", performerArtistId=" + performerArtistId +
+                ", performerArtistName='" + performerArtistName + '\'' +
                 ", title='" + title + '\'' +
                 ", duration=" + duration +
                 ", size=" + size +

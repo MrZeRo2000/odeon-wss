@@ -22,6 +22,11 @@ public class EntityCompositionBuilder {
         return this;
     }
 
+    public EntityCompositionBuilder withPerformerArtist(Artist performerArtist) {
+        composition.setPerformerArtist(performerArtist);
+        return this;
+    }
+
     public EntityCompositionBuilder withMediaFile(MediaFile mediaFile) {
         composition.getMediaFiles().add(mediaFile);
         return this;

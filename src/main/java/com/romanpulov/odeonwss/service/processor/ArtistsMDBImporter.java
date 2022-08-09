@@ -29,6 +29,10 @@ public class ArtistsMDBImporter {
 
     private Map<Long, Artist> migratedArtists;
 
+    public Map<Long, Artist> getMigratedArtists() {
+        return migratedArtists;
+    }
+
     public ArtistsMDBImporter(
             ArtistRepository artistRepository,
             ArtistDetailRepository artistDetailRepository,

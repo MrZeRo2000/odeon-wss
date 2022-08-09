@@ -55,6 +55,11 @@ public class RepositoryCompositionTests {
         Assertions.assertNotNull(savedArtist);
         Assertions.assertNotNull(savedArtist.getId());
 
+        //Performer Artist
+        Artist performerArtist = new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("PerformerName1").build();
+        artistRepository.save(performerArtist);
+        Assertions.assertNotNull(performerArtist.getId());
+
         //Artifact
         Artifact artifact = new EntityArtifactBuilder()
                 .withArtifactType(artifactType)
@@ -97,6 +102,7 @@ public class RepositoryCompositionTests {
         Composition composition = new EntityCompositionBuilder()
                 .withArtifact(savedArtifact)
                 .withArtist(artist)
+                .withPerformerArtist(performerArtist)
                 .withTitle("Composition title")
                 .withDiskNum(1L)
                 .withNum(8L)
@@ -106,7 +112,9 @@ public class RepositoryCompositionTests {
         Assertions.assertNotNull(savedComposition.getId());
         Assertions.assertEquals(savedComposition.getArtifact(), savedArtifact);
         assert savedComposition.getArtist() != null;
+        assert savedComposition.getPerformerArtist() != null;
         Assertions.assertEquals("Name1", savedComposition.getArtist().getName());
+        Assertions.assertEquals("PerformerName1", savedComposition.getPerformerArtist().getName());
         Assertions.assertEquals("Composition title", savedComposition.getTitle());
         Assertions.assertEquals(1L, savedComposition.getDiskNum());
         Assertions.assertEquals(8, savedComposition.getNum());

@@ -63,6 +63,7 @@ public class ProcessService implements ProgressHandler {
             currentProcessor.get().execute();
 
         } catch (Exception e) {
+            e.printStackTrace();
             processInfo.addProgressDetails(ProgressDetail.fromException(e));
         } finally {
             // final status

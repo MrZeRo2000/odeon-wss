@@ -47,6 +47,7 @@ public class ProcessorMessages {
     static final String INFO_MEDIA_FILES_VALIDATED = "Media files validated";
 
     static final String INFO_ARTISTS_LOADED = "Artists loaded: %d";
+    static final String INFO_ARTISTS_CLEANSED = "Artists cleansed: %d";
 
     static final String INFO_ARTIFACTS_IMPORTED = "Artifacts imported: %d";
 

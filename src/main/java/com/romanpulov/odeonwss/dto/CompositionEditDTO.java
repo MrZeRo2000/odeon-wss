@@ -15,6 +15,10 @@ public class CompositionEditDTO {
 
     private String artistName;
 
+    private Long performerArtistId;
+
+    private String performerArtistName;
+
     private String title;
 
     private Long duration;
@@ -93,13 +97,15 @@ public class CompositionEditDTO {
         this.mediaFileIds = mediaFileIds;
     }
 
-    public CompositionEditDTO(Long id, Long artifactId, Long diskNum, Long num, Long artistId, String artistName, String title, Long duration, Set<Long> mediaFileIds) {
+    public CompositionEditDTO(Long id, Long artifactId, Long diskNum, Long num, Long artistId, String artistName, Long performerArtistId, String performerArtistName, String title, Long duration, Set<Long> mediaFileIds) {
         this.id = id;
         this.artifactId = artifactId;
         this.diskNum = diskNum;
         this.num = num;
         this.artistId = artistId;
         this.artistName = artistName;
+        this.performerArtistId = performerArtistId;
+        this.performerArtistName = performerArtistName;
         this.title = title;
         this.duration = duration;
         this.mediaFileIds = mediaFileIds;
@@ -117,6 +123,8 @@ public class CompositionEditDTO {
                 ", num=" + num +
                 ", artistId=" + artistId +
                 ", artistName='" + artistName + '\'' +
+                ", performerArtistId=" + performerArtistId +
+                ", performerArtistName='" + performerArtistName + '\'' +
                 ", title='" + title + '\'' +
                 ", duration=" + duration +
                 ", mediaFileIds=" + mediaFileIds +

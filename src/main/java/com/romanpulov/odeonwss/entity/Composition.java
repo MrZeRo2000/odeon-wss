@@ -42,13 +42,27 @@ public class Composition {
     @org.springframework.lang.Nullable
     private Artist artist;
 
-    @org.springframework.lang.Nullable
+    @Nullable
     public Artist getArtist() {
         return artist;
     }
 
     public void setArtist(@Nullable Artist artist) {
         this.artist = artist;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "perf_arts_id", referencedColumnName = "arts_id")
+    @org.springframework.lang.Nullable
+    private Artist performerArtist;
+
+    @org.springframework.lang.Nullable
+    public Artist getPerformerArtist() {
+        return performerArtist;
+    }
+
+    public void setPerformerArtist(@org.springframework.lang.Nullable Artist performerArtist) {
+        this.performerArtist = performerArtist;
     }
 
     @Column(name = "comp_title")
