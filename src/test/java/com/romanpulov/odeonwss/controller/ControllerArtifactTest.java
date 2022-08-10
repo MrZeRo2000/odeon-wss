@@ -172,7 +172,17 @@ public class ControllerArtifactTest {
         this.mockMvc.perform(get("/api/artifact/table")
                         .queryParam("artistTypeCode", "A")
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(3)))
+        ;
+
+        this.mockMvc.perform(get("/api/artifact/table")
+                        .queryParam("artistTypeCode", "C")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(1)))
         ;
     }
 

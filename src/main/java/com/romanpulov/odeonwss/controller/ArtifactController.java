@@ -34,11 +34,14 @@ public class ArtifactController {
     }
 
     @GetMapping("/table")
-    ResponseEntity<List<ArtifactTableDTO>> getTable(@RequestParam String artistTypeCode, @RequestParam List<String> artifactTypeCodes) {
+    ResponseEntity<List<ArtifactTableDTO>> getTable(@RequestParam String artistTypeCode, @RequestParam(required = false) List<String> artifactTypeCodes) {
         ArtistType artistType = ArtistType.fromCode(artistTypeCode);
-        List<ArtifactType> artifactTypes = artifactTypeRepository.getAllByIdIsIn(artifactTypeCodes.stream().map(Long::valueOf).collect(Collectors.toList()));
-
-        return ResponseEntity.ok(artifactRepository.getArtifactTableByArtistTypeAndArtifactTypes(artistType, artifactTypes));
+        if (artifactTypeCodes == null) {
+            return ResponseEntity.ok(artifactRepository.getArtifactTableByArtistType(artistType));
+        } else {
+            List<ArtifactType> artifactTypes = artifactTypeRepository.getAllByIdIsIn(artifactTypeCodes.stream().map(Long::valueOf).collect(Collectors.toList()));
+            return ResponseEntity.ok(artifactRepository.getArtifactTableByArtistTypeAndArtifactTypes(artistType, artifactTypes));
+        }
     }
 
     @GetMapping("/{id}")
