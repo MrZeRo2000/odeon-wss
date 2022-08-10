@@ -22,7 +22,7 @@ import java.util.stream.StreamSupport;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-//@Disabled
+@Disabled
 public class ServiceProcessMDBImportArtistsTest {
 
     private static final Logger log = Logger.getLogger(ServiceProcessMDBImportArtistsTest.class.getSimpleName());
@@ -68,15 +68,15 @@ public class ServiceProcessMDBImportArtistsTest {
     @Test
     @Order(3)
     void testRunSecondTime() {
-        long artistCount = artistRepository.getAllByType(ArtistType.ARTIST).size();
+        long artistCount = StreamSupport.stream(artistRepository.findAll().spliterator(), false).count();
         long artistDetailCount = StreamSupport.stream(artistDetailRepository.findAll().spliterator(), false).count();
         long artistCategoryCount = StreamSupport.stream(artistCategoryRepository.findAll().spliterator(), false).count();
         long artistLyricsCount = StreamSupport.stream(artistLyricsRepository.findAll().spliterator(), false).count();
 
-        service.executeProcessor(ProcessorType.CLASSICS_IMPORTER);
+        service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
 
-        Assertions.assertEquals(artistCount, artistRepository.getAllByType(ArtistType.ARTIST).size());
+        Assertions.assertEquals(artistCount, StreamSupport.stream(artistRepository.findAll().spliterator(), false).count());
         Assertions.assertEquals(artistDetailCount, StreamSupport.stream(artistDetailRepository.findAll().spliterator(), false).count());
         Assertions.assertEquals(artistCategoryCount, StreamSupport.stream(artistCategoryRepository.findAll().spliterator(), false).count());
         Assertions.assertEquals(artistLyricsCount, StreamSupport.stream(artistLyricsRepository.findAll().spliterator(), false).count());
