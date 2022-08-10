@@ -103,7 +103,7 @@ public class ControllerArtifactTest {
                 new EntityArtifactBuilder()
                         .withArtist(classics1)
                         .withPerformerArtist(performerArtist1)
-                        .withArtifactType(ArtifactType.withClassics())
+                        .withArtifactType(ArtifactType.withMP3())
                         .withTitle("Classics Artist 1 Classics Title 1")
                         .withYear(1975L)
                         .withDuration(46534L)
@@ -156,7 +156,7 @@ public class ControllerArtifactTest {
     void testGetTableClassics() throws Exception {
         this.mockMvc.perform(get("/api/artifact/table")
                         .queryParam("artistTypeCode", "C")
-                        .queryParam("artifactTypeCodes", "103")
+                        .queryParam("artifactTypeCodes", "101")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())

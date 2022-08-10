@@ -20,7 +20,7 @@ import java.util.stream.StreamSupport;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Disabled
+//@Disabled
 public class ServiceProcessMDBImportClassicsTest {
 
     private static final Logger log = Logger.getLogger(ServiceProcessMDBImportClassicsTest.class.getSimpleName());
@@ -55,20 +55,24 @@ public class ServiceProcessMDBImportClassicsTest {
         List<Artist> artists = artistRepository.getAllByType(ArtistType.CLASSICS);
         Assertions.assertTrue(artists.size() > 0);
         Assertions.assertEquals(artists.size(), artists.stream().map(Artist::getMigrationId).collect(Collectors.toSet()).size());
+
+        Assertions.assertEquals(98, StreamSupport.stream(artistRepository.findAll().spliterator(), false).count());
+        Assertions.assertEquals(73, StreamSupport.stream(artifactRepository.findAll().spliterator(), false).count());
+        Assertions.assertEquals(157, StreamSupport.stream(compositionRepository.findAll().spliterator(), false).count());
     }
 
     @Test
     @Order(3)
     void testRunSecondTime() {
-        long artistCount = artistRepository.getAllByType(ArtistType.CLASSICS).size();
-        long artifactCount = artifactRepository.getAllByArtifactType(ArtifactType.withClassics()).size();
+        long artistCount = StreamSupport.stream(artistRepository.findAll().spliterator(), false).count();
+        long artifactCount = StreamSupport.stream(artifactRepository.findAll().spliterator(), false).count();
         long compositionCount = StreamSupport.stream(compositionRepository.findAll().spliterator(), false).count();
 
         service.executeProcessor(ProcessorType.CLASSICS_IMPORTER);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
 
-        Assertions.assertEquals(artistCount, artistRepository.getAllByType(ArtistType.CLASSICS).size());
-        Assertions.assertEquals(artifactCount, artifactRepository.getAllByArtifactType(ArtifactType.withClassics()).size());
+        Assertions.assertEquals(artistCount, StreamSupport.stream(artistRepository.findAll().spliterator(), false).count());
+        Assertions.assertEquals(artifactCount, StreamSupport.stream(artifactRepository.findAll().spliterator(), false).count());
         Assertions.assertEquals(compositionCount, StreamSupport.stream(compositionRepository.findAll().spliterator(), false).count());
     }
 }

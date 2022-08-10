@@ -71,4 +71,7 @@ public interface ArtifactRepository extends PagingAndSortingRepository<Artifact,
 
     @Query("SELECT a FROM Artifact a JOIN FETCH a.artist WHERE a.artifactType = :artifactType AND a.title = :title")
     Optional<Artifact> getArtifactWithArtistByArtifactTypeAndTitle(ArtifactType artifactType, String title);
+
+    @Query("SELECT a FROM Artifact a JOIN FETCH a.artist WHERE a.artist = :artist AND a.title = :title")
+    Optional<Artifact> getArtifactWithArtistByArtistAndTitle(Artist artist, String title);
 }

@@ -92,12 +92,4 @@ public class ArtifactType {
 
         return artifactType;
     }
-
-    public static ArtifactType withClassics() {
-        ArtifactType artifactType = new ArtifactType();
-        artifactType.setId(103L);
-        artifactType.setName("Classics");
-
-        return artifactType;
-    }
 }

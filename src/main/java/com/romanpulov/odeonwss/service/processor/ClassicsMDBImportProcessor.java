@@ -144,11 +144,11 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
                 ClassicsData classicsData = classicsDataMap.get(artifactName);
                 if (classicsData == null) {
                     Artifact artifact = artifactRepository
-                            .getArtifactWithArtistByArtifactTypeAndTitle(ArtifactType.withClassics(), artifactName)
+                            .getArtifactWithArtistByArtistAndTitle(artist, artifactName)
                             .orElseGet(() -> {
                                 Artifact newArtifact = new Artifact();
 
-                                newArtifact.setArtifactType(ArtifactType.withClassics());
+                                newArtifact.setArtifactType(ArtifactType.withMP3());
                                 newArtifact.setTitle(artifactName);
                                 newArtifact.setArtist(artist);
                                 newArtifact.setPerformerArtist(performerArtist);
