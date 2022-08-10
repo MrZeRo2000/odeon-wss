@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.service.processor;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTOBuilder;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,7 @@ public class LAValidateProcessor extends AbstractValidateProcessor {
     public void execute() throws ProcessorException {
         Path path = validateAndGetPath();
 
-        List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getCompositionMediaFileValidationMusic(ArtifactType.withLA());
+        List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getCompositionMediaFileValidationMusic(ArtistType.ARTIST, ArtifactType.withLA());
         mediaFormats = dbValidation.stream().map(MediaFileValidationDTO::getMediaFileFormat).collect(Collectors.toSet());
 
         List<MediaFileValidationDTO> pathValidation = loadFromPath(path);
