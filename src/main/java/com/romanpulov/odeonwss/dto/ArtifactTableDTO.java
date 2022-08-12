@@ -1,11 +1,15 @@
 package com.romanpulov.odeonwss.dto;
 
+import com.romanpulov.odeonwss.entity.ArtistType;
+
 import java.time.LocalDate;
 
 public class ArtifactTableDTO {
     private Long id;
 
     private String artifactTypeName;
+
+    private String artistTypeCode;
 
     private String artistName;
 
@@ -35,6 +39,14 @@ public class ArtifactTableDTO {
 
     public void setArtifactTypeName(String artifactTypeName) {
         this.artifactTypeName = artifactTypeName;
+    }
+
+    public String getArtistTypeCode() {
+        return artistTypeCode;
+    }
+
+    public void setArtistTypeCode(String artistTypeCode) {
+        this.artistTypeCode = artistTypeCode;
     }
 
     public String getArtistName() {
@@ -93,9 +105,10 @@ public class ArtifactTableDTO {
         this.insertDate = insertDate;
     }
 
-    public ArtifactTableDTO(Long id, String artifactTypeName, String artistName, String performerArtistName, String title, Long year, Long duration, Long size, LocalDate insertDate) {
+    public ArtifactTableDTO(Long id, String artifactTypeName, ArtistType artistType, String artistName, String performerArtistName, String title, Long year, Long duration, Long size, LocalDate insertDate) {
         this.id = id;
         this.artifactTypeName = artifactTypeName;
+        this.artistTypeCode = artistType.getCode();
         this.artistName = artistName;
         this.performerArtistName = performerArtistName;
         this.title = title;
@@ -113,6 +126,7 @@ public class ArtifactTableDTO {
         return "ArtifactTableDTO{" +
                 "id=" + id +
                 ", artifactTypeName='" + artifactTypeName + '\'' +
+                ", artistTypeCode='" + artistTypeCode + '\'' +
                 ", artistName='" + artistName + '\'' +
                 ", performerArtistName='" + performerArtistName + '\'' +
                 ", title='" + title + '\'' +

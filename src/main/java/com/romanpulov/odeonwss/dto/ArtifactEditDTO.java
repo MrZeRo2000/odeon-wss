@@ -1,8 +1,11 @@
 package com.romanpulov.odeonwss.dto;
 
+import com.romanpulov.odeonwss.entity.ArtistType;
+
 public class ArtifactEditDTO {
     private Long id;
     private Long artifactTypeId;
+    private String artistTypeCode;
     private Long artistId;
     private String artistName;
     private Long performerArtistId;
@@ -22,6 +25,14 @@ public class ArtifactEditDTO {
 
     public Long getArtifactTypeId() {
         return artifactTypeId;
+    }
+
+    public String getArtistTypeCode() {
+        return artistTypeCode;
+    }
+
+    public void setArtistTypeCode(String artistTypeCode) {
+        this.artistTypeCode = artistTypeCode;
     }
 
     public void setArtifactTypeId(Long artifactTypeId) {
@@ -92,9 +103,10 @@ public class ArtifactEditDTO {
         this.size = size;
     }
 
-    public ArtifactEditDTO(Long id, Long artifactTypeId, Long artistId, String artistName, Long performerArtistId, String performerArtistName, String title, Long year, Long duration, Long size) {
+    public ArtifactEditDTO(Long id, Long artifactTypeId, ArtistType artistType, Long artistId, String artistName, Long performerArtistId, String performerArtistName, String title, Long year, Long duration, Long size) {
         this.id = id;
         this.artifactTypeId = artifactTypeId;
+        this.artistTypeCode = artistType.getCode();
         this.artistId = artistId;
         this.artistName = artistName;
         this.performerArtistId = performerArtistId;
@@ -113,6 +125,7 @@ public class ArtifactEditDTO {
         return "ArtifactEditDTO{" +
                 "id=" + id +
                 ", artifactTypeId=" + artifactTypeId +
+                ", artistTypeCode='" + artistTypeCode + '\'' +
                 ", artistId=" + artistId +
                 ", artistName='" + artistName + '\'' +
                 ", performerArtistId=" + performerArtistId +

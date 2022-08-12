@@ -29,6 +29,7 @@ public interface ArtifactRepository extends PagingAndSortingRepository<Artifact,
         "SELECT new com.romanpulov.odeonwss.dto.ArtifactTableDTO(" +
                 "a.id," +
                 "at.name," +
+                "ar.type, " +
                 "ar.name, " +
                 "par.name, " +
                 "a.title, " +
@@ -48,30 +49,10 @@ public interface ArtifactRepository extends PagingAndSortingRepository<Artifact,
     List<ArtifactTableDTO> getArtifactTableByArtistTypeAndArtifactTypes(@Param("artistType") ArtistType artistType, @Param("artifactTypes") List<ArtifactType> artifactTypes);
 
     @Query(
-            "SELECT new com.romanpulov.odeonwss.dto.ArtifactTableDTO(" +
-                    "a.id," +
-                    "at.name," +
-                    "ar.name, " +
-                    "par.name, " +
-                    "a.title, " +
-                    "a.year," +
-                    "a.duration," +
-                    "a.size," +
-                    "a.insertDate" +
-                    ") " +
-                    "FROM Artifact as a " +
-                    "INNER JOIN ArtifactType as at ON a.artifactType = at " +
-                    "INNER JOIN Artist as ar ON a.artist = ar " +
-                    "LEFT OUTER JOIN Artist as par ON a.performerArtist = par " +
-                    "WHERE ar.type=:artistType " +
-                    "ORDER BY ar.name, a.year, a.title"
-    )
-    List<ArtifactTableDTO> getArtifactTableByArtistType(@Param("artistType") ArtistType artistType);
-
-    @Query(
             "SELECT new com.romanpulov.odeonwss.dto.ArtifactEditDTO(" +
                     "a.id, " +
                     "a.artifactType.id, " +
+                    "a.artist.type, " +
                     "a.artist.id, " +
                     "ar.name, " +
                     "a.performerArtist.id, " +
