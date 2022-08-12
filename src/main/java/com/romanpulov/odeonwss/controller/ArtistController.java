@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class ArtistController {
     }
 
     @GetMapping("/artists/table-id-name")
-    ResponseEntity<List<IdNameView>> getArtistList() {
-        return ResponseEntity.ok(artistRepository.getByTypeOrderByName(ArtistType.ARTIST));
+    ResponseEntity<List<IdNameView>> getArtistList(@RequestParam String artistTypeCode) {
+        return ResponseEntity.ok(artistRepository.getByTypeOrderByName(ArtistType.fromCode(artistTypeCode)));
     }
 }
