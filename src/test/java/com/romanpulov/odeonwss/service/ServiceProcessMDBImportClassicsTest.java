@@ -56,7 +56,7 @@ public class ServiceProcessMDBImportClassicsTest {
         Assertions.assertTrue(artists.size() > 0);
         Assertions.assertEquals(artists.size(), artists.stream().map(Artist::getMigrationId).collect(Collectors.toSet()).size());
 
-        Assertions.assertEquals(98, StreamSupport.stream(artistRepository.findAll().spliterator(), false).count());
+        Assertions.assertEquals(99, StreamSupport.stream(artistRepository.findAll().spliterator(), false).count());
         Assertions.assertEquals(73, StreamSupport.stream(artifactRepository.findAll().spliterator(), false).count());
         Assertions.assertEquals(157, StreamSupport.stream(compositionRepository.findAll().spliterator(), false).count());
     }

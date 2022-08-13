@@ -25,6 +25,8 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private static final String VARIOUS_COMPOSERS_ARTIST_NAME = "Various Composers";
 
+    private static final String VARIOUS_PERFORMERS_ARTIST_NAME = "Various Performers";
+
     private static final Map<Long, String> RENAME_ARTISTS_MAP = new HashMap<>();
     static {
         RENAME_ARTISTS_MAP.put(1921L, VARIOUS_COMPOSERS_ARTIST_NAME);
@@ -95,6 +97,21 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
         }
     }
 
+    private void saveArtistClassicsGenreAndCategory(Artist artist) {
+        ArtistCategory genreArtistCategory = new ArtistCategory();
+        genreArtistCategory.setArtist(artist);
+        genreArtistCategory.setType(ArtistCategoryType.GENRE);
+        genreArtistCategory.setName(ARTIST_CATEGORY_CLASSICAL);
+        artistCategoryRepository.save(genreArtistCategory);
+
+        ArtistCategory styleArtistCategory = new ArtistCategory();
+        styleArtistCategory.setArtist(artist);
+        styleArtistCategory.setType(ArtistCategoryType.STYLE);
+        styleArtistCategory.setName(ARTIST_CATEGORY_CLASSICAL);
+        artistCategoryRepository.save(styleArtistCategory);
+    }
+
+
     private int cleanseArtistNames() {
         AtomicInteger counter = new AtomicInteger(0);
 
@@ -105,19 +122,22 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
                 artistRepository.save(artist);
                 counter.getAndIncrement();
 
-                ArtistCategory genreArtistCategory = new ArtistCategory();
-                genreArtistCategory.setArtist(artist);
-                genreArtistCategory.setType(ArtistCategoryType.GENRE);
-                genreArtistCategory.setName(ARTIST_CATEGORY_CLASSICAL);
-                artistCategoryRepository.save(genreArtistCategory);
-
-                ArtistCategory styleArtistCategory = new ArtistCategory();
-                styleArtistCategory.setArtist(artist);
-                styleArtistCategory.setType(ArtistCategoryType.STYLE);
-                styleArtistCategory.setName(ARTIST_CATEGORY_CLASSICAL);
-                artistCategoryRepository.save(styleArtistCategory);
+                saveArtistClassicsGenreAndCategory(artist);
             }
         });
+
+        artistRepository.findFirstByTypeAndName(ArtistType.CLASSICS, VARIOUS_PERFORMERS_ARTIST_NAME)
+                .orElseGet(() -> {
+                    Artist variousPerformerArtist = new Artist();
+                    variousPerformerArtist.setType(ArtistType.CLASSICS);
+                    variousPerformerArtist.setName(VARIOUS_PERFORMERS_ARTIST_NAME);
+                    artistRepository.save(variousPerformerArtist);
+                    counter.getAndIncrement();
+
+                    saveArtistClassicsGenreAndCategory(variousPerformerArtist);
+
+                    return variousPerformerArtist;
+                });
 
         return counter.get();
     }
@@ -130,6 +150,9 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
         Artist variousComposersArtist = artistRepository
                 .findFirstByTypeAndName(ArtistType.CLASSICS, VARIOUS_COMPOSERS_ARTIST_NAME)
                 .orElseThrow(() -> new ProcessorException("Various composers artist not found"));
+        Artist variousPerformersArtist = artistRepository
+                .findFirstByTypeAndName(ArtistType.CLASSICS, VARIOUS_PERFORMERS_ARTIST_NAME)
+                .orElseThrow(() -> new ProcessorException("Various performers artist not found"));
 
         for (Row row: table) {
             if (row.getInt(REC_ID_COLUMN_NAME) == ROW_ID) {
@@ -144,7 +167,7 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
                 ClassicsData classicsData = classicsDataMap.get(artifactName);
                 if (classicsData == null) {
                     Artifact artifact = artifactRepository
-                            .getArtifactWithArtistByArtistAndTitle(artist, artifactName)
+                            .getArtifactWithArtistByTitle(artifactName)
                             .orElseGet(() -> {
                                 Artifact newArtifact = new Artifact();
 
@@ -188,9 +211,22 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
                 if (
                         (artist != null) &&
                         (classicsData.artifact.getArtist() != null) &&
-                        !(artist.getName().equals(classicsData.artifact.getArtist().getName()))
+                        !(artist.getName().equals(classicsData.artifact.getArtist().getName())) &&
+                        !(classicsData.artifact.getArtist().getName().equals(VARIOUS_COMPOSERS_ARTIST_NAME))
                 ) {
                     classicsData.artifact.setArtist(variousComposersArtist);
+                    artifactRepository.save(classicsData.artifact);
+                }
+
+                if (
+                        ((performerArtist == null) && (classicsData.artifact.getPerformerArtist() != null)) ||
+                        ((performerArtist != null) && (classicsData.artifact.getPerformerArtist() == null)) ||
+                        ((performerArtist != null) && (classicsData.artifact.getPerformerArtist() != null) &&
+                        !(performerArtist.getName().equals(classicsData.artifact.getPerformerArtist().getName())) &&
+                        !(classicsData.artifact.getPerformerArtist().getName().equals(VARIOUS_PERFORMERS_ARTIST_NAME)))
+                ) {
+                    classicsData.artifact.setPerformerArtist(variousPerformersArtist);
+                    artifactRepository.save(classicsData.artifact);
                 }
 
                 classicsData.compositions.add(composition);

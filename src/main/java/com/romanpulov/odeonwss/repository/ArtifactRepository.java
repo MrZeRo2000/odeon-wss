@@ -69,11 +69,6 @@ public interface ArtifactRepository extends PagingAndSortingRepository<Artifact,
     )
     Optional<ArtifactEditDTO> getArtifactEditById(Long id);
 
-    Optional<Artifact> findArtifactByArtifactTypeAndTitle(ArtifactType artifactType, String title);
-
-    @Query("SELECT a FROM Artifact a JOIN FETCH a.artist WHERE a.artifactType = :artifactType AND a.title = :title")
-    Optional<Artifact> getArtifactWithArtistByArtifactTypeAndTitle(ArtifactType artifactType, String title);
-
-    @Query("SELECT a FROM Artifact a JOIN FETCH a.artist WHERE a.artist = :artist AND a.title = :title")
-    Optional<Artifact> getArtifactWithArtistByArtistAndTitle(Artist artist, String title);
+    @Query("SELECT a FROM Artifact a INNER JOIN FETCH a.artist LEFT JOIN FETCH a.performerArtist WHERE a.title = :title")
+    Optional<Artifact> getArtifactWithArtistByTitle(String title);
 }
