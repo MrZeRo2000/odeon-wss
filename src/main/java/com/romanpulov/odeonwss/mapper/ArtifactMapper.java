@@ -20,6 +20,12 @@ public class ArtifactMapper {
         artist.setId(aed.getArtistId());
         artifact.setArtist(artist);
 
+        if (aed.getPerformerArtistId() != null) {
+            Artist performerArtist = new Artist();
+            performerArtist.setId(aed.getPerformerArtistId());
+            artifact.setPerformerArtist(performerArtist);
+        }
+
         artifact.setTitle(aed.getTitle());
         artifact.setYear(aed.getYear());
         artifact.setDuration(aed.getDuration());

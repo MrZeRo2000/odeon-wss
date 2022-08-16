@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.mapper;
 
 import com.romanpulov.odeonwss.dto.CompositionEditDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.entity.MediaFile;
 
@@ -12,6 +13,23 @@ public class CompositionMapper {
     public static void updateFromEditDTO(Composition composition, CompositionEditDTO editDTO, Artifact artifact, Set<MediaFile> mediaFiles) {
         composition.setId(editDTO.getId());
         composition.setArtifact(artifact);
+
+        if (editDTO.getArtistId() != null) {
+            Artist artist = new Artist();
+            artist.setId(editDTO.getArtistId());
+            composition.setArtist(artist);
+        } else {
+            composition.setArtist(null);
+        }
+
+        if (editDTO.getPerformerArtistId() != null) {
+            Artist performerArtist = new Artist();
+            performerArtist.setId(editDTO.getPerformerArtistId());
+            composition.setPerformerArtist(performerArtist);
+        } else {
+            composition.setPerformerArtist(null);
+        }
+
         composition.setTitle(editDTO.getTitle());
         composition.setDuration(editDTO.getDuration());
         composition.setDiskNum(editDTO.getDiskNum());
@@ -25,6 +43,19 @@ public class CompositionMapper {
 
         composition.setId(editDTO.getId());
         composition.setArtifact(artifact);
+
+        if (editDTO.getArtistId() != null) {
+            Artist artist = new Artist();
+            artist.setId(editDTO.getArtistId());
+            composition.setArtist(artist);
+        }
+
+        if (editDTO.getPerformerArtistId() != null) {
+            Artist performerArtist = new Artist();
+            performerArtist.setId(editDTO.getPerformerArtistId());
+            composition.setPerformerArtist(performerArtist);
+        }
+
         composition.setTitle(editDTO.getTitle());
         composition.setDuration(editDTO.getDuration());
         composition.setDiskNum(editDTO.getDiskNum());
@@ -40,6 +71,19 @@ public class CompositionMapper {
 
         dto.setId(composition.getId());
         dto.setArtifactId(composition.getArtifact().getId());
+
+        Artist artist = composition.getArtist();
+        if (artist != null) {
+            dto.setArtistId(artist.getId());
+            dto.setArtistName(artist.getName());
+        }
+
+        Artist performerArtist = composition.getPerformerArtist();
+        if (performerArtist != null) {
+            dto.setPerformerArtistId(performerArtist.getId());
+            dto.setPerformerArtistName(performerArtist.getName());
+        }
+
         dto.setTitle(composition.getTitle());
         dto.setDuration(composition.getDuration());
         dto.setDiskNum(composition.getDiskNum());

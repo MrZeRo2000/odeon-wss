@@ -73,6 +73,22 @@ public class CompositionEditDTO {
         this.artistName = artistName;
     }
 
+    public Long getPerformerArtistId() {
+        return performerArtistId;
+    }
+
+    public void setPerformerArtistId(Long performerArtistId) {
+        this.performerArtistId = performerArtistId;
+    }
+
+    public String getPerformerArtistName() {
+        return performerArtistName;
+    }
+
+    public void setPerformerArtistName(String performerArtistName) {
+        this.performerArtistName = performerArtistName;
+    }
+
     public String getTitle() {
         return title;
     }

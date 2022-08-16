@@ -61,6 +61,12 @@ public class ServiceCompositionTest {
                 .build()
         );
 
+        Artist performerArtist = artistRepository.save(new EntityArtistBuilder()
+                .withType(ArtistType.ARTIST)
+                .withName("Performer Artist 1")
+                .build()
+        );
+
         Artifact artifact1 = artifactRepository.save(
                 new EntityArtifactBuilder()
                         .withArtifactType(ArtifactType.withMP3())
@@ -94,7 +100,9 @@ public class ServiceCompositionTest {
 
         CompositionEditDTO comp11 = compositionService.insert(
             new CompositionEditDTOBuilder()
-                    .withArtifact(artifact1)
+                    .withArtifactId(artifact1.getId())
+                    .withArtistId(artist.getId())
+                    .withPerformerArtistId(performerArtist.getId())
                     .withTitle("Comp 1-1")
                     .withDiskNum(1L)
                     .withNum(4L)
@@ -108,6 +116,8 @@ public class ServiceCompositionTest {
         Assertions.assertEquals(1, comp11.getDiskNum());
         Assertions.assertEquals(4, comp11.getNum());
         Assertions.assertEquals(1234, comp11.getDuration());
+        Assertions.assertEquals(1, comp11.getArtistId());
+        Assertions.assertEquals(2, comp11.getPerformerArtistId());
 
         MediaFile mediaFile12 = mediaFileRepository.save(
                 new EntityMediaFileBuilder()
@@ -122,7 +132,7 @@ public class ServiceCompositionTest {
 
         CompositionEditDTO comp12 = compositionService.insert(
                 new CompositionEditDTOBuilder()
-                        .withArtifact(artifact1)
+                        .withArtifactId(artifact1.getId())
                         .withTitle("Comp 1-2")
                         .withDiskNum(1L)
                         .withNum(5L)

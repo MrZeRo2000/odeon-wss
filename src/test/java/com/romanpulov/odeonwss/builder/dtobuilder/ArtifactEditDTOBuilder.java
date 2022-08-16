@@ -24,6 +24,11 @@ public class ArtifactEditDTOBuilder extends AbstractClassBuilder<ArtifactEditDTO
         return this;
     }
 
+    public ArtifactEditDTOBuilder withPerformerArtistId(long id) {
+        instance.setPerformerArtistId(id);
+        return this;
+    }
+
     public ArtifactEditDTOBuilder withTitle(String title) {
         instance.setTitle(title);
         return this;

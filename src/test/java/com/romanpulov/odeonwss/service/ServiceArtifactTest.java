@@ -39,15 +39,29 @@ public class ServiceArtifactTest {
                         .build()
         );
 
+        ArtistCategoriesDetailDTO pacd = artistService.insert(
+                new ArtistCategoriesDetailDTOBuilder()
+                        .withArtistName("Performer Name 1")
+                        .withArtistType(ArtistType.ARTIST)
+                        .withArtistBiography("Performer Bio 1")
+                        .withGenre("Pop")
+                        .withStyles("Electronic", "Rap", "Electronic")
+                        .build()
+        );
+
+
         ArtifactEditDTO aed = new ArtifactEditDTOBuilder()
                 .withArtifactTypeId(ArtifactType.withMP3().getId())
                 .withArtistId(acd.getId())
+                .withPerformerArtistId(pacd.getId())
                 .withTitle("Title 1")
                 .build();
 
         aed = artifactService.insert(aed);
 
         Assertions.assertEquals(1, aed.getId());
+        Assertions.assertEquals(acd.getId(), aed.getArtistId());
+        Assertions.assertEquals(pacd.getId(), aed.getPerformerArtistId());
     }
 
     @Test
