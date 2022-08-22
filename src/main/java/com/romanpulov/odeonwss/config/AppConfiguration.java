@@ -13,6 +13,8 @@ public class AppConfiguration {
 
     private final String laPath;
 
+    private final String classicsPath;
+
     private final String mdbPath;
 
     private final String ffprobePath;
@@ -31,6 +33,10 @@ public class AppConfiguration {
         return laPath;
     }
 
+    public String getClassicsPath() {
+        return classicsPath;
+    }
+
     public String getMdbPath() {
         return mdbPath;
     }
@@ -47,6 +53,7 @@ public class AppConfiguration {
         dbUrl = context.getInitParameter("db-url");
         mp3Path = context.getInitParameter("mp3-path");
         laPath = context.getInitParameter("la-path");
+        classicsPath = context.getInitParameter("classics-path");
         mdbPath = context.getInitParameter("mdb-path");
         ffprobePath = context.getInitParameter("ffprobe-path");
         version = projectConfigurationProperties.getVersion();

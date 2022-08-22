@@ -11,6 +11,7 @@ public class ProcessorFactory {
 
     private final ArtistsMDBImportProcessor artistsMDBImportProcessor;
     private final ClassicsMDBImportProcessor classicsMDBImportProcessor;
+    private final ClassicsValidateProcessor classicsValidateProcessor;
     private final MP3LoadProcessor mp3LoadProcessor;
     private final MP3ValidateProcessor mp3ValidateProcessor;
     private final LALoadProcessor laLoadProcessor;
@@ -20,6 +21,7 @@ public class ProcessorFactory {
             AppConfiguration appConfiguration,
             ArtistsMDBImportProcessor artistsMDBImportProcessor,
             ClassicsMDBImportProcessor classicsMDBImportProcessor,
+            ClassicsValidateProcessor classicsValidateProcessor,
             MP3LoadProcessor mp3LoadProcessor,
             MP3ValidateProcessor mp3ValidateProcessor,
             LALoadProcessor laLoadProcessor,
@@ -28,6 +30,7 @@ public class ProcessorFactory {
         this.appConfiguration = appConfiguration;
         this.artistsMDBImportProcessor = artistsMDBImportProcessor;
         this.classicsMDBImportProcessor = classicsMDBImportProcessor;
+        this.classicsValidateProcessor = classicsValidateProcessor;
         this.mp3LoadProcessor = mp3LoadProcessor;
         this.mp3ValidateProcessor = mp3ValidateProcessor;
         this.laLoadProcessor = laLoadProcessor;
@@ -46,6 +49,11 @@ public class ProcessorFactory {
                 processor = classicsMDBImportProcessor;
                 processor.setProgressHandler(handler);
                 processor.setRootFolder(appConfiguration.getMdbPath());
+                return processor;
+            case CLASSICS_VALIDATOR:
+                processor = classicsValidateProcessor;
+                processor.setProgressHandler(handler);
+                processor.setRootFolder(appConfiguration.getClassicsPath());
                 return processor;
             case MP3_LOADER:
                 processor = mp3LoadProcessor;

@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
-public class LAValidateProcessor extends AbstractValidateProcessor {
+public class LAValidateProcessor extends AbstractArtistBaseValidateProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(LAValidateProcessor.class);
 

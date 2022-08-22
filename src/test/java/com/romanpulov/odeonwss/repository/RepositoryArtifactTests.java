@@ -130,6 +130,14 @@ public class RepositoryArtifactTests {
     }
 
     @Test
+    @Order(5)
+    void testArtifactsByType() throws Exception{
+        Assertions.assertEquals(1, artifactRepository.getArtifactsByArtistType(ArtistType.ARTIST).size());
+        Assertions.assertEquals(0, artifactRepository.getArtifactsByArtistType(ArtistType.CLASSICS).size());
+        Assertions.assertEquals("Title 1", artifactRepository.getArtifactsByArtistType(ArtistType.ARTIST).get(0).getTitle());
+    }
+
+    @Test
     @Order(10)
     void testCascade() {
         Artifact artifact = artifactRepository.findAll().iterator().next();

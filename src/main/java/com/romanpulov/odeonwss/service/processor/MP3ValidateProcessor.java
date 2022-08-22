@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
-public class MP3ValidateProcessor extends AbstractValidateProcessor {
+public class MP3ValidateProcessor extends AbstractArtistBaseValidateProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(MP3ValidateProcessor.class);
 
