@@ -21,7 +21,7 @@ public class RepositoryArtifactTypeTest {
         List<ArtifactType> artifactTypes = new ArrayList<>();
         artifactTypeRepository.findAll().forEach(artifactTypes::add);
 
-        Assertions.assertEquals(3, artifactTypes.size());
+        Assertions.assertEquals(7, artifactTypes.size());
     }
 
     @Test

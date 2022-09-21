@@ -21,6 +21,15 @@ CREATE TABLE artifact_types (
 CREATE UNIQUE INDEX idx_artifact_types_name ON artifact_types (attp_name)
 ;
 
+DROP TABLE IF EXISTS dv_types;
+
+CREATE TABLE dv_types (
+    dvtp_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    dvtp_name TEXT NOT NULL
+);
+
+CREATE UNIQUE INDEX idx_dv_types_dvtp_name ON dv_types(dvtp_name);
+
 DROP TABLE IF EXISTS artifacts;
 
 CREATE TABLE artifacts (
@@ -48,6 +57,7 @@ CREATE TABLE compositions (
     artf_id INTEGER NOT NULL,
     arts_id INTEGER NULL,
     perf_arts_id INTEGER NULL,
+    dvtp_id INTEGER NULL,
     comp_title TEXT NOT NULL,
     comp_duration INTEGER NULL,
     comp_disk_num INTEGER NULL,
