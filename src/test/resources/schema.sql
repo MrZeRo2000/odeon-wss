@@ -18,7 +18,7 @@ CREATE TABLE artifact_types (
     attp_parent_id INTEGER NULL
 );
 
-CREATE UNIQUE INDEX idx_artifact_types_name ON artifact_types (attp_name)
+CREATE UNIQUE INDEX idx_artifact_attp_parent_id_attp_name ON artifact_types (attp_parent_id, attp_name)
 ;
 
 DROP TABLE IF EXISTS dv_types;

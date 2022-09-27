@@ -7,6 +7,8 @@ public class MDBConst {
     public static final String ARTISTLISTCAT_TABLE_NAME = "ArtistListCat";
     public static final String ARTISTLYRICS_TABLE_NAME = "ArtistLyrics";
     public static final String CLASSICS_TABLE_NAME = "CLCont";
+    public static final String DVCONT_TABLE_NAME = "DVCont";
+    public static final String DVDET_TABLE_NAME = "DVDet";
 
     public static final String ARTISTLIST_ID_COLUMN_NAME = "ArtistListID";
     public static final String TITLE_COLUMN_NAME = "Title";
@@ -21,5 +23,9 @@ public class MDBConst {
     public static final String PERFORMER_ARTISTLIST_ID_COLUMN_NAME = "PerArtistListID";
     public static final String YEAR_COLUMN_NAME = "Year";
     public static final String REC_ID_COLUMN_NAME = "RecID";
-    public static final String DIR_NAME_COLUMN_NAME = "DirName";    
+    public static final String DIR_NAME_COLUMN_NAME = "DirName";
+    public static final String DVCONT_ID_COLUMN_NAME = "DVContID";
+    public static final String FILE_NAME_COLUMN_NAME = "FileName";
+    public static final String DVDET_ID_COLUMN_NAME = "DVDetID";
+    public static final String VIDEOTYPE_ID_COLUMN_NAME = "VideoTypeID";
 }

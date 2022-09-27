@@ -8,7 +8,7 @@ VALUES (102, 'LA', 100);
 INSERT INTO artifact_types (attp_id, attp_name, attp_parent_id)
 VALUES (200, 'Video', null);
 INSERT INTO artifact_types (attp_id, attp_name, attp_parent_id)
-VALUES (201, 'DV', 200);
+VALUES (201, 'Music', 200);
 INSERT INTO artifact_types (attp_id, attp_name, attp_parent_id)
 VALUES (202, 'Movies', 200);
 INSERT INTO artifact_types (attp_id, attp_name, attp_parent_id)
