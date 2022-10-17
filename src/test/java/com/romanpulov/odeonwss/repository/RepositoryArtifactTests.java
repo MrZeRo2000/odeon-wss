@@ -138,6 +138,32 @@ public class RepositoryArtifactTests {
     }
 
     @Test
+    @Order(6)
+    void testArtifactWithoutYear() throws Exception {
+        Artist artist = artistRepository.getAllByType(ArtistType.ARTIST).get(0);
+
+        Artifact artifact = new EntityArtifactBuilder()
+                .withArtifactType(ArtifactType.withDVMusic())
+                .withArtist(artist)
+                .withTitle("Title No Year")
+                .withDuration(77743L)
+                .withInsertDate(LocalDate.now().minusDays(2))
+                .build();
+
+        artifactRepository.save(artifact);
+
+        Artifact getArtifact = artifactRepository.findFirstByArtifactTypeAndArtistAndTitleAndYear(
+                ArtifactType.withDVMusic(),
+                artist,
+                "Title No Year",
+                null
+        ).orElseThrow();
+
+        Assertions.assertEquals("Title No Year", getArtifact.getTitle());
+        Assertions.assertNull(getArtifact.getYear());
+    }
+
+    @Test
     @Order(10)
     void testCascade() {
         Artifact artifact = artifactRepository.findAll().iterator().next();

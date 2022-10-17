@@ -92,4 +92,13 @@ public class ArtifactType {
 
         return artifactType;
     }
+
+    public static ArtifactType withDVMusic() {
+        ArtifactType artifactType = new ArtifactType();
+        artifactType.setId(201L);
+        artifactType.setName("Music");
+
+        return artifactType;
+    }
+
 }
