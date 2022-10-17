@@ -56,13 +56,27 @@ public class Composition {
     @org.springframework.lang.Nullable
     private Artist performerArtist;
 
-    @org.springframework.lang.Nullable
+    @Nullable
     public Artist getPerformerArtist() {
         return performerArtist;
     }
 
     public void setPerformerArtist(@org.springframework.lang.Nullable Artist performerArtist) {
         this.performerArtist = performerArtist;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dvtp_id", referencedColumnName = "dvtp_id")
+    @Nullable
+    private DVType dvType;
+
+    @Nullable
+    public DVType getDvType() {
+        return dvType;
+    }
+
+    public void setDvType(@Nullable DVType dvType) {
+        this.dvType = dvType;
     }
 
     @Column(name = "comp_title")
