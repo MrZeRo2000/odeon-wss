@@ -19,12 +19,6 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private final ArtistRepository artistRepository;
 
-    private final ArtistDetailRepository artistDetailRepository;
-
-    private final ArtistCategoryRepository artistCategoryRepository;
-
-    private final ArtistLyricsRepository artistLyricsRepository;
-
     private final ArtifactRepository artifactRepository;
 
     private final CompositionRepository compositionRepository;
@@ -43,9 +37,6 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
 
     public DVMusicMDBImportProcessor(
             ArtistRepository artistRepository,
-            ArtistDetailRepository artistDetailRepository,
-            ArtistCategoryRepository artistCategoryRepository,
-            ArtistLyricsRepository artistLyricsRepository,
             ArtifactRepository artifactRepository,
             CompositionRepository compositionRepository,
             CompositionService compositionService,
@@ -53,9 +44,6 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
             DVTypeRepository dvTypeRepository
     ) {
         this.artistRepository = artistRepository;
-        this.artistDetailRepository = artistDetailRepository;
-        this.artistCategoryRepository = artistCategoryRepository;
-        this.artistLyricsRepository = artistLyricsRepository;
         this.artifactRepository = artifactRepository;
         this.compositionRepository = compositionRepository;
         this.compositionService = compositionService;
@@ -130,11 +118,11 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
                     newArtifact.setTitle(artifactName);
                     newArtifact.setYear(year);
 
+                    artifactRepository.save(newArtifact);
+                    counter.getAndIncrement();
+
                     return newArtifact;
                 });
-
-                artifactRepository.save(artifact);
-                counter.getAndIncrement();
 
                 int compositionsSize = compositionRepository.findAllByArtifact(artifact).size();
                 if (compositionsSize == 0) {
