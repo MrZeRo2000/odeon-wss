@@ -4,11 +4,13 @@ import com.healthmarketscience.jackcess.Row;
 import com.healthmarketscience.jackcess.Table;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
+import com.romanpulov.odeonwss.service.CompositionService;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.romanpulov.jutilscore.io.FileUtils.getExtension;
 import static com.romanpulov.odeonwss.service.processor.MDBConst.*;
 
 @Component
@@ -27,6 +29,10 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private final CompositionRepository compositionRepository;
 
+    private final CompositionService compositionService;
+
+    private final MediaFileRepository mediaFileRepository;
+
     private final DVTypeRepository dvTypeRepository;
 
     private Map<Long, Artist> migratedArtists;
@@ -42,6 +48,8 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
             ArtistLyricsRepository artistLyricsRepository,
             ArtifactRepository artifactRepository,
             CompositionRepository compositionRepository,
+            CompositionService compositionService,
+            MediaFileRepository mediaFileRepository,
             DVTypeRepository dvTypeRepository
     ) {
         this.artistRepository = artistRepository;
@@ -50,6 +58,8 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
         this.artistLyricsRepository = artistLyricsRepository;
         this.artifactRepository = artifactRepository;
         this.compositionRepository = compositionRepository;
+        this.compositionService = compositionService;
+        this.mediaFileRepository = mediaFileRepository;
         this.dvTypeRepository = dvTypeRepository;
     }
 
@@ -174,7 +184,21 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
 
             composition.setNum(++compNum);
 
-            compositionRepository.save(composition);
+            MediaFile mediaFile = mediaFileRepository.findFirstByArtifactAndName(
+                    artifact,
+                    dvDet.fileName
+            ).orElseGet(() -> {
+                MediaFile newMediaFile = new MediaFile();
+
+                newMediaFile.setArtifact(artifact);
+                newMediaFile.setName(dvDet.fileName);
+                newMediaFile.setFormat(getExtension(dvDet.fileName).toUpperCase());
+                newMediaFile.setSize(0L);
+
+                return newMediaFile;
+            });
+
+            compositionService.insertCompositionWithMedia(composition, mediaFile);
             counter.getAndIncrement();
         }
 

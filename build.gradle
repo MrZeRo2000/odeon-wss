@@ -63,6 +63,9 @@ dependencies {
 	//api doc
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
 
+	//jutils
+	implementation 'com.romanpulov:jutils-core:0.3.13'
+
 	//test
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -99,20 +99,34 @@ public class RepositoryMediaFileTests {
 
     @Test
     @Order(2)
+    void testCreateMinimal() throws Exception {
+        Artifact artifact = artifactRepository.findById(1L).orElseThrow();
+
+        MediaFile mediaFile = new EntityMediaFileBuilder()
+                .withArtifact(artifact)
+                .withName("CCC.mp3")
+                .withFormat("MP3")
+                .withSize(0L)
+                .build();
+        mediaFileRepository.save(mediaFile);
+    }
+
+    @Test
+    @Order(3)
     void testCompositionValidation() {
         List<MediaFileValidationDTO> mediaFileValidation = mediaFileRepository.getCompositionMediaFileValidationMusic(ArtistType.ARTIST, ArtifactType.withMP3());
         Assertions.assertEquals(1, mediaFileValidation.size());
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     void testMediaFileValidation() {
         List<MediaFileValidationDTO> mediaFileValidation = mediaFileRepository.getMediaFileValidationMusic(ArtifactType.withMP3());
-        Assertions.assertEquals(2, mediaFileValidation.size());
+        Assertions.assertEquals(3, mediaFileValidation.size());
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void testMediaFileEditDTO() {
         MediaFileEditDTO dto = mediaFileRepository.getMediaFileEditById(1L).orElseThrow();
         Assertions.assertEquals(1L, dto.getId());
@@ -120,24 +134,26 @@ public class RepositoryMediaFileTests {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void testMediaFileTableDTO() {
         List<MediaFileTableDTO> dtoList = mediaFileRepository.getMediaFileTableByArtifact(
                 new EntityArtifactBuilder().withId(1L).build()
         );
-        Assertions.assertEquals(2, dtoList.size());
+        Assertions.assertEquals(3, dtoList.size());
         Assertions.assertEquals("AAA.mp3", dtoList.get(0).getName());
         Assertions.assertEquals("BBB.mp3", dtoList.get(1).getName());
+        Assertions.assertEquals("CCC.mp3", dtoList.get(2).getName());
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     void testGetIdName() {
         List<IdNameView> idNames = mediaFileRepository.findByArtifactOrderByName(
                 new EntityArtifactBuilder().withId(1L).build()
         );
-        Assertions.assertEquals(2, idNames.size());
+        Assertions.assertEquals(3, idNames.size());
         Assertions.assertEquals("AAA.mp3", idNames.get(0).getName());
         Assertions.assertEquals("BBB.mp3", idNames.get(1).getName());
+        Assertions.assertEquals("CCC.mp3", idNames.get(2).getName());
     }
 }
