@@ -15,6 +15,8 @@ public class AppConfiguration {
 
     private final String classicsPath;
 
+    private final String dvMusicPath;
+
     private final String mdbPath;
 
     private final String ffprobePath;
@@ -37,6 +39,10 @@ public class AppConfiguration {
         return classicsPath;
     }
 
+    public String getDvMusicPath() {
+        return dvMusicPath;
+    }
+
     public String getMdbPath() {
         return mdbPath;
     }
@@ -54,6 +60,7 @@ public class AppConfiguration {
         mp3Path = context.getInitParameter("mp3-path");
         laPath = context.getInitParameter("la-path");
         classicsPath = context.getInitParameter("classics-path");
+        dvMusicPath = context.getInitParameter("dv-music-path");
         mdbPath = context.getInitParameter("mdb-path");
         ffprobePath = context.getInitParameter("ffprobe-path");
         version = projectConfigurationProperties.getVersion();

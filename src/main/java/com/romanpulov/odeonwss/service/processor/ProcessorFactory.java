@@ -12,6 +12,7 @@ public class ProcessorFactory {
     private final ArtistsMDBImportProcessor artistsMDBImportProcessor;
     private final ClassicsMDBImportProcessor classicsMDBImportProcessor;
     private final DVMusicMDBImportProcessor dvMusicMDBImportProcessor;
+    private final DVMusicLoadProcessor dvMusicLoadProcessor;
     private final ClassicsValidateProcessor classicsValidateProcessor;
     private final MP3LoadProcessor mp3LoadProcessor;
     private final MP3ValidateProcessor mp3ValidateProcessor;
@@ -23,6 +24,7 @@ public class ProcessorFactory {
             ArtistsMDBImportProcessor artistsMDBImportProcessor,
             ClassicsMDBImportProcessor classicsMDBImportProcessor,
             DVMusicMDBImportProcessor dvMusicMDBImportProcessor,
+            DVMusicLoadProcessor dvMusicLoadProcessor,
             ClassicsValidateProcessor classicsValidateProcessor,
             MP3LoadProcessor mp3LoadProcessor,
             MP3ValidateProcessor mp3ValidateProcessor,
@@ -34,6 +36,7 @@ public class ProcessorFactory {
         this.classicsMDBImportProcessor = classicsMDBImportProcessor;
         this.classicsValidateProcessor = classicsValidateProcessor;
         this.dvMusicMDBImportProcessor = dvMusicMDBImportProcessor;
+        this.dvMusicLoadProcessor = dvMusicLoadProcessor;
         this.mp3LoadProcessor = mp3LoadProcessor;
         this.mp3ValidateProcessor = mp3ValidateProcessor;
         this.laLoadProcessor = laLoadProcessor;
@@ -57,6 +60,11 @@ public class ProcessorFactory {
                 processor = dvMusicMDBImportProcessor;
                 processor.setProgressHandler(handler);
                 processor.setRootFolder(appConfiguration.getMdbPath());
+                return processor;
+            case DV_MUSIC_MEDIA_LOADER:
+                processor = dvMusicLoadProcessor;
+                processor.setProgressHandler(handler);
+                processor.setRootFolder(appConfiguration.getDvMusicPath());
                 return processor;
             case CLASSICS_VALIDATOR:
                 processor = classicsValidateProcessor;

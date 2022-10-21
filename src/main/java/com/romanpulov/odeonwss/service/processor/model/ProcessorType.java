@@ -3,8 +3,10 @@ package com.romanpulov.odeonwss.service.processor.model;
 public enum ProcessorType {
     ARTISTS_IMPORTER("Artists importer"),
     CLASSICS_IMPORTER("Classics importer"),
-    DV_MUSIC_IMPORTER("Video music importer"),
     CLASSICS_VALIDATOR("Classics validator"),
+    DV_MUSIC_IMPORTER("Video music importer"),
+    DV_MUSIC_MEDIA_LOADER("Video music media loader"),
+    DV_MUSIC_VALIDATOR("Video music validator"),
     MP3_LOADER("MP3 Loader"),
     MP3_VALIDATOR("MP3 Validator"),
     LA_LOADER("LA Loader"),

@@ -5,6 +5,7 @@
 	<Parameter name="la-path" value="D:/Temp/ok/Lossless/"/>
 	<Parameter name="ffprobe-path" value="D:/prj/ffmpeg/"/>
 	<Parameter name="classics-path" value="D:/Temp/classics/"/>
+	<Parameter name="dv-music-path" value="D:/Temp/dv_music/"/>
 	<Parameter name="mdb-path" value="D:/prj/Cat2000/"/>
 	<Parameter name="spring.profiles.active" value="int"/>
 </Context>
