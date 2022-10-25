@@ -87,4 +87,13 @@ public interface MediaFileRepository extends CrudRepository<MediaFile, Long> {
                     "ORDER BY mf.name"
     )
     List<MediaFileTableDTO> getMediaFileTableByArtifact(Artifact artifact);
+
+    @Query(
+            "SELECT mf " +
+            "FROM MediaFile as mf " +
+            "INNER JOIN FETCH mf.artifact as a " +
+            "WHERE a.artifactType = :artifactType " +
+            "AND mf.size = 0"
+    )
+    List<MediaFile> getMediaFilesWithEmptySizeByArtifactType(ArtifactType artifactType);
 }

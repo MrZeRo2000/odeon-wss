@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 
 @Component
-public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
+public class DVMusicMediaFilesLoadProcessor extends AbstractFileSystemProcessor {
     @Override
     public void execute() throws ProcessorException {
         Path path = validateAndGetPath();

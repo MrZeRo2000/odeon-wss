@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.entity;
 
+import org.hibernate.Hibernate;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -129,7 +131,7 @@ public class MediaFile {
     public String toString() {
         return "MediaFile{" +
                 "id=" + id +
-                ", artifact=" + artifact +
+                ", artifact=" + (Hibernate.isInitialized(artifact) ? artifact : "not initialized") +
                 ", name='" + name + '\'' +
                 ", format='" + format + '\'' +
                 ", size=" + size +

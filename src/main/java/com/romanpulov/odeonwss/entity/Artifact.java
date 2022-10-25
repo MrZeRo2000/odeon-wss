@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.entity;
 
 import com.romanpulov.odeonwss.entity.converter.DateConverter;
+import org.hibernate.Hibernate;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
@@ -162,15 +163,15 @@ public class Artifact {
     public String toString() {
         return "Artifact{" +
                 "id=" + id +
-                ", artifactType=" + artifactType +
-                ", artist=" + artist +
+                ", artifactType=" + (Hibernate.isInitialized(artifactType) ? artifactType : "not initialized") +
+                ", artist=" + (Hibernate.isInitialized(artist) ? artist : "not initialized") +
                 ", title='" + title + '\'' +
                 ", year=" + year +
                 ", duration=" + duration +
                 ", size=" + size +
                 ", insertDate=" + insertDate +
-                ", compositions=" + compositions +
-                ", mediaFiles=" + mediaFiles +
+                ", compositions=" + (Hibernate.isInitialized(compositions) ? compositions : "not initialized") +
+                ", mediaFiles=" + (Hibernate.isInitialized(mediaFiles) ? mediaFiles : "not initialized") +
                 '}';
     }
 }
