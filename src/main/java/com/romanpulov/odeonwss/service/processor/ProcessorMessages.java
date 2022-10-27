@@ -45,6 +45,7 @@ public class ProcessorMessages {
     static final String ERROR_MEDIA_FILES_NOT_IN_DB = "Media files not in database: %s";
     static final String ERROR_MEDIA_FILES_NOT_IN_FILES = "Media files not in files: %s";
     static final String INFO_MEDIA_FILES_VALIDATED = "Media files validated";
+    static final String INFO_MEDIA_FILES_LOADED = "Media files loaded: %d";
 
     static final String INFO_ARTISTS_LOADED = "Artists loaded: %d";
     static final String INFO_ARTISTS_CLEANSED = "Artists cleansed: %d";

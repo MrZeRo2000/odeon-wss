@@ -60,6 +60,7 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
         log.info("Artifacts:" + mediaFiles.stream().map(v -> v.getArtifact().getTitle()).collect(Collectors.toList()));
         for (MediaFile mediaFile: mediaFiles) {
             MediaFile getMediaFile = mediaFileRepository.findById(mediaFile.getId()).orElseThrow();
+            log.info("Artifact title:" + mediaFile.getArtifact().getTitle());
             log.info("MediaFile:" + getMediaFile);
         }
     }
