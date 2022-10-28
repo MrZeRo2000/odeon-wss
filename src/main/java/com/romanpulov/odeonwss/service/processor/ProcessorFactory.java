@@ -13,6 +13,7 @@ public class ProcessorFactory {
     private final ClassicsMDBImportProcessor classicsMDBImportProcessor;
     private final DVMusicMDBImportProcessor dvMusicMDBImportProcessor;
     private final DVMusicMediaFilesLoadProcessor dvMusicMediaFilesLoadProcessor;
+    private final DVMusicValidateProcessor dvMusicValidateProcessor;
     private final ClassicsValidateProcessor classicsValidateProcessor;
     private final MP3LoadProcessor mp3LoadProcessor;
     private final MP3ValidateProcessor mp3ValidateProcessor;
@@ -25,6 +26,7 @@ public class ProcessorFactory {
             ClassicsMDBImportProcessor classicsMDBImportProcessor,
             DVMusicMDBImportProcessor dvMusicMDBImportProcessor,
             DVMusicMediaFilesLoadProcessor dvMusicMediaFilesLoadProcessor,
+            DVMusicValidateProcessor dvMusicValidateProcessor,
             ClassicsValidateProcessor classicsValidateProcessor,
             MP3LoadProcessor mp3LoadProcessor,
             MP3ValidateProcessor mp3ValidateProcessor,
@@ -37,6 +39,7 @@ public class ProcessorFactory {
         this.classicsValidateProcessor = classicsValidateProcessor;
         this.dvMusicMDBImportProcessor = dvMusicMDBImportProcessor;
         this.dvMusicMediaFilesLoadProcessor = dvMusicMediaFilesLoadProcessor;
+        this.dvMusicValidateProcessor = dvMusicValidateProcessor;
         this.mp3LoadProcessor = mp3LoadProcessor;
         this.mp3ValidateProcessor = mp3ValidateProcessor;
         this.laLoadProcessor = laLoadProcessor;
@@ -63,6 +66,11 @@ public class ProcessorFactory {
                 return processor;
             case DV_MUSIC_MEDIA_LOADER:
                 processor = dvMusicMediaFilesLoadProcessor;
+                processor.setProgressHandler(handler);
+                processor.setRootFolder(appConfiguration.getDvMusicPath());
+                return processor;
+            case DV_MUSIC_VALIDATOR:
+                processor = dvMusicValidateProcessor;
                 processor.setProgressHandler(handler);
                 processor.setRootFolder(appConfiguration.getDvMusicPath());
                 return processor;
