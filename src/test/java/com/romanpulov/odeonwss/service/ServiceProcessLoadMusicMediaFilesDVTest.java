@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.service;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -32,7 +34,7 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
-    @Disabled("For dev purposes")
+    // @Disabled("For dev purposes")
     void testPrepare() {
         service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
@@ -47,10 +49,15 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
     @Order(2)
     @Rollback(false)
     void testLoadMediaFiles() throws Exception {
+        int oldCount =  mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(ArtifactType.withDVMusic()).size();
+
         service.executeProcessor(ProcessorType.DV_MUSIC_MEDIA_LOADER);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
         log.info("Music Media Loader Processing info: " + service.getProcessInfo());
 
+        int newCount =  mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(ArtifactType.withDVMusic()).size();
+
+        Assertions.assertTrue(newCount < oldCount);
     }
 
     @Test
