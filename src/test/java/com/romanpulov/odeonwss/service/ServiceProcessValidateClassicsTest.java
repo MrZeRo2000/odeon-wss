@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Disabled
 public class ServiceProcessValidateClassicsTest {
 
     private static final Logger log = Logger.getLogger(ServiceProcessValidateClassicsTest.class.getName());

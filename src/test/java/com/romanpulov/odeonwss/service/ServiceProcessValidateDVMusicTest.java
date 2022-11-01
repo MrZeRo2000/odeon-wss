@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Disabled
 public class ServiceProcessValidateDVMusicTest {
 
     private static final Logger log = Logger.getLogger(ServiceProcessValidateDVMusicTest.class.getSimpleName());
@@ -23,7 +24,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
-    @Disabled("For dev purposes")
+    // @Disabled("For dev purposes")
     void testLoadDV() {
         // load artists
         service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
