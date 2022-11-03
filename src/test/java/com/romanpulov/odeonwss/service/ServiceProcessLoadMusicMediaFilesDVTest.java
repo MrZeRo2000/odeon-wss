@@ -11,13 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -34,7 +31,7 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
-    // @Disabled("For dev purposes")
+    @Disabled("For dev purposes")
     void testPrepare() {
         service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());

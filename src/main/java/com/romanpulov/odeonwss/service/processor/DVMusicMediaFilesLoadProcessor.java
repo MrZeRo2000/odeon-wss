@@ -1,7 +1,9 @@
 package com.romanpulov.odeonwss.service.processor;
 
+import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
@@ -11,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,11 +24,18 @@ import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.INFO_M
 @Component
 public class DVMusicMediaFilesLoadProcessor extends AbstractFileSystemProcessor {
 
+    private final ArtifactRepository artifactRepository;
+
     private final MediaFileRepository mediaFileRepository;
 
     private final MediaParser mediaParser;
 
-    public DVMusicMediaFilesLoadProcessor(MediaFileRepository mediaFileRepository, MediaParser mediaParser) {
+    public DVMusicMediaFilesLoadProcessor(
+            ArtifactRepository artifactRepository,
+            MediaFileRepository mediaFileRepository,
+            MediaParser mediaParser
+    ) {
+        this.artifactRepository = artifactRepository;
         this.mediaFileRepository = mediaFileRepository;
         this.mediaParser = mediaParser;
     }
@@ -37,12 +47,28 @@ public class DVMusicMediaFilesLoadProcessor extends AbstractFileSystemProcessor 
         infoHandler(INFO_MEDIA_FILES_LOADED, processArtifactsPath(path));
     }
 
+    private static class SizeDuration {
+        long size;
+        long duration;
+
+        public SizeDuration(long size, long duration) {
+            this.size = size;
+            this.duration = duration;
+        }
+
+        public SizeDuration() {
+        }
+    }
+
     private int processArtifactsPath(Path path) throws ProcessorException {
         AtomicInteger counter = new AtomicInteger(0);
 
         List<MediaFile> emptyMediaFiles = mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(ArtifactType.withDVMusic());
+        Map<Long, SizeDuration> artifactSizeDurationMap = new HashMap<>();
+
         String rootMediaPath = path.toAbsolutePath().toString();
 
+        // update media files
         for (MediaFile emptyMediaFile: emptyMediaFiles) {
             Path compositionPath = Paths.get(rootMediaPath, emptyMediaFile.getArtifact().getTitle(), emptyMediaFile.getName());
             if (Files.exists(compositionPath)) {
@@ -54,6 +80,11 @@ public class DVMusicMediaFilesLoadProcessor extends AbstractFileSystemProcessor 
                     getMediaFile.setBitrate(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getBitRate());
                     getMediaFile.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
 
+                    SizeDuration sd = artifactSizeDurationMap.getOrDefault(getMediaFile.getArtifact().getId(), new SizeDuration());
+                    sd.size = sd.size + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize();
+                    sd.duration = sd.duration + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration();
+                    artifactSizeDurationMap.put(getMediaFile.getArtifact().getId(), sd);
+
                     mediaFileRepository.save(getMediaFile);
 
                     counter.getAndIncrement();
@@ -61,6 +92,17 @@ public class DVMusicMediaFilesLoadProcessor extends AbstractFileSystemProcessor 
                     errorHandler(ERROR_PARSING_FILE, compositionPath.toAbsolutePath().toString());
                 }
             }
+        }
+
+        // update artifacts
+        for (long artifactId: artifactSizeDurationMap.keySet()) {
+            Artifact artifact = artifactRepository.findById(artifactId).orElseThrow();
+            SizeDuration sd = artifactSizeDurationMap.get(artifactId);
+
+            artifact.setSize(sd.size);
+            artifact.setDuration(sd.duration);
+
+            artifactRepository.save(artifact);
         }
 
         return counter.get();
