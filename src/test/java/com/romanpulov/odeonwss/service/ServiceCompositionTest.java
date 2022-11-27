@@ -103,6 +103,7 @@ public class ServiceCompositionTest {
                     .withArtifactId(artifact1.getId())
                     .withArtistId(artist.getId())
                     .withPerformerArtistId(performerArtist.getId())
+                    .withDvTypeId(8L)
                     .withTitle("Comp 1-1")
                     .withDiskNum(1L)
                     .withNum(4L)
@@ -118,6 +119,8 @@ public class ServiceCompositionTest {
         Assertions.assertEquals(1234, comp11.getDuration());
         Assertions.assertEquals(1, comp11.getArtistId());
         Assertions.assertEquals(2, comp11.getPerformerArtistId());
+        Assertions.assertEquals(8, comp11.getDvTypeId());
+
 
         MediaFile mediaFile12 = mediaFileRepository.save(
                 new EntityMediaFileBuilder()

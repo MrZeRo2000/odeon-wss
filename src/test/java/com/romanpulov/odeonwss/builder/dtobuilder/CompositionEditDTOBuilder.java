@@ -30,6 +30,11 @@ public class CompositionEditDTOBuilder extends AbstractClassBuilder<CompositionE
         return this;
     }
 
+    public CompositionEditDTOBuilder withDvTypeId(long dvTypeId) {
+        instance.setDvTypeId(dvTypeId);
+        return this;
+    }
+
     public CompositionEditDTOBuilder withTitle(String title) {
         instance.setTitle(title);
         return this;

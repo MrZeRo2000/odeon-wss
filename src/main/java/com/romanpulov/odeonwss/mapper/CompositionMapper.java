@@ -1,10 +1,7 @@
 package com.romanpulov.odeonwss.mapper;
 
 import com.romanpulov.odeonwss.dto.CompositionEditDTO;
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.Composition;
-import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.entity.*;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,6 +25,14 @@ public class CompositionMapper {
             composition.setPerformerArtist(performerArtist);
         } else {
             composition.setPerformerArtist(null);
+        }
+
+        if (editDTO.getDvTypeId() != null) {
+            DVType dvType = new DVType();
+            dvType.setId(editDTO.getDvTypeId());
+            composition.setDvType(dvType);
+        } else {
+            composition.setDvType(null);
         }
 
         composition.setTitle(editDTO.getTitle());
@@ -56,6 +61,12 @@ public class CompositionMapper {
             composition.setPerformerArtist(performerArtist);
         }
 
+        if (editDTO.getDvTypeId() != null) {
+            DVType dvType = new DVType();
+            dvType.setId(editDTO.getDvTypeId());
+            composition.setDvType(dvType);
+        }
+
         composition.setTitle(editDTO.getTitle());
         composition.setDuration(editDTO.getDuration());
         composition.setDiskNum(editDTO.getDiskNum());
@@ -82,6 +93,12 @@ public class CompositionMapper {
         if (performerArtist != null) {
             dto.setPerformerArtistId(performerArtist.getId());
             dto.setPerformerArtistName(performerArtist.getName());
+        }
+
+        DVType dvType = composition.getDvType();
+        if (dvType != null) {
+            dto.setDvTypeId(dvType.getId());
+            dto.setDvTypeName(dvType.getName());
         }
 
         dto.setTitle(composition.getTitle());

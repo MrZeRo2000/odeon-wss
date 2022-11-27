@@ -19,6 +19,10 @@ public class CompositionEditDTO {
 
     private String performerArtistName;
 
+    private Long dvTypeId;
+
+    private String dvTypeName;
+
     private String title;
 
     private Long duration;
@@ -89,6 +93,22 @@ public class CompositionEditDTO {
         this.performerArtistName = performerArtistName;
     }
 
+    public Long getDvTypeId() {
+        return dvTypeId;
+    }
+
+    public void setDvTypeId(Long dvTypeId) {
+        this.dvTypeId = dvTypeId;
+    }
+
+    public String getDvTypeName() {
+        return dvTypeName;
+    }
+
+    public void setDvTypeName(String dvTypeName) {
+        this.dvTypeName = dvTypeName;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -113,7 +133,7 @@ public class CompositionEditDTO {
         this.mediaFileIds = mediaFileIds;
     }
 
-    public CompositionEditDTO(Long id, Long artifactId, Long diskNum, Long num, Long artistId, String artistName, Long performerArtistId, String performerArtistName, String title, Long duration, Set<Long> mediaFileIds) {
+    public CompositionEditDTO(Long id, Long artifactId, Long diskNum, Long num, Long artistId, String artistName, Long performerArtistId, String performerArtistName, Long dvTypeId, String dvTypeName, String title, Long duration, Set<Long> mediaFileIds) {
         this.id = id;
         this.artifactId = artifactId;
         this.diskNum = diskNum;
@@ -122,6 +142,8 @@ public class CompositionEditDTO {
         this.artistName = artistName;
         this.performerArtistId = performerArtistId;
         this.performerArtistName = performerArtistName;
+        this.dvTypeId = dvTypeId;
+        this.dvTypeName = dvTypeName;
         this.title = title;
         this.duration = duration;
         this.mediaFileIds = mediaFileIds;
@@ -141,6 +163,8 @@ public class CompositionEditDTO {
                 ", artistName='" + artistName + '\'' +
                 ", performerArtistId=" + performerArtistId +
                 ", performerArtistName='" + performerArtistName + '\'' +
+                ", dvTypeId=" + dvTypeId +
+                ", dvTypeName='" + dvTypeName + '\'' +
                 ", title='" + title + '\'' +
                 ", duration=" + duration +
                 ", mediaFileIds=" + mediaFileIds +
