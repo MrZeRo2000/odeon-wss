@@ -38,6 +38,8 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
             "ar.name, " +
             "par.id, " +
             "par.name, " +
+            "dvt.id, " +
+            "dvt.name, " +
             "c.title, " +
             "c.duration, " +
             "m.size, " +
@@ -49,6 +51,7 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
             "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
             "LEFT OUTER JOIN Artist ar ON ar = c.artist " +
             "LEFT OUTER JOIN Artist par ON par = c.performerArtist " +
+            "LEFT OUTER JOIN DVType dvt ON dvt = c.dvType " +
             "WHERE c.artifact.id = :id " +
             "ORDER BY c.diskNum, c.num, ar.name, c.title")
     List<CompositionTableDTO> getCompositionTableByArtifactId(Long id);
@@ -61,6 +64,8 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
             "ar.name, " +
             "par.id, " +
             "par.name, " +
+            "dvt.id, " +
+            "dvt.name, " +
             "c.title, " +
             "c.duration, " +
             "m.size, " +
@@ -72,6 +77,7 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
             "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
             "LEFT OUTER JOIN Artist ar ON ar = c.artist " +
             "LEFT OUTER JOIN Artist par ON par = c.performerArtist " +
+            "LEFT OUTER JOIN DVType dvt ON dvt = c.dvType " +
             "WHERE c.artifact = :artifact " +
             "ORDER BY c.diskNum, c.num, ar.name, c.title")
     List<CompositionTableDTO> getCompositionTableByArtifact(Artifact artifact);
