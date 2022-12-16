@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Disabled
 public class ServiceProcessLoadMusicMediaFilesDVTest {
     private static final Logger log = Logger.getLogger(ServiceProcessLoadMusicMediaFilesDVTest.class.getSimpleName());
 
@@ -31,7 +32,6 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
-    @Disabled("For dev purposes")
     void testPrepare() {
         service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
