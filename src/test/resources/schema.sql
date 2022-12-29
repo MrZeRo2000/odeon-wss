@@ -122,3 +122,58 @@ CREATE TABLE artist_lyrics (
 );
 
 CREATE UNIQUE INDEX idx_artist_lyrics_arts_id_atlr_title ON artist_lyrics(arts_id, atlr_title);
+
+DROP TABLE IF EXISTS dv_origins;
+
+CREATE TABLE dv_origins (
+    dvor_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    dvor_name TEXT NOT NULL
+);
+
+CREATE UNIQUE INDEX idx_dv_origins_dvor_name ON dv_origins(dvor_name);
+
+DROP TABLE IF EXISTS dv_categories;
+
+CREATE TABLE dv_categories (
+    dvct_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    dvct_name TEXT NOT NULL
+);
+
+CREATE UNIQUE INDEX idx_dv_categories_dvct_name ON dv_categories(dvct_name);
+
+CREATE TABLE dv_products(
+    dvpd_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    dvor_id INTEGER NOT NULL,
+    dvpd_title TEXT NOT NULL,
+    dvpd_orig_title TEXT,
+    dvpd_year INTEGER,
+    dvpd_front_info TEXT,
+    dvpd_description TEXT,
+    dvpd_notes TEXT
+);
+
+CREATE UNIQUE INDEX idx_dv_products_dvpd_name ON dv_products(dvpd_title);
+
+CREATE INDEX idx_dv_products_dvor_id ON dv_products(dvor_id);
+
+DROP TABLE IF EXISTS dv_products_dv_categories;
+
+CREATE TABLE dv_products_dv_categories(
+    dvpd_id INTEGER NOT NULL,
+    dvct_id INTEGER NOT NULL,
+    PRIMARY KEY (dvpd_id, dvct_id)
+);
+
+CREATE INDEX idx_dv_products_dv_categories_dvpd_id ON dv_products_dv_categories(dvpd_id);
+
+DROP TABLE IF EXISTS compositions_dv_products;
+
+CREATE TABLE compositions_dv_products(
+    comp_id INTEGER NOT NULL,
+    dvpd_id INTEGER NOT NULL,
+    PRIMARY KEY (comp_id, dvpd_id)
+);
+
+CREATE UNIQUE INDEX idx_compositions_dv_products_comp_id ON compositions_dv_products(comp_id);
+
+CREATE UNIQUE INDEX idx_compositions_dv_products_dvpd_id ON compositions_dv_products(dvpd_id);
