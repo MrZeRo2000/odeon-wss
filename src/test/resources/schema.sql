@@ -141,6 +141,8 @@ CREATE TABLE dv_categories (
 
 CREATE UNIQUE INDEX idx_dv_categories_dvct_name ON dv_categories(dvct_name);
 
+DROP TABLE IF EXISTS dv_products;
+
 CREATE TABLE dv_products(
     dvpd_id INTEGER PRIMARY KEY AUTOINCREMENT,
     dvor_id INTEGER NOT NULL,
