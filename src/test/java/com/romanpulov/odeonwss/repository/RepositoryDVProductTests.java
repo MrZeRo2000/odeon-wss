@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
+import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -69,5 +70,25 @@ public class RepositoryDVProductTests {
                 .withCategories(categories)
                 .build();
         dvProductRepository.save(product);
+    }
+
+    @Test
+    @Order(3)
+    @Transactional
+    @Rollback(value = false)
+    void testAddRemoveCategory() {
+        DVProduct product = dvProductRepository.findById(2L).orElseThrow();
+        DVCategory newCategory = dVCategoryRepository.save(new EntityDVCategoryBuilder().withId(3).withName("Cat 3").build());
+
+        Set<DVCategory> categories = product.getDvCategories();
+        categories.removeIf(f -> f.getId() == 1L);
+        categories.add(newCategory);
+        product.setDvCategories(categories);
+        dvProductRepository.save(product);
+
+        product = dvProductRepository.findById(2L).orElseThrow();
+        Assertions.assertEquals(2, product.getDvCategories().size());
+        Assertions.assertEquals(0, product.getDvCategories().stream().filter(c -> c.getId() == 1L).count());
+        Assertions.assertEquals(1, product.getDvCategories().stream().filter(c -> c.getId() == 3L).count());
     }
 }

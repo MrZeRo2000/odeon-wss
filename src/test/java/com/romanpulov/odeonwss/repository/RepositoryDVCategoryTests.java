@@ -7,6 +7,7 @@ import com.romanpulov.odeonwss.entity.DVOrigin;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -42,5 +43,18 @@ public class RepositoryDVCategoryTests {
 
         Assertions.assertEquals(2, dvCategoryRepository.findAllMap().size());
         Assertions.assertEquals(66, dvCategoryRepository.getMaxId());
+    }
+
+    @Test
+    @Order(2)
+    void testDuplicateName() {
+        Assertions.assertThrows(JpaSystemException.class, () -> {
+            dvCategoryRepository.save(
+                    new EntityDVCategoryBuilder()
+                            .withId(55)
+                            .withName("Category 66")
+                            .build()
+            );
+        });
     }
 }

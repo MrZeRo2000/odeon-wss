@@ -5,8 +5,10 @@ import com.romanpulov.odeonwss.entity.DVOrigin;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.TransactionSystemException;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -40,5 +42,30 @@ public class RepositoryDVOriginTests {
 
         Assertions.assertEquals(2, dvOriginRepository.findAllMap().size());
         Assertions.assertEquals(7, dvOriginRepository.getMaxId());
+    }
+
+    @Test
+    @Order(2)
+    void testDuplicateName() {
+        Assertions.assertThrows(JpaSystemException.class, () -> {
+            dvOriginRepository.save(
+                    new EntityDVOriginBuilder()
+                            .withId(55)
+                            .withName("Origin 5")
+                            .build()
+            );
+        });
+    }
+
+    @Test
+    @Order(2)
+    void testNoName() {
+        Assertions.assertThrows(TransactionSystemException.class, () -> {
+            dvOriginRepository.save(
+                    new EntityDVOriginBuilder()
+                            .withId(312)
+                            .build()
+            );
+        });
     }
 }
