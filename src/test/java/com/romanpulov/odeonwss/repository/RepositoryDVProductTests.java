@@ -74,6 +74,33 @@ public class RepositoryDVProductTests {
 
     @Test
     @Order(3)
+    @Rollback(value = false)
+    void testInsertFields() {
+        DVOrigin origin = dvOriginRepository.findAllMap().values().stream().findFirst().orElseThrow();
+        DVProduct product = new EntityDVProductBuilder()
+                .withOrigin(origin)
+                .withTitle("Product title")
+                .withOriginalTitle("Product original title")
+                .withYear(2000L)
+                .withFrontInfo("Front info")
+                .withDescription("Description")
+                .withNotes("Notes")
+                .build();
+        dvProductRepository.save(product);
+
+        DVProduct savedProduct = dvProductRepository.findById(3L).orElseThrow();
+
+        Assertions.assertEquals(origin.getId(), savedProduct.getDvOrigin().getId());
+        Assertions.assertEquals("Product title", savedProduct.getTitle());
+        Assertions.assertEquals("Product original title", savedProduct.getOriginalTitle());
+        Assertions.assertEquals(2000L, savedProduct.getYear());
+        Assertions.assertEquals("Front info", savedProduct.getFrontInfo());
+        Assertions.assertEquals("Description", savedProduct.getDescription());
+        Assertions.assertEquals("Notes", savedProduct.getNotes());
+    }
+
+    @Test
+    @Order(4)
     @Transactional
     @Rollback(value = false)
     void testAddRemoveCategory() {
