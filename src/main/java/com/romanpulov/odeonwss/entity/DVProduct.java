@@ -1,0 +1,164 @@
+package com.romanpulov.odeonwss.entity;
+
+import org.hibernate.Hibernate;
+
+import javax.annotation.Nullable;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+@Entity
+@Table(name = "dv_products")
+public class DVProduct {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "dvpd_id")
+    private Long id;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dvor_id", referencedColumnName = "dvor_id")
+    @NotNull
+    private DVOrigin dvOrigin;
+
+    public DVOrigin getDvOrigin() {
+        return dvOrigin;
+    }
+
+    public void setDvOrigin(DVOrigin dvOrigin) {
+        this.dvOrigin = dvOrigin;
+    }
+
+    @Column(name = "dvpd_title")
+    @NotNull
+    private String title;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @Column(name = "dvpd_orig_title")
+    private String originalTitle;
+
+    public String getOriginalTitle() {
+        return originalTitle;
+    }
+
+    public void setOriginalTitle(String originalTitle) {
+        this.originalTitle = originalTitle;
+    }
+
+    @Column(name = "dvpd_year")
+    private Long year;
+
+    public Long getYear() {
+        return year;
+    }
+
+    public void setYear(Long year) {
+        this.year = year;
+    }
+
+    @Column(name = "dvpd_front_info")
+    private String frontInfo;
+
+    public String getFrontInfo() {
+        return frontInfo;
+    }
+
+    public void setFrontInfo(String frontInfo) {
+        this.frontInfo = frontInfo;
+    }
+
+    @Column(name = "dvpd_description")
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Column(name = "dvpd_notes")
+    private String notes;
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    @ManyToMany(cascade = {CascadeType.MERGE})
+    @JoinTable(
+            name = "dv_products_dv_categories",
+            joinColumns = @JoinColumn(name = "dvpd_id"),
+            inverseJoinColumns = @JoinColumn(name = "dvct_id")
+    )
+    private Set<DVCategory> dvCategories = new HashSet<>();
+
+    public Set<DVCategory> getDvCategories() {
+        return dvCategories;
+    }
+
+    public void setDvCategories(Set<DVCategory> dvCategories) {
+        this.dvCategories = dvCategories;
+    }
+
+    public DVProduct() {
+    }
+
+    public DVProduct(Long id, DVOrigin dvOrigin, String title, String originalTitle, Long year, String frontInfo, String description, String notes) {
+        this.id = id;
+        this.dvOrigin = dvOrigin;
+        this.title = title;
+        this.originalTitle = originalTitle;
+        this.year = year;
+        this.frontInfo = frontInfo;
+        this.description = description;
+        this.notes = notes;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DVProduct dvProduct = (DVProduct) o;
+        return id.equals(dvProduct.id) && title.equals(dvProduct.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title);
+    }
+
+    @Override
+    public String toString() {
+        return "DVProduct{" +
+                "id=" + id +
+                ", dvOrigin=" + (Hibernate.isInitialized(dvOrigin) ? dvOrigin : "not initialized") +
+                ", title='" + title + '\'' +
+                ", originalTitle='" + originalTitle + '\'' +
+                ", year=" + year +
+                ", frontInfo='" + frontInfo + '\'' +
+                ", description='" + description + '\'' +
+                ", notes='" + notes + '\'' +
+                '}';
+    }
+}
