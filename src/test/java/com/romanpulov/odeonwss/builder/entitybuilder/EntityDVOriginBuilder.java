@@ -17,4 +17,9 @@ public class EntityDVOriginBuilder extends AbstractClassBuilder<DVOrigin> {
         this.instance.setName(name);
         return this;
     }
+
+    public EntityDVOriginBuilder withMigrationId(long migrationId) {
+        this.instance.setMigrationId(migrationId);
+        return this;
+    }
 }

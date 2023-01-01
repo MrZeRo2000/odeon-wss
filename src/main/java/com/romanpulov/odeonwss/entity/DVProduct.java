@@ -105,6 +105,17 @@ public class DVProduct {
         this.notes = notes;
     }
 
+    @Column(name = "dvpd_migration_id")
+    private Long migrationId;
+
+    public Long getMigrationId() {
+        return migrationId;
+    }
+
+    public void setMigrationId(Long migrationId) {
+        this.migrationId = migrationId;
+    }
+
     @ManyToMany(cascade = {CascadeType.MERGE})
     @JoinTable(
             name = "dv_products_dv_categories",

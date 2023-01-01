@@ -47,6 +47,11 @@ public class EntityDVProductBuilder extends AbstractClassBuilder<DVProduct> {
         return this;
     }
 
+    public EntityDVProductBuilder withMigrationId(long migrationId) {
+        this.instance.setMigrationId(migrationId);
+        return this;
+    }
+
     public EntityDVProductBuilder withCategories(Set<DVCategory> categories) {
         this.instance.setDvCategories(categories);
         return this;

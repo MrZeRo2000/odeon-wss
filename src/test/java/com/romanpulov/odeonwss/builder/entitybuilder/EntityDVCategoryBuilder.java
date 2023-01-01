@@ -17,4 +17,9 @@ public class EntityDVCategoryBuilder extends AbstractClassBuilder<DVCategory> {
         this.instance.setName(name);
         return this;
     }
+
+    public EntityDVCategoryBuilder withMigrationId(long migrationId) {
+        this.instance.setMigrationId(migrationId);
+        return this;
+    }
 }

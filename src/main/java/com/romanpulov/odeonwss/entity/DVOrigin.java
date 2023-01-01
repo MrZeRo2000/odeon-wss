@@ -12,6 +12,7 @@ import java.util.Objects;
 public class DVOrigin {
     @Id
     @Column(name = "dvor_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     public Long getId() {
@@ -32,6 +33,17 @@ public class DVOrigin {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Column(name = "dvor_migration_id")
+    private Long migrationId;
+
+    public Long getMigrationId() {
+        return migrationId;
+    }
+
+    public void setMigrationId(Long migrationId) {
+        this.migrationId = migrationId;
     }
 
     public DVOrigin() {

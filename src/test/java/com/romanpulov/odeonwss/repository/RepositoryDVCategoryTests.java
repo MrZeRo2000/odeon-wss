@@ -11,6 +11,8 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
+import javax.validation.ConstraintViolationException;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RepositoryDVCategoryTests {
@@ -26,23 +28,23 @@ public class RepositoryDVCategoryTests {
         Assertions.assertEquals(0, dvCategoryRepository.getMaxId());
 
         DVCategory category = new EntityDVCategoryBuilder()
-                .withId(7)
                 .withName("Category 33")
+                .withMigrationId(312)
                 .build();
         dvCategoryRepository.save(category);
 
-        Assertions.assertEquals(7, category.getId());
+        Assertions.assertEquals(1, category.getId());
+        Assertions.assertEquals(312, category.getMigrationId());
 
         category = new EntityDVCategoryBuilder()
-                .withId(66)
                 .withName("Category 66")
                 .build();
         dvCategoryRepository.save(category);
 
-        Assertions.assertEquals(66, category.getId());
+        Assertions.assertEquals(2, category.getId());
 
         Assertions.assertEquals(2, dvCategoryRepository.findAllMap().size());
-        Assertions.assertEquals(66, dvCategoryRepository.getMaxId());
+        Assertions.assertEquals(2, dvCategoryRepository.getMaxId());
     }
 
     @Test
@@ -52,6 +54,14 @@ public class RepositoryDVCategoryTests {
             dvCategoryRepository.save(
                     new EntityDVCategoryBuilder()
                             .withId(55)
+                            .withName("Category 66")
+                            .build()
+            );
+        });
+
+        Assertions.assertThrows(JpaSystemException.class, () -> {
+            dvCategoryRepository.save(
+                    new EntityDVCategoryBuilder()
                             .withName("Category 66")
                             .build()
             );

@@ -127,7 +127,8 @@ DROP TABLE IF EXISTS dv_origins;
 
 CREATE TABLE dv_origins (
     dvor_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    dvor_name TEXT NOT NULL
+    dvor_name TEXT NOT NULL,
+    dvor_migration_id INTEGER NULL
 );
 
 CREATE UNIQUE INDEX idx_dv_origins_dvor_name ON dv_origins(dvor_name);
@@ -136,7 +137,8 @@ DROP TABLE IF EXISTS dv_categories;
 
 CREATE TABLE dv_categories (
     dvct_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    dvct_name TEXT NOT NULL
+    dvct_name TEXT NOT NULL,
+    dvct_migration_id INTEGER NULL
 );
 
 CREATE UNIQUE INDEX idx_dv_categories_dvct_name ON dv_categories(dvct_name);
@@ -151,7 +153,8 @@ CREATE TABLE dv_products(
     dvpd_year INTEGER,
     dvpd_front_info TEXT,
     dvpd_description TEXT,
-    dvpd_notes TEXT
+    dvpd_notes TEXT,
+    dvpd_migration_id INTEGER NULL
 );
 
 CREATE UNIQUE INDEX idx_dv_products_dvpd_name ON dv_products(dvpd_title);

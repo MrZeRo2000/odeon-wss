@@ -8,7 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.TransactionSystemException;
+import javax.validation.ConstraintViolationException;
+
+import java.util.Map;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -25,23 +27,24 @@ public class RepositoryDVOriginTests {
         Assertions.assertEquals(0, dvOriginRepository.getMaxId());
 
         DVOrigin origin = new EntityDVOriginBuilder()
-                .withId(7)
                 .withName("Origin 7")
                 .build();
         dvOriginRepository.save(origin);
 
-        Assertions.assertEquals(7, origin.getId());
+        Assertions.assertEquals(1, origin.getId());
 
         origin = new EntityDVOriginBuilder()
-                .withId(5)
                 .withName("Origin 5")
+                .withMigrationId(13)
                 .build();
         dvOriginRepository.save(origin);
 
-        Assertions.assertEquals(5, origin.getId());
+        Assertions.assertEquals(2, origin.getId());
 
-        Assertions.assertEquals(2, dvOriginRepository.findAllMap().size());
-        Assertions.assertEquals(7, dvOriginRepository.getMaxId());
+        Map<Long, DVOrigin> dvOrigins = dvOriginRepository.findAllMap();
+        Assertions.assertEquals(2, dvOrigins.size());
+        Assertions.assertEquals(13, dvOrigins.get(2L).getMigrationId());
+        Assertions.assertEquals(2, dvOriginRepository.getMaxId());
     }
 
     @Test
@@ -60,10 +63,9 @@ public class RepositoryDVOriginTests {
     @Test
     @Order(2)
     void testNoName() {
-        Assertions.assertThrows(TransactionSystemException.class, () -> {
+        Assertions.assertThrows(ConstraintViolationException.class, () -> {
             dvOriginRepository.save(
                     new EntityDVOriginBuilder()
-                            .withId(312)
                             .build()
             );
         });

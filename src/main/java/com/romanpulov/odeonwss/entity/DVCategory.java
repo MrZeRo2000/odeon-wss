@@ -11,6 +11,7 @@ import java.util.Set;
 public class DVCategory {
     @Id
     @Column(name = "dvct_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     public Long getId() {
@@ -31,6 +32,17 @@ public class DVCategory {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Column(name = "dvct_migration_id")
+    private Long migrationId;
+
+    public Long getMigrationId() {
+        return migrationId;
+    }
+
+    public void setMigrationId(Long migrationId) {
+        this.migrationId = migrationId;
     }
 
     @ManyToMany(mappedBy = "dvCategories")

@@ -85,6 +85,7 @@ public class RepositoryDVProductTests {
                 .withFrontInfo("Front info")
                 .withDescription("Description")
                 .withNotes("Notes")
+                .withMigrationId(623)
                 .build();
         dvProductRepository.save(product);
 
@@ -97,6 +98,7 @@ public class RepositoryDVProductTests {
         Assertions.assertEquals("Front info", savedProduct.getFrontInfo());
         Assertions.assertEquals("Description", savedProduct.getDescription());
         Assertions.assertEquals("Notes", savedProduct.getNotes());
+        Assertions.assertEquals(623, savedProduct.getMigrationId());
     }
 
     @Test
