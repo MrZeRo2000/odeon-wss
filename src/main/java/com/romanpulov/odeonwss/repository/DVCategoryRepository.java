@@ -12,6 +12,10 @@ public interface DVCategoryRepository extends JpaRepository<DVCategory, Long> {
         return findAll().stream().collect(Collectors.toMap(DVCategory::getId, v -> v));
     }
 
+    default Map<Long, DVCategory> findAllMigrationIdMap() {
+        return findAll().stream().filter(v -> v.getMigrationId() != null).collect(Collectors.toMap(DVCategory::getMigrationId, v -> v));
+    }
+
     @Query("SELECT COALESCE(MAX(c.id), 0) FROM DVCategory c")
     Long getMaxId();
 }

@@ -12,6 +12,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Map;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -45,6 +46,10 @@ public class RepositoryDVCategoryTests {
 
         Assertions.assertEquals(2, dvCategoryRepository.findAllMap().size());
         Assertions.assertEquals(2, dvCategoryRepository.getMaxId());
+
+        Map<Long, DVCategory> migrationIds = dvCategoryRepository.findAllMigrationIdMap();
+        Assertions.assertEquals(1, migrationIds.size());
+        Assertions.assertNotNull(migrationIds.get(312L));
     }
 
     @Test

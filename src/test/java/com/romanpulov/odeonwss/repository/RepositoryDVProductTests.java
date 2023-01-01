@@ -99,6 +99,10 @@ public class RepositoryDVProductTests {
         Assertions.assertEquals("Description", savedProduct.getDescription());
         Assertions.assertEquals("Notes", savedProduct.getNotes());
         Assertions.assertEquals(623, savedProduct.getMigrationId());
+
+        Map<Long, DVProduct> migrationIds = dvProductRepository.findAllMigrationIdMap();
+        Assertions.assertEquals(1, migrationIds.size());
+        Assertions.assertNotNull(migrationIds.get(623L));
     }
 
     @Test

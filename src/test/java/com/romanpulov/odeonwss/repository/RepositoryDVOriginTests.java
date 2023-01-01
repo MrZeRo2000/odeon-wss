@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
+import com.romanpulov.odeonwss.entity.DVCategory;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,11 @@ public class RepositoryDVOriginTests {
         Assertions.assertEquals(2, dvOrigins.size());
         Assertions.assertEquals(13, dvOrigins.get(2L).getMigrationId());
         Assertions.assertEquals(2, dvOriginRepository.getMaxId());
+
+        Map<Long, DVOrigin> migrationIds = dvOriginRepository.findAllMigrationIdMap();
+        Assertions.assertEquals(1, migrationIds.size());
+        Assertions.assertNotNull(migrationIds.get(13L));
+        Assertions.assertNull(migrationIds.get(12L));
     }
 
     @Test
