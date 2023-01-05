@@ -55,6 +55,8 @@ public class ProcessorMessages {
     static final String INFO_ARTIFACTS_IMPORTED = "Artifacts imported: %d";
     static final String INFO_COMPOSITIONS_IMPORTED = "Compositions imported: %d";
 
+    static final String INFO_CATEGORIES_IMPORTED = "Categories imported: %d";
+
     static final String FORMAT_PATH_DELIMITER = " >> ";
 
 }
