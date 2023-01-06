@@ -7,7 +7,6 @@ import com.romanpulov.odeonwss.entity.DVOrigin;
 import com.romanpulov.odeonwss.repository.DVCategoryRepository;
 import com.romanpulov.odeonwss.repository.DVOriginRepository;
 import com.romanpulov.odeonwss.repository.DVProductRepository;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;

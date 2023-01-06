@@ -10,9 +10,11 @@ public class MDBConst {
     public static final String DVCONT_TABLE_NAME = "DVCont";
     public static final String DVDET_TABLE_NAME = "DVDet";
     public static final String CAT_TABLE_NAME = "Cat";
+    public static final String PRODUCT_TABLE_NAME = "VProduct";
 
     public static final String ARTISTLIST_ID_COLUMN_NAME = "ArtistListID";
     public static final String TITLE_COLUMN_NAME = "Title";
+    public static final String DESCRIPTION_COLUMN_NAME = "Description";
     public static final String NOTES_COLUMN_NAME = "Notes";
     public static final String SOURCE_COLUMN_NAME = "Source";
     public static final String ARTISTLISTCAT_ID_COLUMN_NAME = "ArtistListCatID";
@@ -29,4 +31,7 @@ public class MDBConst {
     public static final String FILE_NAME_COLUMN_NAME = "FileName";
     public static final String DVDET_ID_COLUMN_NAME = "DVDetID";
     public static final String VIDEOTYPE_ID_COLUMN_NAME = "VideoTypeID";
+    public static final String VPRODUCT_ID_COLUMN_NAME = "VProductID";
+    public static final String ORIG_TITLE_COLUMN_NAME = "OrigTitle";
+    public static final String FRONT_INFO_COLUMN_NAME = "FrontInfo";
 }

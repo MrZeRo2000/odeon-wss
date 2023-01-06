@@ -56,6 +56,7 @@ public class ProcessorMessages {
     static final String INFO_COMPOSITIONS_IMPORTED = "Compositions imported: %d";
 
     static final String INFO_CATEGORIES_IMPORTED = "Categories imported: %d";
+    static final String INFO_PRODUCTS_IMPORTED = "Products imported: %d";
 
     static final String FORMAT_PATH_DELIMITER = " >> ";
 

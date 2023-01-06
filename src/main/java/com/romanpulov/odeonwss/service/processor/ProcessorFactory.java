@@ -14,6 +14,7 @@ public class ProcessorFactory {
     private final DVMusicMDBImportProcessor dvMusicMDBImportProcessor;
     private final DVMusicMediaFilesLoadProcessor dvMusicMediaFilesLoadProcessor;
     private final DVMusicValidateProcessor dvMusicValidateProcessor;
+    private final DVProductMDBImportProcessor dvProductMDBImportProcessor;
     private final ClassicsValidateProcessor classicsValidateProcessor;
     private final MP3LoadProcessor mp3LoadProcessor;
     private final MP3ValidateProcessor mp3ValidateProcessor;
@@ -27,6 +28,7 @@ public class ProcessorFactory {
             DVMusicMDBImportProcessor dvMusicMDBImportProcessor,
             DVMusicMediaFilesLoadProcessor dvMusicMediaFilesLoadProcessor,
             DVMusicValidateProcessor dvMusicValidateProcessor,
+            DVProductMDBImportProcessor dvProductMDBImportProcessor,
             ClassicsValidateProcessor classicsValidateProcessor,
             MP3LoadProcessor mp3LoadProcessor,
             MP3ValidateProcessor mp3ValidateProcessor,
@@ -40,6 +42,7 @@ public class ProcessorFactory {
         this.dvMusicMDBImportProcessor = dvMusicMDBImportProcessor;
         this.dvMusicMediaFilesLoadProcessor = dvMusicMediaFilesLoadProcessor;
         this.dvMusicValidateProcessor = dvMusicValidateProcessor;
+        this.dvProductMDBImportProcessor = dvProductMDBImportProcessor;
         this.mp3LoadProcessor = mp3LoadProcessor;
         this.mp3ValidateProcessor = mp3ValidateProcessor;
         this.laLoadProcessor = laLoadProcessor;
@@ -61,6 +64,11 @@ public class ProcessorFactory {
                 return processor;
             case DV_MUSIC_IMPORTER:
                 processor = dvMusicMDBImportProcessor;
+                processor.setProgressHandler(handler);
+                processor.setRootFolder(appConfiguration.getMdbPath());
+                return processor;
+            case DV_PRODUCT_IMPORTER:
+                processor = dvProductMDBImportProcessor;
                 processor.setProgressHandler(handler);
                 processor.setRootFolder(appConfiguration.getMdbPath());
                 return processor;
