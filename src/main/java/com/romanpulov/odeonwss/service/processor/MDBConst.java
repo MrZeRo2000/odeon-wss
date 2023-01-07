@@ -11,6 +11,7 @@ public class MDBConst {
     public static final String DVDET_TABLE_NAME = "DVDet";
     public static final String CAT_TABLE_NAME = "Cat";
     public static final String PRODUCT_TABLE_NAME = "VProduct";
+    public static final String PRODUCT_CAT_TABLE_NAME = "VProductCat";
 
     public static final String ARTISTLIST_ID_COLUMN_NAME = "ArtistListID";
     public static final String TITLE_COLUMN_NAME = "Title";
