@@ -1,59 +1,59 @@
 package com.romanpulov.odeonwss.builder.entitybuilder;
 
+import com.romanpulov.odeonwss.builder.AbstractClassBuilder;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.entity.MediaFile;
 
-public class EntityCompositionBuilder {
-    private final Composition composition;
+public class EntityCompositionBuilder extends AbstractClassBuilder<Composition> {
 
     public EntityCompositionBuilder() {
-        composition = new Composition();
+        super(Composition.class);
     }
 
     public EntityCompositionBuilder withArtifact(Artifact artifact) {
-        composition.setArtifact(artifact);
+        instance.setArtifact(artifact);
         return this;
     }
 
     public EntityCompositionBuilder withArtist(Artist artist) {
-        composition.setArtist(artist);
+        instance.setArtist(artist);
         return this;
     }
 
     public EntityCompositionBuilder withPerformerArtist(Artist performerArtist) {
-        composition.setPerformerArtist(performerArtist);
+        instance.setPerformerArtist(performerArtist);
         return this;
     }
 
     public EntityCompositionBuilder withMediaFile(MediaFile mediaFile) {
-        composition.getMediaFiles().add(mediaFile);
+        instance.getMediaFiles().add(mediaFile);
         return this;
     }
 
-
     public EntityCompositionBuilder withTitle(String title) {
-        composition.setTitle(title);
+        instance.setTitle(title);
         return this;
     }
 
     public EntityCompositionBuilder withDuration(long duration) {
-        composition.setDuration(duration);
+        instance.setDuration(duration);
         return this;
     }
 
     public EntityCompositionBuilder withDiskNum(long diskNum) {
-        composition.setDiskNum(diskNum);
+        instance.setDiskNum(diskNum);
         return this;
     }
 
     public EntityCompositionBuilder withNum(long num) {
-        composition.setNum(num);
+        instance.setNum(num);
         return this;
     }
 
-    public Composition build() {
-        return composition;
+    public EntityCompositionBuilder withMigrationId(long migrationId) {
+        instance.setMigrationId(migrationId);
+        return this;
     }
 }

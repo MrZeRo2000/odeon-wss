@@ -107,6 +107,7 @@ public class RepositoryCompositionTests {
                 .withDiskNum(1L)
                 .withNum(8L)
                 .withDuration(123456L)
+                .withMigrationId(4321L)
                 .build();
         Composition savedComposition = compositionRepository.save(composition);
         Assertions.assertNotNull(savedComposition.getId());
@@ -119,6 +120,7 @@ public class RepositoryCompositionTests {
         Assertions.assertEquals(1L, savedComposition.getDiskNum());
         Assertions.assertEquals(8, savedComposition.getNum());
         Assertions.assertEquals(123456L, savedComposition.getDuration());
+        Assertions.assertEquals(4321L, savedComposition.getMigrationId());
 
         //Composition 2
         Composition composition2 = new EntityCompositionBuilder()

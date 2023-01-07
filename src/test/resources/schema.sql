@@ -61,7 +61,8 @@ CREATE TABLE compositions (
     comp_title TEXT NOT NULL,
     comp_duration INTEGER NULL,
     comp_disk_num INTEGER NULL,
-    comp_num INTEGER NULL
+    comp_num INTEGER NULL,
+    comp_migration_id INTEGER NULL
 );
 
 CREATE INDEX idx_composition_artf ON compositions(artf_id);
