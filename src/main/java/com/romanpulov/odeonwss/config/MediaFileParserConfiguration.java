@@ -16,6 +16,6 @@ public class MediaFileParserConfiguration {
 
     @Bean
     public MediaFileParserInterface getMediaFileParser() {
-        return new FFMPEGMediaFileParser(appConfiguration.getFFProbePath());
+        return new FFMPEGMediaFileParser(appConfiguration.getPathMap().get(AppConfiguration.PathType.PT_FFPROBE));
     }
 }

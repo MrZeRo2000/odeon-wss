@@ -3,23 +3,35 @@ package com.romanpulov.odeonwss.config;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletContext;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class AppConfiguration {
 
+    public enum PathType {
+        PT_MP3,
+        PT_LA,
+        PT_CLASSICS,
+        PT_DV_MUSIC,
+        PT_DV_MOVIE,
+        PT_MDB,
+        PT_FFPROBE
+    }
+
+    private static final Map<PathType, String> PATH_PARAMETER_MAP = Map.of(
+            PathType.PT_MP3, "mp3-path",
+            PathType.PT_LA, "la-path",
+            PathType.PT_CLASSICS, "classics-path",
+            PathType.PT_DV_MUSIC, "dv-music-path",
+            PathType.PT_DV_MOVIE, "dv-movie-path",
+            PathType.PT_MDB, "mdb-path",
+            PathType.PT_FFPROBE, "ffprobe-path"
+    );
+
+    private final Map<PathType, String> pathMap = new HashMap<>();
+
     private final String dbUrl;
-
-    private final String mp3Path;
-
-    private final String laPath;
-
-    private final String classicsPath;
-
-    private final String dvMusicPath;
-
-    private final String mdbPath;
-
-    private final String ffprobePath;
 
     private final String version;
 
@@ -27,28 +39,8 @@ public class AppConfiguration {
         return dbUrl;
     }
 
-    public String getMp3Path() {
-        return mp3Path;
-    }
-
-    public String getLaPath() {
-        return laPath;
-    }
-
-    public String getClassicsPath() {
-        return classicsPath;
-    }
-
-    public String getDvMusicPath() {
-        return dvMusicPath;
-    }
-
-    public String getMdbPath() {
-        return mdbPath;
-    }
-
-    public String getFFProbePath() {
-        return ffprobePath;
+    public Map<PathType, String> getPathMap() {
+        return pathMap;
     }
 
     public String getVersion() {
@@ -57,12 +49,11 @@ public class AppConfiguration {
 
     public AppConfiguration(ServletContext context, ProjectConfigurationProperties projectConfigurationProperties) {
         dbUrl = context.getInitParameter("db-url");
-        mp3Path = context.getInitParameter("mp3-path");
-        laPath = context.getInitParameter("la-path");
-        classicsPath = context.getInitParameter("classics-path");
-        dvMusicPath = context.getInitParameter("dv-music-path");
-        mdbPath = context.getInitParameter("mdb-path");
-        ffprobePath = context.getInitParameter("ffprobe-path");
+
+        AppConfiguration.PATH_PARAMETER_MAP.forEach(
+                (key, value) -> this.pathMap.put(key, context.getInitParameter(value))
+        );
+
         version = projectConfigurationProperties.getVersion();
     }
 }
