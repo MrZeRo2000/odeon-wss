@@ -12,10 +12,13 @@ public class DVMovieMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private final DVTypeRepository dvTypeRepository;
 
+    private final DVProductMDBImportProcessor dvProductMDBImportProcessor;
+
     private Map<Long, DVType> dvTypeMap;
 
-    public DVMovieMDBImportProcessor(DVTypeRepository dvTypeRepository) {
+    public DVMovieMDBImportProcessor(DVTypeRepository dvTypeRepository, DVProductMDBImportProcessor dvProductMDBImportProcessor) {
         this.dvTypeRepository = dvTypeRepository;
+        this.dvProductMDBImportProcessor = dvProductMDBImportProcessor;
     }
 
     @Override
@@ -23,6 +26,10 @@ public class DVMovieMDBImportProcessor extends AbstractMDBImportProcessor {
         if (dvTypeMap == null) {
             dvTypeMap = dvTypeRepository.findAllMap();
         }
+
+        dvProductMDBImportProcessor.setProgressHandler(getProgressHandler());
+        dvProductMDBImportProcessor.setRootFolder(getRootFolder());
+        dvProductMDBImportProcessor.execute();
 
     }
 }
