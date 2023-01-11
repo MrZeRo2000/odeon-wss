@@ -2,7 +2,6 @@ package com.romanpulov.odeonwss.entity;
 
 import org.hibernate.Hibernate;
 
-import javax.annotation.Nullable;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;

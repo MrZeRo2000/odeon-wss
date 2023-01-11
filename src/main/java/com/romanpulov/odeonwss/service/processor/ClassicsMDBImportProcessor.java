@@ -88,7 +88,7 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private static class ClassicsData {
         Artifact artifact;
-        List<Composition> compositions = new ArrayList<>();
+        final List<Composition> compositions = new ArrayList<>();
 
         public static ClassicsData withArtifact(Artifact artifact) {
             ClassicsData instance = new ClassicsData();
@@ -232,15 +232,6 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
                 classicsData.compositions.add(composition);
             }
         }
-
-        /*
-        for (ClassicsData cd: classicsDataMap.values()) {
-            artifactRepository.save(cd.artifact);
-            compositionRepository.saveAll(cd.compositions);
-            counter.getAndIncrement();
-        }
-
-         */
 
         return counter.get();
     }

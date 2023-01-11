@@ -1,7 +1,5 @@
 package com.romanpulov.odeonwss.utils.media;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 public class MediaFileInfo {

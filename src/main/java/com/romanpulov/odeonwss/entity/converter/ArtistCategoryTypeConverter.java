@@ -4,7 +4,6 @@ import com.romanpulov.odeonwss.entity.ArtistCategoryType;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
-import java.util.stream.Stream;
 
 @Converter
 public class ArtistCategoryTypeConverter implements AttributeConverter<ArtistCategoryType, String> {

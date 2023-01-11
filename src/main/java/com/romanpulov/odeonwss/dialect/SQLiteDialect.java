@@ -7,8 +7,8 @@ import java.sql.Types;
 
 /**
  * SQLite database dialect
- * https://www.baeldung.com/spring-boot-sqlite
- * https://github.com/bharat0126/springboot-sqlite-app/tree/master/sqlite-db-sample/src/main/java/com/sqlite
+ * <a href="https://www.baeldung.com/spring-boot-s<a href="qlite">...</a>
+ ">* https://github.com/bharat0126/springboot-sqlite-app/tree/master/sqlite-db-sample/src/ma</a>in/java/com/sqlite
  */
 public class SQLiteDialect extends Dialect {
 

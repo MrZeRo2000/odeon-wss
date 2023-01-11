@@ -3,7 +3,6 @@ package com.romanpulov.odeonwss.mapper;
 import com.romanpulov.odeonwss.dto.CompositionEditDTO;
 import com.romanpulov.odeonwss.dto.MediaFileEditDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
 import com.romanpulov.odeonwss.utils.media.MediaFormatInfo;

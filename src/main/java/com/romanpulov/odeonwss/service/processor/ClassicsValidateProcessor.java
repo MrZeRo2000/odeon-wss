@@ -2,7 +2,6 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.view.IdNameView;
 import com.romanpulov.odeonwss.view.IdTitleView;
 import org.springframework.stereotype.Component;
 

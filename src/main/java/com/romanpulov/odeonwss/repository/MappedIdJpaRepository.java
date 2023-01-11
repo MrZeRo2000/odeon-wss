@@ -1,11 +1,13 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.entity.DVType;
+import com.romanpulov.odeonwss.entity.AbstractBaseEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.NoRepositoryBean;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
-@NoRepositoryBean
-public interface MappedIdJpaRepository<T, ID> extends JpaRepository<T, ID> {
+public interface MappedIdJpaRepository<T extends AbstractBaseEntity, ID> extends JpaRepository<T, ID> {
+    default Map<Long, T> findAllMap() {
+        return findAll().stream().collect(Collectors.toMap(T::getId, v -> v));
+    }
 }

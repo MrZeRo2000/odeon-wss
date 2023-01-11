@@ -1,7 +1,5 @@
 package com.romanpulov.odeonwss.entity.converter;
 
-import org.springframework.stereotype.Component;
-
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.time.Instant;

@@ -19,7 +19,7 @@ public class ProcessService implements ProgressHandler {
         this.processorFactory = processorFactory;
     }
 
-    AtomicReference<AbstractProcessor> currentProcessor = new AtomicReference<>();
+    final AtomicReference<AbstractProcessor> currentProcessor = new AtomicReference<>();
 
     private ProcessInfo processInfo;
 

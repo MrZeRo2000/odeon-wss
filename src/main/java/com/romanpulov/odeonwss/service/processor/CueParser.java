@@ -16,7 +16,7 @@ public class CueParser {
     private static final Pattern REGEXP_PATTERN_TRACK = Pattern.compile("TRACK\\s+(\\d+)");
     private static final Pattern REGEXP_PATTERN_INDEX = Pattern.compile("INDEX\\s+01\\s+(\\d{2}):(\\d{2})");
 
-    private static Map<CUE_STATE, Pattern> PATTERN_MAPPING = new HashMap<>();
+    private static final Map<CUE_STATE, Pattern> PATTERN_MAPPING = new HashMap<>();
 
     static {
         PATTERN_MAPPING.put(CUE_STATE.ST_FILE, REGEXP_PATTERN_FILE);

@@ -2,7 +2,6 @@ package com.romanpulov.odeonwss.entity;
 
 import com.romanpulov.odeonwss.entity.converter.ArtistTypeConverter;
 import org.hibernate.HibernateException;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

@@ -18,7 +18,7 @@ public class ArtistTypeDeserializer extends StdDeserializer<ArtistType> {
     }
 
     @Override
-    public ArtistType deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+    public ArtistType deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         return ArtistType.fromCode(p.readValueAs(String.class));
     }
 }

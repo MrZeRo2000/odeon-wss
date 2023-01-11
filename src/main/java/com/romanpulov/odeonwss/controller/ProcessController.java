@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/api/process", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ProcessController {
 
-    ProcessService processService;
+    final ProcessService processService;
 
     public ProcessController(ProcessService processService) {
         this.processService = processService;

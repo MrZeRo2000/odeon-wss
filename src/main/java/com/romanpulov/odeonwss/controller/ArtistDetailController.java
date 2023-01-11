@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.romanpulov.odeonwss.entity.ArtistDetail;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.repository.ArtistDetailRepository;
 import com.romanpulov.odeonwss.view.BiographyView;

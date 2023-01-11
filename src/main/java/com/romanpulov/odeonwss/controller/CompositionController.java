@@ -4,7 +4,6 @@ import com.romanpulov.odeonwss.dto.CompositionEditDTO;
 import com.romanpulov.odeonwss.dto.CompositionTableDTO;
 import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
 import com.romanpulov.odeonwss.service.CompositionService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
