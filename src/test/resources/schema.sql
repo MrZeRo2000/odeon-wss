@@ -41,7 +41,8 @@ CREATE TABLE artifacts (
     artf_year INTEGER NULL,
     artf_duration INTEGER NULL,
     artf_size INTEGER NULL,
-    artf_ins_date INTEGER NULL
+    artf_ins_date INTEGER NULL,
+    artf_migration_id INTEGER NULL
 );
 
 CREATE INDEX idx_artifact_attp ON artifacts (attp_id);

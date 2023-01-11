@@ -10,20 +10,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "compositions")
-public class Composition {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comp_id")
-    private Long id;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+@AttributeOverride(name = "id", column = @Column(name = "comp_id"))
+@AttributeOverride(name = "migrationId", column = @Column(name = "comp_migration_id"))
+public class Composition extends AbstractBaseMigratedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artf_id", referencedColumnName = "artf_id")
     @NotNull
@@ -130,17 +119,6 @@ public class Composition {
         this.num = num;
     }
 
-    @Column(name = "comp_migration_id")
-    private Long migrationId;
-
-    public Long getMigrationId() {
-        return migrationId;
-    }
-
-    public void setMigrationId(Long migrationId) {
-        this.migrationId = migrationId;
-    }
-
     @ManyToMany(cascade = {CascadeType.MERGE})
     @JoinTable(name = "compositions_media_files",
             joinColumns = @JoinColumn(name = "comp_id"),
@@ -161,18 +139,18 @@ public class Composition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Composition that = (Composition) o;
-        return id.equals(that.id);
+        return getId().equals(that.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 
     @Override
     public String toString() {
         return "Composition{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", artifact=" + artifact +
                 ", title='" + title + '\'' +
                 ", duration=" + duration +

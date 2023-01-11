@@ -1,27 +1,13 @@
 package com.romanpulov.odeonwss.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Entity
 @Table(name = "dv_types")
-public class DVType {
-    @Id
-    @Column(name = "dvtp_id")
-    private Long id;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+@AttributeOverride(name = "id", column = @Column(name = "dvtp_id"))
+public class DVType extends AbstractBaseEntity {
     @Column(name = "dvtp_name")
     @NotNull
     private String name;
@@ -38,7 +24,7 @@ public class DVType {
     }
 
     public DVType(Long id, String name) {
-        this.id = id;
+        this.setId(id);
         this.name = name;
     }
 
@@ -47,18 +33,18 @@ public class DVType {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DVType dvType = (DVType) o;
-        return id.equals(dvType.id) && name.equals(dvType.name);
+        return getId().equals(dvType.getId()) && name.equals(dvType.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(getId(), name);
     }
 
     @Override
     public String toString() {
         return "DVType{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", name='" + name + '\'' +
                 '}';
     }

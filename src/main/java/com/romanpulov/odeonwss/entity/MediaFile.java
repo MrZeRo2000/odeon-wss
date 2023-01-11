@@ -11,20 +11,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "media_files")
-public class MediaFile {
-    @Id
-    @Column(name = "mdfl_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+@AttributeOverride(name = "id", column = @Column(name = "mdfl_id"))
+public class MediaFile extends AbstractBaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artf_id", referencedColumnName = "artf_id")
     private Artifact artifact;
@@ -119,18 +107,18 @@ public class MediaFile {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MediaFile mediaFile = (MediaFile) o;
-        return id.equals(mediaFile.id);
+        return getId().equals(mediaFile.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 
     @Override
     public String toString() {
         return "MediaFile{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", artifact=" + (Hibernate.isInitialized(artifact) ? artifact : "not initialized") +
                 ", name='" + name + '\'' +
                 ", format='" + format + '\'' +

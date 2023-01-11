@@ -12,20 +12,9 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "artifacts")
-public class Artifact {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "artf_id")
-    private Long id;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+@AttributeOverride(name = "id", column = @Column(name = "artf_id"))
+@AttributeOverride(name = "migrationId", column = @Column(name = "artf_migration_id"))
+public class Artifact extends AbstractBaseMigratedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "attp_id", referencedColumnName = "attp_id")
     @NotNull
@@ -151,18 +140,18 @@ public class Artifact {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Artifact artifact = (Artifact) o;
-        return id.equals(artifact.id);
+        return getId().equals(artifact.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 
     @Override
     public String toString() {
         return "Artifact{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", artifactType=" + (Hibernate.isInitialized(artifactType) ? artifactType : "not initialized") +
                 ", artist=" + (Hibernate.isInitialized(artist) ? artist : "not initialized") +
                 ", title='" + title + '\'' +

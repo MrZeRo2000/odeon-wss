@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public interface DVTypeRepository extends JpaRepository<DVType, Long> {
+public interface DVTypeRepository extends MappedIdJpaRepository<DVType, Long> {
     @Cacheable("dvTypes")
     List<DVType> getAllByOrderById();
 

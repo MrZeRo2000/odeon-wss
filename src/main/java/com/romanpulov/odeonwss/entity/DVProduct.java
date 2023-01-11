@@ -11,20 +11,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "dv_products")
-public class DVProduct {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "dvpd_id")
-    private Long id;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+@AttributeOverride(name = "id", column = @Column(name = "dvpd_id"))
+@AttributeOverride(name = "migrationId", column = @Column(name = "dvpd_migration_id"))
+public class DVProduct extends AbstractBaseMigratedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dvor_id", referencedColumnName = "dvor_id")
     @NotNull
@@ -105,17 +94,6 @@ public class DVProduct {
         this.notes = notes;
     }
 
-    @Column(name = "dvpd_migration_id")
-    private Long migrationId;
-
-    public Long getMigrationId() {
-        return migrationId;
-    }
-
-    public void setMigrationId(Long migrationId) {
-        this.migrationId = migrationId;
-    }
-
     @ManyToMany(cascade = {CascadeType.MERGE})
     @JoinTable(
             name = "dv_products_dv_categories",
@@ -136,7 +114,7 @@ public class DVProduct {
     }
 
     public DVProduct(Long id, DVOrigin dvOrigin, String title, String originalTitle, Long year, String frontInfo, String description, String notes) {
-        this.id = id;
+        this.setId(id);
         this.dvOrigin = dvOrigin;
         this.title = title;
         this.originalTitle = originalTitle;
@@ -151,18 +129,18 @@ public class DVProduct {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DVProduct dvProduct = (DVProduct) o;
-        return id.equals(dvProduct.id) && title.equals(dvProduct.title);
+        return getId().equals(dvProduct.getId()) && title.equals(dvProduct.title);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title);
+        return Objects.hash(getId(), title);
     }
 
     @Override
     public String toString() {
         return "DVProduct{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", dvOrigin=" + (Hibernate.isInitialized(dvOrigin) ? dvOrigin : "not initialized") +
                 ", title='" + title + '\'' +
                 ", originalTitle='" + originalTitle + '\'' +

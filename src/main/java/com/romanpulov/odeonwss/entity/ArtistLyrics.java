@@ -7,20 +7,8 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "artist_lyrics")
-public class ArtistLyrics {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "atlr_id")
-    private Long id;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+@AttributeOverride(name = "id", column = @Column(name = "atlr_id"))
+public class ArtistLyrics extends AbstractBaseEntity {
     @ManyToOne
     @JoinColumn(name = "arts_id", referencedColumnName = "arts_id")
     @NotNull

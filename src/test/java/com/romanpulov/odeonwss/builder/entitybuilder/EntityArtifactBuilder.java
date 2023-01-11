@@ -1,59 +1,60 @@
 package com.romanpulov.odeonwss.builder.entitybuilder;
 
+import com.romanpulov.odeonwss.builder.AbstractClassBuilder;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
 
 import java.time.LocalDate;
 
-public class EntityArtifactBuilder {
-    private final Artifact artifact;
+public class EntityArtifactBuilder extends AbstractClassBuilder<Artifact> {
 
     public EntityArtifactBuilder() {
-        artifact = new Artifact();
+        super(Artifact.class);
     }
 
     public EntityArtifactBuilder withId(Long id) {
-        artifact.setId(id);
+        this.instance.setId(id);
         return this;
     }
 
     public EntityArtifactBuilder withArtifactType(ArtifactType artifactType) {
-        artifact.setArtifactType(artifactType);
+        this.instance.setArtifactType(artifactType);
         return this;
     }
 
     public EntityArtifactBuilder withArtist(Artist artist) {
-        artifact.setArtist(artist);
+        this.instance.setArtist(artist);
         return this;
     }
 
     public EntityArtifactBuilder withPerformerArtist(Artist performerArtist) {
-        artifact.setPerformerArtist(performerArtist);
+        this.instance.setPerformerArtist(performerArtist);
         return this;
     }
 
     public EntityArtifactBuilder withTitle(String title) {
-        artifact.setTitle(title);
+        this.instance.setTitle(title);
         return this;
     }
 
     public EntityArtifactBuilder withYear(Long year) {
-        artifact.setYear(year);
+        this.instance.setYear(year);
         return this;
     }
 
     public EntityArtifactBuilder withDuration(Long duration) {
-        artifact.setDuration(duration);
+        this.instance.setDuration(duration);
         return this;
     }
 
     public EntityArtifactBuilder withInsertDate(LocalDate insertDate) {
-        artifact.setInsertDate(insertDate);
+        this.instance.setInsertDate(insertDate);
         return this;
     }
 
-    public Artifact build() {
-        return artifact;
+    public EntityArtifactBuilder withMigrationId(long id) {
+        this.instance.setMigrationId(id);
+        return this;
     }
 }

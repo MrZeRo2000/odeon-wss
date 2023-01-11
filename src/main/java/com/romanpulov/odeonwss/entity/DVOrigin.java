@@ -9,20 +9,9 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "dv_origins")
-public class DVOrigin {
-    @Id
-    @Column(name = "dvor_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+@AttributeOverride(name = "id", column = @Column(name = "dvor_id"))
+@AttributeOverride(name = "migrationId", column = @Column(name = "dvor_migration_id"))
+public class DVOrigin extends AbstractBaseMigratedEntity {
     @Column(name = "dvor_name")
     @NotNull
     private String name;
@@ -35,22 +24,11 @@ public class DVOrigin {
         this.name = name;
     }
 
-    @Column(name = "dvor_migration_id")
-    private Long migrationId;
-
-    public Long getMigrationId() {
-        return migrationId;
-    }
-
-    public void setMigrationId(Long migrationId) {
-        this.migrationId = migrationId;
-    }
-
     public DVOrigin() {
     }
 
     public DVOrigin(Long id, String name) {
-        this.id = id;
+        this.setId(id);
         this.name = name;
     }
 
@@ -59,18 +37,18 @@ public class DVOrigin {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DVOrigin dvOrigin = (DVOrigin) o;
-        return id.equals(dvOrigin.id) && name.equals(dvOrigin.name);
+        return getId().equals(dvOrigin.getId()) && name.equals(dvOrigin.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 
     @Override
     public String toString() {
         return "DVOrigin{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", name='" + name + '\'' +
                 '}';
     }

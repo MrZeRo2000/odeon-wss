@@ -8,19 +8,8 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "artifact_types")
-public class ArtifactType {
-    @Id
-    @Column(name = "attp_id")
-    private Long id;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+@AttributeOverride(name = "id", column = @Column(name = "attp_id"))
+public class ArtifactType extends AbstractBaseEntity {
     @Column(name = "attp_name")
     @NotNull
     private String name;
@@ -50,7 +39,7 @@ public class ArtifactType {
     }
 
     public ArtifactType(Long id, String name, @Nullable Long parentId) {
-        this.id = id;
+        this.setId(id);
         this.name = name;
         this.parentId = parentId;
     }
@@ -60,18 +49,18 @@ public class ArtifactType {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ArtifactType that = (ArtifactType) o;
-        return id.equals(that.id);
+        return getId().equals(that.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 
     @Override
     public String toString() {
         return "ArtifactType{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", name='" + name + '\'' +
                 ", parentId=" + parentId +
                 '}';

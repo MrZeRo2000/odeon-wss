@@ -11,20 +11,9 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "artists")
-public class Artist {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "arts_id")
-    private Long id;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+@AttributeOverride(name = "id", column = @Column(name = "arts_id"))
+@AttributeOverride(name = "migrationId", column = @Column(name = "arts_migration_id"))
+public class Artist extends AbstractBaseMigratedEntity {
     @Column(name = "arts_type_code")
     @NotNull
     @Convert(converter = ArtistTypeConverter.class)
@@ -48,19 +37,6 @@ public class Artist {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Column(name = "arts_migration_id")
-    @Nullable
-    private Long migrationId;
-
-    @Nullable
-    public Long getMigrationId() {
-        return migrationId;
-    }
-
-    public void setMigrationId(@Nullable Long migrationId) {
-        this.migrationId = migrationId;
     }
 
     @OneToMany(mappedBy = "artist", fetch = FetchType.LAZY)
@@ -132,7 +108,7 @@ public class Artist {
     }
 
     public Artist(Long id, ArtistType type, String name) {
-        this.id = id;
+        this.setId(id);
         this.type = type;
         this.name = name;
     }
@@ -142,18 +118,18 @@ public class Artist {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Artist artist = (Artist) o;
-        return id.equals(artist.id);
+        return getId().equals(artist.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 
     @Override
     public String toString() {
         return "Artist{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", type='" + type + '\'' +
                 ", name='" + name + '\'' +
                 '}';

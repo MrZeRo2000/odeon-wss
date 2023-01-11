@@ -8,20 +8,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "dv_categories")
-public class DVCategory {
-    @Id
-    @Column(name = "dvct_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+@AttributeOverride(name = "id", column = @Column(name = "dvct_id"))
+@AttributeOverride(name = "migrationId", column = @Column(name = "dvct_migration_id"))
+public class DVCategory extends AbstractBaseMigratedEntity {
     @Column(name = "dvct_name")
     @NotNull
     private String name;
@@ -32,17 +21,6 @@ public class DVCategory {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Column(name = "dvct_migration_id")
-    private Long migrationId;
-
-    public Long getMigrationId() {
-        return migrationId;
-    }
-
-    public void setMigrationId(Long migrationId) {
-        this.migrationId = migrationId;
     }
 
     @ManyToMany(mappedBy = "dvCategories")
@@ -60,7 +38,7 @@ public class DVCategory {
     }
 
     public DVCategory(Long id, String name) {
-        this.id = id;
+        this.setId(id);
         this.name = name;
     }
 
@@ -69,18 +47,18 @@ public class DVCategory {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DVCategory that = (DVCategory) o;
-        return id.equals(that.id) && name.equals(that.name);
+        return getId().equals(that.getId()) && name.equals(that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(getId(), name);
     }
 
     @Override
     public String toString() {
         return "DVCategory{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", name='" + name + '\'' +
                 '}';
     }

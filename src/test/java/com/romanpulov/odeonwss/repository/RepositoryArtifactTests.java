@@ -74,6 +74,7 @@ public class RepositoryArtifactTests {
                 .withYear(2000L)
                 .withDuration(54334L)
                 .withInsertDate(LocalDate.now().minusDays(1))
+                .withMigrationId(321L)
                 .build();
 
         artifactRepository.save(artifact);
@@ -81,11 +82,13 @@ public class RepositoryArtifactTests {
         Assertions.assertNotNull(artifact);
         Assertions.assertNotNull(artifact.getId());
         Assertions.assertEquals(artist, artifact.getArtist());
+        assert artifact.getPerformerArtist() != null;
         Assertions.assertEquals(performerArtist.getName(), artifact.getPerformerArtist().getName());
         Assertions.assertEquals(artifactType, ArtifactType.withMP3());
         Assertions.assertEquals("Title 1", artifact.getTitle());
         Assertions.assertEquals(2000L, artifact.getYear());
         Assertions.assertEquals(54334L, artifact.getDuration());
+        Assertions.assertEquals(321L, artifact.getMigrationId());
 
         log.info("Saved artifact summary:" + artifact);
 
@@ -148,6 +151,7 @@ public class RepositoryArtifactTests {
                 .withTitle("Title No Year")
                 .withDuration(77743L)
                 .withInsertDate(LocalDate.now().minusDays(2))
+                .withMigrationId(732L)
                 .build();
 
         artifactRepository.save(artifact);

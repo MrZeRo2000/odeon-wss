@@ -8,6 +8,7 @@ import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.view.IdNameView;
 import com.romanpulov.odeonwss.view.IdTitleView;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -15,7 +16,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface ArtifactRepository extends PagingAndSortingRepository<Artifact, Long> {
+public interface ArtifactRepository extends JpaRepository<Artifact, Long> {
     List<Artifact> getAllByArtifactType(ArtifactType artifactType);
 
     List<Artifact> getArtifactsByArtist(Artist artist);
