@@ -8,14 +8,14 @@ import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class UnitFFMPEGMediaFileParserTest {
-    FFMPEGMediaFileParser fp = new FFMPEGMediaFileParser("D:/prj/ffmpeg/");
+    FFMPEGMediaFileParser fp = new FFMPEGMediaFileParser("../ffmpeg/");
 
-    static final String TEST_MP3_FILE_NAME = "D:/temp/ok/MP3 Music/Aerosmith/2004 Honkin'On Bobo/01 - Road Runner.mp3";
+    static final String TEST_MP3_FILE_NAME = "../odeon-test-data/ok/MP3 Music/Aerosmith/2004 Honkin'On Bobo/01 - Road Runner.mp3";
     static final long TEST_MP3_FILE_DURATION = 226L;
     static final long TEST_MP3_FILE_SIZE = 9027961;
     static final long TEST_MP3_FILE_BITRATE = 320;
 
-    static final String TEST_LA_FILE_NAME= "D:/Temp/ok/Lossless/Abigail Williams/2010 In The Absence Of Light/01 Hope The Great Betrayal.flac";
+    static final String TEST_LA_FILE_NAME= "../odeon-test-data/ok/Lossless/Abigail Williams/2010 In The Absence Of Light/01 Hope The Great Betrayal.flac";
     static final long TEST_LA_FILE_DURATION = 405;
     static final long TEST_LA_FILE_SIZE = 51873290L;
     static final long TEST_LA_FILE_BITRATE = 1025L;

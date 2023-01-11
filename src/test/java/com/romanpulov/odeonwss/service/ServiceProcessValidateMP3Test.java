@@ -54,7 +54,7 @@ public class ServiceProcessValidateMP3Test {
     @Test
     @Order(4)
     void testWrongTitleMissingFileArtist() throws Exception {
-        service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/wrong_artifact_title/");
+        service.executeProcessor(ProcessorType.MP3_VALIDATOR, "../odeon-test-data/wrong_artifact_title/");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
         Assertions.assertTrue(service.getProcessInfo().getLastProgressDetail().getInfo().contains("Artists not in files"));
     }
@@ -62,7 +62,7 @@ public class ServiceProcessValidateMP3Test {
     @Test
     @Order(5)
     void testMissingFileArtist() throws Exception {
-        service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/validation_mp3_missing_artist/");
+        service.executeProcessor(ProcessorType.MP3_VALIDATOR, "../odeon-test-data/validation_mp3_missing_artist/");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
         Assertions.assertTrue(service.getProcessInfo().getLastProgressDetail().getInfo().contains("Artists not in files"));
     }
@@ -70,7 +70,7 @@ public class ServiceProcessValidateMP3Test {
     @Test
     @Order(6)
     void testAdditionalFileArtist() throws Exception {
-        service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/validation_mp3_additional_artist/");
+        service.executeProcessor(ProcessorType.MP3_VALIDATOR, "../odeon-test-data/validation_mp3_additional_artist/");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
         Assertions.assertTrue(service.getProcessInfo().getLastProgressDetail().getInfo().contains("Artists not in database"));
     }
@@ -78,7 +78,7 @@ public class ServiceProcessValidateMP3Test {
     @Test
     @Order(7)
     void testMissingFileArtifact() throws Exception {
-        service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/validation_mp3_missing_artifact/");
+        service.executeProcessor(ProcessorType.MP3_VALIDATOR, "../odeon-test-data/validation_mp3_missing_artifact/");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
         Assertions.assertTrue(service.getProcessInfo().getLastProgressDetail().getInfo().contains("Artifacts not in files"));
     }
@@ -86,7 +86,7 @@ public class ServiceProcessValidateMP3Test {
     @Test
     @Order(8)
     void testMissingFileCompositions() throws Exception {
-        service.executeProcessor(ProcessorType.MP3_VALIDATOR, "D:/Temp/validation_mp3_missing_compositions/");
+        service.executeProcessor(ProcessorType.MP3_VALIDATOR, "../odeon-test-data/validation_mp3_missing_compositions/");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
         Assertions.assertTrue(service.getProcessInfo().getLastProgressDetail().getInfo().contains("Compositions not in files"));
     }

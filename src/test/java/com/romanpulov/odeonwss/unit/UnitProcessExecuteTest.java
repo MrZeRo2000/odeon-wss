@@ -19,12 +19,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UnitProcessExecuteTest {
-    private static String FFPROBE_PATH = "D:\\prj\\ffmpeg\\ffprobe.exe";
+    private static String FFPROBE_PATH = "../ffmpeg/ffprobe.exe";
 
     @Test
     void test() throws Exception {
         Process process = new ProcessBuilder()
-                .command(FFPROBE_PATH, "-print_format", "json", "-show_format", "-v", "quiet", "D:\\temp\\ok\\MP3 Music\\Aerosmith\\2004 Honkin'On Bobo\\01 - Road Runner.mp3"
+                .command(FFPROBE_PATH, "-print_format", "json", "-show_format", "-v", "quiet", "../odeon-test-data/ok/MP3 Music/Aerosmith/2004 Honkin'On Bobo/01 - Road Runner.mp3"
                 )
                 .start();
 
@@ -45,7 +45,7 @@ public class UnitProcessExecuteTest {
 
     @Test
     void testSequence() throws Exception {
-        Path path = Paths.get("D:/temp/ok/MP3 Music/Aerosmith/2004 Honkin'On Bobo/");
+        Path path = Paths.get("../odeon-test-data/ok/MP3 Music/Aerosmith/2004 Honkin'On Bobo/");
         try (Stream<Path> stream = Files.list(path)) {
             List<Path> files = stream.collect(Collectors.toList());
             for (Path file: files) {
@@ -75,7 +75,7 @@ public class UnitProcessExecuteTest {
     void testParallel() throws Exception {
 
         List<Callable<String>> callables = new ArrayList<>();
-        Path path = Paths.get("D:/temp/ok/MP3 Music/Aerosmith/2004 Honkin'On Bobo/");
+        Path path = Paths.get("../odeon-test-data/ok/MP3 Music/Aerosmith/2004 Honkin'On Bobo/");
         try (Stream<Path> stream = Files.list(path)) {
             List<Path> files = stream.collect(Collectors.toList());
             for (Path file: files) {

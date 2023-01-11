@@ -15,3 +15,6 @@ $env:java_home = 'D:/WinApp/jdk-12.0.2'
 
 # Run one test to create DEV database
 ./gradlew test --tests *OdeonWssApplicationTests*
+
+# Set node
+$env:Path += ";C:\Users\r1525\AppData\Local\Programs\node"

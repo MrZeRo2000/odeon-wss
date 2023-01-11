@@ -82,7 +82,7 @@ public class ServiceProcessLoadMP3Test {
 
         artistRepository.save(artist);
 
-        service.executeProcessor(ProcessorType.MP3_LOADER, "D:/Temp/wrong_artifact_title/");
+        service.executeProcessor(ProcessorType.MP3_LOADER, "../odeon-test-data/wrong_artifact_title/");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
         Assertions.assertTrue(service.getProcessInfo().getProgressDetails().get(service.getProcessInfo().getProgressDetails().size() - 2).getInfo().contains("Error parsing artifact name"));
     }
@@ -98,7 +98,7 @@ public class ServiceProcessLoadMP3Test {
                         .build()
         );
         log.info("Created artist");
-        Assertions.assertDoesNotThrow(() -> service.executeProcessor(ProcessorType.MP3_LOADER, "D:/Temp/ok/MP3 Music/"));
+        Assertions.assertDoesNotThrow(() -> service.executeProcessor(ProcessorType.MP3_LOADER, "../odeon-test-data/ok/MP3 Music/"));
         Assertions.assertEquals(ProcessingStatus.WARNING, service.getProcessInfo().getProcessingStatus());
     }
 
@@ -115,7 +115,7 @@ public class ServiceProcessLoadMP3Test {
                 ));
 
         log.info("Created artists");
-        Assertions.assertDoesNotThrow(() -> service.executeProcessor(ProcessorType.MP3_LOADER, "D:/Temp/ok/MP3 Music/"));
+        Assertions.assertDoesNotThrow(() -> service.executeProcessor(ProcessorType.MP3_LOADER, "../odeon-test-data/ok/MP3 Music/"));
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
 
         Artist aerosmithArtist = artistRepository.findFirstByName("Aerosmith").orElseThrow();

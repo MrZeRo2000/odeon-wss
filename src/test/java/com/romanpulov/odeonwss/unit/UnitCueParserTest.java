@@ -11,7 +11,7 @@ public class UnitCueParserTest {
 
     @Test
     void testOneFileManyTracks() {
-        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of("D:/temp/ok/Lossless/Agua De Annique/2007 Air/air.flac.cue"));
+        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of("../odeon-test-data/ok/Lossless/Agua De Annique/2007 Air/air.flac.cue"));
 
         Assertions.assertEquals(13, tracks.size());
 
@@ -32,7 +32,7 @@ public class UnitCueParserTest {
 
     @Test
     void testManyFilesManyTracks() {
-        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of("D:/temp/ok/Lossless/Abigail Williams/2010 In The Absence Of Light/In The Absence Of Light.cue"));
+        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of("../odeon-test-data/ok/Lossless/Abigail Williams/2010 In The Absence Of Light/In The Absence Of Light.cue"));
 
         Assertions.assertEquals(8, tracks.size());
 
