@@ -12,10 +12,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-public interface ArtifactRepository extends JpaRepository<Artifact, Long> {
+public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifact, Long> {
     List<Artifact> getAllByArtifactType(ArtifactType artifactType);
+
+    default Map<Long, Artifact> findAllByArtifactTypeMigrationIdMap(ArtifactType artifactType) {
+        return getAllByArtifactType(artifactType)
+                .stream()
+                .filter(v -> v.getMigrationId() != null)
+                .collect(Collectors.toMap(Artifact::getMigrationId, v -> v));
+    }
 
     List<Artifact> getArtifactsByArtist(Artist artist);
 

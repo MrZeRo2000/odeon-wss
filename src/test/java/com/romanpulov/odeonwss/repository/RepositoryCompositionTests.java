@@ -137,6 +137,9 @@ public class RepositoryCompositionTests {
         Assertions.assertEquals(2, savedComposition2.getDiskNum());
         Assertions.assertEquals(5, savedComposition2.getNum());
         Assertions.assertEquals(777, savedComposition2.getDuration());
+
+        Assertions.assertEquals(2, compositionRepository.getCompositionsByArtifactType(ArtifactType.withMP3()).size());
+        Assertions.assertEquals(0, compositionRepository.getCompositionsByArtifactType(ArtifactType.withDVMovies()).size());
     }
 
     @Test

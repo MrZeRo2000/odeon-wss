@@ -79,7 +79,8 @@ CREATE TABLE media_files (
     mdfl_format_code TEXT NOT NULL,
     mdfl_size INTEGER NOT NULL,
     mdfl_bitrate INTEGER NULL,
-    mdfl_duration INTEGER NULL
+    mdfl_duration INTEGER NULL,
+    mdfl_migration_id INTEGER NULL
 );
 
 CREATE UNIQUE INDEX idx_media_files_artf_name ON media_files(artf_id, mdfl_name);

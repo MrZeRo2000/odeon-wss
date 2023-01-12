@@ -11,7 +11,8 @@ import java.util.Set;
 @Entity
 @Table(name = "media_files")
 @AttributeOverride(name = "id", column = @Column(name = "mdfl_id"))
-public class MediaFile extends AbstractBaseEntity {
+@AttributeOverride(name = "migrationId", column = @Column(name = "mdfl_migration_id"))
+public class MediaFile extends AbstractBaseMigratedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artf_id", referencedColumnName = "artf_id")
     private Artifact artifact;

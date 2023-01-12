@@ -63,6 +63,7 @@ public class RepositoryMediaFileTests {
                 .withSize(423L)
                 .withDuration(6234L)
                 .withBitrate(320L)
+                .withMigrationId(230L)
                 .build();
 
         Composition composition = new EntityCompositionBuilder()
@@ -83,6 +84,7 @@ public class RepositoryMediaFileTests {
         Assertions.assertEquals(savedMediaFile.getSize(), mediaFile.getSize());
         Assertions.assertEquals(savedMediaFile.getDuration(), mediaFile.getDuration());
         Assertions.assertEquals(savedMediaFile.getBitrate(), mediaFile.getBitrate());
+        Assertions.assertEquals(230L, mediaFile.getMigrationId());
 
         log.info("Saved MediaFile:" + savedMediaFile);
 

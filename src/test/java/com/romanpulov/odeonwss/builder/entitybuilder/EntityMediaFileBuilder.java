@@ -1,47 +1,48 @@
 package com.romanpulov.odeonwss.builder.entitybuilder;
 
+import com.romanpulov.odeonwss.builder.AbstractClassBuilder;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.entity.MediaFile;
 
-public class EntityMediaFileBuilder {
-    private final MediaFile mediaFile;
+public class EntityMediaFileBuilder extends AbstractClassBuilder<MediaFile> {
 
     public EntityMediaFileBuilder() {
-        mediaFile = new MediaFile();
+        super(MediaFile.class);
     }
 
     public EntityMediaFileBuilder withArtifact(Artifact artifact) {
-        mediaFile.setArtifact(artifact);
+        this.instance.setArtifact(artifact);
         return this;
     }
 
     public EntityMediaFileBuilder withName(String name) {
-        mediaFile.setName(name);
+        this.instance.setName(name);
         return this;
     }
 
     public EntityMediaFileBuilder withFormat(String format) {
-        mediaFile.setFormat(format);
+        this.instance.setFormat(format);
         return this;
     }
 
     public EntityMediaFileBuilder withSize(Long size) {
-        mediaFile.setSize(size);
+        this.instance.setSize(size);
         return this;
     }
 
     public EntityMediaFileBuilder withBitrate(Long bitrate) {
-        mediaFile.setBitrate(bitrate);
+        this.instance.setBitrate(bitrate);
         return this;
     }
 
     public EntityMediaFileBuilder withDuration(Long duration) {
-        mediaFile.setDuration(duration);
+        this.instance.setDuration(duration);
         return this;
     }
 
-    public MediaFile build() {
-        return mediaFile;
+    public EntityMediaFileBuilder withMigrationId(long migrationId) {
+        this.instance.setMigrationId(migrationId);
+        return this;
     }
 }

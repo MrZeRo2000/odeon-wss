@@ -126,7 +126,10 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
 
                 int compositionsSize = compositionRepository.findAllByArtifact(artifact).size();
                 if (compositionsSize == 0) {
-                    importCompositionsAndMediaFiles(mdbReader, row.getInt(DVCONT_ID_COLUMN_NAME), artifact);
+                    infoHandler(
+                            ProcessorMessages.INFO_COMPOSITIONS_IMPORTED,
+                            importCompositionsAndMediaFiles(mdbReader, row.getInt(DVCONT_ID_COLUMN_NAME), artifact)
+                    );
                 }
             }
         }

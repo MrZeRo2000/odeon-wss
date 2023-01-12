@@ -8,12 +8,29 @@ import com.romanpulov.odeonwss.entity.Composition;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public interface CompositionRepository extends CrudRepository<Composition, Long> {
 
     List<Composition> findAllByArtifact(Artifact artifact);
+
+    @Query(
+            "SELECT c " +
+            "FROM Composition c " +
+            "INNER JOIN Artifact a ON c.artifact = a " +
+            "WHERE a.artifactType=:artifactType"
+    )
+    List<Composition> getCompositionsByArtifactType(ArtifactType artifactType);
+
+    default Map<Long, Composition> getCompositionsByArtifactTypeMigrationIdMap(ArtifactType artifactType) {
+        return getCompositionsByArtifactType(artifactType)
+                .stream()
+                .collect(Collectors.toMap(Composition::getMigrationId, v -> v));
+    }
 
     @Query("SELECT " +
             "new com.romanpulov.odeonwss.dto.CompositionValidationDTO(" +
