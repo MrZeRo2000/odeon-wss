@@ -99,23 +99,28 @@ public class DVMovieMDBImportProcessor extends AbstractMDBImportProcessor {
         AtomicInteger counter = new AtomicInteger(0);
 
         ArtifactType artifactType =ArtifactType.withDVMovies();
-        Map<Long, Composition> migrationCompositions =
-                compositionRepository.getCompositionsByArtifactTypeMigrationIdMap(artifactType);
+        Map<String, Composition> migrationCompositions =
+                compositionRepository.getCompositionsByArtifactType(artifactType)
+                        .stream()
+                        .collect(Collectors.toMap(Composition::getTitle, v-> v));
 
         for (Row row: table) {
             long id = row.getInt(DVDET_ID_COLUMN_NAME);
             long contId = row.getInt(DVCONT_ID_COLUMN_NAME);
 
             if (this.artifacts.containsKey(contId)) {
-                Composition composition = migrationCompositions.get(id);
+                String title = row.getString(TITLE_COLUMN_NAME);
+                Composition composition = migrationCompositions.get(title);
                 if (composition == null) {
                     composition = new Composition();
                     composition.setArtifact(this.artifacts.get(contId));
                     composition.setTitle(row.getString(TITLE_COLUMN_NAME));
+                    composition.setDuration(0L);
                     composition.setDvType(dvTypeMap.get(row.getInt(VIDEOTYPE_ID_COLUMN_NAME).longValue()));
                     composition.setMigrationId(id);
 
                     compositionRepository.save(composition);
+                    migrationCompositions.put(title, composition);
 
                     counter.getAndIncrement();
                 }

@@ -26,12 +26,6 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
     )
     List<Composition> getCompositionsByArtifactType(ArtifactType artifactType);
 
-    default Map<Long, Composition> getCompositionsByArtifactTypeMigrationIdMap(ArtifactType artifactType) {
-        return getCompositionsByArtifactType(artifactType)
-                .stream()
-                .collect(Collectors.toMap(Composition::getMigrationId, v -> v));
-    }
-
     @Query("SELECT " +
             "new com.romanpulov.odeonwss.dto.CompositionValidationDTO(" +
             "ar.name, " +
