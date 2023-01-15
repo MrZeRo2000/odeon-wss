@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import static com.romanpulov.odeonwss.service.processor.MDBConst.*;
 
 @Component
-public class DVMovieMDBImportProcessor extends AbstractMDBImportProcessor {
+public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
     private static final int DV_MOVIE_REC_ID = 1254;
 
     private final DVTypeRepository dvTypeRepository;
@@ -34,7 +34,7 @@ public class DVMovieMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private Map<Long, Artifact> artifacts;
 
-    public DVMovieMDBImportProcessor(
+    public DVMoviesMDBImportProcessor(
             DVTypeRepository dvTypeRepository,
             DVProductMDBImportProcessor dvProductMDBImportProcessor,
             ArtifactRepository artifactRepository,
@@ -59,6 +59,7 @@ public class DVMovieMDBImportProcessor extends AbstractMDBImportProcessor {
 
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_IMPORTED, importArtifacts(mdbReader));
         infoHandler(ProcessorMessages.INFO_COMPOSITIONS_IMPORTED, importCompositions(mdbReader));
+        infoHandler(ProcessorMessages.INFO_MEDIA_FILES_IMPORTED, importMediaFiles(mdbReader));
     }
 
     public int importArtifacts(MDBReader mdbReader) throws ProcessorException {
@@ -98,7 +99,7 @@ public class DVMovieMDBImportProcessor extends AbstractMDBImportProcessor {
         Table table = mdbReader.getTable(DVDET_TABLE_NAME);
         AtomicInteger counter = new AtomicInteger(0);
 
-        ArtifactType artifactType =ArtifactType.withDVMovies();
+        ArtifactType artifactType = ArtifactType.withDVMovies();
         Map<String, Composition> migrationCompositions =
                 compositionRepository.getCompositionsByArtifactType(artifactType)
                         .stream()
@@ -126,6 +127,13 @@ public class DVMovieMDBImportProcessor extends AbstractMDBImportProcessor {
                 }
             }
         }
+
+        return counter.get();
+    }
+
+    public int importMediaFiles(MDBReader mdbReader) throws ProcessorException {
+        Table table = mdbReader.getTable(DVDET_TABLE_NAME);
+        AtomicInteger counter = new AtomicInteger(0);
 
         return counter.get();
     }

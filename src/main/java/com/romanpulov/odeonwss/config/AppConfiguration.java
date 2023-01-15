@@ -14,7 +14,7 @@ public class AppConfiguration {
         PT_LA,
         PT_CLASSICS,
         PT_DV_MUSIC,
-        PT_DV_MOVIE,
+        PT_DV_MOVIES,
         PT_MDB,
         PT_FFPROBE
     }
@@ -24,7 +24,7 @@ public class AppConfiguration {
             PathType.PT_LA, "la-path",
             PathType.PT_CLASSICS, "classics-path",
             PathType.PT_DV_MUSIC, "dv-music-path",
-            PathType.PT_DV_MOVIE, "dv-movie-path",
+            PathType.PT_DV_MOVIES, "dv-movies-path",
             PathType.PT_MDB, "mdb-path",
             PathType.PT_FFPROBE, "ffprobe-path"
     );

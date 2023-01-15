@@ -9,7 +9,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.DisabledIf;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -29,7 +28,7 @@ public class ServiceProcessMDBImportDVMovieTest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     void testImportDVMovie() {
-        service.executeProcessor(ProcessorType.DV_MOVIE_IMPORTER);
+        service.executeProcessor(ProcessorType.DV_MOVIES_IMPORTER);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
     }
 
@@ -43,7 +42,7 @@ public class ServiceProcessMDBImportDVMovieTest {
         Assertions.assertTrue(oldCompositions > 0);
         Assertions.assertEquals(oldCompositions, oldArtifacts);
 
-        service.executeProcessor(ProcessorType.DV_MOVIE_IMPORTER);
+        service.executeProcessor(ProcessorType.DV_MOVIES_IMPORTER);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
 
         int newArtifacts = artifactRepository.getAllByArtifactType(ArtifactType.withDVMovies()).size();

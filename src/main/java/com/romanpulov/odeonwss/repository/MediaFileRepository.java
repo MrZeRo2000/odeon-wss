@@ -95,4 +95,12 @@ public interface MediaFileRepository extends CrudRepository<MediaFile, Long> {
             "AND mf.size = 0"
     )
     List<MediaFile> getMediaFilesWithEmptySizeByArtifactType(ArtifactType artifactType);
+
+    @Query(
+            "SELECT mf " +
+            "FROM MediaFile mf " +
+            "INNER JOIN FETCH mf.artifact AS a " +
+            "WHERE a.artifactType = :artifactType"
+    )
+    List<MediaFile> getMediaFilesByArtifactType(ArtifactType artifactType);
 }
