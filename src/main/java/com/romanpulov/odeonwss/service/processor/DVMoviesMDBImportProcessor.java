@@ -2,25 +2,27 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.healthmarketscience.jackcess.Row;
 import com.healthmarketscience.jackcess.Table;
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Composition;
-import com.romanpulov.odeonwss.entity.DVType;
+import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.CompositionRepository;
 import com.romanpulov.odeonwss.repository.DVTypeRepository;
+import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static com.romanpulov.jutilscore.io.FileUtils.getExtension;
 import static com.romanpulov.odeonwss.service.processor.MDBConst.*;
 
 @Component
 public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
     private static final int DV_MOVIE_REC_ID = 1254;
+    private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMovies();
 
     private final DVTypeRepository dvTypeRepository;
 
@@ -30,20 +32,26 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private final CompositionRepository compositionRepository;
 
+    private final MediaFileRepository mediaFileRepository;
+
     private Map<Long, DVType> dvTypeMap;
 
     private Map<Long, Artifact> artifacts;
+    private Map<String, Composition> compositions;
+    private Map<Long, MediaFile> mediaFiles;
 
     public DVMoviesMDBImportProcessor(
             DVTypeRepository dvTypeRepository,
             DVProductMDBImportProcessor dvProductMDBImportProcessor,
             ArtifactRepository artifactRepository,
-            CompositionRepository compositionRepository
+            CompositionRepository compositionRepository,
+            MediaFileRepository mediaFileRepository
     ) {
         this.dvTypeRepository = dvTypeRepository;
         this.dvProductMDBImportProcessor = dvProductMDBImportProcessor;
         this.artifactRepository = artifactRepository;
         this.compositionRepository = compositionRepository;
+        this.mediaFileRepository = mediaFileRepository;
     }
 
     @Override
@@ -51,7 +59,13 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
         if (dvTypeMap == null) {
             dvTypeMap = dvTypeRepository.findAllMap();
         }
-        artifacts = new HashMap<>();
+        artifacts = artifactRepository.findAllByArtifactTypeMigrationIdMap(ARTIFACT_TYPE);
+        compositions = compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE)
+                .stream()
+                .collect(Collectors.toMap(Composition::getTitle, v-> v));
+        mediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE)
+                        .stream()
+                        .collect(Collectors.toMap(MediaFile::getMigrationId, v ->v));
 
         dvProductMDBImportProcessor.setProgressHandler(getProgressHandler());
         dvProductMDBImportProcessor.setRootFolder(getRootFolder());
@@ -66,19 +80,15 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
         Table table = mdbReader.getTable(DVCONT_TABLE_NAME);
         AtomicInteger counter = new AtomicInteger(0);
 
-        ArtifactType artifactType =ArtifactType.withDVMovies();
-        Map<Long, Artifact> migrationArtifacts =
-                artifactRepository.findAllByArtifactTypeMigrationIdMap(artifactType);
-
         for (Row row: table) {
             if (row.getInt(REC_ID_COLUMN_NAME) == DV_MOVIE_REC_ID) {
                 long id = row.getInt(DVCONT_ID_COLUMN_NAME);
                 String artifactName = row.getString(FILE_NAME_COLUMN_NAME);
 
-                Artifact artifact = migrationArtifacts.get(id);
+                Artifact artifact = this.artifacts.get(id);
                 if (artifact == null) {
                     artifact = new Artifact();
-                    artifact.setArtifactType(artifactType);
+                    artifact.setArtifactType(ARTIFACT_TYPE);
                     artifact.setDuration(0L);
                     artifact.setTitle(artifactName);
                     artifact.setMigrationId(id);
@@ -99,19 +109,13 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
         Table table = mdbReader.getTable(DVDET_TABLE_NAME);
         AtomicInteger counter = new AtomicInteger(0);
 
-        ArtifactType artifactType = ArtifactType.withDVMovies();
-        Map<String, Composition> migrationCompositions =
-                compositionRepository.getCompositionsByArtifactType(artifactType)
-                        .stream()
-                        .collect(Collectors.toMap(Composition::getTitle, v-> v));
-
         for (Row row: table) {
             long id = row.getInt(DVDET_ID_COLUMN_NAME);
             long contId = row.getInt(DVCONT_ID_COLUMN_NAME);
 
             if (this.artifacts.containsKey(contId)) {
                 String title = row.getString(TITLE_COLUMN_NAME);
-                Composition composition = migrationCompositions.get(title);
+                Composition composition = this.compositions.get(title);
                 if (composition == null) {
                     composition = new Composition();
                     composition.setArtifact(this.artifacts.get(contId));
@@ -121,7 +125,7 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
                     composition.setMigrationId(id);
 
                     compositionRepository.save(composition);
-                    migrationCompositions.put(title, composition);
+                    this.compositions.put(title, composition);
 
                     counter.getAndIncrement();
                 }
@@ -134,6 +138,40 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
     public int importMediaFiles(MDBReader mdbReader) throws ProcessorException {
         Table table = mdbReader.getTable(DVDET_TABLE_NAME);
         AtomicInteger counter = new AtomicInteger(0);
+
+        for (Row row: table) {
+            long id = row.getInt(DVDET_ID_COLUMN_NAME);
+            long contId = row.getInt(DVCONT_ID_COLUMN_NAME);
+
+            if (this.artifacts.containsKey(contId)) {
+                String title = row.getString(TITLE_COLUMN_NAME);
+                String fileName = row.getString(FILE_NAME_COLUMN_NAME);
+                Composition composition = this.compositions.get(title);
+                if ((composition != null) && !this.mediaFiles.containsKey(id)) {
+                    MediaFile mediaFile = new MediaFile();
+                    mediaFile.setArtifact(artifacts.get(contId));
+                    mediaFile.setName(fileName);
+                    mediaFile.setFormat(getExtension(fileName.toUpperCase()));
+                    mediaFile.setSize(0L);
+                    mediaFile.setMigrationId(id);
+
+                    mediaFileRepository.save(mediaFile);
+
+                    Set<MediaFile> mediaFiles = composition.getMediaFiles();
+                    mediaFiles.add(mediaFile);
+
+                    if (mediaFiles.size() > 1) {
+                        composition.setMediaFiles(new HashSet<>());
+                        compositionRepository.save(composition);
+                    }
+
+                    composition.setMediaFiles(mediaFiles);
+                    compositionRepository.save(composition);
+
+                    counter.getAndIncrement();
+                }
+            }
+        }
 
         return counter.get();
     }
