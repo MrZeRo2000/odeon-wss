@@ -9,6 +9,7 @@ public enum ProcessorType {
     DV_MUSIC_VALIDATOR("Video music validator"),
     DV_PRODUCT_IMPORTER("Video product importer"),
     DV_MOVIES_IMPORTER("Movies importer"),
+    DV_MOVIES_MEDIA_LOADER("Movies media loader"),
     MP3_LOADER("MP3 Loader"),
     MP3_VALIDATOR("MP3 Validator"),
     LA_LOADER("LA Loader"),

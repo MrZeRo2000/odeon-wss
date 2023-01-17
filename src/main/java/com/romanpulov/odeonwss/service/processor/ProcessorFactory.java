@@ -28,6 +28,7 @@ public class ProcessorFactory {
             DVMusicValidateProcessor dvMusicValidateProcessor,
             DVProductMDBImportProcessor dvProductMDBImportProcessor,
             DVMoviesMDBImportProcessor dvMoviesMDBImportProcessor,
+            DVMoviesMediaFilesLoadProcessor dvMoviesMediaFilesLoadProcessor,
             ClassicsValidateProcessor classicsValidateProcessor,
             MP3LoadProcessor mp3LoadProcessor,
             MP3ValidateProcessor mp3ValidateProcessor,
@@ -44,6 +45,7 @@ public class ProcessorFactory {
         addProcessorMap(ProcessorType.DV_MUSIC_VALIDATOR, dvMusicValidateProcessor, AppConfiguration.PathType.PT_DV_MUSIC);
         addProcessorMap(ProcessorType.DV_PRODUCT_IMPORTER, dvProductMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
         addProcessorMap(ProcessorType.DV_MOVIES_IMPORTER, dvMoviesMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
+        addProcessorMap(ProcessorType.DV_MOVIES_MEDIA_LOADER, dvMoviesMediaFilesLoadProcessor, AppConfiguration.PathType.PT_DV_MOVIES);
         addProcessorMap(ProcessorType.MP3_LOADER, mp3LoadProcessor, AppConfiguration.PathType.PT_MP3);
         addProcessorMap(ProcessorType.MP3_VALIDATOR, mp3ValidateProcessor, AppConfiguration.PathType.PT_MP3);
         addProcessorMap(ProcessorType.LA_LOADER, laLoadProcessor, AppConfiguration.PathType.PT_LA);

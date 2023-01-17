@@ -12,7 +12,6 @@ public class DatabaseConfiguration {
     private final DatabaseConfigurationProperties databaseConfigurationProperties;
     private final AppConfiguration appConfiguration;
 
-    @Autowired
     public DatabaseConfiguration(AppConfiguration appConfiguration, DatabaseConfigurationProperties databaseConfigurationProperties) {
         this.appConfiguration = appConfiguration;
         this.databaseConfigurationProperties = databaseConfigurationProperties;

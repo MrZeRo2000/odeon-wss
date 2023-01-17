@@ -8,6 +8,7 @@ import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
 
+import javax.transaction.Transactional;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -60,11 +61,11 @@ public class AbstractDVMediaFilesLoadProcessor extends AbstractFileSystemProcess
         }
     }
 
-    private int processArtifactsPath(Path path) throws ProcessorException {
+    public int processArtifactsPath(Path path) throws ProcessorException {
         AtomicInteger counter = new AtomicInteger(0);
 
         List<MediaFile> emptyMediaFiles = mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(artifactType);
-        Map<Long, SizeDuration> artifactSizeDurationMap = new HashMap<>();
+        Map<Artifact, SizeDuration> artifactSizeDurationMap = new HashMap<>();
 
         String rootMediaPath = path.toAbsolutePath().toString();
 
@@ -74,18 +75,18 @@ public class AbstractDVMediaFilesLoadProcessor extends AbstractFileSystemProcess
             if (Files.exists(compositionPath)) {
                 try {
                     MediaFileInfo mediaFileInfo = mediaParser.parseComposition(compositionPath);
-                    MediaFile getMediaFile = mediaFileRepository.findById(emptyMediaFile.getId()).orElseThrow();
+                    //MediaFile getMediaFile = mediaFileRepository.findById(emptyMediaFile.getId()).orElseThrow();
 
-                    getMediaFile.setSize(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
-                    getMediaFile.setBitrate(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getBitRate());
-                    getMediaFile.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
+                    emptyMediaFile.setSize(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
+                    emptyMediaFile.setBitrate(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getBitRate());
+                    emptyMediaFile.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
 
-                    SizeDuration sd = artifactSizeDurationMap.getOrDefault(getMediaFile.getArtifact().getId(), new SizeDuration());
+                    SizeDuration sd = artifactSizeDurationMap.getOrDefault(emptyMediaFile.getArtifact(), new SizeDuration());
                     sd.size = sd.size + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize();
                     sd.duration = sd.duration + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration();
-                    artifactSizeDurationMap.put(getMediaFile.getArtifact().getId(), sd);
+                    artifactSizeDurationMap.put(emptyMediaFile.getArtifact(), sd);
 
-                    mediaFileRepository.save(getMediaFile);
+                    mediaFileRepository.save(emptyMediaFile);
 
                     counter.getAndIncrement();
                 } catch (MediaFileInfoException e) {
@@ -95,17 +96,20 @@ public class AbstractDVMediaFilesLoadProcessor extends AbstractFileSystemProcess
         }
 
         // update artifacts
-        for (long artifactId: artifactSizeDurationMap.keySet()) {
-            Artifact artifact = artifactRepository.findById(artifactId).orElseThrow();
-            SizeDuration sd = artifactSizeDurationMap.get(artifactId);
+        updateArtifacts(artifactSizeDurationMap);
+
+        return counter.get();
+    }
+
+    protected void updateArtifacts(Map<Artifact, SizeDuration> artifactSizeDurationMap) {
+        for (Artifact artifact: artifactSizeDurationMap.keySet()) {
+            SizeDuration sd = artifactSizeDurationMap.get(artifact);
 
             artifact.setSize(sd.size);
             artifact.setDuration(sd.duration);
 
             artifactRepository.save(artifact);
         }
-
-        return counter.get();
     }
 
 }
