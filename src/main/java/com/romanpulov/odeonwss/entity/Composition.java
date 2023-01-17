@@ -118,7 +118,7 @@ public class Composition extends AbstractBaseMigratedEntity {
         this.num = num;
     }
 
-    @ManyToMany(cascade = {CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
     @JoinTable(name = "compositions_media_files",
             joinColumns = @JoinColumn(name = "comp_id"),
             inverseJoinColumns = @JoinColumn(name = "mdfl_id")
@@ -131,6 +131,21 @@ public class Composition extends AbstractBaseMigratedEntity {
 
     public void setMediaFiles(Set<MediaFile> mediaFiles) {
         this.mediaFiles = mediaFiles;
+    }
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
+    @JoinTable(name = "compositions_dv_products",
+            joinColumns = @JoinColumn(name = "comp_id"),
+            inverseJoinColumns = @JoinColumn(name = "dvpd_id")
+    )
+    private Set<DVProduct> dvProducts = new HashSet<>();
+
+    public Set<DVProduct> getDvProducts() {
+        return dvProducts;
+    }
+
+    public void setDvProducts(Set<DVProduct> dvProducts) {
+        this.dvProducts = dvProducts;
     }
 
     @Override

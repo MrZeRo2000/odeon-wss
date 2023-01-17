@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "full.tests.disabled",
+      "type": "java.lang.Boolean"
+    }
+  ]
+}

@@ -3,17 +3,16 @@ package com.romanpulov.odeonwss.service.processor;
 import com.healthmarketscience.jackcess.Row;
 import com.healthmarketscience.jackcess.Table;
 import com.romanpulov.odeonwss.entity.*;
-import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
-import com.romanpulov.odeonwss.repository.DVTypeRepository;
-import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.*;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static com.romanpulov.jutilscore.io.FileUtils.getExtension;
@@ -21,6 +20,8 @@ import static com.romanpulov.odeonwss.service.processor.MDBConst.*;
 
 @Component
 public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
+    private static final Logger log = Logger.getLogger(DVMoviesMDBImportProcessor.class.getSimpleName());
+
     private static final int DV_MOVIE_REC_ID = 1254;
     private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMovies();
 
@@ -34,24 +35,30 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private final MediaFileRepository mediaFileRepository;
 
+    private final DVProductRepository dvProductRepository;
+
     private Map<Long, DVType> dvTypeMap;
 
     private Map<Long, Artifact> artifacts;
     private Map<String, Composition> compositions;
+    private Map<Long, Composition> contentCompositions;
     private Map<Long, MediaFile> mediaFiles;
+    private Map<Long, DVProduct> dvProducts;
 
     public DVMoviesMDBImportProcessor(
             DVTypeRepository dvTypeRepository,
             DVProductMDBImportProcessor dvProductMDBImportProcessor,
             ArtifactRepository artifactRepository,
             CompositionRepository compositionRepository,
-            MediaFileRepository mediaFileRepository
+            MediaFileRepository mediaFileRepository,
+            DVProductRepository dvProductRepository
     ) {
         this.dvTypeRepository = dvTypeRepository;
         this.dvProductMDBImportProcessor = dvProductMDBImportProcessor;
         this.artifactRepository = artifactRepository;
         this.compositionRepository = compositionRepository;
         this.mediaFileRepository = mediaFileRepository;
+        this.dvProductRepository = dvProductRepository;
     }
 
     @Override
@@ -63,6 +70,7 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
         compositions = compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE)
                 .stream()
                 .collect(Collectors.toMap(Composition::getTitle, v-> v));
+        contentCompositions = new HashMap<>();
         mediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE)
                         .stream()
                         .collect(Collectors.toMap(MediaFile::getMigrationId, v ->v));
@@ -71,8 +79,11 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
         dvProductMDBImportProcessor.setRootFolder(getRootFolder());
         dvProductMDBImportProcessor.execute();
 
+        dvProducts = dvProductRepository.findAllMigrationIdMap();
+
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_IMPORTED, importArtifacts(mdbReader));
         infoHandler(ProcessorMessages.INFO_COMPOSITIONS_IMPORTED, importCompositions(mdbReader));
+        infoHandler(ProcessorMessages.INFO_PRODUCTS_COMPOSITIONS_IMPORTED, importProductsCompositions(mdbReader));
         infoHandler(ProcessorMessages.INFO_MEDIA_FILES_IMPORTED, importMediaFiles(mdbReader));
     }
 
@@ -129,6 +140,8 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
 
                     counter.getAndIncrement();
                 }
+
+                this.contentCompositions.put(id, composition);
             }
         }
 
@@ -174,5 +187,36 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
         }
 
         return counter.get();
+    }
+
+    public int importProductsCompositions(MDBReader mdbReader) throws ProcessorException {
+        Table table = mdbReader.getTable(PRODUCT_DVDET_TABLE_NAME);
+
+        Set<Composition> savedCompositions = new HashSet<>();
+
+        for (Row row: table) {
+            long id = row.getInt(DVDET_ID_COLUMN_NAME);
+            long productId = row.getInt(VPRODUCT_ID_COLUMN_NAME);
+            log.info(String.format("Loading %s DVDetId=%d, VProductId=%d", PRODUCT_DVDET_TABLE_NAME, id, productId));
+
+            Composition composition = null;
+            if (this.contentCompositions.containsKey(id)) {
+                composition = compositionRepository.findByIdFetchProducts(this.contentCompositions.get(id).getId()).orElse(null);
+            }
+            DVProduct dvProduct = this.dvProducts.get(productId);
+
+            if (
+                    (composition != null)
+                            && (dvProduct != null)
+                            && (!savedCompositions.contains(composition))
+                            && (composition.getDvProducts().size() == 0)) {
+                composition.getDvProducts().add(dvProduct);
+                compositionRepository.save(composition);
+
+                savedCompositions.add(composition);
+            }
+        }
+
+        return savedCompositions.size();
     }
 }

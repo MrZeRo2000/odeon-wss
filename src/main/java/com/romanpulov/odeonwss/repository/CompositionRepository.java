@@ -8,6 +8,7 @@ import com.romanpulov.odeonwss.entity.Composition;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import javax.swing.text.html.Option;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public interface CompositionRepository extends CrudRepository<Composition, Long> {
+
+    @Query("SELECT c FROM Composition AS c LEFT JOIN FETCH c.dvProducts WHERE c.id = :id")
+    Optional<Composition> findByIdFetchProducts(Long id);
 
     List<Composition> findAllByArtifact(Artifact artifact);
 

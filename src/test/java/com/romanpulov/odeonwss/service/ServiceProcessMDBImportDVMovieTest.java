@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.CompositionRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
@@ -10,10 +11,11 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.DisabledIf;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-//@DisabledIf(value = "${full.tests.disabled}", loadContext = true)
+@DisabledIf(value = "${full.tests.disabled}", loadContext = true)
 public class ServiceProcessMDBImportDVMovieTest {
 
     @Autowired
@@ -60,5 +62,16 @@ public class ServiceProcessMDBImportDVMovieTest {
         Assertions.assertEquals(oldCompositions, newCompositions);
         Assertions.assertEquals(oldMediaFiles, newMediaFiles);
         Assertions.assertEquals(newCompositions, newArtifacts);
+    }
+
+    @Test
+    @Order(3)
+    void testProductsForAll() throws Exception {
+        compositionRepository.getCompositionsByArtifactType(ArtifactType.withDVMovies()).forEach(
+                c -> {
+                    Composition composition = compositionRepository.findByIdFetchProducts(c.getId()).orElseThrow();
+                    Assertions.assertEquals(1L, composition.getDvProducts().size());
+                }
+        );
     }
 }

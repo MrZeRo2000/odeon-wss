@@ -109,6 +109,17 @@ public class DVProduct extends AbstractBaseMigratedEntity {
         this.dvCategories = dvCategories;
     }
 
+    @ManyToMany(mappedBy = "dvProducts")
+    private Set<Composition> compositions = new HashSet<>();
+
+    public Set<Composition> getCompositions() {
+        return compositions;
+    }
+
+    public void setCompositions(Set<Composition> compositions) {
+        this.compositions = compositions;
+    }
+
     public DVProduct() {
     }
 

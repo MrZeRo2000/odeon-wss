@@ -9,6 +9,7 @@ public class MDBConst {
     public static final String CLASSICS_TABLE_NAME = "CLCont";
     public static final String DVCONT_TABLE_NAME = "DVCont";
     public static final String DVDET_TABLE_NAME = "DVDet";
+    public static final String PRODUCT_DVDET_TABLE_NAME = "VProductDVDet";
     public static final String CAT_TABLE_NAME = "Cat";
     public static final String PRODUCT_TABLE_NAME = "VProduct";
     public static final String PRODUCT_CAT_TABLE_NAME = "VProductCat";
