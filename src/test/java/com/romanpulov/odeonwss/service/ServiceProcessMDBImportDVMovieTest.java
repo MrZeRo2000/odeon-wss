@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
@@ -30,10 +32,13 @@ public class ServiceProcessMDBImportDVMovieTest {
     @Autowired
     MediaFileRepository mediaFileRepository;
 
+    @Autowired
+    AppConfiguration appConfiguration;
+
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
-    void testImportDVMovie() {
+    void testImportDVMovie() throws Exception {
         service.executeProcessor(ProcessorType.DV_MOVIES_IMPORTER);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
     }

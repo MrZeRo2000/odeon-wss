@@ -1,24 +1,89 @@
 package com.romanpulov.odeonwss.db;
 
 import com.romanpulov.odeonwss.config.AppConfiguration;
-import com.romanpulov.odeonwss.config.DatabaseConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.hibernate.cfg.Environment;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Logger;
 
-@Service
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 public class DbManagerService {
+    private static DbManagerService INSTANCE;
+
+    public static DbManagerService getInstance(AppConfiguration appConfiguration) {
+        if (INSTANCE == null) {
+            INSTANCE = new DbManagerService(appConfiguration);
+        }
+
+        return INSTANCE;
+    }
+
+    private static final String PROJECT_NAME;
+
+    static {
+        String[] location = DbManagerService.class
+                .getProtectionDomain()
+                .getCodeSource()
+                .getLocation()
+                .toString()
+                .split("/");
+        if (location.length > 5) {
+            PROJECT_NAME = location[5];
+        } else {
+            PROJECT_NAME = "DEFAULT";
+        }
+    }
+
+    private static final String DB_STORAGE_PATH = "%s/" + PROJECT_NAME + "/db/%s";
+
     private static final Logger log = Logger.getLogger(DbManagerService.class.getSimpleName());
 
     public enum DbType {
-        DB_MOVIES
+        DB_MOVIES("movies");
+
+        public final String fileName;
+
+        private DbType(String fileName) {
+            this.fileName = fileName;
+        }
     }
 
-    @Autowired
-    DatabaseConfiguration databaseConfiguration;
+    private final String dbPath;
 
-    public void saveDb(DbType dbType) {
+    public String getDbPath() {
+        return dbPath;
+    }
 
+    public String getStorageFileName(DbType dbType) {
+        return this.storageDbFolder + dbType.fileName;
+    }
+
+    private final String storageDbFolder;
+
+    private DbManagerService(AppConfiguration appConfiguration) {
+        this.dbPath = appConfiguration.getDbUrl().split(":")[2];
+        this.storageDbFolder = Environment.getProperties().get("java.io.tmpdir").toString() +
+                PROJECT_NAME +
+                "-db" +
+                File.separator;
+    }
+
+    public void saveDb(DbType dbType) throws IOException {
+        Files.createDirectories(Paths.get(this.storageDbFolder));
+        Files.copy(Paths.get(this.dbPath), Paths.get(getStorageFileName(dbType)), REPLACE_EXISTING);
+    }
+
+    public boolean loadDb(DbType dbType) throws IOException {
+        Path sourcePath = Paths.get(getStorageFileName(dbType));
+        boolean sourceExists = Files.exists(sourcePath);
+        if (sourceExists) {
+            Files.copy(Paths.get(getStorageFileName(dbType)), Paths.get(this.dbPath), REPLACE_EXISTING);
+        }
+        return sourceExists;
     }
 }

@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.MediaFile;
@@ -34,18 +36,29 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
 
     @PersistenceContext
     EntityManager em;
+
     @Autowired
     private ArtifactRepository artifactRepository;
+
+    @Autowired
+    private AppConfiguration appConfiguration;
 
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
-    void testPrepare() {
-        service.executeProcessor(ProcessorType.DV_MOVIES_IMPORTER);
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
-        log.info("Movies Importer Processing info: " + service.getProcessInfo());
+    void testPrepare() throws Exception {
 
+        DbManagerService dbManagerService = DbManagerService.getInstance(appConfiguration);
+        final DbManagerService.DbType dbType = DbManagerService.DbType.DB_MOVIES;
+
+        if (!dbManagerService.loadDb(dbType)) {
+            service.executeProcessor(ProcessorType.DV_MOVIES_IMPORTER);
+            Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+            log.info("Movies Importer Processing info: " + service.getProcessInfo());
+
+            dbManagerService.saveDb(dbType);
+        }
     }
 
     @Test
