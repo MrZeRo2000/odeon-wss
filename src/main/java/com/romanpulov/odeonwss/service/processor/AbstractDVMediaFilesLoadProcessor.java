@@ -2,8 +2,10 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.CompositionRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
@@ -20,10 +22,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.ERROR_PARSING_FILE;
 import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.INFO_MEDIA_FILES_LOADED;
 
-public class AbstractDVMediaFilesLoadProcessor extends AbstractFileSystemProcessor {
+public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSystemProcessor {
     private final ArtifactType artifactType;
 
     private final ArtifactRepository artifactRepository;
+
+    private final CompositionRepository compositionRepository;
 
     private final MediaFileRepository mediaFileRepository;
 
@@ -32,11 +36,13 @@ public class AbstractDVMediaFilesLoadProcessor extends AbstractFileSystemProcess
     public AbstractDVMediaFilesLoadProcessor(
             ArtifactType artifactType,
             ArtifactRepository artifactRepository,
+            CompositionRepository compositionRepository,
             MediaFileRepository mediaFileRepository,
             MediaParser mediaParser
     ) {
         this.artifactType = artifactType;
         this.artifactRepository = artifactRepository;
+        this.compositionRepository = compositionRepository;
         this.mediaFileRepository = mediaFileRepository;
         this.mediaParser = mediaParser;
     }
@@ -48,7 +54,7 @@ public class AbstractDVMediaFilesLoadProcessor extends AbstractFileSystemProcess
         infoHandler(INFO_MEDIA_FILES_LOADED, processArtifactsPath(path));
     }
 
-    private static class SizeDuration {
+    static class SizeDuration {
         long size;
         long duration;
 
@@ -95,13 +101,14 @@ public class AbstractDVMediaFilesLoadProcessor extends AbstractFileSystemProcess
             }
         }
 
-        // update artifacts
-        updateArtifacts(artifactSizeDurationMap);
+        processArtifactSizeDuration(artifactSizeDurationMap);
 
         return counter.get();
     }
 
-    protected void updateArtifacts(Map<Artifact, SizeDuration> artifactSizeDurationMap) {
+    protected abstract void processArtifactSizeDuration(Map<Artifact, SizeDuration> artifactSizeDurationMap);
+
+    protected void updateArtifactsDuration(Map<Artifact, SizeDuration> artifactSizeDurationMap) {
         for (Artifact artifact: artifactSizeDurationMap.keySet()) {
             SizeDuration sd = artifactSizeDurationMap.get(artifact);
 
@@ -112,4 +119,16 @@ public class AbstractDVMediaFilesLoadProcessor extends AbstractFileSystemProcess
         }
     }
 
+    protected void updateCompositionsDuration(Map<Artifact, SizeDuration> artifactSizeDurationMap) {
+        artifactSizeDurationMap.keySet().forEach(artifact -> {
+            List<Composition> compositions =
+                    artifactRepository.getByIdsWithCompositions(artifact.getId()).orElseThrow().getCompositions();
+            if (compositions.size() == 1) {
+                Composition composition = compositions.get(0);
+                composition.setDuration(artifact.getDuration());
+
+                compositionRepository.save(composition);
+            }
+        });
+    }
 }

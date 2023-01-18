@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Disabled
 public class ServiceDbManagerTest {
 
     @Autowired

@@ -44,7 +44,8 @@ public class DbManagerService {
     private static final Logger log = Logger.getLogger(DbManagerService.class.getSimpleName());
 
     public enum DbType {
-        DB_MOVIES("movies");
+        DB_MOVIES("movies"),
+        DB_ARTISTS_DV_MUSIC("artists_dv_music");
 
         public final String fileName;
 

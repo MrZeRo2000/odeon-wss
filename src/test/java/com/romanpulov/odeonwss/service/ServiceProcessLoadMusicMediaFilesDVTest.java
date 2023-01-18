@@ -1,8 +1,12 @@
 package com.romanpulov.odeonwss.service;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.db.DbManagerService;
+import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
@@ -13,6 +17,9 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.DisabledIf;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -27,13 +34,15 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
     ProcessService service;
 
     @Autowired
+    ArtifactRepository artifactRepository;
+
+    @Autowired
     MediaFileRepository mediaFileRepository;
 
-    @Test
-    @Order(1)
-    @Sql({"/schema.sql", "/data.sql"})
-    @Rollback(false)
-    void testPrepare() {
+    @Autowired
+    AppConfiguration appConfiguration;
+
+    void prepare() {
         service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
         log.info("Artist Importer Processing info: " + service.getProcessInfo());
@@ -44,9 +53,26 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
     }
 
     @Test
+    @Order(1)
+    @Sql({"/schema.sql", "/data.sql"})
+    @Rollback(false)
+    void testPrepare() throws Exception {
+        DbManagerService dbManagerService = DbManagerService.getInstance(appConfiguration);
+
+        try {
+            if (!dbManagerService.loadDb(DbManagerService.DbType.DB_ARTISTS_DV_MUSIC)) {
+                prepare();
+                dbManagerService.saveDb(DbManagerService.DbType.DB_ARTISTS_DV_MUSIC);
+            }
+        } catch (IOException e) {
+            prepare();
+        }
+    }
+
+    @Test
     @Order(2)
     @Rollback(false)
-    void testLoadMediaFiles() throws Exception {
+    void testLoadMediaFiles() {
         int oldCount =  mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(ArtifactType.withDVMusic()).size();
 
         service.executeProcessor(ProcessorType.DV_MUSIC_MEDIA_LOADER);
@@ -60,7 +86,8 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
 
     @Test
     @Order(2)
-    void testGetEmptyMediaFiles() throws Exception {
+    @Rollback(false)
+    void testGetEmptyMediaFiles() {
         List<MediaFile> mediaFiles = mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(ArtifactType.withDVMusic());
         log.info("Artifacts:" + mediaFiles.stream().map(v -> v.getArtifact().getTitle()).collect(Collectors.toList()));
         for (MediaFile mediaFile: mediaFiles) {
@@ -68,5 +95,21 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
             log.info("Artifact title:" + mediaFile.getArtifact().getTitle());
             log.info("MediaFile:" + getMediaFile);
         }
+    }
+
+    @Test
+    @Order(3)
+    @Rollback(false)
+    void testEmptyArtifacts() {
+        List<Artifact> artifacts = artifactRepository.getAllByArtifactType(ArtifactType.withDVMusic());
+        Assertions.assertTrue(artifacts.size() > 0);
+
+        List<Artifact> emptyDurationArtifacts = artifacts
+                .stream()
+                .filter(a -> a.getDuration() == null || a.getDuration() == 0)
+                .collect(Collectors.toList());
+        Assertions.assertTrue(emptyDurationArtifacts.size() > 0);
+
+        Assertions.assertTrue(emptyDurationArtifacts.size() < artifacts.size());
     }
 }

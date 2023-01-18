@@ -19,6 +19,12 @@ import java.util.stream.Collectors;
 public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifact, Long> {
     List<Artifact> getAllByArtifactType(ArtifactType artifactType);
 
+    @Query("SELECT a FROM Artifact a LEFT JOIN FETCH a.compositions WHERE a.artifactType = :artifactType")
+    List<Artifact> getAllByArtifactTypeWithCompositions(ArtifactType artifactType);
+
+    @Query("SELECT a FROM Artifact a LEFT JOIN FETCH a.compositions WHERE a.id = :id")
+    Optional<Artifact> getByIdsWithCompositions(Long id);
+
     default Map<Long, Artifact> findAllByArtifactTypeMigrationIdMap(ArtifactType artifactType) {
         return getAllByArtifactType(artifactType)
                 .stream()
