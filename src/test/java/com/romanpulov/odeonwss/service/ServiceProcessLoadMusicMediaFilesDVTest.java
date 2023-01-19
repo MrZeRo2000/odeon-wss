@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.service;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.Artifact;
@@ -17,8 +16,6 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.DisabledIf;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
