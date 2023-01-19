@@ -19,12 +19,9 @@ import org.springframework.test.context.junit.jupiter.DisabledIf;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import static com.fasterxml.jackson.databind.type.LogicalType.Collection;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -47,29 +44,16 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
     @Autowired
     private AppConfiguration appConfiguration;
 
-    void prepare() {
-        service.executeProcessor(ProcessorType.DV_MOVIES_IMPORTER);
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
-        log.info("Movies Importer Processing info: " + service.getProcessInfo());
-    }
-
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
     void testPrepare() throws Exception {
-        DbManagerService dbManagerService = DbManagerService.getInstance(appConfiguration);
-        final DbManagerService.DbType dbType = DbManagerService.DbType.DB_MOVIES;
-
-        try {
-            if (!dbManagerService.loadDb(dbType)) {
-                prepare();
-
-                dbManagerService.saveDb(dbType);
-            }
-        } catch (IOException e) {
-            prepare();
-        }
+        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_MOVIES, () -> {
+            service.executeProcessor(ProcessorType.DV_MOVIES_IMPORTER);
+            Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+            log.info("Movies Importer Processing info: " + service.getProcessInfo());
+        });
     }
 
     @Test

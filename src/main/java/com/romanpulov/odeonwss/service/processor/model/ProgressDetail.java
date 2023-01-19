@@ -23,6 +23,12 @@ public class ProgressDetail {
         return status;
     }
 
+    private final Integer rows;
+
+    public Integer getRows() {
+        return rows;
+    }
+
     private final ProcessingAction processingAction;
 
     public ProcessingAction getProcessingAction() {
@@ -30,13 +36,14 @@ public class ProgressDetail {
     }
 
     public ProgressDetail(String info, ProcessingStatus status) {
-        this(info, status, null);
+        this(info, status, null, null);
     }
 
-    public ProgressDetail(String info, ProcessingStatus status, ProcessingAction processingAction) {
+    public ProgressDetail(String info, ProcessingStatus status, Integer rows, ProcessingAction processingAction) {
         this.time = LocalDateTime.now();
         this.info = info;
         this.status = status;
+        this.rows = rows;
         this.processingAction = processingAction;
     }
 
@@ -46,6 +53,10 @@ public class ProgressDetail {
 
     public static ProgressDetail fromInfoMessage(String errorMessage) {
         return new ProgressDetail(errorMessage, ProcessingStatus.INFO);
+    }
+
+    public static ProgressDetail fromInfoMessage(String errorMessage, int rows) {
+        return new ProgressDetail(errorMessage, ProcessingStatus.INFO, rows, null);
     }
 
     public static ProgressDetail fromInfoMessage(String errorMessage, Object ...args) {
@@ -69,7 +80,7 @@ public class ProgressDetail {
     }
 
     public static ProgressDetail fromWarningMessageWithAction(String warningMessage, ProcessingActionType processingActionType, String actionValue) {
-        return new ProgressDetail(warningMessage, ProcessingStatus.WARNING, new ProcessingAction(processingActionType, actionValue));
+        return new ProgressDetail(warningMessage, ProcessingStatus.WARNING, null, new ProcessingAction(processingActionType, actionValue));
     }
 
     public static ProcessingStatus getFinalProcessingStatus(List<ProgressDetail> progressDetails) {
@@ -92,6 +103,7 @@ public class ProgressDetail {
         return "ProgressDetail{" +
                 "time=" + time +
                 ", info='" + info + '\'' +
+                ", rows=" + rows +
                 ", status=" + status +
                 ", processingAction=" + processingAction +
                 '}';

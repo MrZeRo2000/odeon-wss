@@ -13,7 +13,8 @@ public enum ProcessorType {
     MP3_LOADER("MP3 Loader"),
     MP3_VALIDATOR("MP3 Validator"),
     LA_LOADER("LA Loader"),
-    LA_VALIDATOR("LA Validator");
+    LA_VALIDATOR("LA Validator"),
+    DV_MOVIES_LOADER("Movies Loader"),;
 
     public final String label;
 

@@ -45,6 +45,7 @@ public class DbManagerService {
 
     public enum DbType {
         DB_MOVIES("movies"),
+        DB_PRODUCTS("products"),
         DB_ARTISTS_DV_MUSIC("artists_dv_music");
 
         public final String fileName;
@@ -86,5 +87,20 @@ public class DbManagerService {
             Files.copy(Paths.get(getStorageFileName(dbType)), Paths.get(this.dbPath), REPLACE_EXISTING);
         }
         return sourceExists;
+    }
+
+    public static void loadOrPrepare(AppConfiguration appConfiguration, DbType dbType, Preparable preparable) {
+        DbManagerService dbManagerService = getInstance(appConfiguration);
+        try {
+            if (!dbManagerService.loadDb(dbType)) {
+                preparable.prepare();
+                dbManagerService.saveDb(dbType);
+            }
+        } catch (IOException e) {
+            preparable.prepare();
+            try {
+                dbManagerService.saveDb(dbType);
+            } catch (IOException ignored) {}
+        }
     }
 }

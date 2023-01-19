@@ -16,7 +16,6 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.DisabledIf;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -39,31 +38,20 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
     @Autowired
     AppConfiguration appConfiguration;
 
-    void prepare() {
-        service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
-        log.info("Artist Importer Processing info: " + service.getProcessInfo());
-
-        service.executeProcessor(ProcessorType.DV_MUSIC_IMPORTER);
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
-        log.info("DV Music Importer Processing info: " + service.getProcessInfo());
-    }
-
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
-    void testPrepare() throws Exception {
-        DbManagerService dbManagerService = DbManagerService.getInstance(appConfiguration);
+    void testPrepare() {
+        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC, () -> {
+            service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
+            Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+            log.info("Artist Importer Processing info: " + service.getProcessInfo());
 
-        try {
-            if (!dbManagerService.loadDb(DbManagerService.DbType.DB_ARTISTS_DV_MUSIC)) {
-                prepare();
-                dbManagerService.saveDb(DbManagerService.DbType.DB_ARTISTS_DV_MUSIC);
-            }
-        } catch (IOException e) {
-            prepare();
-        }
+            service.executeProcessor(ProcessorType.DV_MUSIC_IMPORTER);
+            Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+            log.info("DV Music Importer Processing info: " + service.getProcessInfo());
+        });
     }
 
     @Test

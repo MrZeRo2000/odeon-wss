@@ -33,7 +33,8 @@ public class ProcessorFactory {
             MP3LoadProcessor mp3LoadProcessor,
             MP3ValidateProcessor mp3ValidateProcessor,
             LALoadProcessor laLoadProcessor,
-            LAValidateProcessor laValidateProcessor)
+            LAValidateProcessor laValidateProcessor,
+            DVMoviesLoadProcessor dvMoviesLoadProcessor)
     {
         this.appConfiguration = appConfiguration;
 
@@ -50,6 +51,7 @@ public class ProcessorFactory {
         addProcessorMap(ProcessorType.MP3_VALIDATOR, mp3ValidateProcessor, AppConfiguration.PathType.PT_MP3);
         addProcessorMap(ProcessorType.LA_LOADER, laLoadProcessor, AppConfiguration.PathType.PT_LA);
         addProcessorMap(ProcessorType.LA_VALIDATOR, laValidateProcessor, AppConfiguration.PathType.PT_LA);
+        addProcessorMap(ProcessorType.DV_MOVIES_LOADER, dvMoviesLoadProcessor, AppConfiguration.PathType.PT_DV_MOVIES);
     }
 
     public AbstractProcessor fromProcessorType(ProcessorType processorType, ProgressHandler handler) {

@@ -26,12 +26,12 @@ public abstract class AbstractProcessor {
 
     abstract public void execute() throws ProcessorException;
 
-    protected void infoHandler(String errorMessage) {
-        progressHandler.handleProgress(ProgressDetail.fromInfoMessage(errorMessage));
+    protected void infoHandler(String infoMessage) {
+        progressHandler.handleProgress(ProgressDetail.fromInfoMessage(infoMessage));
     }
 
-    protected void infoHandler(String errorMessage, Object ...args) {
-        progressHandler.handleProgress(ProgressDetail.fromInfoMessage(errorMessage, args));
+    protected void infoHandler(String infoMessage, int rows) {
+        progressHandler.handleProgress(ProgressDetail.fromInfoMessage(infoMessage, rows));
     }
 
     protected void errorHandler(String errorMessage) {
