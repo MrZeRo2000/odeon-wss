@@ -6,6 +6,7 @@ import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
+import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -5,6 +5,8 @@ import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.service.CompositionService;
+import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
+import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
 import org.springframework.stereotype.Component;
 

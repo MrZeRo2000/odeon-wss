@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.unit;
 
 
-import com.romanpulov.odeonwss.service.processor.NamesParser;
+import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

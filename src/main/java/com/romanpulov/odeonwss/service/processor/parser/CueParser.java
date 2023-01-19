@@ -1,4 +1,4 @@
-package com.romanpulov.odeonwss.service.processor;
+package com.romanpulov.odeonwss.service.processor.parser;
 
 import java.io.IOException;
 import java.nio.file.Files;

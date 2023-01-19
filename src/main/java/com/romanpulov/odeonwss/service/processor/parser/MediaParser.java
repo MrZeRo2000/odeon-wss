@@ -1,5 +1,6 @@
-package com.romanpulov.odeonwss.service.processor;
+package com.romanpulov.odeonwss.service.processor.parser;
 
+import com.romanpulov.odeonwss.service.processor.ProcessorException;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
 import com.romanpulov.odeonwss.utils.media.MediaFileParserInterface;
@@ -12,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+
+import static com.romanpulov.odeonwss.service.processor.parser.ParserMessages.*;
 
 @Component
 public class MediaParser {
@@ -63,7 +66,7 @@ public class MediaParser {
                 result.put(futureData.getFirst(), futureData.getSecond());
             }
         } catch (ExecutionException | InterruptedException e) {
-            throw new ProcessorException(ProcessorMessages.ERROR_PARSING_FILE, e.getMessage());
+            throw new ProcessorException(ERROR_PARSING_FILE, e.getMessage());
         }
 
         return result;

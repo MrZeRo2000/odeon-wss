@@ -1,6 +1,6 @@
 package com.romanpulov.odeonwss.dto;
 
-import com.romanpulov.odeonwss.service.processor.NamesParser;
+import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 
 import java.util.List;
 import java.util.Objects;

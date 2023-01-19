@@ -7,10 +7,10 @@ import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.CompositionRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
 
-import javax.transaction.Transactional;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;

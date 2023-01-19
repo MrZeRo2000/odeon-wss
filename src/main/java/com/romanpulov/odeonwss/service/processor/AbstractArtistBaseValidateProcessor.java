@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
+import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 
 import java.io.IOException;
 import java.nio.file.Files;

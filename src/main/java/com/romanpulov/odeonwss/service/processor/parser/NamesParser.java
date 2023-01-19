@@ -1,4 +1,4 @@
-package com.romanpulov.odeonwss.service.processor;
+package com.romanpulov.odeonwss.service.processor.parser;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
