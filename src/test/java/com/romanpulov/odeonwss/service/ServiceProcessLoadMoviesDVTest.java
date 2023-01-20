@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.service;
 import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.CompositionRepository;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
@@ -80,6 +81,11 @@ public class ServiceProcessLoadMoviesDVTest {
                 new ProgressDetail("Compositions loaded", ProcessingStatus.INFO, 3, null),
                 processService.getProcessInfo().getProgressDetails().get(2)
         );
+
+        compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE).forEach(c -> {
+            Composition composition = compositionRepository.findByIdFetchProducts(c.getId()).orElseThrow();
+            Assertions.assertEquals(1, composition.getDvProducts().size());
+        });
     }
 
     @Test
@@ -104,5 +110,9 @@ public class ServiceProcessLoadMoviesDVTest {
                 new ProgressDetail("Compositions loaded", ProcessingStatus.INFO, 0, null),
                 processService.getProcessInfo().getProgressDetails().get(2)
         );
+        compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE).forEach(c -> {
+            Composition composition = compositionRepository.findByIdFetchProducts(c.getId()).orElseThrow();
+            Assertions.assertEquals(1, composition.getDvProducts().size());
+        });
     }
 }

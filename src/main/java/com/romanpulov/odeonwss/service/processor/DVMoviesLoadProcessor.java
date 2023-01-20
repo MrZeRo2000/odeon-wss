@@ -4,10 +4,7 @@ import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.entity.DVType;
-import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
-import com.romanpulov.odeonwss.repository.DVTypeRepository;
-import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -18,6 +15,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,16 +32,19 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
     private final MediaFileRepository mediaFileRepository;
 
     private final DVTypeRepository dvTypeRepository;
+    private final DVProductRepository dVProductRepository;
 
     public DVMoviesLoadProcessor(
             ArtifactRepository artifactRepository,
             CompositionRepository compositionRepository,
             MediaFileRepository mediaFileRepository,
-            DVTypeRepository dvTypeRepository) {
+            DVTypeRepository dvTypeRepository,
+            DVProductRepository dVProductRepository) {
         this.artifactRepository = artifactRepository;
         this.compositionRepository = compositionRepository;
         this.mediaFileRepository = mediaFileRepository;
         this.dvTypeRepository = dvTypeRepository;
+        this.dVProductRepository = dVProductRepository;
     }
 
     @Override
@@ -52,6 +53,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
 
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED, processArtifactsPath(path));
         infoHandler(ProcessorMessages.INFO_COMPOSITIONS_LOADED, processCompositions());
+        infoHandler(ProcessorMessages.INFO_MEDIA_FILES_LOADED, processMediaFiles(path));
     }
 
     private int processArtifactsPath(Path path) throws ProcessorException {
@@ -109,6 +111,9 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
                     composition.setDvType(dvType);
                     composition.setTitle(artifact.getTitle());
                     composition.setDuration(artifact.getDuration());
+                    dVProductRepository.getFirstByTitle(composition.getTitle()).ifPresent(p -> {
+                        composition.setDvProducts(Set.of(p));
+                    });
 
                     compositionRepository.save(composition);
 
@@ -117,6 +122,15 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
 
                     counter.getAndIncrement();
                 });
+
+        return counter.get();
+    }
+
+    private int processMediaFiles(Path path) {
+        AtomicInteger counter = new AtomicInteger(0);
+
+        //artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE).f
+        //compositionRepository.g
 
         return counter.get();
     }
