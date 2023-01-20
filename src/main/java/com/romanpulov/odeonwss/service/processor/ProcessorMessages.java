@@ -41,6 +41,7 @@ public class ProcessorMessages {
     static final String ERROR_COMPOSITIONS_NOT_IN_FILES = "Compositions not in files: %s";
     static final String ERROR_COMPOSITIONS_NOT_FOUND_FOR_ARTIFACT = "Compositions not found for artifact: %s";
     static final String INFO_COMPOSITIONS_VALIDATED = "Compositions validated";
+    static final String INFO_COMPOSITIONS_LOADED = "Compositions loaded";
 
     static final String ERROR_MEDIA_FILES_NOT_IN_DB = "Media files not in database: %s";
     static final String ERROR_MEDIA_FILES_NOT_IN_FILES = "Media files not in files: %s";
