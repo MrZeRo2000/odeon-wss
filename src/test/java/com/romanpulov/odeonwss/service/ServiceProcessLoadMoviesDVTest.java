@@ -67,5 +67,9 @@ public class ServiceProcessLoadMoviesDVTest {
         log.info("Movies Loader Processing info: " + processService.getProcessInfo());
 
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
+        Assertions.assertEquals(
+                new ProgressDetail("Artifacts loaded", ProcessingStatus.INFO, 3, null),
+                processService.getProcessInfo().getProgressDetails().get(1)
+        );
     }
 }

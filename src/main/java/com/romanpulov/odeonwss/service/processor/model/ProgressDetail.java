@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.service.processor.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ProgressDetail {
@@ -96,6 +97,19 @@ public class ProgressDetail {
 
     public static ProgressDetail createFinalProgressDetail(List<ProgressDetail> progressDetails) {
         return new ProgressDetail("Task status", getFinalProcessingStatus(progressDetails));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProgressDetail that = (ProgressDetail) o;
+        return info.equals(that.info) && status == that.status && Objects.equals(rows, that.rows) && Objects.equals(processingAction, that.processingAction);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(info, status, rows, processingAction);
     }
 
     @Override
