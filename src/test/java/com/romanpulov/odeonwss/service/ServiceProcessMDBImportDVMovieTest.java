@@ -1,7 +1,6 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.config.AppConfiguration;
-import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
@@ -74,7 +73,7 @@ public class ServiceProcessMDBImportDVMovieTest {
     void testProductsForAll() throws Exception {
         compositionRepository.getCompositionsByArtifactType(ArtifactType.withDVMovies()).forEach(
                 c -> {
-                    Composition composition = compositionRepository.findByIdFetchProducts(c.getId()).orElseThrow();
+                    Composition composition = compositionRepository.findByIdWithProducts(c.getId()).orElseThrow();
                     Assertions.assertEquals(1L, composition.getDvProducts().size());
                 }
         );

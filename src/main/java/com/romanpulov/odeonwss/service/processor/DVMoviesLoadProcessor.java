@@ -1,10 +1,11 @@
 package com.romanpulov.odeonwss.service.processor;
 
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Composition;
-import com.romanpulov.odeonwss.entity.DVType;
+import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.*;
+import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
+import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
+import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -12,13 +13,13 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.ERROR_PARSING_FILE;
 
 @Component
 public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
@@ -32,19 +33,25 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
     private final MediaFileRepository mediaFileRepository;
 
     private final DVTypeRepository dvTypeRepository;
+
     private final DVProductRepository dVProductRepository;
+
+    private final MediaParser mediaParser;
 
     public DVMoviesLoadProcessor(
             ArtifactRepository artifactRepository,
             CompositionRepository compositionRepository,
             MediaFileRepository mediaFileRepository,
             DVTypeRepository dvTypeRepository,
-            DVProductRepository dVProductRepository) {
+            DVProductRepository dVProductRepository,
+            MediaParser mediaParser)
+    {
         this.artifactRepository = artifactRepository;
         this.compositionRepository = compositionRepository;
         this.mediaFileRepository = mediaFileRepository;
         this.dvTypeRepository = dvTypeRepository;
         this.dVProductRepository = dVProductRepository;
+        this.mediaParser = mediaParser;
     }
 
     @Override
@@ -68,31 +75,24 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
                 .stream()
                 .collect(Collectors.toMap(Artifact::getTitle, v -> v));
 
-        List<String> artifactNames = new ArrayList<>();
-
-        try (Stream<Path> stream = Files.list(path)) {
-            for (Path p: stream.collect(Collectors.toList())) {
-                if (!Files.isDirectory(p)) {
-                    errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, path.getFileName());
-                    return counter.get();
-                }
-
-                artifactNames.add(p.getFileName().toString());
-            }
-        } catch (IOException e) {
-            throw new ProcessorException(ProcessorMessages.ERROR_PROCESSING_FILES, e.getMessage());
+        List<Path> artifactFiles = new ArrayList<>();
+        if (!PathReader.readPathFoldersOnly(this, path, artifactFiles)) {
+            return counter.get();
         }
 
-        artifactNames.forEach(artifactName -> {
-            if (!artifacts.containsKey(artifactName)) {
-                Artifact artifact = new Artifact();
-                artifact.setArtifactType(ArtifactType.withDVMovies());
-                artifact.setTitle(artifactName);
-                artifact.setDuration(0L);
+        artifactFiles
+                .stream()
+                .map(f -> f.getFileName().toString())
+                .forEach(artifactName -> {
+                    if (!artifacts.containsKey(artifactName)) {
+                        Artifact artifact = new Artifact();
+                        artifact.setArtifactType(ArtifactType.withDVMovies());
+                        artifact.setTitle(artifactName);
+                        artifact.setDuration(0L);
 
-                artifactRepository.save(artifact);
-                counter.getAndIncrement();
-            }
+                        artifactRepository.save(artifact);
+                        counter.getAndIncrement();
+                    }
         });
 
         return counter.get();
@@ -126,10 +126,54 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
         return counter.get();
     }
 
-    private int processMediaFiles(Path path) {
+    private int processMediaFiles(Path path) throws ProcessorException {
         AtomicInteger counter = new AtomicInteger(0);
 
-        //artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE).f
+        for (Artifact a: artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)) {
+            Path mediaFilesRootPath = Paths.get(path.toAbsolutePath().toString(), a.getTitle());
+
+            List<Path> mediaFilesPaths = new ArrayList<>();
+            if (!PathReader.readPathFilesOnly(this, mediaFilesRootPath, mediaFilesPaths)) {
+                return counter.get();
+            }
+
+            Set<MediaFile> mediaFiles = new HashSet<>();
+            for (Path mediaFilePath: mediaFilesPaths) {
+                String fileName = mediaFilePath.getFileName().toString();
+                MediaFile mediaFile = null;
+
+                if (mediaFileRepository.findFirstByArtifactAndName(a, fileName).isEmpty()) {
+                    try {
+                        MediaFileInfo mediaFileInfo = mediaParser.parseComposition(mediaFilePath);
+
+                        mediaFile = MediaFileMapper.fromMediaFileInfo(mediaFileInfo);
+                        mediaFile.setArtifact(a);
+                        mediaFile.setName(fileName);
+
+                        mediaFileRepository.save(mediaFile);
+                        counter.getAndIncrement();
+
+                    } catch (MediaFileInfoException e) {
+                        errorHandler(ERROR_PARSING_FILE, mediaFilePath.toAbsolutePath().toString());
+                    }
+                } else {
+                    mediaFile = mediaFileRepository.findFirstByArtifactAndName(a, fileName).get();
+                }
+                if (mediaFile != null) {
+                    mediaFiles.add(mediaFile);
+                }
+            }
+
+            if (a.getCompositions().size() == 1) {
+                Composition composition = compositionRepository
+                        .findByIdWithMediaFiles(a.getCompositions().get(0).getId()).orElseThrow();
+                if (!composition.getMediaFiles().equals(mediaFiles)) {
+                    composition.setMediaFiles(mediaFiles);
+                    compositionRepository.save(composition);
+                }
+            }
+        }
+
         //compositionRepository.g
 
         return counter.get();

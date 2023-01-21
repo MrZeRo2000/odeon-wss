@@ -16,7 +16,6 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.DisabledIf;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 import static com.romanpulov.odeonwss.db.DbManagerService.DbType.DB_PRODUCTS;
@@ -83,7 +82,7 @@ public class ServiceProcessLoadMoviesDVTest {
         );
 
         compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE).forEach(c -> {
-            Composition composition = compositionRepository.findByIdFetchProducts(c.getId()).orElseThrow();
+            Composition composition = compositionRepository.findByIdWithProducts(c.getId()).orElseThrow();
             Assertions.assertEquals(1, composition.getDvProducts().size());
         });
     }
@@ -111,7 +110,7 @@ public class ServiceProcessLoadMoviesDVTest {
                 processService.getProcessInfo().getProgressDetails().get(2)
         );
         compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE).forEach(c -> {
-            Composition composition = compositionRepository.findByIdFetchProducts(c.getId()).orElseThrow();
+            Composition composition = compositionRepository.findByIdWithProducts(c.getId()).orElseThrow();
             Assertions.assertEquals(1, composition.getDvProducts().size());
         });
     }

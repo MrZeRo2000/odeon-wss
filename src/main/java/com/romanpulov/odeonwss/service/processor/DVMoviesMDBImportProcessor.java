@@ -6,7 +6,6 @@ import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
 import org.springframework.stereotype.Component;
 
-import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -201,7 +200,7 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
 
             Composition composition = null;
             if (this.contentCompositions.containsKey(id)) {
-                composition = compositionRepository.findByIdFetchProducts(this.contentCompositions.get(id).getId()).orElse(null);
+                composition = compositionRepository.findByIdWithProducts(this.contentCompositions.get(id).getId()).orElse(null);
             }
             DVProduct dvProduct = this.dvProducts.get(productId);
 
