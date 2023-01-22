@@ -2,11 +2,13 @@ package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
+import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.CompositionRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.service.processor.ValueValidator;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 import com.romanpulov.odeonwss.service.processor.model.ProgressDetail;
@@ -18,6 +20,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.DisabledIf;
 
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static com.romanpulov.odeonwss.db.DbManagerService.DbType.DB_PRODUCTS;
 
@@ -138,5 +141,22 @@ public class ServiceProcessLoadMoviesDVTest {
 
         int newMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE).size();
         Assertions.assertEquals(oldMediaFiles, newMediaFiles);
+    }
+
+    @Test
+    @Order(5)
+    @Rollback(value = true)
+    void testSizeDuration() {
+        artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)
+                .forEach(artifact -> {
+                    Assertions.assertFalse(ValueValidator.isEmpty(artifact.getSize()));
+                    Assertions.assertFalse(ValueValidator.isEmpty(artifact.getDuration()));
+
+                    Assertions.assertEquals(artifact.getDuration(), artifact.getCompositions().get(0).getDuration());
+                });
+        compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE)
+                .forEach(composition -> {
+                    Assertions.assertFalse(ValueValidator.isEmpty(composition.getDuration()));
+                });
     }
 }

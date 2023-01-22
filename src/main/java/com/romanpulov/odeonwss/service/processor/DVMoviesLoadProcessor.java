@@ -10,14 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.ERROR_PARSING_FILE;
 
@@ -111,9 +109,8 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
                     composition.setDvType(dvType);
                     composition.setTitle(artifact.getTitle());
                     composition.setDuration(artifact.getDuration());
-                    dVProductRepository.getFirstByTitle(composition.getTitle()).ifPresent(p -> {
-                        composition.setDvProducts(Set.of(p));
-                    });
+                    dVProductRepository.getFirstByTitle(composition.getTitle())
+                            .ifPresent(p -> composition.setDvProducts(Set.of(p)));
 
                     compositionRepository.save(composition);
 
@@ -169,12 +166,31 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
                         .findByIdWithMediaFiles(a.getCompositions().get(0).getId()).orElseThrow();
                 if (!composition.getMediaFiles().equals(mediaFiles)) {
                     composition.setMediaFiles(mediaFiles);
+
                     compositionRepository.save(composition);
                 }
             }
-        }
 
-        //compositionRepository.g
+            long totalSize = mediaFiles.stream().collect(Collectors.summarizingLong(MediaFile::getSize)).getSum();
+            long totalDuration = mediaFiles.stream().collect(Collectors.summarizingLong(MediaFile::getDuration)).getSum();
+
+            if (
+                    ValueValidator.isEmpty(a.getSize()) ||
+                    ValueValidator.isEmpty(a.getDuration())) {
+                a.setSize(totalSize);
+                a.setDuration(totalDuration);
+
+                artifactRepository.save(a);
+            }
+
+            if (
+                    (a.getCompositions().size() == 1) &&
+                    ValueValidator.isEmpty(a.getCompositions().get(0).getDuration())) {
+                a.getCompositions().get(0).setDuration(totalDuration);
+
+                compositionRepository.save(a.getCompositions().get(0));
+            }
+        }
 
         return counter.get();
     }
