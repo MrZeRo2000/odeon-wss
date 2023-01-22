@@ -25,7 +25,6 @@ public class ServiceProcessValidateDVMusicTest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
-    // @Disabled("For dev purposes")
     void testLoadDV() {
         // load artists
         service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);

@@ -49,7 +49,7 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
     void testPrepare() throws Exception {
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_MOVIES, () -> {
+        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_IMPORTED_MOVIES, () -> {
             service.executeProcessor(ProcessorType.DV_MOVIES_IMPORTER);
             Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
             log.info("Movies Importer Processing info: " + service.getProcessInfo());

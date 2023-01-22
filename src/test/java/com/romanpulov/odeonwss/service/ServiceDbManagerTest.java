@@ -30,7 +30,7 @@ public class ServiceDbManagerTest {
     void testCopyDb() throws Exception {
         DbManagerService dbManagerService = DbManagerService.getInstance(appConfiguration);
 
-        final DbManagerService.DbType dbType = DbManagerService.DbType.DB_MOVIES;
+        final DbManagerService.DbType dbType = DbManagerService.DbType.DB_IMPORTED_MOVIES;
 
         Path storageFileNamePath = Paths.get(dbManagerService.getStorageFileName(dbType));
         if (Files.exists(storageFileNamePath)) {
@@ -47,18 +47,18 @@ public class ServiceDbManagerTest {
     @Order(3)
     void testLoadSourceExists() throws Exception {
         DbManagerService dbManagerService = DbManagerService.getInstance(appConfiguration);
-        Assertions.assertTrue(dbManagerService.loadDb(DbManagerService.DbType.DB_MOVIES));
+        Assertions.assertTrue(dbManagerService.loadDb(DbManagerService.DbType.DB_IMPORTED_MOVIES));
     }
 
     @Test
     @Order(4)
     void testLoadSourceNotExists() throws Exception {
         DbManagerService dbManagerService = DbManagerService.getInstance(appConfiguration);
-        final DbManagerService.DbType dbType = DbManagerService.DbType.DB_MOVIES;
+        final DbManagerService.DbType dbType = DbManagerService.DbType.DB_IMPORTED_MOVIES;
 
         Files.deleteIfExists(Paths.get(dbManagerService.getStorageFileName(dbType)));
 
-        Assertions.assertFalse(dbManagerService.loadDb(DbManagerService.DbType.DB_MOVIES));
+        Assertions.assertFalse(dbManagerService.loadDb(DbManagerService.DbType.DB_IMPORTED_MOVIES));
     }
 
 }
