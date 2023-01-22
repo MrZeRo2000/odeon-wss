@@ -6,6 +6,7 @@ import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 import com.romanpulov.odeonwss.service.processor.model.ProgressDetail;
@@ -38,6 +39,8 @@ public class ServiceProcessLoadMoviesDVTest {
     private ArtifactRepository artifactRepository;
     @Autowired
     private CompositionRepository compositionRepository;
+    @Autowired
+    private MediaFileRepository mediaFileRepository;
 
     @Test
     @Order(1)
@@ -80,10 +83,14 @@ public class ServiceProcessLoadMoviesDVTest {
                 new ProgressDetail("Compositions loaded", ProcessingStatus.INFO, 3, null),
                 processService.getProcessInfo().getProgressDetails().get(2)
         );
+        Assertions.assertEquals(
+                new ProgressDetail("Media files loaded", ProcessingStatus.INFO, 4, null),
+                processService.getProcessInfo().getProgressDetails().get(3)
+        );
 
         compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE).forEach(c -> {
-            Composition composition = compositionRepository.findByIdWithProducts(c.getId()).orElseThrow();
-            Assertions.assertEquals(1, composition.getDvProducts().size());
+            Composition productsComposition = compositionRepository.findByIdWithProducts(c.getId()).orElseThrow();
+            Assertions.assertEquals(1, productsComposition.getDvProducts().size());
         });
     }
 
@@ -98,6 +105,10 @@ public class ServiceProcessLoadMoviesDVTest {
         Assertions.assertTrue(oldCompositions > 0);
         Assertions.assertEquals(oldArtifacts, oldCompositions);
 
+        int oldMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE).size();
+        Assertions.assertTrue(oldMediaFiles > 0);
+        Assertions.assertTrue(oldMediaFiles >= oldCompositions);
+
         processService.executeProcessor(PROCESSOR_TYPE);
 
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
@@ -109,9 +120,23 @@ public class ServiceProcessLoadMoviesDVTest {
                 new ProgressDetail("Compositions loaded", ProcessingStatus.INFO, 0, null),
                 processService.getProcessInfo().getProgressDetails().get(2)
         );
+        Assertions.assertEquals(
+                new ProgressDetail("Media files loaded", ProcessingStatus.INFO, 0, null),
+                processService.getProcessInfo().getProgressDetails().get(3)
+        );
+
         compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE).forEach(c -> {
             Composition composition = compositionRepository.findByIdWithProducts(c.getId()).orElseThrow();
             Assertions.assertEquals(1, composition.getDvProducts().size());
         });
+
+        int newArtifacts = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE).size();
+        Assertions.assertEquals(oldArtifacts, newArtifacts);
+
+        int newCompositions = compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE).size();
+        Assertions.assertEquals(oldCompositions, newCompositions);
+
+        int newMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE).size();
+        Assertions.assertEquals(oldMediaFiles, newMediaFiles);
     }
 }
