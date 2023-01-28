@@ -3,6 +3,8 @@ package com.romanpulov.odeonwss.service.processor;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingActionType;
 import com.romanpulov.odeonwss.service.processor.model.ProgressDetail;
 
+import java.util.List;
+
 public abstract class AbstractProcessor {
     private ProgressHandler progressHandler;
 
@@ -36,6 +38,10 @@ public abstract class AbstractProcessor {
 
     protected void errorHandler(String errorMessage) {
         progressHandler.handleProgress(ProgressDetail.fromErrorMessage(errorMessage));
+    }
+
+    protected void errorHandler(String errorMessage, List<String> items) {
+        progressHandler.handleProgress(ProgressDetail.fromErrorMessage(errorMessage, items));
     }
 
     protected void errorHandler(String errorMessage, Object ...args) {

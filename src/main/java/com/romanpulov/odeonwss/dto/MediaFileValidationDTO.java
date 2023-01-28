@@ -37,14 +37,25 @@ public class MediaFileValidationDTO extends CompositionValidationDTO {
     }
 
     public MediaFileValidationDTO(String artistName, String artifactTitle, Long artifactYear, String mediaFileName, String mediaFileFormat) {
-        super(artistName, artifactTitle, artifactYear, null, null);
-        this.mediaFileName = mediaFileName;
-        this.mediaFileFormat = mediaFileFormat;
+        this(artistName, artifactTitle, artifactYear, null, null, mediaFileName, mediaFileFormat);
+    }
+
+    public MediaFileValidationDTO(String artifactTitle, Long artifactYear, String compositionTitle, String mediaFileName, String mediaFileFormat) {
+        this(null, artifactTitle, artifactYear, null, compositionTitle, mediaFileName, mediaFileFormat);
+    }
+
+    public static MediaFileValidationDTO fromDVMediaFile(String artifactTitle, Long artifactYear, String mediaFileName) {
+        MediaFileValidationDTO result = new MediaFileValidationDTO();
+        result.setArtifactTitle(artifactTitle);
+        result.setArtifactYear(artifactYear);
+        result.setMediaFileName(mediaFileName);
+
+        return result;
     }
 
     public MediaFileValidationDTO() {}
 
-    public static Set<String> getMediaFiles(List<MediaFileValidationDTO> data) {
+    public static Set<String> getMusicMediaFiles(List<MediaFileValidationDTO> data) {
         return data.stream()
                 .map(d ->
                         d.getArtistName() +
@@ -55,7 +66,7 @@ public class MediaFileValidationDTO extends CompositionValidationDTO {
                 .collect(Collectors.toSet());
     }
 
-    public static Set<String> getCompositions(List<MediaFileValidationDTO> data) {
+    public static Set<String> getMusicCompositions(List<MediaFileValidationDTO> data) {
         return data.stream()
                 .map(d ->
                 d.getArtistName() +

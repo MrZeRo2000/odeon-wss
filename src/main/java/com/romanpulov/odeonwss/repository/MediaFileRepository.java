@@ -44,6 +44,22 @@ public interface MediaFileRepository extends CrudRepository<MediaFile, Long> {
 
     @Query("SELECT " +
             "new com.romanpulov.odeonwss.dto.MediaFileValidationDTO(" +
+            "af.title, " +
+            "af.year, " +
+            "c.title, " +
+            "m.name, " +
+            "m.format) " +
+            "FROM Artifact af " +
+            "LEFT OUTER JOIN Composition c ON c.artifact = af " +
+            "LEFT OUTER JOIN CompositionMediaFile cm ON cm.compositionId = c.id " +
+            "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
+            "WHERE af.artifactType = :artifactType " +
+            "ORDER BY af.title"
+    )
+    List<MediaFileValidationDTO> getCompositionMediaFileValidationDV(ArtifactType artifactType);
+
+    @Query("SELECT " +
+            "new com.romanpulov.odeonwss.dto.MediaFileValidationDTO(" +
             "ar.name, " +
             "af.title, " +
             "af.year, " +

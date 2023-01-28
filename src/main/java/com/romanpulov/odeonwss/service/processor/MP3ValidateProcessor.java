@@ -119,8 +119,8 @@ public class MP3ValidateProcessor extends AbstractArtistBaseValidateProcessor {
     }
 
     private boolean validateCompositions(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
-        Set<String> pathCompositions = MediaFileValidationDTO.getCompositions(pathValidation);
-        Set<String> dbCompositions = MediaFileValidationDTO.getCompositions(dbValidation);
+        Set<String> pathCompositions = MediaFileValidationDTO.getMusicCompositions(pathValidation);
+        Set<String> dbCompositions = MediaFileValidationDTO.getMusicCompositions(dbValidation);
 
         return compareStringSets(
                 pathCompositions,

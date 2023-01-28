@@ -49,10 +49,10 @@ public class ServiceProcessMDBImportArtistsTest {
     void testLoad() {
         service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
-        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artists imported")));
-        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artist details imported")));
-        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artist categories imported")));
-        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("Artist lyrics imported")));
+        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("Artists imported")));
+        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("Artist details imported")));
+        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("Artist categories imported")));
+        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("Artist lyrics imported")));
         log.info("Processing info: " + service.getProcessInfo());
     }
 

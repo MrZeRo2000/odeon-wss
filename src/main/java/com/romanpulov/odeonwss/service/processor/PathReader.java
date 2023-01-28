@@ -28,11 +28,10 @@ public class PathReader {
         try (Stream<Path> stream = Files.list(path)) {
             for (Path p: stream.collect(Collectors.toList())) {
                 if (ReadRule.validateRule(p, filterRule)) {
+                    paths.add(p);
                     if (!ReadRule.validateRule(p, validationRule)) {
                         return false;
                     }
-
-                    paths.add(p);
                 }
             }
             return true;
@@ -48,7 +47,9 @@ public class PathReader {
     {
         boolean result = readPath(path, null, ReadRule.RR_DIRECTORY, folders);
         if (!result) {
-            processor.errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, path.getFileName());
+            processor.errorHandler(
+                    ProcessorMessages.ERROR_EXPECTED_DIRECTORY,
+                    folders.stream().findFirst().orElseThrow().toString());
         }
         return result;
     }
@@ -60,7 +61,9 @@ public class PathReader {
     {
         boolean result = readPath(path, null, ReadRule.RR_FILE, files);
         if (!result) {
-            processor.errorHandler(ProcessorMessages.ERROR_EXPECTED_FILE, path.getFileName());
+            processor.errorHandler(
+                    ProcessorMessages.ERROR_EXPECTED_FILE,
+                    files.stream().findFirst().orElseThrow().toString());
         }
         return result;
     }

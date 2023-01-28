@@ -134,8 +134,8 @@ public class LAValidateProcessor extends AbstractArtistBaseValidateProcessor {
     }
 
     private boolean validateCompositions(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
-        Set<String> pathMediaFiles = MediaFileValidationDTO.getMediaFiles(pathValidation);
-        Set<String> dbMediaFiles = MediaFileValidationDTO.getMediaFiles(dbValidation);
+        Set<String> pathMediaFiles = MediaFileValidationDTO.getMusicMediaFiles(pathValidation);
+        Set<String> dbMediaFiles = MediaFileValidationDTO.getMusicMediaFiles(dbValidation);
 
         return compareStringSets(
                 pathMediaFiles,
@@ -146,8 +146,8 @@ public class LAValidateProcessor extends AbstractArtistBaseValidateProcessor {
     }
 
     private boolean validateMediaFiles(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
-        Set<String> pathMediaFiles = MediaFileValidationDTO.getMediaFiles(pathValidation);
-        Set<String> dbMediaFiles = MediaFileValidationDTO.getMediaFiles(dbValidation);
+        Set<String> pathMediaFiles = MediaFileValidationDTO.getMusicMediaFiles(pathValidation);
+        Set<String> dbMediaFiles = MediaFileValidationDTO.getMusicMediaFiles(dbValidation);
 
         return compareStringSets(
                 pathMediaFiles,

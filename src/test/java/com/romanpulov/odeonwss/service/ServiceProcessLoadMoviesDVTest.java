@@ -79,15 +79,15 @@ public class ServiceProcessLoadMoviesDVTest {
 
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
         Assertions.assertEquals(
-                new ProgressDetail("Artifacts loaded", ProcessingStatus.INFO, 3, null),
+                new ProgressDetail(ProgressDetail.ProgressInfo.fromMessage("Artifacts loaded"), ProcessingStatus.INFO, 3, null),
                 processService.getProcessInfo().getProgressDetails().get(1)
         );
         Assertions.assertEquals(
-                new ProgressDetail("Compositions loaded", ProcessingStatus.INFO, 3, null),
+                new ProgressDetail(ProgressDetail.ProgressInfo.fromMessage("Compositions loaded"), ProcessingStatus.INFO, 3, null),
                 processService.getProcessInfo().getProgressDetails().get(2)
         );
         Assertions.assertEquals(
-                new ProgressDetail("Media files loaded", ProcessingStatus.INFO, 4, null),
+                new ProgressDetail(ProgressDetail.ProgressInfo.fromMessage("Media files loaded"), ProcessingStatus.INFO, 4, null),
                 processService.getProcessInfo().getProgressDetails().get(3)
         );
 
@@ -116,15 +116,15 @@ public class ServiceProcessLoadMoviesDVTest {
 
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
         Assertions.assertEquals(
-                new ProgressDetail("Artifacts loaded", ProcessingStatus.INFO, 0, null),
+                new ProgressDetail(ProgressDetail.ProgressInfo.fromMessage("Artifacts loaded"), ProcessingStatus.INFO, 0, null),
                 processService.getProcessInfo().getProgressDetails().get(1)
         );
         Assertions.assertEquals(
-                new ProgressDetail("Compositions loaded", ProcessingStatus.INFO, 0, null),
+                new ProgressDetail(ProgressDetail.ProgressInfo.fromMessage("Compositions loaded"), ProcessingStatus.INFO, 0, null),
                 processService.getProcessInfo().getProgressDetails().get(2)
         );
         Assertions.assertEquals(
-                new ProgressDetail("Media files loaded", ProcessingStatus.INFO, 0, null),
+                new ProgressDetail(ProgressDetail.ProgressInfo.fromMessage("Media files loaded"), ProcessingStatus.INFO, 0, null),
                 processService.getProcessInfo().getProgressDetails().get(3)
         );
 

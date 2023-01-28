@@ -70,7 +70,7 @@ public class ServiceProcessLoadMP3Test {
     void testDirectoryWithFiles() throws Exception {
         service.executeProcessor(ProcessorType.MP3_LOADER, "");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
-        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().contains("directory, found:")));
+        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("directory, found:")));
     }
 
     @Test
@@ -84,7 +84,7 @@ public class ServiceProcessLoadMP3Test {
 
         service.executeProcessor(ProcessorType.MP3_LOADER, "../odeon-test-data/wrong_artifact_title/");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
-        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().get(service.getProcessInfo().getProgressDetails().size() - 2).getInfo().contains("Error parsing artifact name"));
+        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().get(service.getProcessInfo().getProgressDetails().size() - 2).getInfo().getMessage().contains("Error parsing artifact name"));
     }
 
     @Test
