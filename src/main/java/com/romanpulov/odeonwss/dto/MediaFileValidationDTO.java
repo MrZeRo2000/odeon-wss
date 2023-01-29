@@ -40,8 +40,8 @@ public class MediaFileValidationDTO extends CompositionValidationDTO {
         this(artistName, artifactTitle, artifactYear, null, null, mediaFileName, mediaFileFormat);
     }
 
-    public MediaFileValidationDTO(String artifactTitle, Long artifactYear, String compositionTitle, String mediaFileName, String mediaFileFormat) {
-        this(null, artifactTitle, artifactYear, null, compositionTitle, mediaFileName, mediaFileFormat);
+    public MediaFileValidationDTO(String artifactTitle, Long artifactYear, String mediaFileName, String mediaFileFormat) {
+        this(null, artifactTitle, artifactYear, null, null, mediaFileName, mediaFileFormat);
     }
 
     public static MediaFileValidationDTO fromDVMediaFile(String artifactTitle, Long artifactYear, String mediaFileName) {

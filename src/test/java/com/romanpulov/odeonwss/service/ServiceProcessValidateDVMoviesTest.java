@@ -47,7 +47,46 @@ public class ServiceProcessValidateDVMoviesTest {
     @Order(2)
     void testValidateOk() {
         service.executeProcessor(ProcessorType.DV_MOVIES_VALIDATOR);
-        assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+        assertThat(pi.getProgressDetails().get(0)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Started Movies Validator", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(pi.getProgressDetails().get(1)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artifacts validated", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(pi.getProgressDetails().get(2)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Media files validated", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artifact media files validated", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(pi.getProgressDetails().get(4)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+                        ProcessingStatus.SUCCESS,
+                        null,
+                        null)
+        );
+
     }
 
     @Test
@@ -90,7 +129,6 @@ public class ServiceProcessValidateDVMoviesTest {
                         null,
                         null)
         );
-
     }
 
 }
