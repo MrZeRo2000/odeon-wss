@@ -5,7 +5,11 @@ import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.Composition;
+import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
@@ -22,6 +26,7 @@ import org.springframework.test.context.junit.jupiter.DisabledIf;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -39,6 +44,11 @@ public class ServiceProcessValidateDVMoviesTest {
 
     @Autowired
     private ArtifactRepository artifactRepository;
+
+    @Autowired
+    private CompositionRepository compositionRepository;
+    @Autowired
+    private MediaFileRepository mediaFileRepository;
 
     private void internalPrepare() {
         DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_LOADED_MOVIES, () -> {});
@@ -183,6 +193,74 @@ public class ServiceProcessValidateDVMoviesTest {
                         new ProgressDetail.ProgressInfo(
                                 "Artifacts not in database",
                                 List.of(artifact.getTitle())),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(6)
+    void testNewFileInDbShouldFail() {
+        this.internalPrepare();
+        Artifact artifact = artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)
+                .stream()
+                .filter(a -> a.getTitle().equals("Крепкий орешек"))
+                .findFirst().orElseThrow();
+        Composition composition = compositionRepository
+                .findByIdWithMediaFiles(artifact.getCompositions().get(0).getId())
+                .orElseThrow();
+
+        MediaFile mediaFile = new MediaFile();
+        mediaFile.setName("New media file.mkv");
+        mediaFile.setFormat("MKV");
+        mediaFile.setSize(100L);
+        mediaFile.setBitrate(245L);
+        mediaFileRepository.save(mediaFile);
+
+        composition.getMediaFiles().add(mediaFile);
+        compositionRepository.save(composition);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+        assertThat(pi.getProgressDetails().get(2)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Media files not in files",
+                                List.of(mediaFile.getName())),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(7)
+    void testNewFileInFilesShouldFail() {
+        this.internalPrepare();
+        Composition composition = compositionRepository
+                .findByIdWithMediaFiles(
+                        compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE)
+                        .stream()
+                        .filter(c -> c.getTitle().equals("Обыкновенное чудо"))
+                        .findFirst()
+                        .orElseThrow()
+                        .getId()
+                ).orElseThrow();
+        composition.getMediaFiles().removeIf(m -> m.getName().equals("Part 2.avi"));
+        compositionRepository.save(composition);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+        assertThat(pi.getProgressDetails().get(2)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Media files not in database",
+                                List.of("Part 2.avi")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
