@@ -1,7 +1,11 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
+import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
@@ -24,12 +28,21 @@ import java.util.logging.Logger;
 @DisabledIf(value = "${full.tests.disabled}", loadContext = true)
 public class ServiceProcessValidateDVMoviesTest {
     private static final Logger log = Logger.getLogger(ServiceProcessValidateDVMoviesTest.class.getSimpleName());
+    private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMovies();
+    private static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MOVIES_VALIDATOR;
 
     @Autowired
     ProcessService service;
 
     @Autowired
     private AppConfiguration appConfiguration;
+
+    @Autowired
+    private ArtifactRepository artifactRepository;
+
+    private void internalPrepare() {
+        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_LOADED_MOVIES, () -> {});
+    }
 
     @Test
     @Order(1)
@@ -46,7 +59,7 @@ public class ServiceProcessValidateDVMoviesTest {
     @Test
     @Order(2)
     void testValidateOk() {
-        service.executeProcessor(ProcessorType.DV_MOVIES_VALIDATOR);
+        service.executeProcessor(PROCESSOR_TYPE);
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         assertThat(pi.getProgressDetails().get(0)).isEqualTo(
@@ -92,7 +105,7 @@ public class ServiceProcessValidateDVMoviesTest {
     @Test
     @Order(3)
     void testContainsFoldersShouldFail() {
-        service.executeProcessor(ProcessorType.DV_MOVIES_VALIDATOR, "../odeon-test-data/ok/MP3 Music/");
+        service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/ok/MP3 Music/");
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         assertThat(pi.getProgressDetails().get(0)).isEqualTo(
@@ -125,6 +138,51 @@ public class ServiceProcessValidateDVMoviesTest {
                         new ProgressDetail.ProgressInfo(
                                 "Task status",
                                 List.of()),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(4)
+    void testNewArtifactInDbShouldFail() {
+        Artifact artifact = (new EntityArtifactBuilder())
+                .withArtifactType(ARTIFACT_TYPE)
+                .withTitle("New Artifact")
+                .build();
+        artifactRepository.save(artifact);
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+        assertThat(pi.getProgressDetails().get(1)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifacts not in files",
+                                List.of("New Artifact")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(5)
+    void testNewArtifactInFilesShouldFail() {
+        this.internalPrepare();
+        Artifact artifact = artifactRepository.findAll().get(0);
+        artifactRepository.delete(artifact);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+        assertThat(pi.getProgressDetails().get(1)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifacts not in database",
+                                List.of(artifact.getTitle())),
                         ProcessingStatus.FAILURE,
                         null,
                         null)

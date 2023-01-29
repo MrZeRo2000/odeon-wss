@@ -33,7 +33,7 @@ public class ProcessorMessages {
     static final String INFO_ARTIST_CATEGORIES_IMPORTED = "Artist categories imported: %d";
     static final String INFO_ARTIST_LYRICS_IMPORTED = "Artist lyrics imported: %d";
 
-    static final String ERROR_ARTIFACTS_NOT_IN_DB = "Artifacts not in database: %s";
+    static final String ERROR_ARTIFACTS_NOT_IN_DB = "Artifacts not in database";
     static final String ERROR_ARTIFACTS_NOT_IN_FILES = "Artifacts not in files";
     static final String INFO_ARTIFACTS_VALIDATED = "Artifacts validated";
 
