@@ -8,6 +8,7 @@ import com.romanpulov.odeonwss.service.CompositionService;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,7 +59,7 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
 
         Map<String, NamesParser.NumberTitle> parsedCompositionFileNames = parseCompositionFileNames(compositionPaths);
         if (parsedCompositionFileNames != null) {
-            Map<String, MediaFileInfo> parsedCompositionMediaInfo = mediaParser.parseCompositions(compositionPaths);
+            Map<Path, MediaFileInfo> parsedCompositionMediaInfo = mediaParser.parseCompositions(compositionPaths);
             if (parsedCompositionMediaInfo != null) {
                 CompositionsSummary summary = saveCompositionsAndMediaFiles(artifact, compositionPaths, parsedCompositionFileNames, parsedCompositionMediaInfo);
 
@@ -67,6 +69,80 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
                 artifactRepository.save(artifact);
             }
         }
+    }
+
+    @Override
+    protected int processCompositions(List<Pair<Path, Artifact>> pathArtifacts) throws ProcessorException {
+        AtomicInteger counter = new AtomicInteger(0);
+
+        // load composition files to flat list
+        List<Pair<Path, Pair<Artifact, NamesParser.NumberTitle>>> flatPathArtifacts = new ArrayList<>();
+        List<Path> flatPathCompositions = new ArrayList<>();
+        for (Pair<Path, Artifact> pathArtifactPair: pathArtifacts) {
+            List<Path> compositionFiles = new ArrayList<>();
+            if (!PathReader.readPathFilesOnly(this, pathArtifactPair.getFirst(), compositionFiles)) {
+                return counter.get();
+            }
+
+            for (Path p: compositionFiles) {
+                String compositionFileName = p.getFileName().toString();
+                if (!compositionFileName.endsWith("mp3")) {
+                    errorHandler(ProcessorMessages.ERROR_WRONG_FILE_TYPE, p.toAbsolutePath());
+                    return counter.get();
+                }
+
+                NamesParser.NumberTitle nt = NamesParser.parseMusicComposition(compositionFileName);
+                if (nt == null) {
+                    errorHandler(ProcessorMessages.ERROR_PARSING_COMPOSITION_NAME, p.toAbsolutePath().getFileName());
+                    return counter.get();
+                }
+
+                flatPathArtifacts.add(Pair.of(p, Pair.of(pathArtifactPair.getSecond(), nt)));
+                flatPathCompositions.add(p);
+            }
+        }
+
+        Map<Path, MediaFileInfo> parsedCompositionMediaInfo = mediaParser.parseCompositions(flatPathCompositions);
+
+        Map<Artifact, List<Pair<Path, Pair<Artifact, NamesParser.NumberTitle>>>> pathArtifactsMap =
+                flatPathArtifacts
+                        .stream()
+                        .collect(Collectors.groupingBy(v -> v.getSecond().getFirst(), Collectors.toList()));
+
+        //process composition files
+        for (Artifact artifact: pathArtifactsMap.keySet()) {
+            CompositionsSummary summary = new CompositionsSummary();
+
+            for (Pair<Path, Pair<Artifact, NamesParser.NumberTitle>> flatPathArtifact: pathArtifactsMap.get(artifact)) {
+                MediaFileInfo mediaFileInfo = parsedCompositionMediaInfo.get(flatPathArtifact.getFirst());
+                if (mediaFileInfo != null) {
+                    MediaFile mediaFile = MediaFileMapper.fromMediaFileInfo(mediaFileInfo);
+                    mediaFile.setArtifact(artifact);
+                    mediaFile.setName(flatPathArtifact.getFirst().getFileName().toString());
+
+                    Composition composition = new Composition();
+                    composition.setArtifact(artifact);
+                    composition.setTitle(flatPathArtifact.getSecond().getSecond().getTitle());
+                    composition.setDiskNum(1L);
+                    composition.setNum(flatPathArtifact.getSecond().getSecond().getNumber());
+                    composition.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
+
+                    compositionService.insertCompositionWithMedia(composition, mediaFile);
+                    counter.getAndIncrement();
+
+                    summary.duration += mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration();
+                    summary.size += mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize();
+
+                }
+
+                artifact.setDuration(summary.duration);
+                artifact.setSize(summary.size);
+                artifact.setInsertDate(LocalDate.now());
+                artifactRepository.save(artifact);
+            }
+        }
+
+        return counter.get();
     }
 
     private Map<String, NamesParser.NumberTitle> parseCompositionFileNames(List<Path> compositionPaths) {
@@ -100,7 +176,7 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
             Artifact artifact,
             List<Path> compositionPaths,
             Map<String, NamesParser.NumberTitle> parsedCompositionNames,
-            Map<String, MediaFileInfo> parsedCompositionsMediaInfo
+            Map<Path, MediaFileInfo> parsedCompositionsMediaInfo
             ) throws ProcessorException {
 
         CompositionsSummary summary = new CompositionsSummary();
@@ -109,7 +185,7 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
             String fileName = path.getFileName().toString();
 
             NamesParser.NumberTitle nt = parsedCompositionNames.get(fileName);
-            MediaFileInfo mediaFileInfo = parsedCompositionsMediaInfo.get(fileName);
+            MediaFileInfo mediaFileInfo = parsedCompositionsMediaInfo.get(path);
             if ((nt == null) || (mediaFileInfo == null)) {
                 throw new ProcessorException(ProcessorMessages.ERROR_NO_DATA_FOR_FILE, fileName);
             } else {

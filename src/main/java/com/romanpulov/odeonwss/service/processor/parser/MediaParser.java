@@ -29,19 +29,19 @@ public class MediaParser {
         return mediaFileParser.parseMediaFile(compositionPath);
     }
 
-    public Map<String, MediaFileInfo> parseCompositions(List<Path> compositionPaths)
+    public Map<Path, MediaFileInfo> parseCompositions(List<Path> compositionPaths)
             throws ProcessorException {
-        List<Callable<Pair<String, MediaFileInfo>>> callables = new ArrayList<>();
+        List<Callable<Pair<Path, MediaFileInfo>>> callables = new ArrayList<>();
 
         for (Path path: compositionPaths) {
-            Callable<Pair<String, MediaFileInfo>> callable = () -> {
+            Callable<Pair<Path, MediaFileInfo>> callable = () -> {
                 MediaFileInfo mediafileInfo = mediaFileParser.parseMediaFile(path);
-                return Pair.of(path.getFileName().toString(), mediafileInfo);
+                return Pair.of(path, mediafileInfo);
             };
             callables.add(callable);
         }
 
-        List<Future<Pair<String, MediaFileInfo>>> futures;
+        List<Future<Pair<Path, MediaFileInfo>>> futures;
         ExecutorService executorService = Executors.newFixedThreadPool(4);
         try {
             futures = executorService.invokeAll(callables);
@@ -58,11 +58,11 @@ public class MediaParser {
             executorService.shutdownNow();
         }
 
-        Map<String, MediaFileInfo> result = new HashMap<>();
+        Map<Path, MediaFileInfo> result = new HashMap<>();
 
         try {
-            for (Future<Pair<String, MediaFileInfo>> future : futures) {
-                Pair<String, MediaFileInfo> futureData = future.get();
+            for (Future<Pair<Path, MediaFileInfo>> future : futures) {
+                Pair<Path, MediaFileInfo> futureData = future.get();
                 result.put(futureData.getFirst(), futureData.getSecond());
             }
         } catch (ExecutionException | InterruptedException e) {

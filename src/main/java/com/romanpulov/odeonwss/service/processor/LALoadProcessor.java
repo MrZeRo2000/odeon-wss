@@ -14,6 +14,7 @@ import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -53,6 +54,11 @@ public class LALoadProcessor extends AbstractArtistProcessor {
     @Override
     protected void processCompositionsPath(Path path, Artifact artifact) throws ProcessorException {
         processCompositionsPathWithDiskNum(path, artifact, 0);
+    }
+
+    @Override
+    protected int processCompositions(List<Pair<Path, Artifact>> pathArtifacts) throws ProcessorException {
+        return 0;
     }
 
     private void processCompositionsPathWithDiskNum(Path path, Artifact artifact, int diskNum) throws ProcessorException {
@@ -154,7 +160,10 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                 .filter(p -> cueFileNames.contains(p.getFileName().toString()))
                 .collect(Collectors.toList());
 
-        Map<String, MediaFileInfo> parsedCompositionMediaInfo = mediaParser.parseCompositions(compositionPaths);
+        Map<String, MediaFileInfo> parsedCompositionMediaInfo = mediaParser.parseCompositions(compositionPaths)
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(e -> e.getKey().getFileName().toString(), Map.Entry::getValue));
 
         Map<String, MediaFile> mediaFiles = new HashMap<>();
         List<Composition> compositions = new ArrayList<>();
@@ -239,7 +248,10 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                     .stream()
                     .filter(p -> parsedCompositionFileNames.containsKey(p.getFileName().toString()))
                     .collect(Collectors.toList());
-            Map<String, MediaFileInfo> parsedCompositionMediaInfo = mediaParser.parseCompositions(directoryCompositionsPaths);
+            Map<String, MediaFileInfo> parsedCompositionMediaInfo = mediaParser.parseCompositions(directoryCompositionsPaths)
+                    .entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(e -> e.getKey().getFileName().toString(), Map.Entry::getValue));
 
             for (Map.Entry<String, NamesParser.NumberTitle> compositionFile: parsedCompositionFileNames.entrySet()) {
                 MediaFileInfo mediaFileInfo = parsedCompositionMediaInfo.get(compositionFile.getKey());

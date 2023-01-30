@@ -9,11 +9,15 @@ import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.util.Pair;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,6 +45,19 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
     public void execute() throws ProcessorException {
         Path path = validateAndGetPath();
 
+        List<Pair<Path, Artist>> pathArtists = processArtists(path);
+        infoHandler(ProcessorMessages.INFO_ARTISTS_LOADED, pathArtists.size());
+
+        if (pathArtists.size() > 0) {
+            List<Pair<Path, Artifact>> pathArtifacts = processArtifacts(pathArtists);
+            infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED, pathArtifacts.size());
+
+            if (pathArtifacts.size() > 0) {
+                infoHandler(ProcessorMessages.INFO_COMPOSITIONS_LOADED, processCompositions(pathArtifacts));
+            }
+        }
+
+        /*
         try (Stream<Path> stream = Files.list(path)){
             for (Path p : stream.collect(Collectors.toList())) {
                 logger.debug("Path:" + p.getFileName());
@@ -49,6 +66,8 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
         } catch (IOException e) {
             throw new ProcessorException(ProcessorMessages.ERROR_EXCEPTION,  e.getMessage());
         }
+
+         */
     }
 
     protected void processArtistsPath(Path path) throws ProcessorException {
@@ -73,6 +92,77 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
         } catch (IOException e) {
             throw new ProcessorException("Error processing files: " + e.getMessage());
         }
+    }
+
+    protected List<Pair<Path, Artist>> processArtists(Path path) throws ProcessorException {
+        List<Pair<Path, Artist>> result = new ArrayList<>();
+
+        List<Path> artistFiles = new ArrayList<>();
+        if (!PathReader.readPathFoldersOnly(this, path, artistFiles)) {
+            return result;
+        }
+
+        AtomicInteger counter = new AtomicInteger(0);
+
+        for (Path p: artistFiles) {
+            String artistName = p.getFileName().toString();
+
+            Optional<Artist> artist = artistRepository.findFirstByTypeAndName(ArtistType.ARTIST, artistName);
+            if (artist.isEmpty()) {
+                warningHandlerWithAddArtistAction(String.format(ProcessorMessages.ERROR_ARTIST_NOT_FOUND, artistName), artistName);
+            } else {
+                result.add(Pair.of(p, artist.get()));
+                counter.getAndIncrement();
+            }
+        }
+
+        return result;
+    }
+
+    protected List<Pair<Path, Artifact>> processArtifacts(List<Pair<Path, Artist>> pathArtists) throws ProcessorException {
+        List<Pair<Path, Artifact>> result = new ArrayList<>();
+
+        // load artifact folders to flat list
+        List<Pair<Path, Pair<Artist, NamesParser.YearTitle>>> flatPathArtists = new ArrayList<>();
+        for (Pair<Path, Artist> pathArtistPair: pathArtists) {
+            List<Path> artifactFiles = new ArrayList<>();
+            if (!PathReader.readPathFoldersOnly(this, pathArtistPair.getFirst(), artifactFiles)) {
+                return result;
+            }
+
+            for (Path p: artifactFiles) {
+                String artifactName = p.getFileName().toString();
+                NamesParser.YearTitle yt = NamesParser.parseMusicArtifactTitle(artifactName);
+                if (yt == null) {
+                    errorHandler(ProcessorMessages.ERROR_PARSING_ARTIFACT_NAME, p.toAbsolutePath().getFileName());
+                    return result;
+                }
+                flatPathArtists.add(Pair.of(p, Pair.of(pathArtistPair.getSecond(), yt)));
+            }
+        }
+
+        // process flat list
+        for (Pair<Path, Pair<Artist, NamesParser.YearTitle>> pathArtistPair: flatPathArtists) {
+            Artifact artifact = new Artifact();
+            artifact.setArtifactType(getArtifactType());
+            artifact.setArtist(pathArtistPair.getSecond().getFirst());
+            artifact.setTitle(pathArtistPair.getSecond().getSecond().getTitle());
+            artifact.setYear((long) pathArtistPair.getSecond().getSecond().getYear());
+
+            Optional<Artifact> existingArtifact = artifactRepository.findFirstByArtifactTypeAndArtistAndTitleAndYear(
+                    artifact.getArtifactType(),
+                    artifact.getArtist(),
+                    artifact.getTitle(),
+                    artifact.getYear()
+            );
+
+            if (existingArtifact.isEmpty()) {
+                artifactRepository.save(artifact);
+                result.add(Pair.of(pathArtistPair.getFirst(), artifact));
+            }
+        }
+
+        return result;
     }
 
     private void processArtifactsPath(Path path, Artist artist) throws ProcessorException {
@@ -108,6 +198,8 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
             processCompositionsPath(path, artifact);
         }
     }
+
+    protected abstract int processCompositions(List<Pair<Path, Artifact>> pathArtifacts) throws ProcessorException;
 
     protected abstract void processCompositionsPath(Path path, Artifact artifact) throws ProcessorException;
 }
