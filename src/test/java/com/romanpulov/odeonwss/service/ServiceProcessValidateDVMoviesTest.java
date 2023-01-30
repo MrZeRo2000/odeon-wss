@@ -267,4 +267,65 @@ public class ServiceProcessValidateDVMoviesTest {
         );
     }
 
+
+    @Test
+    @Order(8)
+    void testNewArtifactFileInDbShouldFail() {
+        this.internalPrepare();
+        Artifact artifact = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE)
+                .stream()
+                .filter(a -> a.getTitle().equals("Крепкий орешек"))
+                .findFirst().orElseThrow();
+
+        MediaFile mediaFile = new MediaFile();
+        mediaFile.setName("New media file.mkv");
+        mediaFile.setFormat("MKV");
+        mediaFile.setSize(100L);
+        mediaFile.setBitrate(245L);
+        mediaFile.setArtifact(artifact);
+        mediaFileRepository.save(mediaFile);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifact media files not in files",
+                                List.of(mediaFile.getName())),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+
+
+    }
+
+    @Test
+    @Order(9)
+    void testNewArtifactFileInFilesShouldFail() {
+        this.internalPrepare();
+        MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE)
+                .stream()
+                .filter(m -> m.getName().equals("Part 2.avi"))
+                .findFirst()
+                .orElseThrow();
+        mediaFile.setArtifact(null);
+        mediaFileRepository.save(mediaFile);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifact media files not in database",
+                                List.of(mediaFile.getName())),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
 }
