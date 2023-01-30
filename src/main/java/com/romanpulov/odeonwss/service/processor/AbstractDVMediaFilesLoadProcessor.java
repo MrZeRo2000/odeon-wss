@@ -67,7 +67,7 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
         }
     }
 
-    public int processArtifactsPath(Path path) throws ProcessorException {
+    public int processArtifactsPath(Path path) {
         AtomicInteger counter = new AtomicInteger(0);
 
         List<MediaFile> emptyMediaFiles = mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(artifactType);

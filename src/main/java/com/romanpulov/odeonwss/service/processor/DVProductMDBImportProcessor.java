@@ -20,7 +20,7 @@ import static com.romanpulov.odeonwss.service.processor.MDBConst.*;
 
 @Component
 public class DVProductMDBImportProcessor extends AbstractMDBImportProcessor {
-    private static final Set<Long> DV_ORIGIN_CODES = Stream.of(1L, 2L, 17L, 76L).collect(Collectors.toSet());;
+    private static final Set<Long> DV_ORIGIN_CODES = Stream.of(1L, 2L, 17L, 76L).collect(Collectors.toSet());
 
     private final DVOriginRepository dvOriginRepository;
 

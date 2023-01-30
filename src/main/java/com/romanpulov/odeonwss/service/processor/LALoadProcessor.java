@@ -7,7 +7,6 @@ import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.CompositionService;
 import com.romanpulov.odeonwss.service.processor.parser.CueParser;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
@@ -30,7 +29,6 @@ public class LALoadProcessor extends AbstractArtistProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(LALoadProcessor.class);
 
-    private final MediaFileRepository mediaFileRepository;
 
     private final CompositionService compositionService;
 
@@ -39,12 +37,10 @@ public class LALoadProcessor extends AbstractArtistProcessor {
     public LALoadProcessor(
             ArtistRepository artistRepository,
             ArtifactRepository artifactRepository,
-            MediaFileRepository mediaFileRepository,
             CompositionService compositionService,
             MediaParser mediaParser
     ) {
         super(artistRepository, artifactRepository);
-        this.mediaFileRepository = mediaFileRepository;
         this.compositionService = compositionService;
         this.mediaParser = mediaParser;
     }

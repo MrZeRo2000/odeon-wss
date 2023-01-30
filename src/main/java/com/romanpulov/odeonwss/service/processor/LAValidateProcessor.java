@@ -114,17 +114,15 @@ public class LAValidateProcessor extends AbstractArtistBaseValidateProcessor {
                     if (compositionFileNames.size() == 0) {
                         errorHandler(ProcessorMessages.ERROR_COMPOSITIONS_NOT_FOUND_FOR_ARTIFACT, artifactPath.getFileName().toString());
                     } else {
-                        compositionFileNames.forEach(compositionFileName -> {
-                            result.add(new MediaFileValidationDTO(
-                                    artistPath.getFileName().toString(),
-                                    yt.getTitle(),
-                                    (long) yt.getYear(),
-                                    null,
-                                    null,
-                                    compositionFileName,
-                                    null
-                            ));
-                        });
+                        compositionFileNames.forEach(compositionFileName -> result.add(new MediaFileValidationDTO(
+                                artistPath.getFileName().toString(),
+                                yt.getTitle(),
+                                (long) yt.getYear(),
+                                null,
+                                null,
+                                compositionFileName,
+                                null
+                        )));
                     }
                 }  catch (IOException e) {
                     throw new ProcessorException(ProcessorMessages.ERROR_EXCEPTION, e.getMessage());

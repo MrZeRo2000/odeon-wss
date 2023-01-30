@@ -65,23 +65,21 @@ public class ArtistsMDBImporter {
                             artist.setMigrationId(migrationId);
                             migratedArtists.put(migrationId, artist);
                         },
-                        () -> {
-                            migratedArtists.put(migrationId,
-                                artistRepository.findFirstByMigrationId(migrationId).orElseGet(
-                                        () -> {
-                                            Artist artist = new Artist();
-                                            artist.setType(rowArtistType);
-                                            artist.setName(artistName);
-                                            artist.setMigrationId(migrationId);
+                        () -> migratedArtists.put(migrationId,
+                            artistRepository.findFirstByMigrationId(migrationId).orElseGet(
+                                    () -> {
+                                        Artist artist = new Artist();
+                                        artist.setType(rowArtistType);
+                                        artist.setName(artistName);
+                                        artist.setMigrationId(migrationId);
 
-                                            artistRepository.save(artist);
-                                            counter.getAndIncrement();
+                                        artistRepository.save(artist);
+                                        counter.getAndIncrement();
 
-                                            return artist;
-                                        }
-                                )
-                            );
-                        });
+                                        return artist;
+                                    }
+                            )
+                        ));
             }
         }
         return counter.get();

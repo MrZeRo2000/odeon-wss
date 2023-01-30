@@ -5,7 +5,6 @@ import com.romanpulov.odeonwss.dto.CompositionTableDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.entity.MediaFile;
-import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.CompositionMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
@@ -69,7 +68,7 @@ public class CompositionService implements EditableObjectService<CompositionEdit
 
     @Override
     @Transactional
-    public CompositionEditDTO update(CompositionEditDTO o) throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException {
+    public CompositionEditDTO update(CompositionEditDTO o) throws CommonEntityNotFoundException {
         Artifact artifact = artifactRepository.findById(o.getArtifactId())
                 .orElseThrow(() -> new CommonEntityNotFoundException("Artifact", o.getArtifactId()));
         Composition composition = compositionRepository.findById(o.getId())

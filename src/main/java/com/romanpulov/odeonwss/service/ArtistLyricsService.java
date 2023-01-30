@@ -4,7 +4,6 @@ import com.romanpulov.odeonwss.dto.ArtistLyricsEditDTO;
 import com.romanpulov.odeonwss.dto.ArtistLyricsTableDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistLyrics;
-import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.ArtistLyricsMapper;
 import com.romanpulov.odeonwss.repository.ArtistLyricsRepository;
@@ -55,14 +54,14 @@ public class ArtistLyricsService implements EditableObjectService <ArtistLyricsE
     }
 
     @Override
-    public ArtistLyricsEditDTO insert(ArtistLyricsEditDTO o) throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException {
+    public ArtistLyricsEditDTO insert(ArtistLyricsEditDTO o) throws CommonEntityNotFoundException {
         ArtistLyrics artistLyrics = ArtistLyricsMapper.fromEditDTO(o);
         artistLyricsRepository.save(artistLyrics);
         return getById(artistLyrics.getId());
     }
 
     @Override
-    public ArtistLyricsEditDTO update(ArtistLyricsEditDTO o) throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException {
+    public ArtistLyricsEditDTO update(ArtistLyricsEditDTO o) throws CommonEntityNotFoundException {
         Optional<ArtistLyrics> existingEntity = artistLyricsRepository.findById(o.getId());
         if (existingEntity.isPresent()) {
             Optional<Artist> existingArtistEntity = artistRepository.findById(o.getArtistId());

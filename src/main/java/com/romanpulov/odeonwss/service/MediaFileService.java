@@ -4,7 +4,6 @@ import com.romanpulov.odeonwss.dto.MediaFileEditDTO;
 import com.romanpulov.odeonwss.dto.MediaFileTableDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.MediaFile;
-import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
@@ -63,7 +62,7 @@ public class MediaFileService implements EditableObjectService <MediaFileEditDTO
     }
 
     @Override
-    public MediaFileEditDTO update(MediaFileEditDTO o) throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException {
+    public MediaFileEditDTO update(MediaFileEditDTO o) throws CommonEntityNotFoundException {
         Optional<MediaFileEditDTO> existingDTO = mediaFileRepository.getMediaFileEditById(o.getId());
         if (existingDTO.isPresent()) {
             MediaFile mediaFile = MediaFileMapper.fromMediaFileEditDTO(o);

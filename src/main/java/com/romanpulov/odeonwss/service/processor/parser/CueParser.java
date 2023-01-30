@@ -131,12 +131,9 @@ public class CueParser {
     public static List<CueTrack> parseFile(Path file) {
         List<CueTrack> result = new ArrayList<>();
 
-        StateData prevState = null;
-        StateData state = null;
-        StateData prevTrackState = null;
-        StateData trackState = null;
+        StateData state;
 
-        CueTrack prevTrack = null;
+        CueTrack prevTrack;
         CueTrack track = null;
 
         try (Stream<String> streamLines = Files.lines(file))  {
@@ -150,7 +147,6 @@ public class CueParser {
                     //save current track if exists
                     if (track != null) {
                         result.add(track);
-                        prevTrack = track;
                     }
 
                     //we expect that there will be a track
