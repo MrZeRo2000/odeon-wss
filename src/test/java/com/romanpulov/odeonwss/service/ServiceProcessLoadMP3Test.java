@@ -15,9 +15,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -57,7 +60,48 @@ public class ServiceProcessLoadMP3Test {
         log.info("Created artists");
         Assertions.assertDoesNotThrow(() -> service.executeProcessor(PROCESSOR_TYPE));
 
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+        assertThat(pi.getProgressDetails().get(0)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Started MP3 Loader", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(pi.getProgressDetails().get(1)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artists loaded", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        2,
+                        null)
+        );
+
+
+        assertThat(pi.getProgressDetails().get(2)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artifacts loaded", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        3,
+                        null)
+        );
+
+        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Compositions loaded", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        40,
+                        null)
+        );
+
+        assertThat(pi.getProgressDetails().get(4)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+                        ProcessingStatus.SUCCESS,
+                        null,
+                        null)
+        );
 
         Artist aerosmithArtist = artistRepository.findFirstByName("Aerosmith").orElseThrow();
         Artist kosheenArtist = artistRepository.findFirstByName("Kosheen").orElseThrow();
@@ -69,19 +113,72 @@ public class ServiceProcessLoadMP3Test {
     @Test
     @Order(2)
     @Sql({"/schema.sql", "/data.sql"})
-    void test() throws Exception {
+    void testNoArtistExistsShouldFail() throws Exception {
         List<ProgressDetail> progressDetail;
 
         // warnings - no artists exist
         service.executeProcessor(PROCESSOR_TYPE, null);
-        progressDetail = service.getProcessInfo().getProgressDetails();
-        Assertions.assertEquals(4, progressDetail.size());
-        Assertions.assertEquals(ProcessingStatus.WARNING, service.getProcessInfo().getProcessingStatus());
+
+        ProcessInfo pi = service.getProcessInfo();
+        progressDetail = pi.getProgressDetails();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.WARNING);
+
+        assertThat(pi.getProgressDetails().get(1)).isIn(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artist Aerosmith not found", new ArrayList<>()),
+                        ProcessingStatus.WARNING,
+                        null,
+                        new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Aerosmith")),
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artist Kosheen not found", new ArrayList<>()),
+                        ProcessingStatus.WARNING,
+                        null,
+                        new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Kosheen"))
+        );
+
+        assertThat(pi.getProgressDetails().get(2)).isIn(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artist Aerosmith not found", new ArrayList<>()),
+                        ProcessingStatus.WARNING,
+                        null,
+                        new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Aerosmith")),
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artist Kosheen not found", new ArrayList<>()),
+                        ProcessingStatus.WARNING,
+                        null,
+                        new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Kosheen"))
+        );
+
+        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artists loaded", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        0,
+                        null)
+        );
+
+        assertThat(pi.getProgressDetails().get(4)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+                        ProcessingStatus.WARNING,
+                        null,
+                        null)
+        );
+
+
         // check processing progress
         ProcessingAction pa = progressDetail.get(1).getProcessingAction();
         Assertions.assertNotNull(pa);
         Assertions.assertEquals(ProcessingActionType.ADD_ARTIST, pa.getActionType());
         Assertions.assertTrue(pa.getValue().contains("Aerosmith") || pa.getValue().contains("Kosheen"));
+
+    }
+
+    @Test
+    @Order(3)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testNoPathExistsShouldFail() throws Exception {
+        List<ProgressDetail> progressDetail;
 
         // error - path not exist
         service.executeProcessor(PROCESSOR_TYPE, "non_existing_path");
@@ -92,7 +189,7 @@ public class ServiceProcessLoadMP3Test {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void testDirectoryWithFiles() throws Exception {
         service.executeProcessor(PROCESSOR_TYPE, "");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
@@ -100,7 +197,7 @@ public class ServiceProcessLoadMP3Test {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void testWrongArtifactTitle() throws Exception {
         Artist artist = new Artist();
         artist.setType(ArtistType.ARTIST);
@@ -109,12 +206,48 @@ public class ServiceProcessLoadMP3Test {
         artistRepository.save(artist);
 
         service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/wrong_artifact_title/");
-        Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
-        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().get(service.getProcessInfo().getProgressDetails().size() - 2).getInfo().getMessage().contains("Error parsing artifact name"));
+        ProcessInfo pi = service.getProcessInfo();
+        List<ProgressDetail> progressDetail = pi.getProgressDetails();
+
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(progressDetail.get(1)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artists loaded", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        1,
+                        null)
+        );
+
+        assertThat(progressDetail.get(2)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Error parsing artifact name: 2004  Honkin'On Bobo", new ArrayList<>()),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+
+        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artifacts loaded", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        0,
+                        null)
+        );
+
+        assertThat(pi.getProgressDetails().get(4)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+
+        //Assertions.assertTrue(service.getProcessInfo().getProgressDetails().get(service.getProcessInfo().getProgressDetails().size() - 2).getInfo().getMessage().contains("Error parsing artifact name"));
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     @Sql({"/schema.sql", "/data.sql"})
     void testOneArtistNotExists() {
         artistRepository.save(
@@ -129,17 +262,15 @@ public class ServiceProcessLoadMP3Test {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     @Sql({"/schema.sql", "/data.sql"})
     void testNoArtistResolving() {
         List<ProgressDetail> progressDetail;
 
         service.executeProcessor(PROCESSOR_TYPE, null);
         progressDetail = service.getProcessInfo().getProgressDetails();
-        Assertions.assertEquals(4, progressDetail.size());
+        Assertions.assertEquals(5, progressDetail.size());
         Assertions.assertEquals(ProcessingStatus.WARNING, service.getProcessInfo().getProcessingStatus());
-
-        Assertions.assertEquals(4, progressDetail.size());
 
         // find first action
         ProcessingAction processingAction = progressDetail.get(1).getProcessingAction();
@@ -147,7 +278,7 @@ public class ServiceProcessLoadMP3Test {
 
         // resolve first action
         service.getProcessInfo().resolveAction(processingAction);
-        Assertions.assertEquals(3, progressDetail.size());
+        Assertions.assertEquals(4, progressDetail.size());
         Assertions.assertEquals(ProcessingStatus.WARNING,
                 service.getProcessInfo().getProgressDetails().get(service.getProcessInfo().getProgressDetails().size() - 1).getStatus());
 
@@ -157,7 +288,7 @@ public class ServiceProcessLoadMP3Test {
 
         // resolve second action
         service.getProcessInfo().resolveAction(processingAction);
-        Assertions.assertEquals(2, progressDetail.size());
+        Assertions.assertEquals(3, progressDetail.size());
     }
 
 }

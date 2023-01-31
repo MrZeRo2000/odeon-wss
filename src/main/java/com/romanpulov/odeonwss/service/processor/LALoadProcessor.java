@@ -51,7 +51,6 @@ public class LALoadProcessor extends AbstractArtistProcessor {
         return ArtifactType.withLA();
     }
 
-    @Override
     protected void processCompositionsPath(Path path, Artifact artifact) throws ProcessorException {
         processCompositionsPathWithDiskNum(path, artifact, 0);
     }

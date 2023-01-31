@@ -49,29 +49,6 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
     }
 
     @Override
-    protected void processCompositionsPath(Path path, Artifact artifact) throws ProcessorException {
-        List<Path> compositionPaths;
-        try (Stream<Path> stream = Files.list(path)) {
-            compositionPaths = stream.collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new ProcessorException(ProcessorMessages.ERROR_PROCESSING_FILES, e.getMessage());
-        }
-
-        Map<String, NamesParser.NumberTitle> parsedCompositionFileNames = parseCompositionFileNames(compositionPaths);
-        if (parsedCompositionFileNames != null) {
-            Map<Path, MediaFileInfo> parsedCompositionMediaInfo = mediaParser.parseCompositions(compositionPaths);
-            if (parsedCompositionMediaInfo != null) {
-                CompositionsSummary summary = saveCompositionsAndMediaFiles(artifact, compositionPaths, parsedCompositionFileNames, parsedCompositionMediaInfo);
-
-                artifact.setDuration(summary.duration);
-                artifact.setSize(summary.size);
-                artifact.setInsertDate(LocalDate.now());
-                artifactRepository.save(artifact);
-            }
-        }
-    }
-
-    @Override
     protected int processCompositions(List<Pair<Path, Artifact>> pathArtifacts) throws ProcessorException {
         AtomicInteger counter = new AtomicInteger(0);
 
