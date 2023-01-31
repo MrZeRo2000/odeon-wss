@@ -25,11 +25,6 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
 
     protected final ArtifactRepository artifactRepository;
 
-    protected static class CompositionsSummary {
-        protected long duration;
-        protected long size;
-    }
-
     public AbstractArtistProcessor(ArtistRepository artistRepository, ArtifactRepository artifactRepository) {
         this.artistRepository = artistRepository;
         this.artifactRepository = artifactRepository;

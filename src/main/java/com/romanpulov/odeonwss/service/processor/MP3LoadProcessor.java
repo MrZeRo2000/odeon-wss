@@ -32,6 +32,11 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
 
     private final MediaParser mediaParser;
 
+    private static class CompositionsSummary {
+        private long duration;
+        private long size;
+    }
+
     public MP3LoadProcessor(
             ArtistRepository artistRepository,
             ArtifactRepository artifactRepository,

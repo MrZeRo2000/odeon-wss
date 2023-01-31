@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,6 +35,31 @@ public class LALoadProcessor extends AbstractArtistProcessor {
     private final CompositionService compositionService;
 
     private final MediaParser mediaParser;
+
+    private static class CompositionsSummary {
+        private int count;
+        private long duration;
+        private long size;
+
+        private void add(CompositionsSummary v) {
+            this.count += v.count;
+            this.duration += v.duration;
+            this.size += v.size;
+        }
+
+        private boolean isEmpty() {
+            return count + duration + size == 0;
+        }
+
+        @Override
+        public String toString() {
+            return "CompositionsSummary{" +
+                    "count=" + count +
+                    ", duration=" + duration +
+                    ", size=" + size +
+                    '}';
+        }
+    }
 
     public LALoadProcessor(
             ArtistRepository artistRepository,
@@ -51,24 +77,33 @@ public class LALoadProcessor extends AbstractArtistProcessor {
         return ArtifactType.withLA();
     }
 
-    protected void processCompositionsPath(Path path, Artifact artifact) throws ProcessorException {
-        processCompositionsPathWithDiskNum(path, artifact, 0);
-    }
-
     @Override
     protected int processCompositions(List<Pair<Path, Artifact>> pathArtifacts) throws ProcessorException {
-        return 0;
+        int counter = 0;
+        for (Pair<Path, Artifact> pathArtifactPair: pathArtifacts) {
+            Path path = pathArtifactPair.getFirst();
+            Artifact artifact = pathArtifactPair.getSecond();
+
+            CompositionsSummary summary = processCompositionsPathWithDiskNum(path, artifact,0);
+            logger.info("Artifact:" + pathArtifactPair.getSecond().getTitle() + ", composition summary: " + summary);
+
+            artifact.setDuration(summary.duration);
+            artifact.setSize(summary.size);
+            artifact.setInsertDate(LocalDate.now());
+            artifactRepository.save(artifact);
+
+            counter += summary.count;
+        }
+        return counter;
     }
 
-    private void processCompositionsPathWithDiskNum(Path path, Artifact artifact, int diskNum) throws ProcessorException {
+    private CompositionsSummary processCompositionsPathWithDiskNum(Path path, Artifact artifact, int diskNum) throws ProcessorException {
         logger.debug("Processing composition path:" + path + " with artifact:" + artifact);
 
-        List<Path> directoryPaths;
-        try (Stream<Path> stream = Files.list(path)) {
-            directoryPaths = stream.collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new ProcessorException(ProcessorMessages.ERROR_PROCESSING_FILES, e.getMessage());
-        }
+        CompositionsSummary summary = new CompositionsSummary();
+
+        List<Path> directoryPaths = new ArrayList<>();
+        PathReader.readPathAll(path, directoryPaths);
 
         List<Path> directoryFolderPaths = directoryPaths
                 .stream()
@@ -89,12 +124,10 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                 errorHandler(ProcessorMessages.ERROR_FOLDER_WITH_DISK_NUMBERS_CONTAINS_OTHER, path.toString());
             } else {
                 for (Map.Entry<Path, Integer> entry: directoryFolderDisksPaths.entrySet()) {
-                    processCompositionsPathWithDiskNum(entry.getKey(), artifact, entry.getValue());
+                    summary.add(processCompositionsPathWithDiskNum(entry.getKey(), artifact, entry.getValue()));
                 }
             }
         } else {
-            CompositionsSummary summary = null;
-
             List<String> directoryFileNames = directoryPaths
                     .stream()
                     .map(p -> p.getFileName().toString())
@@ -114,7 +147,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
 
                     if (new HashSet<>(directoryFileNames).containsAll(cueFiles)) {
                         logger.debug("Contains all for " + cuePath.toString());
-                        summary = processCueFile(path, artifact, directoryPaths, cuePath, cueTracks, cueFiles, diskNum);
+                        summary.add(processCueFile(path, artifact, directoryPaths, cuePath, cueTracks, cueFiles, diskNum));
                         cueProcessed = true;
                     }
                 }
@@ -124,18 +157,15 @@ public class LALoadProcessor extends AbstractArtistProcessor {
             } else {
                 logger.debug("Cue files not found, processing files");
                 //no cue files,
-                summary = processCompositions(path, artifact, directoryPaths, diskNum);
+                summary.add(processCompositions(path, artifact, directoryPaths, diskNum));
             }
 
-            if (summary == null) {
+            if (summary.isEmpty()) {
                 errorHandler(ProcessorMessages.ERROR_NO_DATA_FOR_FOLDER, path.toString());
-            } else {
-                artifact.setDuration(summary.duration);
-                artifact.setSize(summary.size);
-                artifact.setInsertDate(LocalDate.now());
-                artifactRepository.save(artifact);
             }
         }
+
+        return summary;
     }
 
     private CompositionsSummary processCueFile(
@@ -218,6 +248,8 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                 }
                 long duration = cueDuration > 0 ? cueDuration : mediaDuration;
                 composition.setDuration(duration);
+
+                summary.count ++;
                 summary.duration += duration;
 
                 composition.getMediaFiles().add(mediaFile);
@@ -273,6 +305,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
 
                 compositions.add(composition);
 
+                summary.count ++;
                 summary.duration += mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration();
                 summary.size += mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize();
             }

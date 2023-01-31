@@ -40,6 +40,10 @@ public class PathReader {
         }
     }
 
+    public static boolean readPathAll(Path path, Collection<Path> paths) throws ProcessorException {
+        return readPath(path, null, null, paths);
+    }
+
     public static boolean readPathFoldersOnly(
             AbstractProcessor processor,
             Path path,
