@@ -45,6 +45,7 @@ public class DbManagerService {
 
     public enum DbType {
         DB_IMPORTED_MOVIES("imported_movies"),
+        DB_IMPORTED_ARTISTS("imported_artists"),
         DB_LOADED_MOVIES("loaded_movies"),
         DB_PRODUCTS("products"),
         DB_ARTISTS_DV_MUSIC("artists_dv_music");
@@ -96,8 +97,11 @@ public class DbManagerService {
             if (!dbManagerService.loadDb(dbType)) {
                 preparable.prepare();
                 dbManagerService.saveDb(dbType);
+            } else {
+                log.info("Successfully loaded " + dbType);
             }
         } catch (IOException e) {
+            log.warning("Unable to load db " + dbType + ":" + e.getMessage() + ", running prepare");
             preparable.prepare();
             try {
                 dbManagerService.saveDb(dbType);

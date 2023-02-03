@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistDetail;
@@ -43,12 +45,19 @@ public class ServiceProcessMDBImportArtistsTest {
     @Autowired
     ArtistLyricsRepository artistLyricsRepository;
 
+    @Autowired
+    AppConfiguration appConfiguration;
+
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     void testLoad() {
-        service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_IMPORTED_ARTISTS, () -> {
+            service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
+            Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+            log.info("Artist Importer Processing info: " + service.getProcessInfo());
+        });
+
         Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("Artists imported")));
         Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("Artist details imported")));
         Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("Artist categories imported")));

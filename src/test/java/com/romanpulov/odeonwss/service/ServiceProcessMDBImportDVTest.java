@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.CompositionRepository;
@@ -34,14 +36,20 @@ public class ServiceProcessMDBImportDVTest {
     @Autowired
     ProcessService service;
 
+    @Autowired
+    AppConfiguration appConfiguration;
+
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
     //@Disabled("For dev purposes")
     void testLoadArtists() {
-        service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_IMPORTED_ARTISTS, () -> {
+            service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
+            Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+            log.info("Artist Importer Processing info: " + service.getProcessInfo());
+        });
 
         log.info("Processing info: " + service.getProcessInfo());
     }

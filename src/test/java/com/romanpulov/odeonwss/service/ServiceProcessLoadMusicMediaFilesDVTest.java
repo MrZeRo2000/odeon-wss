@@ -44,9 +44,11 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
     @Rollback(false)
     void testPrepare() {
         DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC, () -> {
-            service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
-            Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
-            log.info("Artist Importer Processing info: " + service.getProcessInfo());
+            DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_IMPORTED_ARTISTS, () -> {
+                service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
+                Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+                log.info("Artist Importer Processing info: " + service.getProcessInfo());
+            });
 
             service.executeProcessor(ProcessorType.DV_MUSIC_IMPORTER);
             Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());

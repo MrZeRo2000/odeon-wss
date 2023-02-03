@@ -51,7 +51,9 @@ public class ServiceProcessValidateDVMoviesTest {
     private MediaFileRepository mediaFileRepository;
 
     private void internalPrepare() {
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_LOADED_MOVIES, () -> {});
+        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_LOADED_MOVIES, () -> {
+            throw new RuntimeException("Movies should already be loaded");
+        });
     }
 
     @Test

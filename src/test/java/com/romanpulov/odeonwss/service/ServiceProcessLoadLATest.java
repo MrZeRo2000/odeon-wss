@@ -10,6 +10,7 @@ import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
@@ -103,7 +104,7 @@ public class ServiceProcessLoadLATest {
         assertThat(artifact.getSize()).isEqualTo(
                 mediaFiles.stream().collect(Collectors.summarizingLong(MediaFile::getSize)).getSum()
         );
-        if (size >0) {
+        if (size > 0) {
             assertThat(artifact.getSize()).isEqualTo(size);
         }
     }
@@ -162,7 +163,7 @@ public class ServiceProcessLoadLATest {
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
 
         int item = 0;
-        assertThat(progressDetails.get(item ++)).isEqualTo(
+        assertThat(progressDetails.get(item++)).isEqualTo(
                 new ProgressDetail(
                         new ProgressDetail.ProgressInfo("Started LA Loader", new ArrayList<>()),
                         ProcessingStatus.INFO,
@@ -170,7 +171,7 @@ public class ServiceProcessLoadLATest {
                         null)
         );
 
-        assertThat(progressDetails.get(item ++)).isEqualTo(
+        assertThat(progressDetails.get(item++)).isEqualTo(
                 new ProgressDetail(
                         new ProgressDetail.ProgressInfo("Artists loaded", new ArrayList<>()),
                         ProcessingStatus.INFO,
@@ -178,7 +179,7 @@ public class ServiceProcessLoadLATest {
                         null)
         );
 
-        assertThat(progressDetails.get(item ++)).isEqualTo(
+        assertThat(progressDetails.get(item++)).isEqualTo(
                 new ProgressDetail(
                         new ProgressDetail.ProgressInfo("Artifacts loaded", new ArrayList<>()),
                         ProcessingStatus.INFO,
@@ -186,7 +187,7 @@ public class ServiceProcessLoadLATest {
                         null)
         );
 
-        assertThat(progressDetails.get(item ++)).isEqualTo(
+        assertThat(progressDetails.get(item++)).isEqualTo(
                 new ProgressDetail(
                         new ProgressDetail.ProgressInfo("Compositions loaded", new ArrayList<>()),
                         ProcessingStatus.INFO,
@@ -212,4 +213,5 @@ public class ServiceProcessLoadLATest {
         testOneMediaFilePerAllCompositions("Therapy", "Infernal Love", 11, 1, 330812393);
         testOneMediaFilePerAllCompositions("Tori Amos", "Y Kant Tori Read", 10, 1, 286331932);
     }
+
 }

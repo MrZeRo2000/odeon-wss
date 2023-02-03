@@ -14,11 +14,13 @@ import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 import com.romanpulov.odeonwss.service.processor.model.ProgressDetail;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.DisabledIf;
 
+import javax.sql.DataSource;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -45,11 +47,14 @@ public class ServiceProcessLoadMoviesDVTest {
     @Autowired
     private MediaFileRepository mediaFileRepository;
 
+    @Autowired
+    DataSource dataSource;
+
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(value = false)
-    void testPrepare() {
+    void testPrepare() throws Exception {
         DbManagerService.loadOrPrepare(appConfiguration, DB_PRODUCTS, () -> {
             processService.executeProcessor(ProcessorType.DV_PRODUCT_IMPORTER);
             Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
