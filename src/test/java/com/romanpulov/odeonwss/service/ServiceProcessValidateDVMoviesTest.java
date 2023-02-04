@@ -231,7 +231,7 @@ public class ServiceProcessValidateDVMoviesTest {
                 new ProgressDetail(
                         new ProgressDetail.ProgressInfo(
                                 "Media files not in files",
-                                List.of(mediaFile.getName())),
+                                List.of(artifact.getTitle() + " >> " + mediaFile.getName())),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -262,7 +262,7 @@ public class ServiceProcessValidateDVMoviesTest {
                 new ProgressDetail(
                         new ProgressDetail.ProgressInfo(
                                 "Media files not in database",
-                                List.of("Part 2.avi")),
+                                List.of("Обыкновенное чудо >> Part 2.avi")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)

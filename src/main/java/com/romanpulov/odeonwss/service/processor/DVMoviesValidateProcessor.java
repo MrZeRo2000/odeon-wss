@@ -32,13 +32,13 @@ public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {
                 ArtifactType.withDVMovies());
         logger.info("dbValidation:" + dbValidation);
 
-        final List<MediaFileValidationDTO> pathValidation = loadFromPath(path);
+        final List<MediaFileValidationDTO> pathValidation = PathLoader.loadFromPath(this, path);
         logger.info("pathValidation:" + pathValidation);
 
-        if (validateArtifacts(pathValidation, dbValidation)) {
+        if (PathValidator.validateArtifacts(this, pathValidation, dbValidation)) {
             infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
-            if (validateMediaFiles(pathValidation, dbValidation)) {
+            if (PathValidator.validateMediaFiles(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
             }
 
@@ -49,62 +49,6 @@ public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {
                 infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
             }
         }
-    }
-
-    private List<MediaFileValidationDTO> loadFromPath(Path path) throws ProcessorException {
-        List<MediaFileValidationDTO> result = new ArrayList<>();
-
-        List<Path> artifactPaths = new ArrayList<>();
-        if (PathReader.readPathFoldersOnly(this, path, artifactPaths)) {
-            for (Path artifactPath: artifactPaths) {
-                List<Path> compositionPaths = new ArrayList<>();
-                if (PathReader.readPathFilesOnly(this, artifactPath, compositionPaths)) {
-                    compositionPaths.forEach(compositionPath ->
-                            result.add(MediaFileValidationDTO.fromDVMediaFile(
-                                    artifactPath.getFileName().toString(),
-                                    null,
-                                    compositionPath.getFileName().toString())));
-                } else {
-                    break;
-                }
-            }
-        }
-
-        return result;
-    }
-
-    protected boolean validateArtifacts(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
-        Set<String> pathArtifacts = pathValidation.stream()
-                .map(CompositionValidationDTO::getArtifactTitle)
-                .collect(Collectors.toSet());
-        Set<String> dbArtifacts = dbValidation.stream()
-                .map(CompositionValidationDTO::getArtifactTitle)
-                .collect(Collectors.toSet());
-
-        return ValueValidator.compareStringSets(
-                this,
-                pathArtifacts,
-                dbArtifacts,
-                ProcessorMessages.ERROR_ARTIFACTS_NOT_IN_FILES,
-                ProcessorMessages.ERROR_ARTIFACTS_NOT_IN_DB
-        );
-    }
-
-    protected boolean validateMediaFiles(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
-        Set<String> pathMediaFiles = pathValidation.stream()
-                .map(MediaFileValidationDTO::getMediaFileName)
-                .collect(Collectors.toSet());
-        Set<String> dbMediaFiles = dbValidation.stream()
-                .map(MediaFileValidationDTO::getMediaFileName)
-                .collect(Collectors.toSet());
-
-        return ValueValidator.compareStringSets(
-                this,
-                pathMediaFiles,
-                dbMediaFiles,
-                ProcessorMessages.ERROR_MEDIA_FILES_NOT_IN_FILES,
-                ProcessorMessages.ERROR_MEDIA_FILES_NOT_IN_DB
-        );
     }
 
     protected boolean validateArtifactMediaFiles(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {

@@ -48,7 +48,8 @@ public class DbManagerService {
         DB_IMPORTED_ARTISTS("imported_artists"),
         DB_LOADED_MOVIES("loaded_movies"),
         DB_PRODUCTS("products"),
-        DB_ARTISTS_DV_MUSIC("artists_dv_music");
+        DB_ARTISTS_DV_MUSIC("artists_dv_music"),
+        DB_ARTISTS_DV_MUSIC_MEDIA("artists_dv_music_media"),;
 
         public final String fileName;
 
