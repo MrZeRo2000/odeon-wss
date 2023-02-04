@@ -13,8 +13,11 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.DisabledIf;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -55,12 +58,37 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(2)
     @Rollback(false)
-    void testValidate() {
+    void testValidateImportedShouldFail() {
         service.executeProcessor(ProcessorType.DV_MUSIC_VALIDATOR);
 
         ProcessInfo pi = service.getProcessInfo();
         List<ProgressDetail> progressDetails = pi.getProgressDetails();
         log.info("Processing info: " + service.getProcessInfo());
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
+
+        assertThat(progressDetails.get(0)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Started Video music validator", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(progressDetails.get(1).getInfo().getMessage()).isEqualTo("Media files with empty size");
+        assertThat(progressDetails.get(1).getInfo().getItems())
+                .contains("Beauty In Darkness Vol 5.mkv", "Iron Maiden.mkv");
+
+        assertThat(progressDetails.get(2).getInfo().getMessage()).isEqualTo("Artifacts not in files");
+        assertThat(progressDetails.get(2).getInfo().getItems())
+                .contains("Beauty In Darkness Vol.5", "Scorpions - Acoustica (Live in Lisboa) 2001");
+
+        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+
     }
 }
