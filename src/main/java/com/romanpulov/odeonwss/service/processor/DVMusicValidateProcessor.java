@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.service.processor;
 
-import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
@@ -8,30 +7,15 @@ import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
-    private static final String FORMAT_DELIMITER = " >> ";
+    private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMusic();
 
     private final MediaFileRepository mediaFileRepository;
-
-    private static class MediaFileValidation {
-        private final String artifactTitle;
-        private final String mediaFileName;
-
-        public MediaFileValidation(String artifactTitle, String mediaFileName) {
-            this.artifactTitle = artifactTitle;
-            this.mediaFileName = mediaFileName;
-        }
-    }
 
     public DVMusicValidateProcessor(MediaFileRepository mediaFileRepository) {
         this.mediaFileRepository = mediaFileRepository;
@@ -42,7 +26,7 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
         Path path = validateAndGetPath();
 
         final List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getCompositionMediaFileValidationMusic(
-                ArtistType.ARTIST, ArtifactType.withDVMusic()
+                ArtistType.ARTIST, ARTIFACT_TYPE
         );
         final List<MediaFileValidationDTO> pathValidation = PathLoader.loadFromPath(this, path);
 
@@ -57,16 +41,25 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
                 infoHandler(ProcessorMessages.INFO_COMPOSITIONS_VALIDATED);
             }
 
-            List<MediaFileValidationDTO> dbArtifactMediaFilesValidation = mediaFileRepository.getMediaFileValidationMusic(ArtifactType.withDVMusic());
+            List<MediaFileValidationDTO> dbArtifactMediaFilesValidation = mediaFileRepository
+                    .getMediaFileValidationMusic(ARTIFACT_TYPE);
 
             if (PathValidator.validateMediaFiles(this, pathValidation, dbArtifactMediaFilesValidation)) {
                 infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
+            }
+
+            List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
+                    .getArtifactMediaFileValidationDV(ARTIFACT_TYPE);
+
+            if (PathValidator.validateArtifactMediaFiles(this, pathValidation, dbArtifactValidation)) {
+                infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
             }
         }
     }
 
     private boolean validateEmptyMediaFiles() {
-        List<MediaFile> mediaFiles = mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(ArtifactType.withDVMusic());
+        List<MediaFile> mediaFiles = mediaFileRepository
+                .getMediaFilesWithEmptySizeByArtifactType(ARTIFACT_TYPE);
         if (mediaFiles.isEmpty()) {
             return true;
         } else {

@@ -74,4 +74,24 @@ public class PathValidator {
         );
     }
 
+    public static boolean validateArtifactMediaFiles(
+            AbstractProcessor processor,
+            List<MediaFileValidationDTO> pathValidation,
+            List<MediaFileValidationDTO> dbValidation) {
+        Set<String> pathMediaFiles = pathValidation.stream()
+                .map(MediaFileValidationDTO::getMediaFileName)
+                .collect(Collectors.toSet());
+        Set<String> dbMediaFiles = dbValidation.stream()
+                .map(MediaFileValidationDTO::getMediaFileName)
+                .collect(Collectors.toSet());
+
+        return ValueValidator.compareStringSets(
+                processor,
+                pathMediaFiles,
+                dbMediaFiles,
+                ProcessorMessages.ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_FILES,
+                ProcessorMessages.ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_DB
+        );
+    }
+
 }

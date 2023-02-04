@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 @Component
 public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {
     private static final Logger logger = LoggerFactory.getLogger(DVMoviesValidateProcessor.class);
+    public static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMovies();
 
     private final MediaFileRepository mediaFileRepository;
 
@@ -29,7 +30,7 @@ public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {
         Path path = validateAndGetPath();
 
         List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getCompositionMediaFileValidationDV(
-                ArtifactType.withDVMovies());
+                ARTIFACT_TYPE);
         logger.info("dbValidation:" + dbValidation);
 
         final List<MediaFileValidationDTO> pathValidation = PathLoader.loadFromPath(this, path);
@@ -42,30 +43,12 @@ public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {
                 infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
             }
 
-            dbValidation = mediaFileRepository.getArtifactMediaFileValidationDV(
-                    ArtifactType.withDVMovies());
+            List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository.getArtifactMediaFileValidationDV(
+                    ARTIFACT_TYPE);
 
-            if (validateArtifactMediaFiles(pathValidation, dbValidation)) {
+            if (PathValidator.validateArtifactMediaFiles(this, pathValidation, dbArtifactValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
             }
         }
     }
-
-    protected boolean validateArtifactMediaFiles(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
-        Set<String> pathMediaFiles = pathValidation.stream()
-                .map(MediaFileValidationDTO::getMediaFileName)
-                .collect(Collectors.toSet());
-        Set<String> dbMediaFiles = dbValidation.stream()
-                .map(MediaFileValidationDTO::getMediaFileName)
-                .collect(Collectors.toSet());
-
-        return ValueValidator.compareStringSets(
-                this,
-                pathMediaFiles,
-                dbMediaFiles,
-                ProcessorMessages.ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_FILES,
-                ProcessorMessages.ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_DB
-        );
-    }
-
 }
