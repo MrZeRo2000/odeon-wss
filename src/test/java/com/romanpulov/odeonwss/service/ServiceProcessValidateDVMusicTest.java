@@ -280,4 +280,24 @@ public class ServiceProcessValidateDVMusicTest {
 
     }
 
+    @Test
+    @Order(15)
+    void testNewArtifactInFilesShouldFail() {
+        this.internalPrepareExisting();
+        Artifact artifact = artifactRepository.findAll().get(0);
+        artifactRepository.delete(artifact);
+
+        ProcessInfo pi = executeProcessor();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+        assertThat(pi.getProgressDetails().get(2)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifacts not in database",
+                                List.of(artifact.getTitle())),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
 }
