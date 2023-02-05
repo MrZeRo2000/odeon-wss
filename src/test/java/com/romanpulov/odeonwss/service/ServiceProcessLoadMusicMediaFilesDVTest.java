@@ -43,7 +43,7 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
     void testPrepare() {
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC, () -> {
+        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_IMPORT, () -> {
             DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_IMPORTED_ARTISTS, () -> {
                 service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
                 Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());

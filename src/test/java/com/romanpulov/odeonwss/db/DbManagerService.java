@@ -48,8 +48,10 @@ public class DbManagerService {
         DB_IMPORTED_ARTISTS("imported_artists"),
         DB_LOADED_MOVIES("loaded_movies"),
         DB_PRODUCTS("products"),
-        DB_ARTISTS_DV_MUSIC("artists_dv_music"),
-        DB_ARTISTS_DV_MUSIC_MEDIA("artists_dv_music_media"),;
+        DB_ARTISTS_DV_MUSIC_IMPORT("artists_dv_music"),
+        DB_ARTISTS_DV_MUSIC_MEDIA("artists_dv_music_media"),
+        //only those which are available in test data
+        DB_ARTISTS_DV_MUSIC_MEDIA_EXISTING("artists_dv_music_existing"),;
 
         public final String fileName;
 
