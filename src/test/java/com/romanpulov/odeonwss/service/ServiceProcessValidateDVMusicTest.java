@@ -3,12 +3,8 @@ package com.romanpulov.odeonwss.service;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
-import com.romanpulov.odeonwss.repository.ArtistRepository;
+import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
@@ -49,6 +45,10 @@ public class ServiceProcessValidateDVMusicTest {
     private ArtistRepository artistRepository;
     @Autowired
     private ArtifactTypeRepository artifactTypeRepository;
+    @Autowired
+    private CompositionRepository compositionRepository;
+    @Autowired
+    private MediaFileRepository mediaFileRepository;
 
     private ProcessInfo executeProcessor() {
         service.executeProcessor(PROCESSOR_TYPE);
@@ -56,11 +56,13 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     private void internalPrepareImported() {
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA, () -> {});
+        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA,
+                () -> {throw new RuntimeException("Error with internalPrepareImported");});
     }
 
     private void internalPrepareExisting() {
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA_EXISTING, () -> {});
+        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA_EXISTING,
+                () -> {throw new RuntimeException("Error with internalPrepareExisting");});
     }
 
     @Test
@@ -298,6 +300,42 @@ public class ServiceProcessValidateDVMusicTest {
                         null,
                         null)
         );
+    }
+
+    @Test
+    @Order(15)
+    void testNewFileInDbShouldFail() {
+        this.internalPrepareExisting();
+        Artifact artifact = artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)
+                .stream()
+                .filter(a -> a.getTitle().equals("Beautiful Voices 1"))
+                .findFirst().orElseThrow();
+        Composition composition = compositionRepository
+                .findByIdWithMediaFiles(artifact.getCompositions().get(0).getId())
+                .orElseThrow();
+
+        MediaFile mediaFile = new MediaFile();
+        mediaFile.setName("New music file.mkv");
+        mediaFile.setFormat("MKV");
+        mediaFile.setSize(150L);
+        mediaFile.setBitrate(2235L);
+        mediaFileRepository.save(mediaFile);
+
+        composition.getMediaFiles().add(mediaFile);
+        compositionRepository.save(composition);
+
+        ProcessInfo pi = executeProcessor();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Media files not in files",
+                                List.of(artifact.getTitle() + " >> " + mediaFile.getName())),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+
     }
 
 }
