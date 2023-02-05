@@ -1,9 +1,14 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
+import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
+import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
@@ -40,6 +45,10 @@ public class ServiceProcessValidateDVMusicTest {
 
     @Autowired
     private ArtifactRepository artifactRepository;
+    @Autowired
+    private ArtistRepository artistRepository;
+    @Autowired
+    private ArtifactTypeRepository artifactTypeRepository;
 
     private ProcessInfo executeProcessor() {
         service.executeProcessor(PROCESSOR_TYPE);
@@ -210,6 +219,60 @@ public class ServiceProcessValidateDVMusicTest {
         assertThat(pi.getProgressDetails().get(4)).isEqualTo(
                 new ProgressDetail(
                         new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+
+    }
+
+    @Test
+    @Order(13)
+    void testNewArtifactWithoutArtistShouldFail() {
+        this.internalPrepareExisting();
+        Artifact artifact = (new EntityArtifactBuilder())
+                .withArtifactType(ARTIFACT_TYPE)
+                .withTitle("Artifact no artist")
+                .build();
+        artifactRepository.save(artifact);
+
+        ProcessInfo pi = executeProcessor();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProgressDetails().get(2)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifacts without artists",
+                                List.of("Artifact no artist")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+
+    }
+
+    @Test
+    @Order(14)
+    void testNewArtifactInDbShouldFail() {
+        this.internalPrepareExisting();
+        Artist artist = artistRepository.findAll().iterator().next();
+        assertThat(artist).isNotNull();
+
+        Artifact artifact = (new EntityArtifactBuilder())
+                .withArtifactType(ARTIFACT_TYPE)
+                .withArtist(artist)
+                .withTitle("New Artifact")
+                .build();
+        artifactRepository.save(artifact);
+
+        ProcessInfo pi = executeProcessor();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProgressDetails().get(2)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifacts not in files",
+                                List.of("New Artifact")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)

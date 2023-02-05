@@ -35,6 +35,7 @@ public class ProcessorMessages {
 
     static final String ERROR_ARTIFACTS_NOT_IN_DB = "Artifacts not in database";
     static final String ERROR_ARTIFACTS_NOT_IN_FILES = "Artifacts not in files";
+    static final String ERROR_ARTIFACTS_WITHOUT_ARTISTS = "Artifacts without artists";
     static final String INFO_ARTIFACTS_VALIDATED = "Artifacts validated";
 
     static final String ERROR_COMPOSITIONS_NOT_IN_DB = "Compositions not in database: %s";

@@ -1,9 +1,11 @@
 package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
+import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import org.springframework.stereotype.Component;
 
@@ -16,9 +18,12 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
     private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMusic();
 
     private final MediaFileRepository mediaFileRepository;
+    private final ArtifactRepository artifactRepository;
 
-    public DVMusicValidateProcessor(MediaFileRepository mediaFileRepository) {
+    public DVMusicValidateProcessor(MediaFileRepository mediaFileRepository,
+                                    ArtifactRepository artifactRepository) {
         this.mediaFileRepository = mediaFileRepository;
+        this.artifactRepository = artifactRepository;
     }
 
     @Override
@@ -34,8 +39,9 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
             infoHandler(ProcessorMessages.INFO_MEDIA_FILES_SIZE_VALIDATED);
         }
 
-        if (PathValidator.validateArtifacts(this, pathValidation, dbValidation)) {
-            infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
+        if (validateArtifactsWithoutArtists()) {
+            if (PathValidator.validateArtifacts(this, pathValidation, dbValidation)) {
+                infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
             /*
             if (PathValidator.validateCompositions(this, pathValidation, dbValidation)) {
@@ -44,18 +50,19 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
 
              */
 
-            List<MediaFileValidationDTO> dbArtifactMediaFilesValidation = mediaFileRepository
-                    .getMediaFileValidationMusic(ARTIFACT_TYPE);
+                List<MediaFileValidationDTO> dbArtifactMediaFilesValidation = mediaFileRepository
+                        .getMediaFileValidationMusic(ARTIFACT_TYPE);
 
-            if (PathValidator.validateMediaFiles(this, pathValidation, dbArtifactMediaFilesValidation)) {
-                infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
-            }
+                if (PathValidator.validateMediaFiles(this, pathValidation, dbArtifactMediaFilesValidation)) {
+                    infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
+                }
 
-            List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
-                    .getArtifactMediaFileValidationDV(ARTIFACT_TYPE);
+                List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
+                        .getArtifactMediaFileValidationDV(ARTIFACT_TYPE);
 
-            if (PathValidator.validateArtifactMediaFiles(this, pathValidation, dbArtifactValidation)) {
-                infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
+                if (PathValidator.validateArtifactMediaFiles(this, pathValidation, dbArtifactValidation)) {
+                    infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
+                }
             }
         }
     }
@@ -72,6 +79,24 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
             );
             return false;
         }
+    }
+
+    private boolean validateArtifactsWithoutArtists() {
+        List<String> artifactsWithoutArtists = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE)
+                .stream()
+                .filter(a -> a.getArtist() == null)
+                .map(Artifact::getTitle)
+                .collect(Collectors.toList());
+        if (artifactsWithoutArtists.size() > 0) {
+            errorHandler(
+                    ProcessorMessages.ERROR_ARTIFACTS_WITHOUT_ARTISTS,
+                    artifactsWithoutArtists
+            );
+            return false;
+        } else {
+            return true;
+        }
+
     }
 
 }
