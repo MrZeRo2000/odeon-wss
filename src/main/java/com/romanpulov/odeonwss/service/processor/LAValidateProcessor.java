@@ -135,7 +135,8 @@ public class LAValidateProcessor extends AbstractArtistBaseValidateProcessor {
         Set<String> pathMediaFiles = MediaFileValidationDTO.getMusicMediaFiles(pathValidation);
         Set<String> dbMediaFiles = MediaFileValidationDTO.getMusicMediaFiles(dbValidation);
 
-        return compareStringSets(
+        return ValueValidator.compareStringSets(
+                this,
                 pathMediaFiles,
                 dbMediaFiles,
                 ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_FILES,
@@ -147,7 +148,8 @@ public class LAValidateProcessor extends AbstractArtistBaseValidateProcessor {
         Set<String> pathMediaFiles = MediaFileValidationDTO.getMusicMediaFiles(pathValidation);
         Set<String> dbMediaFiles = MediaFileValidationDTO.getMusicMediaFiles(dbValidation);
 
-        return compareStringSets(
+        return ValueValidator.compareStringSets(
+                this,
                 pathMediaFiles,
                 dbMediaFiles,
                 ProcessorMessages.ERROR_MEDIA_FILES_NOT_IN_FILES,

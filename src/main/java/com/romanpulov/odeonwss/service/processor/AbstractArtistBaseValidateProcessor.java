@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.service.processor;
 import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
+import org.hibernate.mapping.Value;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,7 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-abstract public class AbstractArtistBaseValidateProcessor extends AbstractValidateProcessor {
+abstract public class AbstractArtistBaseValidateProcessor extends AbstractFileSystemProcessor {
     protected List<MediaFileValidationDTO> loadFromPath(Path path) throws ProcessorException {
         List<MediaFileValidationDTO> result = new ArrayList<>();
 
@@ -44,7 +45,8 @@ abstract public class AbstractArtistBaseValidateProcessor extends AbstractValida
         Set<String> pathArtistNames = pathValidation.stream().map(CompositionValidationDTO::getArtistName).collect(Collectors.toSet());
         Set<String> dbArtistNames = dbValidation.stream().map(CompositionValidationDTO::getArtistName).collect(Collectors.toSet());
 
-        return compareStringSets(
+        return ValueValidator.compareStringSets(
+                this,
                 pathArtistNames,
                 dbArtistNames,
                 ProcessorMessages.ERROR_ARTISTS_NOT_IN_FILES,
@@ -64,7 +66,8 @@ abstract public class AbstractArtistBaseValidateProcessor extends AbstractValida
                         NamesParser.formatMusicArtifact(d.getArtifactYear(), d.getArtifactTitle()))
                 .collect(Collectors.toSet());
 
-        return compareStringSets(
+        return ValueValidator.compareStringSets(
+                this,
                 pathArtifacts,
                 dbArtifacts,
                 ProcessorMessages.ERROR_ARTIFACTS_NOT_IN_FILES,

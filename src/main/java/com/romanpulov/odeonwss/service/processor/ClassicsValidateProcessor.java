@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
-public class ClassicsValidateProcessor extends AbstractValidateProcessor {
+public class ClassicsValidateProcessor extends AbstractFileSystemProcessor {
 
     private final ArtifactRepository artifactRepository;
 
@@ -56,7 +56,8 @@ public class ClassicsValidateProcessor extends AbstractValidateProcessor {
     }
 
     private boolean validateArtifacts(Set<String> pathValidation, Set<String> dbValidation) {
-        return compareStringSets(
+        return ValueValidator.compareStringSets(
+                this,
                 pathValidation,
                 dbValidation,
                 ProcessorMessages.ERROR_ARTIFACTS_NOT_IN_FILES,

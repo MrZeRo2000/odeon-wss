@@ -122,7 +122,8 @@ public class MP3ValidateProcessor extends AbstractArtistBaseValidateProcessor {
         Set<String> pathCompositions = MediaFileValidationDTO.getMusicCompositions(pathValidation);
         Set<String> dbCompositions = MediaFileValidationDTO.getMusicCompositions(dbValidation);
 
-        return compareStringSets(
+        return ValueValidator.compareStringSets(
+                this,
                 pathCompositions,
                 dbCompositions,
                 ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_FILES,
