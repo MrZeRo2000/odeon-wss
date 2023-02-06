@@ -17,6 +17,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.DisabledIf;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -331,6 +332,114 @@ public class ServiceProcessValidateDVMusicTest {
                         new ProgressDetail.ProgressInfo(
                                 "Media files not in files",
                                 List.of(artifact.getTitle() + " >> " + mediaFile.getName())),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+
+    }
+
+    @Test
+    @Order(16)
+    void testNewFileInFilesShouldFail() {
+        this.internalPrepareExisting();
+        Artifact artifact = artifactRepository
+                .findAll()
+                .stream()
+                .filter(a -> a.getTitle().equals("Tori Amos - Fade to Red 2006"))
+                .findFirst()
+                .orElseThrow();
+        MediaFile mediaFile = mediaFileRepository
+                .findAllByArtifact(artifact)
+                .stream()
+                .filter(m -> m.getName().equals("Tori Amos - Fade to Red Disk 2 2006.mkv"))
+                .findFirst()
+                .orElseThrow();
+
+        compositionRepository.findAllByArtifact(artifact).forEach(c -> {
+            Composition composition = compositionRepository.findByIdWithMediaFiles(c.getId()).orElseThrow();
+            if (composition.getMediaFiles().contains(mediaFile)) {
+                compositionRepository.delete(composition);
+            }
+        });
+        mediaFile.setArtifact(null);
+        mediaFileRepository.delete(mediaFile);
+
+        ProcessInfo pi = executeProcessor();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Media files not in database",
+                                List.of("Tori Amos - Fade to Red 2006 >> Tori Amos - Fade to Red Disk 2 2006.mkv")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+
+        assertThat(pi.getProgressDetails().get(4)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifact media files not in database",
+                                List.of("Tori Amos - Fade to Red Disk 2 2006.mkv")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+
+    }
+
+    @Test
+    @Order(17)
+    void testNewArtifactFileInDbShouldFail() {
+        this.internalPrepareExisting();
+        Artifact artifact = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE)
+                .stream()
+                .filter(a -> a.getTitle().equals("The Cure - Picture Show 1991"))
+                .findFirst().orElseThrow();
+
+        MediaFile mediaFile = new MediaFile();
+        mediaFile.setName("Another media file.mkv");
+        mediaFile.setFormat("MKV");
+        mediaFile.setSize(160445L);
+        mediaFile.setBitrate(2345L);
+        mediaFile.setArtifact(artifact);
+        mediaFileRepository.save(mediaFile);
+
+        ProcessInfo pi = executeProcessor();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProgressDetails().get(4)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifact media files not in files",
+                                List.of("Another media file.mkv")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(18)
+    void testNewArtifactFileInFilesShouldFail() {
+        this.internalPrepareExisting();
+        MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE)
+                .stream()
+                .filter(m -> m.getName().equals("The Cure - Picture Show 1991.mp4"))
+                .findFirst()
+                .orElseThrow();
+        mediaFile.setArtifact(null);
+        mediaFileRepository.save(mediaFile);
+
+        ProcessInfo pi = executeProcessor();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProgressDetails().get(4)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifact media files not in database",
+                                List.of("The Cure - Picture Show 1991.mp4")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)

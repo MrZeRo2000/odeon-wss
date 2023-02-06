@@ -12,6 +12,10 @@ public class ValueValidator {
         return data.stream().sorted().collect(Collectors.toList());
     }
 
+    private static <T> Set<T> nonNullSet(Set<T> data) {
+        return (new HashSet<>(data)).stream().filter(Objects::nonNull).collect(Collectors.toSet());
+    }
+
     public static boolean compareStringSets(
             AbstractProcessor processor,
             Set<String> pathStrings,
@@ -21,8 +25,8 @@ public class ValueValidator {
     {
         boolean result = true;
 
-        Set<String> pathStringsDiff = new HashSet<>(pathStrings);
-        pathStringsDiff.removeAll(dbStrings);
+        Set<String> pathStringsDiff = nonNullSet(pathStrings);
+        pathStringsDiff.removeAll(nonNullSet(dbStrings));
         if (!pathStringsDiff.isEmpty()) {
             processor.errorHandler(
                     dbErrorMessage,
@@ -30,8 +34,8 @@ public class ValueValidator {
             result = false;
         }
 
-        Set<String> dbStringsDiff = new HashSet<>(dbStrings);
-        dbStringsDiff.removeAll(pathStrings);
+        Set<String> dbStringsDiff = nonNullSet(dbStrings);
+        dbStringsDiff.removeAll(nonNullSet(pathStrings));
         if (!dbStringsDiff.isEmpty()) {
             processor.errorHandler(pathErrorMessage, sortedCollection(dbStringsDiff));
             result = false;
