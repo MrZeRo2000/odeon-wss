@@ -57,20 +57,6 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     private void internalPrepareImported() {
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA,
-                () -> {throw new RuntimeException("Error with internalPrepareImported");});
-    }
-
-    private void internalPrepareExisting() {
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA_EXISTING,
-                () -> {throw new RuntimeException("Error with internalPrepareExisting");});
-    }
-
-    @Test
-    @Order(1)
-    @Sql({"/schema.sql", "/data.sql"})
-    @Rollback(false)
-    void testPrepareImported() {
         DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA, () -> {
             // load artists
             service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
@@ -87,7 +73,10 @@ public class ServiceProcessValidateDVMusicTest {
             Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
             log.info("Music Media Loader Processing info: " + service.getProcessInfo());
         });
+    }
 
+    private void internalPrepareExisting() {
+        internalPrepareImported();
         DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA_EXISTING, () -> {
             artifactRepository.getAllByArtifactType(ARTIFACT_TYPE)
                     .forEach(artifact -> {
@@ -99,8 +88,17 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
+    @Order(1)
+    @Sql({"/schema.sql", "/data.sql"})
+    @Rollback(false)
+    void testPrepareImported() {
+        internalPrepareExisting();
+    }
+
+    @Test
     @Order(2)
     @Rollback(false)
+    @Sql({"/schema.sql", "/data.sql"})
     void testValidateImportedShouldFail() {
         this.internalPrepareImported();
         ProcessInfo pi = executeProcessor();
@@ -136,6 +134,7 @@ public class ServiceProcessValidateDVMusicTest {
 
     @Test
     @Order(11)
+    @Sql({"/schema.sql", "/data.sql"})
     void validateOk() {
         this.internalPrepareExisting();
         ProcessInfo pi = executeProcessor();
@@ -231,6 +230,7 @@ public class ServiceProcessValidateDVMusicTest {
 
     @Test
     @Order(13)
+    @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactWithoutArtistShouldFail() {
         this.internalPrepareExisting();
         Artifact artifact = (new EntityArtifactBuilder())
@@ -256,6 +256,7 @@ public class ServiceProcessValidateDVMusicTest {
 
     @Test
     @Order(14)
+    @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactInDbShouldFail() {
         this.internalPrepareExisting();
         Artist artist = artistRepository.findAll().iterator().next();
@@ -285,6 +286,7 @@ public class ServiceProcessValidateDVMusicTest {
 
     @Test
     @Order(15)
+    @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactInFilesShouldFail() {
         this.internalPrepareExisting();
         Artifact artifact = artifactRepository.findAll().get(0);
@@ -305,6 +307,7 @@ public class ServiceProcessValidateDVMusicTest {
 
     @Test
     @Order(15)
+    @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInDbShouldFail() {
         this.internalPrepareExisting();
         Artifact artifact = artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)
@@ -341,6 +344,7 @@ public class ServiceProcessValidateDVMusicTest {
 
     @Test
     @Order(16)
+    @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInFilesShouldFail() {
         this.internalPrepareExisting();
         Artifact artifact = artifactRepository
@@ -391,6 +395,7 @@ public class ServiceProcessValidateDVMusicTest {
 
     @Test
     @Order(17)
+    @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInDbShouldFail() {
         this.internalPrepareExisting();
         Artifact artifact = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE)
@@ -422,6 +427,7 @@ public class ServiceProcessValidateDVMusicTest {
 
     @Test
     @Order(18)
+    @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInFilesShouldFail() {
         this.internalPrepareExisting();
         MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE)
@@ -444,7 +450,6 @@ public class ServiceProcessValidateDVMusicTest {
                         null,
                         null)
         );
-
     }
 
 }

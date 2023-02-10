@@ -43,22 +43,12 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
             if (PathValidator.validateArtifacts(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
-            /*
-            if (PathValidator.validateCompositions(this, pathValidation, dbValidation)) {
-                infoHandler(ProcessorMessages.INFO_COMPOSITIONS_VALIDATED);
-            }
-
-             */
-
-                List<MediaFileValidationDTO> dbArtifactMediaFilesValidation = mediaFileRepository
-                        .getMediaFileValidationMusic(ARTIFACT_TYPE);
-
                 if (PathValidator.validateMediaFiles(this, pathValidation, dbValidation)) {
                     infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
                 }
 
                 List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
-                        .getArtifactMediaFileValidationDV(ARTIFACT_TYPE);
+                        .getArtifactMediaFileValidationMusic(ARTIFACT_TYPE);
 
                 if (PathValidator.validateArtifactMediaFiles(this, pathValidation, dbArtifactValidation)) {
                     infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);

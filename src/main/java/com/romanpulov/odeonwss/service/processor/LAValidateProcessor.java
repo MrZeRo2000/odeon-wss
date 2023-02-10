@@ -43,17 +43,18 @@ public class LAValidateProcessor extends AbstractArtistBaseValidateProcessor {
         if (validateArtistNames(pathValidation, dbValidation)) {
             infoHandler(ProcessorMessages.INFO_ARTISTS_VALIDATED);
 
-            if (validateArtifacts(pathValidation, dbValidation)) {
+            if (PathValidator.validateArtifactsMusic(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
-                if (validateCompositions(pathValidation, dbValidation)) {
-                    infoHandler(ProcessorMessages.INFO_COMPOSITIONS_VALIDATED);
+                if (PathValidator.validateMediaFilesMusic(this, pathValidation, dbValidation)) {
+                    infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
                 }
 
-                dbValidation = mediaFileRepository.getMediaFileValidationMusic(ArtifactType.withLA());
+                List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
+                        .getArtifactMediaFileValidationMusic(ArtifactType.withLA());
 
-                if (validateMediaFiles(pathValidation, dbValidation)) {
-                    infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
+                if (PathValidator.validateMediaFiles(this, pathValidation, dbArtifactValidation)) {
+                        infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
                 }
             }
         }

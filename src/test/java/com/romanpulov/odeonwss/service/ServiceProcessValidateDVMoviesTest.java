@@ -52,7 +52,9 @@ public class ServiceProcessValidateDVMoviesTest {
 
     private void internalPrepare() {
         DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_LOADED_MOVIES, () -> {
-            throw new RuntimeException("Movies should already be loaded");
+            service.executeProcessor(ProcessorType.DV_MOVIES_LOADER);
+            Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+            log.info("Movies Importer Processing info: " + service.getProcessInfo());
         });
     }
 
@@ -61,11 +63,7 @@ public class ServiceProcessValidateDVMoviesTest {
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
     void testPrepare() {
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_LOADED_MOVIES, () -> {
-            service.executeProcessor(ProcessorType.DV_MOVIES_LOADER);
-            Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
-            log.info("Movies Importer Processing info: " + service.getProcessInfo());
-        });
+        internalPrepare();
     }
 
     @Test
@@ -181,6 +179,7 @@ public class ServiceProcessValidateDVMoviesTest {
 
     @Test
     @Order(5)
+    @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactInFilesShouldFail() {
         this.internalPrepare();
         Artifact artifact = artifactRepository.findAll().get(0);
@@ -203,6 +202,7 @@ public class ServiceProcessValidateDVMoviesTest {
 
     @Test
     @Order(6)
+    @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInDbShouldFail() {
         this.internalPrepare();
         Artifact artifact = artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)
@@ -240,6 +240,7 @@ public class ServiceProcessValidateDVMoviesTest {
 
     @Test
     @Order(7)
+    @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInFilesShouldFail() {
         this.internalPrepare();
         Composition composition = compositionRepository
@@ -272,6 +273,7 @@ public class ServiceProcessValidateDVMoviesTest {
 
     @Test
     @Order(8)
+    @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInDbShouldFail() {
         this.internalPrepare();
         Artifact artifact = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE)
@@ -306,6 +308,7 @@ public class ServiceProcessValidateDVMoviesTest {
 
     @Test
     @Order(9)
+    @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInFilesShouldFail() {
         this.internalPrepare();
         MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE)

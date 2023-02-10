@@ -43,8 +43,8 @@ public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {
                 infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
             }
 
-            List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository.getArtifactMediaFileValidationDV(
-                    ARTIFACT_TYPE);
+            List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
+                    .getArtifactMediaFileValidationDV(ARTIFACT_TYPE);
 
             if (PathValidator.validateArtifactMediaFiles(this, pathValidation, dbArtifactValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);

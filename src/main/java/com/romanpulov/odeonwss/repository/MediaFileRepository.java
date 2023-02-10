@@ -83,7 +83,7 @@ public interface MediaFileRepository extends CrudRepository<MediaFile, Long> {
             "WHERE af.artifactType = ?1 " +
             "ORDER BY ar.name, af.year, af.title, m.name"
     )
-    List<MediaFileValidationDTO> getMediaFileValidationMusic(ArtifactType artifactType);
+    List<MediaFileValidationDTO> getArtifactMediaFileValidationMusic(ArtifactType artifactType);
 
     @Query(
             "SELECT new com.romanpulov.odeonwss.dto.MediaFileEditDTO(" +
