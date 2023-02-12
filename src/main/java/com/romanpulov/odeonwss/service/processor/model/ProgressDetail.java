@@ -35,7 +35,7 @@ public class ProgressDetail {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             ProgressInfo that = (ProgressInfo) o;
-            return message.equals(that.message) && Objects.equals(items, that.items);
+            return message.equals(that.message) && items.equals(that.items);
         }
 
         @Override

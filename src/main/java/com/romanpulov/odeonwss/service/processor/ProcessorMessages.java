@@ -26,6 +26,8 @@ public class ProcessorMessages {
 
     static final String ERROR_ARTISTS_NOT_IN_DB = "Artists not in database: %s";
     static final String ERROR_ARTISTS_NOT_IN_FILES = "Artists not in files: %s";
+    static final String ERROR_ARTISTS_ARTIFACTS_COMPOSITIONS_NOT_IN_DB = "Artists not in database or have no artifacts and compositions";
+    static final String ERROR_ARTISTS_ARTIFACTS_COMPOSITIONS_NOT_IN_FILES = "Artists not in files or have no artifacts and compositions";
     static final String INFO_ARTISTS_VALIDATED = "Artists validated";
 
     static final String INFO_ARTISTS_IMPORTED = "Artists imported: %d";
@@ -41,6 +43,7 @@ public class ProcessorMessages {
     static final String ERROR_COMPOSITIONS_NOT_IN_DB = "Compositions not in database: %s";
     static final String ERROR_COMPOSITIONS_NOT_IN_FILES = "Compositions not in files: %s";
     static final String ERROR_COMPOSITIONS_NOT_FOUND_FOR_ARTIFACT = "Compositions not found for artifact: %s";
+    static final String ERROR_COMPOSITION_FILES_NOT_FOUND_FOR_ARTIFACT = "Composition files not found for artifact: %s";
     static final String INFO_COMPOSITIONS_VALIDATED = "Compositions validated";
     static final String INFO_COMPOSITIONS_LOADED = "Compositions loaded";
 
