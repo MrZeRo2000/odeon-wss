@@ -306,7 +306,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(15)
+    @Order(16)
     @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInDbShouldFail() {
         this.internalPrepareExisting();
@@ -343,7 +343,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(16)
+    @Order(17)
     @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInFilesShouldFail() {
         this.internalPrepareExisting();
@@ -394,7 +394,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(17)
+    @Order(18)
     @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInDbShouldFail() {
         this.internalPrepareExisting();
@@ -426,7 +426,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(18)
+    @Order(19)
     @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInFilesShouldFail() {
         this.internalPrepareExisting();

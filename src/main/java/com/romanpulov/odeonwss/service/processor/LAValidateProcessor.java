@@ -53,7 +53,7 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                 List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
                         .getArtifactMediaFileValidationMusic(ArtifactType.withLA());
 
-                if (PathValidator.validateMediaFiles(this, pathValidation, dbArtifactValidation)) {
+                if (PathValidator.validateArtifactMediaFilesMusic(this, pathValidation, dbArtifactValidation)) {
                         infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
                 }
             }

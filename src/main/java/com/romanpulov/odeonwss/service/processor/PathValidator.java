@@ -36,6 +36,13 @@ public class PathValidator {
             m.getArtifactTitle(),
             formatNullable(m.getMediaFileName()));
 
+    private static final MediaFileValidationDTOMapper ARTIFACT_MEDIA_FILE_MUSIC_MAPPER = m -> String.format(
+            MUSIC_ARTIFACT_ENTITY_FORMAT,
+            m.getArtistName(),
+            m.getArtifactYear(),
+            m.getArtifactTitle(),
+            formatNullable(m.getMediaFileName()));
+
     private static final MediaFileValidationDTOMapper COMPOSITION_MUSIC_MAPPER = d -> String.format(
             MUSIC_ARTIFACT_ENTITY_FORMAT,
             d.getArtistName(),
@@ -170,6 +177,20 @@ public class PathValidator {
                 pathValidation,
                 dbValidation,
                 MEDIA_FILE_MAPPER,
+                ProcessorMessages.ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_FILES,
+                ProcessorMessages.ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_DB
+        );
+    }
+
+    public static boolean validateArtifactMediaFilesMusic(
+            AbstractProcessor processor,
+            List<MediaFileValidationDTO> pathValidation,
+            List<MediaFileValidationDTO> dbValidation) {
+        return validate(
+                processor,
+                pathValidation,
+                dbValidation,
+                ARTIFACT_MEDIA_FILE_MUSIC_MAPPER,
                 ProcessorMessages.ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_FILES,
                 ProcessorMessages.ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_DB
         );

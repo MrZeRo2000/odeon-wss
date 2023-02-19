@@ -1,15 +1,14 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.entity.Composition;
+import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
@@ -23,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -30,6 +30,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceProcessValidateLATest {
+    private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withLA();
     private static final List<String> TEST_ARTISTS =
             List.of(
                     "Evanescence",
@@ -48,6 +49,9 @@ public class ServiceProcessValidateLATest {
 
     @Autowired
     EntityManager em;
+
+    @Autowired
+    private MediaFileRepository mediaFileRepository;
 
     @Autowired
     private CompositionRepository compositionRepository;
@@ -353,4 +357,232 @@ public class ServiceProcessValidateLATest {
                         null)
         );
     }
+
+    @Test
+    @Order(14)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testNewArtifactInDbShouldFail() {
+        this.prepareInternal();
+
+        Artist artist = artistRepository.findAll().iterator().next();
+        assertThat(artist).isNotNull();
+
+        Artifact artifact = (new EntityArtifactBuilder())
+                .withArtifactType(ARTIFACT_TYPE)
+                .withArtist(artist)
+                .withTitle("New Artifact")
+                .withYear(2000L)
+                .build();
+        artifactRepository.save(artifact);
+
+        ProcessInfo pi = executeProcessor();
+        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        int id = 1;
+        assertThat(progressDetails.get(id++)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artists validated", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(progressDetails.get(id++)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifacts not in files",
+                                List.of(artist.getName() + " >> 2000 New Artifact")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+        assertThat(progressDetails.get(id)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(15)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testNewArtifactInFilesShouldFail() {
+        this.prepareInternal();
+        Artifact artifact = artifactRepository
+                .findAll()
+                .stream()
+                .filter(a -> a.getTitle().equals("Origin"))
+                .findFirst()
+                .orElseThrow();
+        artifactRepository.delete(artifact);
+
+        ProcessInfo pi = executeProcessor();
+        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        int id = 1;
+        assertThat(progressDetails.get(id++)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artists validated", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(progressDetails.get(id++)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifacts not in database",
+                                List.of("Evanescence >> 2000 Origin")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+        assertThat(progressDetails.get(id)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+
+    }
+
+    @Test
+    @Order(16)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testNewFileInDbShouldFail() {
+        this.prepareInternal();
+        Artifact artifact = artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)
+                .stream()
+                .filter(a -> a.getTitle().equals("Evanescence") && !Objects.isNull(a.getYear()) && a.getYear().equals(2011L))
+                .findFirst().orElseThrow();
+        Composition composition = compositionRepository
+                .findByIdWithMediaFiles(artifact.getCompositions().get(0).getId())
+                .orElseThrow();
+
+        MediaFile mediaFile = new MediaFile();
+        mediaFile.setName("New music file.flac");
+        mediaFile.setFormat("FLAC");
+        mediaFile.setSize(29883733L);
+        mediaFile.setBitrate(1048L);
+        mediaFileRepository.save(mediaFile);
+
+        composition.getMediaFiles().add(mediaFile);
+        compositionRepository.save(composition);
+
+        ProcessInfo pi = executeProcessor();
+        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(progressDetails.get(3)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Media files not in files",
+                                List.of("Evanescence >> 2011 Evanescence >> " + mediaFile.getName())),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(17)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testNewFileInFilesShouldFail() {
+        this.prepareInternal();
+        MediaFile mediaFile = mediaFileRepository
+                .getMediaFilesByArtifactType(ARTIFACT_TYPE)
+                .stream()
+                .filter(m -> m.getName().equals("16 - Secret Door.flac"))
+                .findFirst()
+                .orElseThrow();
+        mediaFileRepository.delete(mediaFile);
+
+        ProcessInfo pi = executeProcessor();
+        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(progressDetails.get(3)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Media files not in database",
+                                List.of("Evanescence >> 2011 Evanescence >> " + mediaFile.getName())),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+
+        assertThat(progressDetails.get(4)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifact media files not in database",
+                                List.of("Evanescence >> 2011 Evanescence >> " + mediaFile.getName())),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(18)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testNewArtifactFileInDbShouldFail() {
+        this.prepareInternal();
+        Artifact artifact = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE)
+                .stream()
+                .filter(a -> a.getTitle().equals("In The Absence Of Light"))
+                .findFirst().orElseThrow();
+
+        MediaFile mediaFile = new MediaFile();
+        mediaFile.setName("Another media file.flac");
+        mediaFile.setFormat("FLAC");
+        mediaFile.setSize(160453L);
+        mediaFile.setBitrate(987L);
+        mediaFile.setArtifact(artifact);
+        mediaFileRepository.save(mediaFile);
+
+        ProcessInfo pi = executeProcessor();
+        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(progressDetails.get(4)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifact media files not in files",
+                                List.of("Abigail Williams >> 2010 In The Absence Of Light >> Another media file.flac")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(19)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testNewArtifactFileInFilesShouldFail() {
+        this.prepareInternal();
+        MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE)
+                .stream()
+                .filter(m -> m.getName().equals("01 Hope The Great Betrayal.flac"))
+                .findFirst()
+                .orElseThrow();
+        mediaFile.setArtifact(null);
+        mediaFileRepository.save(mediaFile);
+
+        ProcessInfo pi = executeProcessor();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProgressDetails().get(4)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifact media files not in database",
+                                List.of("Abigail Williams >> 2010 In The Absence Of Light >> 01 Hope The Great Betrayal.flac")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
 }
