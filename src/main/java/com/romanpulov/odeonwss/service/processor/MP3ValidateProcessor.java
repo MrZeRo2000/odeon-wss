@@ -18,7 +18,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
-public class MP3ValidateProcessor extends AbstractArtistBaseValidateProcessor {
+public class MP3ValidateProcessor extends AbstractArtistBaseValidateProcessor
+        implements PathLoader.ArtistArtifactPathLoader{
 
     private static final Logger logger = LoggerFactory.getLogger(MP3ValidateProcessor.class);
 
@@ -33,9 +34,10 @@ public class MP3ValidateProcessor extends AbstractArtistBaseValidateProcessor {
         Path path = validateAndGetPath();
 
         List<MediaFileValidationDTO> pathValidation = loadFromPath(path);
-        List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getCompositionMediaFileValidationMusic(ArtistType.ARTIST, ArtifactType.withMP3());
+        List<MediaFileValidationDTO> dbValidation = mediaFileRepository
+                .getCompositionMediaFileValidationMusic(ArtistType.ARTIST, ArtifactType.withMP3());
 
-        if (validateArtistNames(pathValidation, dbValidation)) {
+        if (PathValidator.validateArtistNamesArtifactsCompositions(this, pathValidation, dbValidation)) {
             infoHandler(ProcessorMessages.INFO_ARTISTS_VALIDATED);
 
             if (validateArtifacts(pathValidation, dbValidation)) {
@@ -46,6 +48,10 @@ public class MP3ValidateProcessor extends AbstractArtistBaseValidateProcessor {
                 }
             }
         }
+    }
+
+    protected List<MediaFileValidationDTO> loadFromPath(Path path) throws ProcessorException {
+        return PathLoader.loadFromPathArtistArtifacts(this, path, this);
     }
 
     protected void loadFromArtistPath(Path artistPath, List<MediaFileValidationDTO> result)
@@ -63,7 +69,7 @@ public class MP3ValidateProcessor extends AbstractArtistBaseValidateProcessor {
         }
     }
 
-    private void loadFromArtifactPath(Path artistPath, Path artifactPath, List<MediaFileValidationDTO> result)
+    public void loadFromArtifactPath(Path artistPath, Path artifactPath, List<MediaFileValidationDTO> result)
             throws ProcessorException {
         NamesParser.YearTitle yt = NamesParser.parseMusicArtifactTitle(artifactPath.getFileName().toString());
         if (yt == null) {
