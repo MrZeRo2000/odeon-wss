@@ -10,18 +10,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
-public class MP3ValidateProcessor extends AbstractArtistBaseValidateProcessor
-        implements PathLoader.ArtistArtifactPathLoader{
-
+public class MP3ValidateProcessor extends AbstractFileSystemProcessor
+        implements PathLoader.ArtistArtifactPathLoader {
     private static final Logger logger = LoggerFactory.getLogger(MP3ValidateProcessor.class);
+    public static final ArtifactType ARTIFACT_TYPE = ArtifactType.withMP3();
+    public static final String MEDIA_FILE_FORMAT = "mp3";
 
     private final MediaFileRepository mediaFileRepository;
 
@@ -33,42 +31,36 @@ public class MP3ValidateProcessor extends AbstractArtistBaseValidateProcessor
     public void execute() throws ProcessorException {
         Path path = validateAndGetPath();
 
-        List<MediaFileValidationDTO> pathValidation = loadFromPath(path);
+        List<MediaFileValidationDTO> pathValidation =
+                PathLoader.loadFromPathArtistArtifacts(this, path, this);
         List<MediaFileValidationDTO> dbValidation = mediaFileRepository
-                .getCompositionMediaFileValidationMusic(ArtistType.ARTIST, ArtifactType.withMP3());
+                .getCompositionMediaFileValidationMusic(ArtistType.ARTIST, ARTIFACT_TYPE);
 
         if (PathValidator.validateArtistNamesArtifactsCompositions(this, pathValidation, dbValidation)) {
             infoHandler(ProcessorMessages.INFO_ARTISTS_VALIDATED);
 
-            if (validateArtifacts(pathValidation, dbValidation)) {
+            if (PathValidator.validateArtifactsMusic(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
-                if (validateCompositions(pathValidation, dbValidation)) {
+                if (PathValidator.validateCompositionsMusic(this, pathValidation, dbValidation)) {
                     infoHandler(ProcessorMessages.INFO_COMPOSITIONS_VALIDATED);
                 }
-            }
-        }
-    }
 
-    protected List<MediaFileValidationDTO> loadFromPath(Path path) throws ProcessorException {
-        return PathLoader.loadFromPathArtistArtifacts(this, path, this);
-    }
+                if (PathValidator.validateMediaFilesMusic(this, pathValidation, dbValidation)) {
+                    infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
+                }
 
-    protected void loadFromArtistPath(Path artistPath, List<MediaFileValidationDTO> result)
-            throws ProcessorException {
-        try (Stream<Path> artifactPathStream = Files.list(artistPath)) {
-            for (Path artifactPath: artifactPathStream.collect(Collectors.toList())) {
-                if (!Files.isDirectory(artifactPath)) {
-                    errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, artistPath.getFileName().toString());
-                } else {
-                    loadFromArtifactPath(artistPath, artifactPath, result);
+                List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
+                        .getArtifactMediaFileValidationMusic(ARTIFACT_TYPE);
+
+                if (PathValidator.validateArtifactMediaFilesMusic(this, pathValidation, dbArtifactValidation)) {
+                    infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
                 }
             }
-        } catch (IOException e) {
-            throw new ProcessorException("Exception:" + e.getMessage());
         }
     }
 
+    @Override
     public void loadFromArtifactPath(Path artistPath, Path artifactPath, List<MediaFileValidationDTO> result)
             throws ProcessorException {
         NamesParser.YearTitle yt = NamesParser.parseMusicArtifactTitle(artifactPath.getFileName().toString());
@@ -81,24 +73,24 @@ public class MP3ValidateProcessor extends AbstractArtistBaseValidateProcessor
             );
         } else {
             int oldResultSize = result.size();
-            try (Stream<Path> compositionPathStream = Files.list(artifactPath)) {
-                compositionPathStream.forEach(compositionPath -> {
+
+            List<Path> compositionPaths = new ArrayList<>();
+            if (PathReader.readPathFilesOnly(this, artifactPath, compositionPaths)) {
+                for (Path compositionPath: compositionPaths) {
                     String compositionFileName = compositionPath.getFileName().toString();
 
-                    if (Files.isDirectory(compositionPath)) {
-                        errorHandler(ProcessorMessages.ERROR_EXPECTED_FILE,  compositionPath.toAbsolutePath());
-                    } else if (!compositionFileName.endsWith("mp3")) {
+                    if (!compositionFileName.endsWith(MEDIA_FILE_FORMAT)) {
                         errorHandler(ProcessorMessages.ERROR_WRONG_FILE_TYPE, compositionPath.toAbsolutePath());
                     } else {
                         NamesParser.NumberTitle nt = NamesParser.parseMusicComposition(compositionFileName);
                         if (nt == null) {
                             errorHandler(ProcessorMessages.ERROR_PARSING_COMPOSITION_NAME, compositionPath.toAbsolutePath().getFileName());
                             result.add(
-                              new MediaFileValidationDTOBuilder()
-                                      .withArtistName(artistPath.getFileName().toString())
-                                      .withArtifactTitle(yt.getTitle())
-                                      .withArtifactYear(yt.getYear())
-                                      .build()
+                                    new MediaFileValidationDTOBuilder()
+                                            .withArtistName(artistPath.getFileName().toString())
+                                            .withArtifactTitle(yt.getTitle())
+                                            .withArtifactYear(yt.getYear())
+                                            .build()
                             );
                         } else {
                             result.add(new MediaFileValidationDTO(
@@ -108,33 +100,17 @@ public class MP3ValidateProcessor extends AbstractArtistBaseValidateProcessor
                                     nt.getNumber(),
                                     nt.getTitle(),
                                     compositionPath.getFileName().toString(),
-                                    "mp3"
+                                    MEDIA_FILE_FORMAT
                             ));
                         }
                     }
-                });
-
-            } catch (IOException e) {
-                throw new ProcessorException(ProcessorMessages.ERROR_EXCEPTION, e.getMessage());
+                }
             }
 
             if (result.size() == oldResultSize) {
                 errorHandler(ProcessorMessages.ERROR_COMPOSITIONS_NOT_FOUND_FOR_ARTIFACT, artifactPath.getFileName().toString());
             }
         }
-    }
-
-    private boolean validateCompositions(List<MediaFileValidationDTO> pathValidation, List<MediaFileValidationDTO> dbValidation) {
-        Set<String> pathCompositions = MediaFileValidationDTO.getMusicCompositions(pathValidation);
-        Set<String> dbCompositions = MediaFileValidationDTO.getMusicCompositions(dbValidation);
-
-        return ValueValidator.compareStringSets(
-                this,
-                pathCompositions,
-                dbCompositions,
-                ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_FILES,
-                ProcessorMessages.ERROR_COMPOSITIONS_NOT_IN_DB
-        );
     }
 
 }

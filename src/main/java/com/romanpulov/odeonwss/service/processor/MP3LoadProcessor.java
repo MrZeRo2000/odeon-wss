@@ -1,6 +1,9 @@
 package com.romanpulov.odeonwss.service.processor;
 
-import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.Composition;
+import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
@@ -8,25 +11,24 @@ import com.romanpulov.odeonwss.service.CompositionService;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 public class MP3LoadProcessor extends AbstractArtistProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(MP3LoadProcessor.class);
+    public static final String MEDIA_FILE_FORMAT = "mp3";
 
     private final CompositionService compositionService;
 
@@ -68,7 +70,7 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
 
             for (Path p: compositionFiles) {
                 String compositionFileName = p.getFileName().toString();
-                if (!compositionFileName.endsWith("mp3")) {
+                if (!compositionFileName.endsWith(MEDIA_FILE_FORMAT)) {
                     errorHandler(ProcessorMessages.ERROR_WRONG_FILE_TYPE, p.toAbsolutePath());
                     return counter.get();
                 }

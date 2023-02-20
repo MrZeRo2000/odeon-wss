@@ -24,6 +24,7 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
     private static final Set<String> MEDIA_FORMATS = Set.of("ape", "flac", "wv");
 
     private static final Logger logger = LoggerFactory.getLogger(LAValidateProcessor.class);
+    public static final ArtifactType ARTIFACT_TYPE = ArtifactType.withLA();
 
     private final MediaFileRepository mediaFileRepository;
 
@@ -36,7 +37,8 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
         logger.info("Started LAValidateProcessor execution");
         Path path = validateAndGetPath();
 
-        List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getCompositionMediaFileValidationMusic(ArtistType.ARTIST, ArtifactType.withLA());
+        List<MediaFileValidationDTO> dbValidation = mediaFileRepository
+                .getCompositionMediaFileValidationMusic(ArtistType.ARTIST, ARTIFACT_TYPE);
         List<MediaFileValidationDTO> pathValidation = loadFromPath(path);
 
         logger.info("Validating ArtistNames");
@@ -51,7 +53,7 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                 }
 
                 List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
-                        .getArtifactMediaFileValidationMusic(ArtifactType.withLA());
+                        .getArtifactMediaFileValidationMusic(ARTIFACT_TYPE);
 
                 if (PathValidator.validateArtifactMediaFilesMusic(this, pathValidation, dbArtifactValidation)) {
                         infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
@@ -65,6 +67,7 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
         return PathLoader.loadFromPathArtistArtifacts(this, path, this);
     }
 
+    @Override
     public void loadFromArtifactPath(Path artistPath, Path artifactPath, List<MediaFileValidationDTO> result)
             throws ProcessorException {
         loadFromArtifactPathParent(artistPath, artifactPath, null, result);
