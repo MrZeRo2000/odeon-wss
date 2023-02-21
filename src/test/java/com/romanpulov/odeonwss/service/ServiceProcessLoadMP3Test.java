@@ -221,7 +221,9 @@ public class ServiceProcessLoadMP3Test {
 
         assertThat(progressDetail.get(2)).isEqualTo(
                 new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Error parsing artifact name: 2004  Honkin'On Bobo", new ArrayList<>()),
+                        new ProgressDetail.ProgressInfo(
+                                "Error parsing artifact name",
+                                List.of("Aerosmith >> 2004  Honkin'On Bobo")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)

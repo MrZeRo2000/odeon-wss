@@ -392,7 +392,7 @@ public class ServiceProcessValidateMP3Test {
 
     @Test
     @Order(12)
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
     void containsFilesShouldFail() {
         this.prepareInternal();
         service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/ok/MP3 Music/Kosheen/2004 Kokopelli");
@@ -503,7 +503,7 @@ public class ServiceProcessValidateMP3Test {
 
     @Test
     @Order(16)
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
     void testNewFileInDbShouldFail() {
         this.prepareInternal();
         Artifact artifact = artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)
@@ -542,7 +542,7 @@ public class ServiceProcessValidateMP3Test {
 
     @Test
     @Order(17)
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
     void testNewFileInFilesShouldFail() {
         this.prepareInternal();
         MediaFile mediaFile = mediaFileRepository
@@ -580,7 +580,7 @@ public class ServiceProcessValidateMP3Test {
 
     @Test
     @Order(18)
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
     void testNewArtifactFileInDbShouldFail() {
         this.prepareInternal();
         Artifact artifact = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE)
@@ -613,7 +613,7 @@ public class ServiceProcessValidateMP3Test {
 
     @Test
     @Order(19)
-    @Sql({"/schema.sql", "/data.sql"})
+    @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
     void testNewArtifactFileInFilesShouldFail() {
         this.prepareInternal();
         MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE)

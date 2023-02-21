@@ -89,7 +89,12 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
                 String artifactName = p.getFileName().toString();
                 NamesParser.YearTitle yt = NamesParser.parseMusicArtifactTitle(artifactName);
                 if (yt == null) {
-                    errorHandler(ProcessorMessages.ERROR_PARSING_ARTIFACT_NAME, p.toAbsolutePath().getFileName());
+                    errorHandlerItem(
+                            ProcessorMessages.ERROR_PARSING_ARTIFACT_NAME,
+                            String.format(
+                                    PathValidator.DELIMITER_FORMAT,
+                                    pathArtistPair.getFirst().getFileName(),
+                                    p.toAbsolutePath().getFileName().toString()));
                     return result;
                 }
                 flatPathArtists.add(Pair.of(p, Pair.of(pathArtistPair.getSecond(), yt)));
