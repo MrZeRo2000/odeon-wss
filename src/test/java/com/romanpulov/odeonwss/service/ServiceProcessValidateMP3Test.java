@@ -4,12 +4,11 @@ import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.ArtistType;
+import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
+import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
@@ -21,6 +20,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -36,6 +36,12 @@ public class ServiceProcessValidateMP3Test {
 
     @Autowired
     ArtifactRepository artifactRepository;
+
+    @Autowired
+    CompositionRepository compositionRepository;
+
+    @Autowired
+    MediaFileRepository mediaFileRepository;
 
     @Autowired
     AppConfiguration appConfiguration;
@@ -489,6 +495,44 @@ public class ServiceProcessValidateMP3Test {
         assertThat(progressDetails.get(id)).isEqualTo(
                 new ProgressDetail(
                         new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(16)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testNewFileInDbShouldFail() {
+        this.prepareInternal();
+        Artifact artifact = artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)
+                .stream()
+                .filter(a -> a.getTitle().equals("Kokopelli") && !Objects.isNull(a.getYear()) && a.getYear().equals(2004L))
+                .findFirst().orElseThrow();
+        Composition composition = compositionRepository
+                .findByIdWithMediaFiles(artifact.getCompositions().get(0).getId())
+                .orElseThrow();
+
+        MediaFile mediaFile = new MediaFile();
+        mediaFile.setName("13 - New Track.mp3");
+        mediaFile.setFormat("MP3");
+        mediaFile.setSize(84583733L);
+        mediaFile.setBitrate(320L);
+        mediaFileRepository.save(mediaFile);
+
+        composition.getMediaFiles().add(mediaFile);
+        compositionRepository.save(composition);
+
+        ProcessInfo pi = executeProcessor();
+        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(progressDetails.get(4)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Media files not in files",
+                                List.of("Kosheen >> 2004 Kokopelli >> " + mediaFile.getName())),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
