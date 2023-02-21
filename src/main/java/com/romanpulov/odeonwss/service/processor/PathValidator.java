@@ -4,6 +4,7 @@ import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -74,7 +75,7 @@ public class PathValidator {
         Set<String> dbArtifacts = dbValidation
                 .stream()
                 .map(mapper)
-                .filter(s -> !s.contains(EMPTY_STRING_VALUE))
+                .filter(s -> !Objects.isNull(s) && !s.contains(EMPTY_STRING_VALUE))
                 .collect(Collectors.toSet());
 
         return ValueValidator.compareStringSets(
