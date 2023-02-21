@@ -115,10 +115,7 @@ public class ServiceProcessValidateMP3Test {
     @Order(2)
     @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
     void testLoad() {
-        service.executeProcessor(ProcessorType.MP3_LOADER);
-        ProcessInfo pi = service.getProcessInfo();
-
-        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+        this.prepareInternal();
         assertThat(artistRepository.getAllByType(ArtistType.ARTIST).size()).isEqualTo(2);
     }
 
@@ -442,6 +439,49 @@ public class ServiceProcessValidateMP3Test {
                         new ProgressDetail.ProgressInfo(
                                 "Artifacts not in files",
                                 List.of(artist.getName() + " >> 2000 New Artifact")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+        assertThat(progressDetails.get(id)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(15)
+    @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
+    void testNewArtifactInFilesShouldFail() {
+        this.prepareInternal();
+        Artifact artifact = artifactRepository
+                .findAll()
+                .stream()
+                .filter(a -> a.getTitle().equals("Kokopelli"))
+                .findFirst()
+                .orElseThrow();
+        artifactRepository.delete(artifact);
+
+        ProcessInfo pi = executeProcessor();
+        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        int id = 1;
+        assertThat(progressDetails.get(id++)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artists validated", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(progressDetails.get(id++)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifacts not in database",
+                                List.of("Kosheen >> 2004 Kokopelli")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
