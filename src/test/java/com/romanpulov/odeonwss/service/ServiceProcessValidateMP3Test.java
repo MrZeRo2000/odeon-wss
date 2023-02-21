@@ -34,6 +34,8 @@ public class ServiceProcessValidateMP3Test {
 
     ProcessService service;
 
+    List<String> artistNames;
+
     @Autowired
     public ServiceProcessValidateMP3Test(ProcessService service) {
         this.service = service;
@@ -44,6 +46,14 @@ public class ServiceProcessValidateMP3Test {
             service.executeProcessor(ProcessorType.MP3_LOADER, null);
             assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         });
+        if (this.artistNames == null) {
+            this.artistNames = artistRepository
+                    .getAllByType(ArtistType.ARTIST)
+                    .stream()
+                    .map(Artist::getName)
+                    .sorted()
+                    .collect(Collectors.toList());
+        }
     }
 
     private ProcessInfo executeProcessor() {
@@ -364,6 +374,27 @@ public class ServiceProcessValidateMP3Test {
                 new ProgressDetail(
                         new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
                         ProcessingStatus.SUCCESS,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(12)
+    @Sql({"/schema.sql", "/data.sql"})
+    void containsFilesShouldFail() {
+        this.prepareInternal();
+        service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/ok/MP3 Music/Kosheen/2004 Kokopelli");
+        ProcessInfo pi = service.getProcessInfo();
+        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+
+        assertThat(progressDetails.get(1).getInfo().getMessage()).contains("Expected directory, found");
+        assertThat(progressDetails.get(2)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artists not in files or have no artifacts and compositions",
+                                artistNames),
+                        ProcessingStatus.FAILURE,
                         null,
                         null)
         );
