@@ -1,5 +1,8 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
+import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
@@ -26,11 +29,21 @@ public class ServiceProcessValidateMP3Test {
     @Autowired
     ArtistRepository artistRepository;
 
+    @Autowired
+    AppConfiguration appConfiguration;
+
     ProcessService service;
 
     @Autowired
     public ServiceProcessValidateMP3Test(ProcessService service) {
         this.service = service;
+    }
+
+    private void prepareInternal() {
+        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_LOADED_MP3, () -> {
+            service.executeProcessor(ProcessorType.MP3_LOADER, null);
+            assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+        });
     }
 
     private ProcessInfo executeProcessor() {
@@ -93,7 +106,7 @@ public class ServiceProcessValidateMP3Test {
 
     @Test
     @Order(3)
-    void testOk() throws Exception {
+    void testOk() {
         ProcessInfo pi = executeProcessor();
         List<ProgressDetail> progressDetails = pi.getProgressDetails();
 
@@ -290,6 +303,67 @@ public class ServiceProcessValidateMP3Test {
                                         "Kosheen >> 2004 Kokopelli >> 04 - Avalanche"
                                 )),
                         ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(11)
+    @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
+    void validateOk() {
+        this.prepareInternal();
+        ProcessInfo pi = executeProcessor();
+        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+        int id = 0;
+        assertThat(progressDetails.get(id++)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Started MP3 Validator", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(progressDetails.get(id++)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artists validated", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(progressDetails.get(id++)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artifacts validated", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(progressDetails.get(id++)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Compositions validated", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(progressDetails.get(id++)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Media files validated", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(progressDetails.get(id++)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artifact media files validated", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(progressDetails.get(id)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+                        ProcessingStatus.SUCCESS,
                         null,
                         null)
         );

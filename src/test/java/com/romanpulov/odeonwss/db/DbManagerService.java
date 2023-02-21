@@ -48,6 +48,7 @@ public class DbManagerService {
         DB_IMPORTED_ARTISTS("imported_artists"),
         DB_LOADED_MOVIES("loaded_movies"),
         DB_LOADED_LA("loaded_la"),
+        DB_LOADED_MP3("loaded_mp3"),
         DB_PRODUCTS("products"),
         DB_ARTISTS_DV_MUSIC_IMPORT("artists_dv_music"),
         DB_ARTISTS_DV_MUSIC_MEDIA("artists_dv_music_media"),
