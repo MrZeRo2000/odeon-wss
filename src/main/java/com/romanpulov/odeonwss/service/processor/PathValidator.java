@@ -9,8 +9,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class PathValidator {
-    private static final String DELIMITER_FORMAT = "%s >> %s";
+    public static final String DELIMITER_FORMAT = "%s >> %s";
     private static final String MUSIC_ARTIFACT_ENTITY_FORMAT = "%s >> %d %s >> %s";
+    private static final String MUSIC_ARTIFACT_COMPOSITION_FORMAT = "%s >> %d %s >> %02d - %s";
     private static final String EMPTY_STRING_VALUE = "@!EMPTY!@";
 
     private static String formatNullable(String s) {
@@ -44,10 +45,11 @@ public class PathValidator {
             formatNullable(m.getMediaFileName()));
 
     private static final MediaFileValidationDTOMapper COMPOSITION_MUSIC_MAPPER = d -> String.format(
-            MUSIC_ARTIFACT_ENTITY_FORMAT,
+            MUSIC_ARTIFACT_COMPOSITION_FORMAT,
             d.getArtistName(),
             d.getArtifactYear(),
             d.getArtifactTitle(),
+            d.getCompositionNum(),
             formatNullable(d.getCompositionTitle()));
 
     private static final MediaFileValidationDTOMapper MEDIA_FILE_MUSIC_MAPPER = d -> String.format(

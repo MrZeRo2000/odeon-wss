@@ -36,6 +36,11 @@ public class ProcessService implements ProgressHandler {
         processInfo.addProgressDetails(progressDetail);
     }
 
+    @Override
+    public void handleErrorItem(String message, String item) {
+        processInfo.addProgressDetailsErrorItem(message, item);
+    }
+
     public void executeProcessor(ProcessorType processorType) {
         executeProcessor(processorType, null);
     }

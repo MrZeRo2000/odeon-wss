@@ -65,7 +65,10 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
             throws ProcessorException {
         NamesParser.YearTitle yt = NamesParser.parseMusicArtifactTitle(artifactPath.getFileName().toString());
         if (yt == null) {
-            errorHandler(ProcessorMessages.ERROR_PARSING_ARTIFACT_NAME, artifactPath.getFileName().toString());
+            errorHandlerItem(
+                    ProcessorMessages.ERROR_PARSING_ARTIFACT_NAME,
+                    String.format(PathValidator.DELIMITER_FORMAT, artistPath.getFileName().toString(),
+                    artifactPath.getFileName().toString()));
             result.add(
                     new MediaFileValidationDTOBuilder()
                             .withArtistName(artistPath.getFileName().toString())

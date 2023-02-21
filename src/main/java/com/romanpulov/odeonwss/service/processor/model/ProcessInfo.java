@@ -66,6 +66,19 @@ public class ProcessInfo {
         lastUpdated = LocalDateTime.now();
     }
 
+    public void addProgressDetailsErrorItem(String message, String item) {
+        ProgressDetail progressDetail = progressDetails
+                .stream()
+                .filter(d -> d.getInfo().getMessage().equals(message))
+                .findFirst()
+                .orElseGet(() -> {
+                    ProgressDetail newProgressDetail = ProgressDetail.fromErrorMessage(message);
+                    progressDetails.add(newProgressDetail);
+                    return newProgressDetail;
+                });
+        progressDetail.getInfo().getItems().add(item);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
