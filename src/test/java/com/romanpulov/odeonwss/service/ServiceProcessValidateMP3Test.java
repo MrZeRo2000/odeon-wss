@@ -1,10 +1,14 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
+import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
+import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
@@ -24,10 +28,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceProcessValidateMP3Test {
-
     public static final ProcessorType PROCESSOR_TYPE = ProcessorType.MP3_VALIDATOR;
+    private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withMP3();
+
     @Autowired
     ArtistRepository artistRepository;
+
+    @Autowired
+    ArtifactRepository artifactRepository;
 
     @Autowired
     AppConfiguration appConfiguration;
@@ -399,4 +407,52 @@ public class ServiceProcessValidateMP3Test {
                         null)
         );
     }
+
+    @Test
+    @Order(14)
+    @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
+    void testNewArtifactInDbShouldFail() {
+        this.prepareInternal();
+
+        Artist artist = artistRepository.findAll().iterator().next();
+        assertThat(artist).isNotNull();
+
+        Artifact artifact = (new EntityArtifactBuilder())
+                .withArtifactType(ARTIFACT_TYPE)
+                .withArtist(artist)
+                .withTitle("New Artifact")
+                .withYear(2000L)
+                .build();
+        artifactRepository.save(artifact);
+
+        ProcessInfo pi = executeProcessor();
+        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        int id = 1;
+        assertThat(progressDetails.get(id++)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Artists validated", new ArrayList<>()),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(progressDetails.get(id++)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifacts not in files",
+                                List.of(artist.getName() + " >> 2000 New Artifact")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+        assertThat(progressDetails.get(id)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
 }
