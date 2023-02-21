@@ -75,7 +75,7 @@ public class PathValidator {
         Set<String> dbArtifacts = dbValidation
                 .stream()
                 .map(mapper)
-                .filter(s -> formatNullable(s).contains(EMPTY_STRING_VALUE))
+                .filter(s -> !Objects.isNull(s) && !s.contains(EMPTY_STRING_VALUE))
                 .collect(Collectors.toSet());
 
         return ValueValidator.compareStringSets(
