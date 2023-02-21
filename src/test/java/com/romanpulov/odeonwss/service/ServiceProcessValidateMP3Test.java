@@ -578,4 +578,38 @@ public class ServiceProcessValidateMP3Test {
         );
     }
 
+    @Test
+    @Order(18)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testNewArtifactFileInDbShouldFail() {
+        this.prepareInternal();
+        Artifact artifact = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE)
+                .stream()
+                .filter(a -> a.getTitle().equals("Damage"))
+                .findFirst().orElseThrow();
+
+        MediaFile mediaFile = new MediaFile();
+        mediaFile.setName("17 - My Life.mp3");
+        mediaFile.setFormat("MP3");
+        mediaFile.setSize(630453L);
+        mediaFile.setBitrate(256L);
+        mediaFile.setArtifact(artifact);
+        mediaFileRepository.save(mediaFile);
+
+        ProcessInfo pi = executeProcessor();
+        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(progressDetails.get(5)).isEqualTo(
+                new ProgressDetail(
+                        new ProgressDetail.ProgressInfo(
+                                "Artifact media files not in files",
+                                List.of("Kosheen >> 2007 Damage >> 17 - My Life.mp3")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+
 }
