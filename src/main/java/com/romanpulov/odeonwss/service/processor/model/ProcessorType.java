@@ -23,6 +23,10 @@ public enum ProcessorType {
         this.label = label;
     }
 
+    public String getLabel() {
+        return this.label;
+    }
+
     public static ProcessorType valueOfLabel(String label) {
         for (ProcessorType e : values()) {
             if (e.label.equals(label)) {

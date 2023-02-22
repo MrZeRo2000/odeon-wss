@@ -32,8 +32,8 @@ public class ProcessService implements ProgressHandler {
     }
 
     @Override
-    public void handleProgress(ProgressDetail progressDetail) {
-        processInfo.addProgressDetails(progressDetail);
+    public void handleProgress(ProcessDetail processDetail) {
+        processInfo.addProgressDetails(processDetail);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class ProcessService implements ProgressHandler {
 
             currentProcessor.set(processorFactory.fromProcessorType(processorType, this));
 
-            processInfo.addProgressDetails(ProgressDetail.fromInfoMessage(ProcessorMessages.INFO_STARTED, processorType.label));
+            processInfo.addProgressDetails(ProcessDetail.fromInfoMessage(ProcessorMessages.INFO_STARTED, processorType.label));
 
             if (rootPath != null) {
                 currentProcessor.get().setRootFolder(rootPath);
@@ -69,12 +69,12 @@ public class ProcessService implements ProgressHandler {
 
         } catch (Exception e) {
             e.printStackTrace();
-            processInfo.addProgressDetails(ProgressDetail.fromException(e));
+            processInfo.addProgressDetails(ProcessDetail.fromException(e));
         } finally {
             // final status
-            ProgressDetail finalProgressDetail = ProgressDetail.createFinalProgressDetail(processInfo.getProgressDetails());
-            processInfo.addProgressDetails(finalProgressDetail);
-            processInfo.setProcessingStatus(finalProgressDetail.getStatus());
+            ProcessDetail finalProcessDetail = ProcessDetail.createFinalProgressDetail(processInfo.getProgressDetails());
+            processInfo.addProgressDetails(finalProcessDetail);
+            processInfo.setProcessingStatus(finalProcessDetail.getStatus());
 
             //clean up processor
             currentProcessor.set(null);

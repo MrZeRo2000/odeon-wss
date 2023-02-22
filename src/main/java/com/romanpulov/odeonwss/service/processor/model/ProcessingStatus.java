@@ -11,7 +11,11 @@ public enum ProcessingStatus {
     WARNING("Warning"),
     NOT_RUNNING("Not Running");
 
-    public final String label;
+    private final String label;
+
+    public String getLabel() {
+        return label;
+    }
 
     ProcessingStatus(String label) {
         this.label = label;

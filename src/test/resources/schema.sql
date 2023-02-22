@@ -185,3 +185,44 @@ CREATE TABLE compositions_dv_products(
 CREATE UNIQUE INDEX idx_compositions_dv_products_comp_id ON compositions_dv_products(comp_id);
 
 CREATE UNIQUE INDEX idx_compositions_dv_products_dvpd_id ON compositions_dv_products(dvpd_id);
+
+-- PROCESSING --
+
+DROP TABLE IF EXISTS process_info;
+
+CREATE TABLE process_info(
+    prif_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    prif_type TEXT NOT NULL,
+    prif_status TEXT NOT NULL,
+    prif_upd_date INTEGER NOT NULL
+);
+
+CREATE INDEX idx_process_info_upd_date ON process_info(prif_upd_date);
+
+DROP TABLE IF EXISTS process_details;
+
+CREATE TABLE process_details(
+    prdt_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    prif_id INTEGER NOT NULL,
+    prdt_message TEXT NOT NULL,
+    prdt_status TEXT NOT NULL,
+    prdt_rows INTEGER NULL,
+    prdt_upd_date INTEGER NOT NULL
+);
+
+DROP TABLE IF EXISTS process_detail_items;
+
+CREATE TABLE process_detail_items(
+    prdi_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    prdt_id INTEGER NOT NULL,
+    prdi_value TEXT NOT NULL
+);
+
+DROP TABLE IF EXISTS process_detail_actions;
+
+CREATE TABLE process_detail_actions(
+    prda_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    prdt_id INTEGER NOT NULL,
+    prda_type TEXT NOT NULL,
+    prda_value TEXT NOT NULL
+);

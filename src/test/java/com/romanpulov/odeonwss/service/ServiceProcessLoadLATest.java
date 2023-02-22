@@ -10,11 +10,9 @@ import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -55,18 +53,18 @@ public class ServiceProcessLoadLATest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     void testNoArtists() throws Exception {
-        List<ProgressDetail> progressDetail;
+        List<ProcessDetail> processDetail;
 
         // warnings - no artists exist
         processService.executeProcessor(PROCESSOR_TYPE, null);
-        progressDetail = processService.getProcessInfo().getProgressDetails();
+        processDetail = processService.getProcessInfo().getProgressDetails();
 
-        Assertions.assertEquals(10, progressDetail.size());
+        Assertions.assertEquals(10, processDetail.size());
         Assertions.assertEquals(ProcessingStatus.WARNING, processService.getProcessInfo().getProcessingStatus());
 
-        List<ProgressDetail> expectedProgressDetails = Stream.of(ARTIST_LIST)
-                .map(v -> new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Artist " + v + " not found", new ArrayList<>()),
+        List<ProcessDetail> expectedProcessDetails = Stream.of(ARTIST_LIST)
+                .map(v -> new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Artist " + v + " not found", new ArrayList<>()),
                         ProcessingStatus.WARNING,
                         null,
                         new ProcessingAction(ProcessingActionType.ADD_ARTIST, v))
@@ -75,7 +73,7 @@ public class ServiceProcessLoadLATest {
 
         // check processing progress
         for (int i = 1; i < 8; i++) {
-            ProcessingAction pa = progressDetail.get(i).getProcessingAction();
+            ProcessingAction pa = processDetail.get(i).getProcessingAction();
             Assertions.assertNotNull(pa);
             Assertions.assertEquals(ProcessingActionType.ADD_ARTIST, pa.getActionType());
             Assertions.assertTrue(
@@ -87,7 +85,7 @@ public class ServiceProcessLoadLATest {
                             pa.getValue().contains("Agua De Annique") ||
                             pa.getValue().contains("Christina Aguilera")
             );
-            assertThat(progressDetail.get(i)).isIn(expectedProgressDetails);
+            assertThat(processDetail.get(i)).isIn(expectedProcessDetails);
         }
     }
 
@@ -159,45 +157,45 @@ public class ServiceProcessLoadLATest {
         processService.executeProcessor(PROCESSOR_TYPE, null);
 
         ProcessInfo pi = processService.getProcessInfo();
-        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProgressDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
 
         int item = 0;
-        assertThat(progressDetails.get(item++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Started LA Loader", new ArrayList<>()),
+        assertThat(processDetails.get(item++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Started LA Loader", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
 
-        assertThat(progressDetails.get(item++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Artists loaded", new ArrayList<>()),
+        assertThat(processDetails.get(item++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Artists loaded", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         7,
                         null)
         );
 
-        assertThat(progressDetails.get(item++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Artifacts loaded", new ArrayList<>()),
+        assertThat(processDetails.get(item++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Artifacts loaded", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         9,
                         null)
         );
 
-        assertThat(progressDetails.get(item++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Compositions loaded", new ArrayList<>()),
+        assertThat(processDetails.get(item++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Compositions loaded", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         116,
                         null)
         );
 
-        assertThat(progressDetails.get(item)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+        assertThat(processDetails.get(item)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
                         ProcessingStatus.SUCCESS,
                         null,
                         null)

@@ -2,7 +2,6 @@ package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
-import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
@@ -11,10 +10,9 @@ import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.ValueValidator;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
-import com.romanpulov.odeonwss.service.processor.model.ProgressDetail;
+import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
@@ -22,7 +20,6 @@ import org.springframework.test.context.junit.jupiter.DisabledIf;
 
 import javax.sql.DataSource;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static com.romanpulov.odeonwss.db.DbManagerService.DbType.DB_PRODUCTS;
 
@@ -84,15 +81,15 @@ public class ServiceProcessLoadMoviesDVTest {
 
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
         Assertions.assertEquals(
-                new ProgressDetail(ProgressDetail.ProgressInfo.fromMessage("Artifacts loaded"), ProcessingStatus.INFO, 3, null),
+                new ProcessDetail(ProcessDetail.ProcessInfo.fromMessage("Artifacts loaded"), ProcessingStatus.INFO, 3, null),
                 processService.getProcessInfo().getProgressDetails().get(1)
         );
         Assertions.assertEquals(
-                new ProgressDetail(ProgressDetail.ProgressInfo.fromMessage("Compositions loaded"), ProcessingStatus.INFO, 3, null),
+                new ProcessDetail(ProcessDetail.ProcessInfo.fromMessage("Compositions loaded"), ProcessingStatus.INFO, 3, null),
                 processService.getProcessInfo().getProgressDetails().get(2)
         );
         Assertions.assertEquals(
-                new ProgressDetail(ProgressDetail.ProgressInfo.fromMessage("Media files loaded"), ProcessingStatus.INFO, 4, null),
+                new ProcessDetail(ProcessDetail.ProcessInfo.fromMessage("Media files loaded"), ProcessingStatus.INFO, 4, null),
                 processService.getProcessInfo().getProgressDetails().get(3)
         );
 
@@ -121,15 +118,15 @@ public class ServiceProcessLoadMoviesDVTest {
 
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
         Assertions.assertEquals(
-                new ProgressDetail(ProgressDetail.ProgressInfo.fromMessage("Artifacts loaded"), ProcessingStatus.INFO, 0, null),
+                new ProcessDetail(ProcessDetail.ProcessInfo.fromMessage("Artifacts loaded"), ProcessingStatus.INFO, 0, null),
                 processService.getProcessInfo().getProgressDetails().get(1)
         );
         Assertions.assertEquals(
-                new ProgressDetail(ProgressDetail.ProgressInfo.fromMessage("Compositions loaded"), ProcessingStatus.INFO, 0, null),
+                new ProcessDetail(ProcessDetail.ProcessInfo.fromMessage("Compositions loaded"), ProcessingStatus.INFO, 0, null),
                 processService.getProcessInfo().getProgressDetails().get(2)
         );
         Assertions.assertEquals(
-                new ProgressDetail(ProgressDetail.ProgressInfo.fromMessage("Media files loaded"), ProcessingStatus.INFO, 0, null),
+                new ProcessDetail(ProcessDetail.ProcessInfo.fromMessage("Media files loaded"), ProcessingStatus.INFO, 0, null),
                 processService.getProcessInfo().getProgressDetails().get(3)
         );
 

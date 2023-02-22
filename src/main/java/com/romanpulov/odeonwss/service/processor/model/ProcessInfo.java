@@ -34,25 +34,25 @@ public class ProcessInfo {
         this.lastUpdated = lastUpdated;
     }
 
-    private final List<ProgressDetail> progressDetails = new ArrayList<>();
+    private final List<ProcessDetail> processDetails = new ArrayList<>();
 
-    public List<ProgressDetail> getProgressDetails() {
-        return progressDetails;
+    public List<ProcessDetail> getProgressDetails() {
+        return processDetails;
     }
 
-    public ProgressDetail getLastProgressDetail() {
-        if (progressDetails.size() < 2) {
+    public ProcessDetail getLastProgressDetail() {
+        if (processDetails.size() < 2) {
             return null;
         } else {
-            return progressDetails.get(progressDetails.size() - 2);
+            return processDetails.get(processDetails.size() - 2);
         }
     }
 
     public void resolveAction(ProcessingAction processingAction) {
-        progressDetails.stream()
+        processDetails.stream()
                 .filter(d -> processingAction.equals(d.getProcessingAction()))
                 .findFirst()
-                .ifPresent(progressDetails::remove);
+                .ifPresent(processDetails::remove);
     }
 
     public ProcessInfo(ProcessorType processorType) {
@@ -61,22 +61,22 @@ public class ProcessInfo {
         this.lastUpdated = LocalDateTime.now();
     }
 
-    public void addProgressDetails(ProgressDetail progressDetail) {
-        progressDetails.add(progressDetail);
+    public void addProgressDetails(ProcessDetail processDetail) {
+        processDetails.add(processDetail);
         lastUpdated = LocalDateTime.now();
     }
 
     public void addProgressDetailsErrorItem(String message, String item) {
-        ProgressDetail progressDetail = progressDetails
+        ProcessDetail processDetail = processDetails
                 .stream()
                 .filter(d -> d.getInfo().getMessage().equals(message))
                 .findFirst()
                 .orElseGet(() -> {
-                    ProgressDetail newProgressDetail = ProgressDetail.fromErrorMessage(message);
-                    progressDetails.add(newProgressDetail);
-                    return newProgressDetail;
+                    ProcessDetail newProcessDetail = ProcessDetail.fromErrorMessage(message);
+                    processDetails.add(newProcessDetail);
+                    return newProcessDetail;
                 });
-        progressDetail.getInfo().getItems().add(item);
+        processDetail.getInfo().getItems().add(item);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class ProcessInfo {
                 "processorType=" + processorType +
                 ", processingStatus=" + processingStatus +
                 ", lastUpdated=" + lastUpdated +
-                ", progressDetails=" + progressDetails.stream().map(Object::toString).collect(Collectors.joining("-", "{", "}")) +
+                ", progressDetails=" + processDetails.stream().map(Object::toString).collect(Collectors.joining("-", "{", "}")) +
                 '}';
     }
 }

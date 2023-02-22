@@ -12,7 +12,7 @@ import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
-import com.romanpulov.odeonwss.service.processor.model.ProgressDetail;
+import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -90,27 +90,27 @@ public class ServiceProcessValidateLATest {
 
         service.executeProcessor(ProcessorType.LA_VALIDATOR, null);
         ProcessInfo pi = service.getProcessInfo();
-        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProgressDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
-        assertThat(progressDetails.get(0)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Started LA Validator", new ArrayList<>()),
+        assertThat(processDetails.get(0)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Started LA Validator", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(1)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo(
+        assertThat(processDetails.get(1)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo(
                                 "Artists not in database or have no artifacts and compositions",
                                 TEST_ARTISTS.stream().sorted().collect(Collectors.toList())),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(2)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+        assertThat(processDetails.get(2)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -129,47 +129,47 @@ public class ServiceProcessValidateLATest {
     void testOk() throws Exception {
         service.executeProcessor(ProcessorType.LA_VALIDATOR);
         ProcessInfo pi = service.getProcessInfo();
-        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProgressDetails();
         assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         int id = 0;
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Started LA Validator", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Started LA Validator", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Artists validated", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Artists validated", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Artifacts validated", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Artifacts validated", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Media files validated", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Media files validated", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Artifact media files validated", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Artifact media files validated", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+        assertThat(processDetails.get(id)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
                         ProcessingStatus.SUCCESS,
                         null,
                         null)
@@ -195,32 +195,32 @@ public class ServiceProcessValidateLATest {
         em.createNativeQuery("delete from compositions_media_files WHERE comp_id = 1").executeUpdate();
         service.executeProcessor(ProcessorType.LA_VALIDATOR);
         ProcessInfo pi = service.getProcessInfo();
-        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProgressDetails();
         int id = 0;
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Started LA Validator", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Started LA Validator", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Artists validated", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Artists validated", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Artifacts validated", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Artifacts validated", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo(
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo(
                                 "Media files not in database",
                                 List.of(errorString)),
                         ProcessingStatus.FAILURE,
@@ -241,34 +241,34 @@ public class ServiceProcessValidateLATest {
         em.createNativeQuery("delete from compositions WHERE comp_id = 1").executeUpdate();
         service.executeProcessor(ProcessorType.LA_VALIDATOR);
         ProcessInfo pi = service.getProcessInfo();
-        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProgressDetails();
         int id = 0;
 
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Started LA Validator", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Started LA Validator", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Artists validated", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Artists validated", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Artifacts validated", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Artifacts validated", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo(
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo(
                                 "Media files not in database",
                                 List.of(errorString)),
                         ProcessingStatus.FAILURE,
@@ -290,48 +290,48 @@ public class ServiceProcessValidateLATest {
     void validateOk() {
         this.prepareInternal();
         ProcessInfo pi = executeProcessor();
-        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProgressDetails();
 
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         int id = 0;
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Started LA Validator", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Started LA Validator", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Artists validated", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Artists validated", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Artifacts validated", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Artifacts validated", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Media files validated", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Media files validated", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Artifact media files validated", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Artifact media files validated", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+        assertThat(processDetails.get(id)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
                         ProcessingStatus.SUCCESS,
                         null,
                         null)
@@ -345,11 +345,11 @@ public class ServiceProcessValidateLATest {
         this.prepareInternal();
         service.executeProcessor(ProcessorType.LA_VALIDATOR, "../odeon-test-data/ok/Lossless/Therapy/1993 Nurse");
         ProcessInfo pi = service.getProcessInfo();
-        List<ProgressDetail> progressDetails = pi.getProgressDetails();
-        assertThat(progressDetails.get(1).getInfo().getMessage()).contains("Expected directory, found");
-        assertThat(progressDetails.get(2)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo(
+        List<ProcessDetail> processDetails = pi.getProgressDetails();
+        assertThat(processDetails.get(1).getInfo().getMessage()).contains("Expected directory, found");
+        assertThat(processDetails.get(2)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo(
                                 "Artists not in files or have no artifacts and compositions",
                                 TEST_ARTISTS.stream().sorted().collect(Collectors.toList())),
                         ProcessingStatus.FAILURE,
@@ -376,29 +376,29 @@ public class ServiceProcessValidateLATest {
         artifactRepository.save(artifact);
 
         ProcessInfo pi = executeProcessor();
-        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProgressDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
         int id = 1;
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Artists validated", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Artists validated", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo(
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo(
                                 "Artifacts not in files",
                                 List.of(artist.getName() + " >> 2000 New Artifact")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+        assertThat(processDetails.get(id)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -419,29 +419,29 @@ public class ServiceProcessValidateLATest {
         artifactRepository.delete(artifact);
 
         ProcessInfo pi = executeProcessor();
-        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProgressDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
         int id = 1;
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Artists validated", new ArrayList<>()),
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Artists validated", new ArrayList<>()),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id++)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo(
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo(
                                 "Artifacts not in database",
                                 List.of("Evanescence >> 2000 Origin")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
         );
-        assertThat(progressDetails.get(id)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo("Task status", new ArrayList<>()),
+        assertThat(processDetails.get(id)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -473,12 +473,12 @@ public class ServiceProcessValidateLATest {
         compositionRepository.save(composition);
 
         ProcessInfo pi = executeProcessor();
-        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProgressDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(progressDetails.get(3)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo(
+        assertThat(processDetails.get(3)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo(
                                 "Media files not in files",
                                 List.of("Evanescence >> 2011 Evanescence >> " + mediaFile.getName())),
                         ProcessingStatus.FAILURE,
@@ -501,12 +501,12 @@ public class ServiceProcessValidateLATest {
         mediaFileRepository.delete(mediaFile);
 
         ProcessInfo pi = executeProcessor();
-        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProgressDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(progressDetails.get(3)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo(
+        assertThat(processDetails.get(3)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo(
                                 "Media files not in database",
                                 List.of("Evanescence >> 2011 Evanescence >> " + mediaFile.getName())),
                         ProcessingStatus.FAILURE,
@@ -514,9 +514,9 @@ public class ServiceProcessValidateLATest {
                         null)
         );
 
-        assertThat(progressDetails.get(4)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo(
+        assertThat(processDetails.get(4)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo(
                                 "Artifact media files not in database",
                                 List.of("Evanescence >> 2011 Evanescence >> " + mediaFile.getName())),
                         ProcessingStatus.FAILURE,
@@ -544,12 +544,12 @@ public class ServiceProcessValidateLATest {
         mediaFileRepository.save(mediaFile);
 
         ProcessInfo pi = executeProcessor();
-        List<ProgressDetail> progressDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProgressDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(progressDetails.get(4)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo(
+        assertThat(processDetails.get(4)).isEqualTo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo(
                                 "Artifact media files not in files",
                                 List.of("Abigail Williams >> 2010 In The Absence Of Light >> Another media file.flac")),
                         ProcessingStatus.FAILURE,
@@ -575,8 +575,8 @@ public class ServiceProcessValidateLATest {
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
         assertThat(pi.getProgressDetails().get(4)).isEqualTo(
-                new ProgressDetail(
-                        new ProgressDetail.ProgressInfo(
+                new ProcessDetail(
+                        new ProcessDetail.ProcessInfo(
                                 "Artifact media files not in database",
                                 List.of("Abigail Williams >> 2010 In The Absence Of Light >> 01 Hope The Great Betrayal.flac")),
                         ProcessingStatus.FAILURE,

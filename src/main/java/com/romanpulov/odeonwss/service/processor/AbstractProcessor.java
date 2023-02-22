@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.service.processor.model.ProcessingActionType;
-import com.romanpulov.odeonwss.service.processor.model.ProgressDetail;
+import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
 
 import java.util.List;
 
@@ -29,23 +29,23 @@ public abstract class AbstractProcessor {
     abstract public void execute() throws ProcessorException;
 
     protected void infoHandler(String infoMessage) {
-        progressHandler.handleProgress(ProgressDetail.fromInfoMessage(infoMessage));
+        progressHandler.handleProgress(ProcessDetail.fromInfoMessage(infoMessage));
     }
 
     protected void infoHandler(String infoMessage, int rows) {
-        progressHandler.handleProgress(ProgressDetail.fromInfoMessage(infoMessage, rows));
+        progressHandler.handleProgress(ProcessDetail.fromInfoMessage(infoMessage, rows));
     }
 
     protected void errorHandler(String errorMessage) {
-        progressHandler.handleProgress(ProgressDetail.fromErrorMessage(errorMessage));
+        progressHandler.handleProgress(ProcessDetail.fromErrorMessage(errorMessage));
     }
 
     protected void errorHandler(String errorMessage, List<String> items) {
-        progressHandler.handleProgress(ProgressDetail.fromErrorMessage(errorMessage, items));
+        progressHandler.handleProgress(ProcessDetail.fromErrorMessage(errorMessage, items));
     }
 
     protected void errorHandler(String errorMessage, Object ...args) {
-        progressHandler.handleProgress(ProgressDetail.fromErrorMessage(errorMessage, args));
+        progressHandler.handleProgress(ProcessDetail.fromErrorMessage(errorMessage, args));
     }
 
     protected void errorHandlerItem(String errorMessage, String item) {
@@ -53,10 +53,10 @@ public abstract class AbstractProcessor {
     }
 
     protected void warningHandler(String warningMessage) {
-        progressHandler.handleProgress(ProgressDetail.fromWarningMessage(warningMessage));
+        progressHandler.handleProgress(ProcessDetail.fromWarningMessage(warningMessage));
     }
 
     protected void warningHandlerWithAddArtistAction(String warningMessage, String artistName) {
-        progressHandler.handleProgress(ProgressDetail.fromWarningMessageWithAction(warningMessage, ProcessingActionType.ADD_ARTIST, artistName));
+        progressHandler.handleProgress(ProcessDetail.fromWarningMessageWithAction(warningMessage, ProcessingActionType.ADD_ARTIST, artistName));
     }
 }
