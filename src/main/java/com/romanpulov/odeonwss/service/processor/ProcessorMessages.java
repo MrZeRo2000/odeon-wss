@@ -6,7 +6,6 @@ public class ProcessorMessages {
     static final String ERROR_ROOT_FOLDER_NOT_FOUND = "Root folder not found";
     static final String ERROR_PATH_NOT_FOUND = "Path not found: %s";
     static final String ERROR_FILE_NOT_FOUND = "File not found: %s";
-    static final String ERROR_EXCEPTION = "Exception: %s";
     static final String ERROR_EXPECTED_DIRECTORY = "Expected directory, found: %s";
     static final String ERROR_EXPECTED_FILE = "Expected file, found: %s";
     static final String ERROR_ARTIST_NOT_FOUND = "Artist %s not found";
@@ -24,8 +23,6 @@ public class ProcessorMessages {
     static final String ERROR_OPENING_MDB_TABLE = "Error opening MDB table %s: %s";
     static final String ERROR_PROCESSING_MDB_DATABASE = "Error processing MDB database: %s";
 
-    static final String ERROR_ARTISTS_NOT_IN_DB = "Artists not in database: %s";
-    static final String ERROR_ARTISTS_NOT_IN_FILES = "Artists not in files: %s";
     static final String ERROR_ARTISTS_ARTIFACTS_COMPOSITIONS_NOT_IN_DB = "Artists not in database or have no artifacts and compositions";
     static final String ERROR_ARTISTS_ARTIFACTS_COMPOSITIONS_NOT_IN_FILES = "Artists not in files or have no artifacts and compositions";
     static final String INFO_ARTISTS_VALIDATED = "Artists validated";
@@ -69,7 +66,4 @@ public class ProcessorMessages {
 
     static final String INFO_CATEGORIES_IMPORTED = "Categories imported: %d";
     static final String INFO_PRODUCTS_IMPORTED = "Products imported: %d";
-
-    static final String FORMAT_PATH_DELIMITER = " >> ";
-
 }
