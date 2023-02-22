@@ -89,23 +89,22 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
             );
         } else {
             List<Path> directoryFolderDisksPaths = null;
-            if (parentYT == null) {
-                try (Stream<Path> compositionPathStream = Files.list(artifactPath)) {
-                    directoryFolderDisksPaths = compositionPathStream
+            List<Path> compositionPaths = new ArrayList<>();
+            if (PathReader.readPathAll(artifactPath, compositionPaths)) {
+                if (parentYT == null) {
+                    directoryFolderDisksPaths = compositionPaths
+                            .stream()
                             .filter(p -> NamesParser.getDiskNumFromFolderName(p.getFileName().toString()) > 0)
                             .collect(Collectors.toList());
-                } catch (IOException e) {
-                    throw new ProcessorException(ProcessorMessages.ERROR_EXCEPTION, e.getMessage());
                 }
-            }
 
-            if (directoryFolderDisksPaths != null && directoryFolderDisksPaths.size() > 0) {
-                for (Path directoryFolderDiskPath: directoryFolderDisksPaths) {
-                    loadFromArtifactPathParent(artistPath, directoryFolderDiskPath, yt, result);
-                }
-            } else {
-                try (Stream<Path> compositionPathStream = Files.list(artifactPath)) {
-                    List<String> compositionFileNames = compositionPathStream
+                if (directoryFolderDisksPaths != null && directoryFolderDisksPaths.size() > 0) {
+                    for (Path directoryFolderDiskPath: directoryFolderDisksPaths) {
+                        loadFromArtifactPathParent(artistPath, directoryFolderDiskPath, yt, result);
+                    }
+                } else {
+                    List<String> compositionFileNames = compositionPaths
+                            .stream()
                             .map(f -> f.getFileName().toString())
                             .filter(f -> f.contains("."))
                             .filter(f -> MEDIA_FORMATS.contains(f.substring(f.lastIndexOf(".") + 1).toLowerCase()))
@@ -123,8 +122,6 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                                 null
                         )));
                     }
-                }  catch (IOException e) {
-                    throw new ProcessorException(ProcessorMessages.ERROR_EXCEPTION, e.getMessage());
                 }
             }
         }

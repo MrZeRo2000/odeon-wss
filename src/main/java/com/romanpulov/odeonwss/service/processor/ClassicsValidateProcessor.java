@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,21 +40,12 @@ public class ClassicsValidateProcessor extends AbstractFileSystemProcessor {
     }
 
     private Set<String> loadFromPath(Path path) throws ProcessorException {
-        Set<String> result = new HashSet<>();
-
-        try (Stream<Path> artistPathStream = Files.list(path)){
-            for (Path folderPath: artistPathStream.collect(Collectors.toList())) {
-                if (!Files.isDirectory(folderPath)) {
-                    errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, folderPath.getFileName().toString());
-                } else {
-                    result.add(folderPath.getFileName().toString());
-                }
-            }
-        } catch (IOException e) {
-            throw new ProcessorException("Exception:" + e.getMessage());
+        List<Path> artifactFiles = new ArrayList<>();
+        if (!PathReader.readPathFoldersOnly(this, path, artifactFiles)) {
+            return Set.of();
+        } else {
+            return artifactFiles.stream().map(p -> p.getFileName().toString()).collect(Collectors.toSet());
         }
-
-        return result;
     }
 
     private boolean validateArtifacts(Set<String> pathValidation, Set<String> dbValidation) {

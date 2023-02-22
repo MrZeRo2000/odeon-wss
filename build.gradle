@@ -84,3 +84,14 @@ tasks.register('deployInt', Copy) {
 	include file_name_build
 	rename file_name_build, file_name_int
 }
+
+tasks.register("testFull") {
+	group = "application"
+	description = "Runs the Spring Boot application with the full-tests profile"
+	doFirst {
+		tasks.test.configure {
+			systemProperty("spring.profiles.active", "full-tests")
+		}
+	}
+	finalizedBy("test")
+}
