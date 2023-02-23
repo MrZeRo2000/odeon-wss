@@ -10,14 +10,15 @@ import java.util.stream.Stream;
 public class ProcessingStatusConverter implements AttributeConverter<ProcessingStatus, String> {
     @Override
     public String convertToDatabaseColumn(ProcessingStatus status) {
-        return status == null ? null : status.getLabel();
+        return status == null ? null : status.toString();
     }
 
     @Override
     public ProcessingStatus convertToEntityAttribute(String s) {
-        return Stream.of(ProcessingStatus.values())
-                .filter(p -> p.getLabel().equals(s))
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+        try {
+            return ProcessingStatus.valueOf(s);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return null;
+        }
     }
 }

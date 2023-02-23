@@ -2,35 +2,44 @@ package com.romanpulov.odeonwss.entity;
 
 import com.romanpulov.odeonwss.entity.converter.DateConverter;
 import com.romanpulov.odeonwss.entity.converter.ProcessingStatusConverter;
-import com.romanpulov.odeonwss.entity.converter.ProcessorTypeConverter;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
-import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "process_info")
-@AttributeOverride(name = "id", column = @Column(name = "prif_id"))
-public class DBProcessInfo extends AbstractBaseEntity {
-
-    @Column(name = "prif_type")
+@Table(name = "process_details")
+@AttributeOverride(name = "id", column = @Column(name = "prdt_id"))
+public class DBProcessDetail extends AbstractBaseEntity {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "prif_id", referencedColumnName = "prif_id")
     @NotNull
-    @Convert(converter = ProcessorTypeConverter.class)
-    private ProcessorType processorType;
+    private DBProcessInfo dbProcessInfo;
 
-    public ProcessorType getProcessorType() {
-        return processorType;
+    public DBProcessInfo getDbProcessInfo() {
+        return dbProcessInfo;
     }
 
-    public void setProcessorType(ProcessorType processorType) {
-        this.processorType = processorType;
+    public void setDbProcessInfo(DBProcessInfo dbProcessInfo) {
+        this.dbProcessInfo = dbProcessInfo;
     }
 
-    @Column(name = "prif_status")
+    @Column(name = "prdt_message")
+    @NotNull
+    private String message;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    @Column(name = "prdt_status")
     @NotNull
     @Convert(converter = ProcessingStatusConverter.class)
     private ProcessingStatus processingStatus;
@@ -43,7 +52,18 @@ public class DBProcessInfo extends AbstractBaseEntity {
         this.processingStatus = processingStatus;
     }
 
-    @Column(name = "prif_upd_date")
+    @Column(name = "prdt_rows")
+    private Long rows;
+
+    public Long getRows() {
+        return rows;
+    }
+
+    public void setRows(Long rows) {
+        this.rows = rows;
+    }
+
+    @Column(name = "prdt_upd_date")
     @NotNull
     @Convert(converter = DateConverter.class)
     private LocalDate updateDate;
@@ -56,23 +76,12 @@ public class DBProcessInfo extends AbstractBaseEntity {
         this.updateDate = updateDate;
     }
 
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "dbProcessInfo", fetch = FetchType.LAZY)
-    private List<DBProcessDetail> dbProcessDetails;
-
-    public List<DBProcessDetail> getDbProcessDetails() {
-        return dbProcessDetails;
-    }
-
-    public void setDbProcessDetails(List<DBProcessDetail> dbProcessDetails) {
-        this.dbProcessDetails = dbProcessDetails;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DBProcessInfo dbProcessInfo = (DBProcessInfo) o;
-        return getId().equals(dbProcessInfo.getId());
+        DBProcessDetail dbProcessDetail = (DBProcessDetail) o;
+        return getId().equals(dbProcessDetail.getId());
     }
 
     @Override
@@ -82,10 +91,12 @@ public class DBProcessInfo extends AbstractBaseEntity {
 
     @Override
     public String toString() {
-        return "DBProcessInfo{" +
-                "processorType=" + processorType +
+        return "DBProcessDetail{" +
+                "dbProcessInfo=" +  (Hibernate.isInitialized(dbProcessInfo) ? dbProcessInfo : dbProcessInfo.getId()) +
+                ", message='" + message + '\'' +
                 ", processingStatus=" + processingStatus +
-                ", insertDate=" + updateDate +
+                ", rows=" + rows +
+                ", updateDate=" + updateDate +
                 '}';
     }
 }
