@@ -4,7 +4,6 @@ import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
-import java.util.stream.Stream;
 
 @Converter
 public class ProcessingStatusConverter implements AttributeConverter<ProcessingStatus, String> {

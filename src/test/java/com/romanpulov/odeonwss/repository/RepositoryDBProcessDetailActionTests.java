@@ -1,8 +1,10 @@
 package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.entity.DBProcessDetail;
+import com.romanpulov.odeonwss.entity.DBProcessDetailAction;
 import com.romanpulov.odeonwss.entity.DBProcessDetailItem;
 import com.romanpulov.odeonwss.entity.DBProcessInfo;
+import com.romanpulov.odeonwss.service.processor.model.ProcessingActionType;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 import org.junit.jupiter.api.MethodOrderer;
@@ -22,7 +24,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class RepositoryDBProcessDetailItemTests {
+public class RepositoryDBProcessDetailActionTests {
 
     @Autowired
     DBProcessInfoRepository dbProcessInfoRepository;
@@ -31,7 +33,7 @@ public class RepositoryDBProcessDetailItemTests {
     DBProcessDetailRepository dbProcessDetailRepository;
 
     @Autowired
-    DBProcessDetailItemRepository dbProcessDetailItemRepository;
+    DBProcessDetailActionRepository dbProcessDetailActionRepository;
 
     @Test
     @Order(1)
@@ -46,13 +48,13 @@ public class RepositoryDBProcessDetailItemTests {
         ).isEqualTo(0L);
 
         assertThat(
-                StreamSupport.stream(dbProcessDetailItemRepository.findAll().spliterator(), false).count()
+                StreamSupport.stream(dbProcessDetailActionRepository.findAll().spliterator(), false).count()
         ).isEqualTo(0L);
 
         DBProcessInfo dbProcessInfo = new DBProcessInfo();
         dbProcessInfo.setProcessorType(ProcessorType.MP3_LOADER);
         dbProcessInfo.setProcessingStatus(ProcessingStatus.INFO);
-        dbProcessInfo.setUpdateDate(LocalDate.of(2011, 5, 19));
+        dbProcessInfo.setUpdateDate(LocalDate.of(2001, 9, 6));
 
         dbProcessInfoRepository.save(dbProcessInfo);
 
@@ -66,7 +68,7 @@ public class RepositoryDBProcessDetailItemTests {
         dbProcessDetail.setProcessingStatus(ProcessingStatus.SUCCESS);
         dbProcessDetail.setMessage("Success");
         dbProcessDetail.setRows(4L);
-        dbProcessDetail.setUpdateDate(LocalDate.of(2022, 5, 21));
+        dbProcessDetail.setUpdateDate(LocalDate.of(2023, 1, 12));
 
         dbProcessDetailRepository.save(dbProcessDetail);
 
@@ -75,21 +77,19 @@ public class RepositoryDBProcessDetailItemTests {
                 .collect(Collectors.toList());
         assertThat(dbProcessDetails.size()).isEqualTo(1L);
 
-        DBProcessDetailItem dbProcessDetailItem1 = new DBProcessDetailItem();
-        dbProcessDetailItem1.setDbProcessDetail(dbProcessDetail);
-        dbProcessDetailItem1.setValue("Value 1");
+        DBProcessDetailAction dbProcessDetailAction = new DBProcessDetailAction();
+        dbProcessDetailAction.setDbProcessDetail(dbProcessDetail);
+        dbProcessDetailAction.setActionType(ProcessingActionType.ADD_ARTIST);
+        dbProcessDetailAction.setValue("New Action");
 
-        DBProcessDetailItem dbProcessDetailItem2 = new DBProcessDetailItem();
-        dbProcessDetailItem2.setDbProcessDetail(dbProcessDetail);
-        dbProcessDetailItem2.setValue("Value 2");
+        dbProcessDetailActionRepository.save(dbProcessDetailAction);
 
-        dbProcessDetailItemRepository.saveAll(List.of(dbProcessDetailItem1, dbProcessDetailItem2));
-
-        List<DBProcessDetailItem> savedDBProcessDetailItems = dbProcessDetailItemRepository
-                .findAllByDbProcessDetailOrderByIdAsc(dbProcessDetail);
-        assertThat(savedDBProcessDetailItems.size()).isEqualTo(2);
-        assertThat(savedDBProcessDetailItems.get(0).getValue()).isEqualTo("Value 1");
-        assertThat(savedDBProcessDetailItems.get(1).getDbProcessDetail().getId()).isEqualTo(dbProcessDetail.getId());
+        List<DBProcessDetailAction> savedDBProcessDetailActions = dbProcessDetailActionRepository
+                .findByDbProcessDetailOrderByIdAsc(dbProcessDetail);
+        assertThat(savedDBProcessDetailActions.size()).isEqualTo(1);
+        assertThat(savedDBProcessDetailActions.get(0).getValue()).isEqualTo("New Action");
+        assertThat(savedDBProcessDetailActions.get(0).getActionType()).isEqualTo(ProcessingActionType.ADD_ARTIST);
+        assertThat(savedDBProcessDetailActions.get(0).getDbProcessDetail().getId()).isEqualTo(dbProcessDetail.getId());
     }
 }
 
