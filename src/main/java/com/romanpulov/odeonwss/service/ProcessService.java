@@ -48,36 +48,38 @@ public class ProcessService implements ProgressHandler {
     synchronized public void executeProcessor(ProcessorType processorType, String rootPath) {
         logger.debug("Starting execution: " + processorType + ", parameter path: " + rootPath);
 
-        processInfo = new ProcessInfo(processorType);
-        try {
+        if (currentProcessor.get() == null) {
+            processInfo = new ProcessInfo(processorType);
+            try {
+                currentProcessor.set(processorFactory.fromProcessorType(processorType, this));
 
-            if (currentProcessor.get() != null) {
-                throw new ProcessorException("Process already running");
+                processInfo.addProgressDetails(ProcessDetail.fromInfoMessage(ProcessorMessages.INFO_STARTED, processorType.label));
+
+                if (rootPath != null) {
+                    currentProcessor.get().setRootFolder(rootPath);
+                }
+
+                // execute
+                logger.debug(String.format("Executing: %s with path: %s", processorType, currentProcessor.get().getRootFolder()));
+                currentProcessor.get().execute();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.debug("Error executing: " + processorType + ": " + e.getMessage());
+                processInfo.addProgressDetails(ProcessDetail.fromException(e));
+            } finally {
+                // final status
+                ProcessDetail finalProcessDetail = ProcessDetail.createFinalProgressDetail(processInfo.getProgressDetails());
+                processInfo.addProgressDetails(finalProcessDetail);
+                processInfo.setProcessingStatus(finalProcessDetail.getStatus());
+
+                //clean up processor
+                currentProcessor.set(null);
+
+                logger.debug("Finished executing: " + processorType);
             }
-
-            currentProcessor.set(processorFactory.fromProcessorType(processorType, this));
-
-            processInfo.addProgressDetails(ProcessDetail.fromInfoMessage(ProcessorMessages.INFO_STARTED, processorType.label));
-
-            if (rootPath != null) {
-                currentProcessor.get().setRootFolder(rootPath);
-            }
-
-            // execute
-            logger.debug(String.format("Executing: %s with path: %s", processorType, currentProcessor.get().getRootFolder()));
-            currentProcessor.get().execute();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            processInfo.addProgressDetails(ProcessDetail.fromException(e));
-        } finally {
-            // final status
-            ProcessDetail finalProcessDetail = ProcessDetail.createFinalProgressDetail(processInfo.getProgressDetails());
-            processInfo.addProgressDetails(finalProcessDetail);
-            processInfo.setProcessingStatus(finalProcessDetail.getStatus());
-
-            //clean up processor
-            currentProcessor.set(null);
+        } else {
+            logger.debug("Another processor is running: " + currentProcessor.get().getClass().getName());
         }
     }
 
