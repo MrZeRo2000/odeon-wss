@@ -4,13 +4,19 @@ import com.romanpulov.odeonwss.entity.DBProcessDetail;
 import com.romanpulov.odeonwss.entity.DBProcessDetailAction;
 import com.romanpulov.odeonwss.entity.DBProcessDetailItem;
 import com.romanpulov.odeonwss.entity.DBProcessInfo;
+import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
 import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingAction;
+import com.romanpulov.odeonwss.service.processor.model.ProcessingActionType;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class ProcessInfoRepository {
@@ -32,6 +38,78 @@ public class ProcessInfoRepository {
         this.dbProcessDetailRepository = dbProcessDetailRepository;
         this.dbProcessDetailItemRepository = dbProcessDetailItemRepository;
         this.dbProcessDetailActionRepository = dbProcessDetailActionRepository;
+    }
+
+    public List<ProcessInfo> findAllByLastUpdated(LocalDateTime startDate, LocalDateTime endDate) {
+        return this.dbProcessInfoRepository.findAllByUpdateDateTimeBetweenOrderByIdAsc(startDate, endDate)
+                .stream()
+                .map(p -> {
+                    ProcessInfo processInfo = new ProcessInfo(p.getProcessorType());
+                    processInfo.setProcessingStatus(p.getProcessingStatus());
+                    processInfo.setLastUpdated(p.getUpdateDateTime());
+                    return processInfo;
+                })
+                .collect(Collectors.toList());
+    }
+
+    public ProcessInfo findById(Long id) {
+        DBProcessInfo dbProcessInfo = dbProcessInfoRepository.findById(id).orElse(null);
+        if (dbProcessInfo == null) {
+            return null;
+        } else {
+            //processInfo
+            ProcessInfo processInfo = new ProcessInfo(dbProcessInfo.getProcessorType());
+            processInfo.setProcessingStatus(dbProcessInfo.getProcessingStatus());
+            processInfo.setLastUpdated(dbProcessInfo.getUpdateDateTime());
+
+            //processDetails
+            this.dbProcessDetailRepository
+                    .findAllByDbProcessInfoOrderByIdAsc(dbProcessInfo)
+                    .forEach(dbProcessDetail -> {
+                        List<String> processInfoItems = this.dbProcessDetailItemRepository
+                                .findAllByDbProcessDetailOrderByIdAsc(dbProcessDetail)
+                                .stream()
+                                .map(DBProcessDetailItem::getValue)
+                                .collect(Collectors.toList());
+
+                        Pair<ProcessingActionType, String> processingAction =
+                                dbProcessDetailActionRepository
+                                        .findFirstByDbProcessDetailOrderByIdAsc(dbProcessDetail)
+                                        .map(pa -> Pair.of(pa.getActionType(), pa.getValue()))
+                                        .orElse(null);
+
+                        ProcessDetail processDetail = new ProcessDetail(
+                                dbProcessDetail.getUpdateDateTime(),
+                                new ProcessDetail.ProcessInfo(dbProcessDetail.getMessage(), processInfoItems),
+                                dbProcessDetail.getProcessingStatus(),
+                                dbProcessDetail.getRows() == null ? null : dbProcessDetail.getRows().intValue(),
+                                processingAction == null ? null :
+                                        new ProcessingAction(processingAction.getFirst(), processingAction.getSecond())
+                        );
+
+                        processInfo.getProgressDetails().add(processDetail);
+                    });
+
+
+            //processDetails
+            /*
+            List<ProcessDetail> processDetails = this.dbProcessDetailRepository
+                    .findAllByDbProcessInfoOrderByIdAsc(dbProcessInfo)
+                    .stream()
+                    .map(p ->
+                            new ProcessDetail(
+                                    p.getUpdateDateTime(),
+                                    new ProcessDetail.ProcessInfo(p.getMessage(), new ArrayList<>()),
+                                    p.getProcessingStatus(),
+                                    p.getRows() == null ? null : p.getRows().intValue(),
+                                    null
+                            )
+                    ).collect(Collectors.toList());
+
+
+             */
+            return processInfo;
+        }
     }
 
     @Transactional

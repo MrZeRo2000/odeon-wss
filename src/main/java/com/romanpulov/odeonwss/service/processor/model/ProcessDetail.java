@@ -82,12 +82,17 @@ public class ProcessDetail {
         return processingAction;
     }
 
-    public ProcessDetail(ProcessInfo info, ProcessingStatus status, Integer rows, ProcessingAction processingAction) {
-        this.time = LocalDateTime.now();
+    public ProcessDetail(LocalDateTime time, ProcessInfo info, ProcessingStatus status, Integer rows, ProcessingAction processingAction) {
+        this.time = time;
         this.info = info;
         this.status = status;
         this.rows = rows;
         this.processingAction = processingAction;
+
+    }
+
+    public ProcessDetail(ProcessInfo info, ProcessingStatus status, Integer rows, ProcessingAction processingAction) {
+        this(LocalDateTime.now(), info, status, rows, processingAction);
     }
 
     public static ProcessDetail fromMessageAndStatus(String message, ProcessingStatus status) {
