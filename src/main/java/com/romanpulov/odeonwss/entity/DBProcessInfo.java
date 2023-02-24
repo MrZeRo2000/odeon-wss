@@ -1,6 +1,6 @@
 package com.romanpulov.odeonwss.entity;
 
-import com.romanpulov.odeonwss.entity.converter.DateConverter;
+import com.romanpulov.odeonwss.entity.converter.DateTimeConverter;
 import com.romanpulov.odeonwss.entity.converter.ProcessingStatusConverter;
 import com.romanpulov.odeonwss.entity.converter.ProcessorTypeConverter;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
@@ -8,7 +8,7 @@ import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,17 +43,17 @@ public class DBProcessInfo extends AbstractBaseEntity {
         this.processingStatus = processingStatus;
     }
 
-    @Column(name = "prif_upd_date")
+    @Column(name = "prif_upd_datm")
     @NotNull
-    @Convert(converter = DateConverter.class)
-    private LocalDate updateDate;
+    @Convert(converter = DateTimeConverter.class)
+    private LocalDateTime updateDateTime;
 
-    public LocalDate getUpdateDate() {
-        return updateDate;
+    public LocalDateTime getUpdateDateTime() {
+        return updateDateTime;
     }
 
-    public void setUpdateDate(LocalDate updateDate) {
-        this.updateDate = updateDate;
+    public void setUpdateDateTime(LocalDateTime updateDateTime) {
+        this.updateDateTime = updateDateTime;
     }
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "dbProcessInfo", fetch = FetchType.LAZY)
@@ -85,7 +85,7 @@ public class DBProcessInfo extends AbstractBaseEntity {
         return "DBProcessInfo{" +
                 "processorType=" + processorType +
                 ", processingStatus=" + processingStatus +
-                ", insertDate=" + updateDate +
+                ", insertDate=" + updateDateTime +
                 '}';
     }
 }

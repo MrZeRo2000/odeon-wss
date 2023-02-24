@@ -2,7 +2,6 @@ package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.entity.DBProcessDetail;
 import com.romanpulov.odeonwss.entity.DBProcessDetailAction;
-import com.romanpulov.odeonwss.entity.DBProcessDetailItem;
 import com.romanpulov.odeonwss.entity.DBProcessInfo;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingActionType;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
@@ -16,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -54,7 +54,7 @@ public class RepositoryDBProcessDetailActionTests {
         DBProcessInfo dbProcessInfo = new DBProcessInfo();
         dbProcessInfo.setProcessorType(ProcessorType.MP3_LOADER);
         dbProcessInfo.setProcessingStatus(ProcessingStatus.INFO);
-        dbProcessInfo.setUpdateDate(LocalDate.of(2001, 9, 6));
+        dbProcessInfo.setUpdateDateTime(LocalDateTime.of(2001, 9, 6, 2, 59, 59));
 
         dbProcessInfoRepository.save(dbProcessInfo);
 
@@ -68,7 +68,7 @@ public class RepositoryDBProcessDetailActionTests {
         dbProcessDetail.setProcessingStatus(ProcessingStatus.SUCCESS);
         dbProcessDetail.setMessage("Success");
         dbProcessDetail.setRows(4L);
-        dbProcessDetail.setUpdateDate(LocalDate.of(2023, 1, 12));
+        dbProcessDetail.setUpdateDateTime(LocalDateTime.of(2023, 1, 12, 23, 2, 59));
 
         dbProcessDetailRepository.save(dbProcessDetail);
 

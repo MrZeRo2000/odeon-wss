@@ -194,10 +194,10 @@ CREATE TABLE process_info(
     prif_id INTEGER PRIMARY KEY AUTOINCREMENT,
     prif_type TEXT NOT NULL,
     prif_status TEXT NOT NULL,
-    prif_upd_date INTEGER NOT NULL
+    prif_upd_datm INTEGER NOT NULL
 );
 
-CREATE INDEX idx_process_info_upd_date ON process_info(prif_upd_date);
+CREATE INDEX idx_process_info_upd_datm ON process_info(prif_upd_datm);
 
 DROP TABLE IF EXISTS process_details;
 
@@ -207,7 +207,7 @@ CREATE TABLE process_details(
     prdt_message TEXT NOT NULL,
     prdt_status TEXT NOT NULL,
     prdt_rows INTEGER NULL,
-    prdt_upd_date INTEGER NOT NULL
+    prdt_upd_datm INTEGER NOT NULL
 );
 
 DROP TABLE IF EXISTS process_detail_items;

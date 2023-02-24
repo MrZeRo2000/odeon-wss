@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -36,7 +37,7 @@ public class RepositoryDBProcessInfoTests {
         DBProcessInfo dbProcessInfo = new DBProcessInfo();
         dbProcessInfo.setProcessorType(ProcessorType.MP3_LOADER);
         dbProcessInfo.setProcessingStatus(ProcessingStatus.INFO);
-        dbProcessInfo.setUpdateDate(LocalDate.of(2022, 2, 12));
+        dbProcessInfo.setUpdateDateTime(LocalDateTime.of(2022, 2, 12, 18, 45, 22));
 
         dbProcessInfoRepository.save(dbProcessInfo);
 
@@ -49,6 +50,7 @@ public class RepositoryDBProcessInfoTests {
         assertThat(savedDBProcessInfo.getId()).isEqualTo(1L);
         assertThat(savedDBProcessInfo.getProcessorType()).isEqualTo(ProcessorType.MP3_LOADER);
         assertThat(savedDBProcessInfo.getProcessingStatus()).isEqualTo(ProcessingStatus.INFO);
+        assertThat(savedDBProcessInfo.getUpdateDateTime()).isEqualTo(LocalDateTime.of(2022, 2, 12, 18, 45, 22));
     }
 }
 

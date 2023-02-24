@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -44,7 +45,7 @@ public class RepositoryDBProcessDetailTests {
         DBProcessInfo dbProcessInfo = new DBProcessInfo();
         dbProcessInfo.setProcessorType(ProcessorType.MP3_LOADER);
         dbProcessInfo.setProcessingStatus(ProcessingStatus.INFO);
-        dbProcessInfo.setUpdateDate(LocalDate.of(2010, 4, 9));
+        dbProcessInfo.setUpdateDateTime(LocalDateTime.of(2010, 4, 9, 14, 54, 12));
 
         dbProcessInfoRepository.save(dbProcessInfo);
 
@@ -58,7 +59,7 @@ public class RepositoryDBProcessDetailTests {
         dbProcessDetail.setProcessingStatus(ProcessingStatus.IN_PROGRESS);
         dbProcessDetail.setMessage("Doing something");
         dbProcessDetail.setRows(22L);
-        dbProcessDetail.setUpdateDate(LocalDate.of(2022, 2, 23));
+        dbProcessDetail.setUpdateDateTime(LocalDateTime.of(2022, 2, 23, 7, 23, 45));
 
         dbProcessDetailRepository.save(dbProcessDetail);
 
@@ -72,7 +73,7 @@ public class RepositoryDBProcessDetailTests {
         assertThat(savedDBProcessDetail.getDbProcessInfo().getId()).isEqualTo(dbProcessInfoList.get(0).getId());
         assertThat(savedDBProcessDetail.getMessage()).isEqualTo("Doing something");
         assertThat(savedDBProcessDetail.getRows()).isEqualTo(22L);
-        assertThat(savedDBProcessDetail.getUpdateDate()).isEqualTo(LocalDate.of(2022, 2, 23));
+        assertThat(savedDBProcessDetail.getUpdateDateTime()).isEqualTo(LocalDateTime.of(2022, 2, 23, 7, 23, 45));
     }
 }
 

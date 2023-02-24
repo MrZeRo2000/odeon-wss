@@ -1,13 +1,13 @@
 package com.romanpulov.odeonwss.entity;
 
-import com.romanpulov.odeonwss.entity.converter.DateConverter;
+import com.romanpulov.odeonwss.entity.converter.DateTimeConverter;
 import com.romanpulov.odeonwss.entity.converter.ProcessingStatusConverter;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -63,17 +63,17 @@ public class DBProcessDetail extends AbstractBaseEntity {
         this.rows = rows;
     }
 
-    @Column(name = "prdt_upd_date")
+    @Column(name = "prdt_upd_datm")
     @NotNull
-    @Convert(converter = DateConverter.class)
-    private LocalDate updateDate;
+    @Convert(converter = DateTimeConverter.class)
+    private LocalDateTime updateDateTime;
 
-    public LocalDate getUpdateDate() {
-        return updateDate;
+    public LocalDateTime getUpdateDateTime() {
+        return updateDateTime;
     }
 
-    public void setUpdateDate(LocalDate updateDate) {
-        this.updateDate = updateDate;
+    public void setUpdateDateTime(LocalDateTime updateDateTime) {
+        this.updateDateTime = updateDateTime;
     }
 
     @Override
@@ -96,7 +96,7 @@ public class DBProcessDetail extends AbstractBaseEntity {
                 ", message='" + message + '\'' +
                 ", processingStatus=" + processingStatus +
                 ", rows=" + rows +
-                ", updateDate=" + updateDate +
+                ", updateDate=" + updateDateTime +
                 '}';
     }
 }

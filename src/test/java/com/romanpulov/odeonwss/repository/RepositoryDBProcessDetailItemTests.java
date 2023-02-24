@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -52,7 +53,7 @@ public class RepositoryDBProcessDetailItemTests {
         DBProcessInfo dbProcessInfo = new DBProcessInfo();
         dbProcessInfo.setProcessorType(ProcessorType.MP3_LOADER);
         dbProcessInfo.setProcessingStatus(ProcessingStatus.INFO);
-        dbProcessInfo.setUpdateDate(LocalDate.of(2011, 5, 19));
+        dbProcessInfo.setUpdateDateTime(LocalDateTime.of(2011, 5, 19, 2, 45, 55));
 
         dbProcessInfoRepository.save(dbProcessInfo);
 
@@ -66,7 +67,7 @@ public class RepositoryDBProcessDetailItemTests {
         dbProcessDetail.setProcessingStatus(ProcessingStatus.SUCCESS);
         dbProcessDetail.setMessage("Success");
         dbProcessDetail.setRows(4L);
-        dbProcessDetail.setUpdateDate(LocalDate.of(2022, 5, 21));
+        dbProcessDetail.setUpdateDateTime(LocalDateTime.of(2022, 5, 21, 6, 43, 21));
 
         dbProcessDetailRepository.save(dbProcessDetail);
 
