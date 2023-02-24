@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.repository.ProcessInfoRepository;
 import com.romanpulov.odeonwss.service.processor.*;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.slf4j.Logger;
@@ -15,8 +16,11 @@ public class ProcessService implements ProgressHandler {
 
     private final ProcessorFactory processorFactory;
 
-    public ProcessService(ProcessorFactory processorFactory) {
+    private final ProcessInfoRepository processInfoRepository;
+
+    public ProcessService(ProcessorFactory processorFactory, ProcessInfoRepository processInfoRepository) {
         this.processorFactory = processorFactory;
+        this.processInfoRepository = processInfoRepository;
     }
 
     final AtomicReference<AbstractProcessor> currentProcessor = new AtomicReference<>();
@@ -75,6 +79,15 @@ public class ProcessService implements ProgressHandler {
 
                 //clean up processor
                 currentProcessor.set(null);
+
+                try {
+                    logger.debug("Saving processing info");
+                    processInfoRepository.save(processInfo);
+                    logger.debug("Saved processing info");
+                } catch (Exception e) {
+                    logger.error("Error saving processing info: " + e.getMessage());
+                    e.printStackTrace();
+                }
 
                 logger.debug("Finished executing: " + processorType);
             }
