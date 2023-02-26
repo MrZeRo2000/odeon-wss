@@ -17,7 +17,6 @@ import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -87,7 +86,7 @@ public class ServiceProcessValidateLATest {
 
         service.executeProcessor(ProcessorType.LA_VALIDATOR, null);
         ProcessInfo pi = service.getProcessInfo();
-        List<ProcessDetail> processDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         assertThat(processDetails.get(0)).isEqualTo(
                 new ProcessDetail(
@@ -126,7 +125,7 @@ public class ServiceProcessValidateLATest {
     void testOk() throws Exception {
         service.executeProcessor(ProcessorType.LA_VALIDATOR);
         ProcessInfo pi = service.getProcessInfo();
-        List<ProcessDetail> processDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
         assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         int id = 0;
         assertThat(processDetails.get(id++)).isEqualTo(
@@ -192,7 +191,7 @@ public class ServiceProcessValidateLATest {
         em.createNativeQuery("delete from compositions_media_files WHERE comp_id = 1").executeUpdate();
         service.executeProcessor(ProcessorType.LA_VALIDATOR);
         ProcessInfo pi = service.getProcessInfo();
-        List<ProcessDetail> processDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
         int id = 0;
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
@@ -237,7 +236,7 @@ public class ServiceProcessValidateLATest {
         em.createNativeQuery("delete from compositions WHERE comp_id = 1").executeUpdate();
         service.executeProcessor(ProcessorType.LA_VALIDATOR);
         ProcessInfo pi = service.getProcessInfo();
-        List<ProcessDetail> processDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
         int id = 0;
 
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -286,7 +285,7 @@ public class ServiceProcessValidateLATest {
     void validateOk() {
         this.prepareInternal();
         ProcessInfo pi = executeProcessor();
-        List<ProcessDetail> processDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
 
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         int id = 0;
@@ -341,7 +340,7 @@ public class ServiceProcessValidateLATest {
         this.prepareInternal();
         service.executeProcessor(ProcessorType.LA_VALIDATOR, "../odeon-test-data/ok/Lossless/Therapy/1993 Nurse");
         ProcessInfo pi = service.getProcessInfo();
-        List<ProcessDetail> processDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
         assertThat(processDetails.get(1).getInfo().getMessage()).contains("Expected directory, found");
         assertThat(processDetails.get(2)).isEqualTo(
                 new ProcessDetail(
@@ -372,7 +371,7 @@ public class ServiceProcessValidateLATest {
         artifactRepository.save(artifact);
 
         ProcessInfo pi = executeProcessor();
-        List<ProcessDetail> processDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
         int id = 1;
@@ -415,7 +414,7 @@ public class ServiceProcessValidateLATest {
         artifactRepository.delete(artifact);
 
         ProcessInfo pi = executeProcessor();
-        List<ProcessDetail> processDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
         int id = 1;
@@ -469,7 +468,7 @@ public class ServiceProcessValidateLATest {
         compositionRepository.save(composition);
 
         ProcessInfo pi = executeProcessor();
-        List<ProcessDetail> processDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
         assertThat(processDetails.get(3)).isEqualTo(
@@ -497,7 +496,7 @@ public class ServiceProcessValidateLATest {
         mediaFileRepository.delete(mediaFile);
 
         ProcessInfo pi = executeProcessor();
-        List<ProcessDetail> processDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
         assertThat(processDetails.get(3)).isEqualTo(
@@ -540,7 +539,7 @@ public class ServiceProcessValidateLATest {
         mediaFileRepository.save(mediaFile);
 
         ProcessInfo pi = executeProcessor();
-        List<ProcessDetail> processDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
         assertThat(processDetails.get(4)).isEqualTo(
@@ -570,7 +569,7 @@ public class ServiceProcessValidateLATest {
         ProcessInfo pi = executeProcessor();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProgressDetails().get(4)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(4)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifact media files not in database",

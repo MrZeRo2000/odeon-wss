@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -57,7 +56,7 @@ public class ServiceProcessLoadLATest {
 
         // warnings - no artists exist
         processService.executeProcessor(PROCESSOR_TYPE, null);
-        processDetail = processService.getProcessInfo().getProgressDetails();
+        processDetail = processService.getProcessInfo().getProcessDetails();
 
         Assertions.assertEquals(10, processDetail.size());
         Assertions.assertEquals(ProcessingStatus.WARNING, processService.getProcessInfo().getProcessingStatus());
@@ -157,7 +156,7 @@ public class ServiceProcessLoadLATest {
         processService.executeProcessor(PROCESSOR_TYPE, null);
 
         ProcessInfo pi = processService.getProcessInfo();
-        List<ProcessDetail> processDetails = pi.getProgressDetails();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
 
         int item = 0;

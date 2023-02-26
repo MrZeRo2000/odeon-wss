@@ -1,10 +1,6 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.healthmarketscience.jackcess.ConstraintViolationException;
-import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
-import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
-import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
-import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
+import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -13,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -57,5 +53,42 @@ public class RepositoryProcessingInfoTests {
         assertThrows(Exception.class, () -> {
             processInfoRepository.save(processInfo);
         });
+    }
+
+    @Test
+    @Order(3)
+    void testSaveDetailItemsOk() {
+        ProcessInfo processInfo = new ProcessInfo(ProcessorType.MP3_LOADER);
+        processInfo.addProcessDetails(ProcessDetail.fromInfoMessage("Loaded", 31));
+        processInfo.addProcessDetails(ProcessDetail.fromErrorMessage("Error"));
+        processInfo.addProcessDetails(ProcessDetail.fromWarningMessageWithAction(
+                "Warning", ProcessingActionType.ADD_ARTIST, "MyArtist"));
+        processInfo.addProcessDetails(ProcessDetail.fromErrorMessage(
+                "Another Error", List.of("One data", "Another data")));
+
+        processInfoRepository.save(processInfo);
+
+        ProcessInfo savedProcessInfo = processInfoRepository.findById(2L).orElseThrow();
+
+        assertThat(savedProcessInfo.getProcessorType()).isEqualTo(ProcessorType.MP3_LOADER);
+        assertThat(savedProcessInfo.getProcessDetails().size()).isEqualTo(4);
+
+        assertThat(savedProcessInfo.getProcessDetails().get(0).getInfo().getMessage()).isEqualTo("Loaded");
+        assertThat(savedProcessInfo.getProcessDetails().get(0).getRows()).isEqualTo(31L);
+
+        assertThat(savedProcessInfo.getProcessDetails().get(1).getStatus()).isEqualTo(ProcessingStatus.FAILURE);
+        assertThat(savedProcessInfo.getProcessDetails().get(1).getInfo().getMessage()).isEqualTo("Error");
+        assertThat(savedProcessInfo.getProcessDetails().get(1).getRows()).isNull();
+        assertThat(savedProcessInfo.getProcessDetails().get(1).getProcessingAction()).isNull();
+
+        assertThat(savedProcessInfo.getProcessDetails().get(2).getStatus()).isEqualTo(ProcessingStatus.WARNING);
+        assertThat(savedProcessInfo.getProcessDetails().get(2).getInfo().getMessage()).isEqualTo("Warning");
+        assertThat(savedProcessInfo.getProcessDetails().get(2).getProcessingAction().getActionType()).isEqualTo(
+                ProcessingActionType.ADD_ARTIST);
+        assertThat(savedProcessInfo.getProcessDetails().get(2).getProcessingAction().getValue()).isEqualTo("MyArtist");
+
+        assertThat(savedProcessInfo.getProcessDetails().get(3).getStatus()).isEqualTo(ProcessingStatus.FAILURE);
+        assertThat(savedProcessInfo.getProcessDetails().get(3).getInfo().getItems().get(0)).isEqualTo("One data");
+        assertThat(savedProcessInfo.getProcessDetails().get(3).getInfo().getItems().get(1)).isEqualTo("Another data");
     }
 }

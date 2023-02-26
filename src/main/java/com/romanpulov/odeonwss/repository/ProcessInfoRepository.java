@@ -83,7 +83,7 @@ public class ProcessInfoRepository {
                                         new ProcessingAction(processingAction.getFirst(), processingAction.getSecond())
                         );
 
-                        processInfo.getProgressDetails().add(processDetail);
+                        processInfo.getProcessDetails().add(processDetail);
                     });
 
             return Optional.of(processInfo);
@@ -106,7 +106,7 @@ public class ProcessInfoRepository {
     }
 
     private void saveDbProcessDetails(ProcessInfo processInfo, DBProcessInfo dbProcessInfo) {
-        processInfo.getProgressDetails().forEach(
+        processInfo.getProcessDetails().forEach(
                 processDetail -> {
                     DBProcessDetail dbProcessDetail = new DBProcessDetail();
                     dbProcessDetail.setDbProcessInfo(dbProcessInfo);

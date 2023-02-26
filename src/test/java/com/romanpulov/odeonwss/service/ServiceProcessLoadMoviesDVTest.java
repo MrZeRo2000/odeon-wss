@@ -83,15 +83,15 @@ public class ServiceProcessLoadMoviesDVTest {
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
         Assertions.assertEquals(
                 new ProcessDetail(ProcessDetailInfo.fromMessage("Artifacts loaded"), ProcessingStatus.INFO, 3, null),
-                processService.getProcessInfo().getProgressDetails().get(1)
+                processService.getProcessInfo().getProcessDetails().get(1)
         );
         Assertions.assertEquals(
                 new ProcessDetail(ProcessDetailInfo.fromMessage("Compositions loaded"), ProcessingStatus.INFO, 3, null),
-                processService.getProcessInfo().getProgressDetails().get(2)
+                processService.getProcessInfo().getProcessDetails().get(2)
         );
         Assertions.assertEquals(
                 new ProcessDetail(ProcessDetailInfo.fromMessage("Media files loaded"), ProcessingStatus.INFO, 4, null),
-                processService.getProcessInfo().getProgressDetails().get(3)
+                processService.getProcessInfo().getProcessDetails().get(3)
         );
 
         compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE).forEach(c -> {
@@ -120,15 +120,15 @@ public class ServiceProcessLoadMoviesDVTest {
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
         Assertions.assertEquals(
                 new ProcessDetail(ProcessDetailInfo.fromMessage("Artifacts loaded"), ProcessingStatus.INFO, 0, null),
-                processService.getProcessInfo().getProgressDetails().get(1)
+                processService.getProcessInfo().getProcessDetails().get(1)
         );
         Assertions.assertEquals(
                 new ProcessDetail(ProcessDetailInfo.fromMessage("Compositions loaded"), ProcessingStatus.INFO, 0, null),
-                processService.getProcessInfo().getProgressDetails().get(2)
+                processService.getProcessInfo().getProcessDetails().get(2)
         );
         Assertions.assertEquals(
                 new ProcessDetail(ProcessDetailInfo.fromMessage("Media files loaded"), ProcessingStatus.INFO, 0, null),
-                processService.getProcessInfo().getProgressDetails().get(3)
+                processService.getProcessInfo().getProcessDetails().get(3)
         );
 
         compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE).forEach(c -> {

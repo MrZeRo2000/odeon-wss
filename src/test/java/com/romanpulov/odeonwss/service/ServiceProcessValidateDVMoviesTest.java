@@ -20,7 +20,6 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.DisabledIf;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -68,21 +67,21 @@ public class ServiceProcessValidateDVMoviesTest {
         service.executeProcessor(PROCESSOR_TYPE);
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
-        assertThat(pi.getProgressDetails().get(0)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(0)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Started Movies Validator"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(pi.getProgressDetails().get(1)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(1)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifacts validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(pi.getProgressDetails().get(2)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(2)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Media files validated"),
                         ProcessingStatus.INFO,
@@ -90,7 +89,7 @@ public class ServiceProcessValidateDVMoviesTest {
                         null)
         );
 
-        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(3)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifact media files validated"),
                         ProcessingStatus.INFO,
@@ -98,7 +97,7 @@ public class ServiceProcessValidateDVMoviesTest {
                         null)
         );
 
-        assertThat(pi.getProgressDetails().get(4)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(4)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
@@ -114,14 +113,14 @@ public class ServiceProcessValidateDVMoviesTest {
         service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/ok/MP3 Music/");
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
-        assertThat(pi.getProgressDetails().get(0)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(0)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Started Movies Validator"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-        assertThat(pi.getProgressDetails().get(1)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(1)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage(
                                 "Expected file, found: ..\\odeon-test-data\\ok\\MP3 Music\\Aerosmith\\2004 Honkin'On Bobo"),
@@ -129,7 +128,7 @@ public class ServiceProcessValidateDVMoviesTest {
                         null,
                         null)
         );
-        assertThat(pi.getProgressDetails().get(2)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(2)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifacts not in files",
@@ -138,7 +137,7 @@ public class ServiceProcessValidateDVMoviesTest {
                         null,
                         null)
         );
-        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(3)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.FAILURE,
@@ -159,7 +158,7 @@ public class ServiceProcessValidateDVMoviesTest {
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
-        assertThat(pi.getProgressDetails().get(1)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(1)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifacts not in files",
@@ -182,7 +181,7 @@ public class ServiceProcessValidateDVMoviesTest {
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
-        assertThat(pi.getProgressDetails().get(1)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(1)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifacts not in database",
@@ -220,7 +219,7 @@ public class ServiceProcessValidateDVMoviesTest {
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
-        assertThat(pi.getProgressDetails().get(2)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(2)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Media files not in files",
@@ -252,7 +251,7 @@ public class ServiceProcessValidateDVMoviesTest {
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
-        assertThat(pi.getProgressDetails().get(2)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(2)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Media files not in database",
@@ -286,7 +285,7 @@ public class ServiceProcessValidateDVMoviesTest {
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
-        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(3)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifact media files not in files",
@@ -314,7 +313,7 @@ public class ServiceProcessValidateDVMoviesTest {
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
-        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(3)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifact media files not in database",

@@ -36,16 +36,8 @@ public class ProcessInfo {
 
     private final List<ProcessDetail> processDetails = new ArrayList<>();
 
-    public List<ProcessDetail> getProgressDetails() {
+    public List<ProcessDetail> getProcessDetails() {
         return processDetails;
-    }
-
-    public ProcessDetail getLastProgressDetail() {
-        if (processDetails.size() < 2) {
-            return null;
-        } else {
-            return processDetails.get(processDetails.size() - 2);
-        }
     }
 
     public void resolveAction(ProcessingAction processingAction) {
@@ -61,7 +53,7 @@ public class ProcessInfo {
         this.lastUpdated = LocalDateTime.now();
     }
 
-    public void addProgressDetails(ProcessDetail processDetail) {
+    public void addProcessDetails(ProcessDetail processDetail) {
         processDetails.add(processDetail);
         lastUpdated = LocalDateTime.now();
     }

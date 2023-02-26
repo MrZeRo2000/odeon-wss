@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
@@ -61,7 +60,7 @@ public class ServiceProcessLoadMP3Test {
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
-        assertThat(pi.getProgressDetails().get(0)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(0)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Started MP3 Loader"),
                         ProcessingStatus.INFO,
@@ -69,7 +68,7 @@ public class ServiceProcessLoadMP3Test {
                         null)
         );
 
-        assertThat(pi.getProgressDetails().get(1)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(1)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artists loaded"),
                         ProcessingStatus.INFO,
@@ -78,7 +77,7 @@ public class ServiceProcessLoadMP3Test {
         );
 
 
-        assertThat(pi.getProgressDetails().get(2)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(2)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifacts loaded"),
                         ProcessingStatus.INFO,
@@ -86,7 +85,7 @@ public class ServiceProcessLoadMP3Test {
                         null)
         );
 
-        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(3)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Compositions loaded"),
                         ProcessingStatus.INFO,
@@ -94,7 +93,7 @@ public class ServiceProcessLoadMP3Test {
                         null)
         );
 
-        assertThat(pi.getProgressDetails().get(4)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(4)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
@@ -119,10 +118,10 @@ public class ServiceProcessLoadMP3Test {
         service.executeProcessor(PROCESSOR_TYPE, null);
 
         ProcessInfo pi = service.getProcessInfo();
-        processDetail = pi.getProgressDetails();
+        processDetail = pi.getProcessDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.WARNING);
 
-        assertThat(pi.getProgressDetails().get(1)).isIn(
+        assertThat(pi.getProcessDetails().get(1)).isIn(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artist Aerosmith not found"),
                         ProcessingStatus.WARNING,
@@ -135,7 +134,7 @@ public class ServiceProcessLoadMP3Test {
                         new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Kosheen"))
         );
 
-        assertThat(pi.getProgressDetails().get(2)).isIn(
+        assertThat(pi.getProcessDetails().get(2)).isIn(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artist Aerosmith not found"),
                         ProcessingStatus.WARNING,
@@ -148,7 +147,7 @@ public class ServiceProcessLoadMP3Test {
                         new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Kosheen"))
         );
 
-        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(3)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artists loaded"),
                         ProcessingStatus.INFO,
@@ -156,7 +155,7 @@ public class ServiceProcessLoadMP3Test {
                         null)
         );
 
-        assertThat(pi.getProgressDetails().get(4)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(4)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.WARNING,
@@ -181,9 +180,9 @@ public class ServiceProcessLoadMP3Test {
 
         // error - path not exist
         service.executeProcessor(PROCESSOR_TYPE, "non_existing_path");
-        processDetail = service.getProcessInfo().getProgressDetails();
+        processDetail = service.getProcessInfo().getProcessDetails();
         Assertions.assertEquals(3, processDetail.size());
-        Assertions.assertEquals(ProcessingStatus.FAILURE, processDetail.get(service.getProcessInfo().getProgressDetails().size() - 1).getStatus());
+        Assertions.assertEquals(ProcessingStatus.FAILURE, processDetail.get(service.getProcessInfo().getProcessDetails().size() - 1).getStatus());
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
     }
 
@@ -192,7 +191,7 @@ public class ServiceProcessLoadMP3Test {
     void testDirectoryWithFiles() throws Exception {
         service.executeProcessor(PROCESSOR_TYPE, "");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
-        Assertions.assertTrue(service.getProcessInfo().getProgressDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("directory, found:")));
+        Assertions.assertTrue(service.getProcessInfo().getProcessDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("directory, found:")));
     }
 
     @Test
@@ -206,7 +205,7 @@ public class ServiceProcessLoadMP3Test {
 
         service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/wrong_artifact_title/");
         ProcessInfo pi = service.getProcessInfo();
-        List<ProcessDetail> processDetail = pi.getProgressDetails();
+        List<ProcessDetail> processDetail = pi.getProcessDetails();
 
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
@@ -228,7 +227,7 @@ public class ServiceProcessLoadMP3Test {
                         null)
         );
 
-        assertThat(pi.getProgressDetails().get(3)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(3)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifacts loaded"),
                         ProcessingStatus.INFO,
@@ -236,7 +235,7 @@ public class ServiceProcessLoadMP3Test {
                         null)
         );
 
-        assertThat(pi.getProgressDetails().get(4)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(4)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.FAILURE,
@@ -244,7 +243,7 @@ public class ServiceProcessLoadMP3Test {
                         null)
         );
 
-        //Assertions.assertTrue(service.getProcessInfo().getProgressDetails().get(service.getProcessInfo().getProgressDetails().size() - 2).getInfo().getMessage().contains("Error parsing artifact name"));
+        //Assertions.assertTrue(service.getProcessInfo().getProcessDetails().get(service.getProcessInfo().getProcessDetails().size() - 2).getInfo().getMessage().contains("Error parsing artifact name"));
     }
 
     @Test
@@ -269,7 +268,7 @@ public class ServiceProcessLoadMP3Test {
         List<ProcessDetail> processDetail;
 
         service.executeProcessor(PROCESSOR_TYPE, null);
-        processDetail = service.getProcessInfo().getProgressDetails();
+        processDetail = service.getProcessInfo().getProcessDetails();
         Assertions.assertEquals(5, processDetail.size());
         Assertions.assertEquals(ProcessingStatus.WARNING, service.getProcessInfo().getProcessingStatus());
 
@@ -281,7 +280,7 @@ public class ServiceProcessLoadMP3Test {
         service.getProcessInfo().resolveAction(processingAction);
         Assertions.assertEquals(4, processDetail.size());
         Assertions.assertEquals(ProcessingStatus.WARNING,
-                service.getProcessInfo().getProgressDetails().get(service.getProcessInfo().getProgressDetails().size() - 1).getStatus());
+                service.getProcessInfo().getProcessDetails().get(service.getProcessInfo().getProcessDetails().size() - 1).getStatus());
 
         // find second action
         processingAction = processDetail.get(1).getProcessingAction();
