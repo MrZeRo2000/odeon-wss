@@ -3,6 +3,10 @@
     {
       "name": "full.tests.disabled",
       "type": "java.lang.Boolean"
+    },
+    {
+      "name": "dbprocess.logging",
+      "type": "java.lang.Boolean"
     }
   ]
 }

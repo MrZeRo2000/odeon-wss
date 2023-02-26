@@ -5,6 +5,7 @@ import com.romanpulov.odeonwss.service.processor.*;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import java.util.concurrent.atomic.AtomicReference;
@@ -17,6 +18,17 @@ public class ProcessService implements ProgressHandler {
     private final ProcessorFactory processorFactory;
 
     private final ProcessInfoRepository processInfoRepository;
+
+    @Value("${dbprocess.logging}")
+    private Boolean dbProcessLogging;
+
+    public Boolean getDbProcessLogging() {
+        return dbProcessLogging;
+    }
+
+    public void setDbProcessLogging(Boolean dbProcessLogging) {
+        this.dbProcessLogging = dbProcessLogging;
+    }
 
     public ProcessService(ProcessorFactory processorFactory, ProcessInfoRepository processInfoRepository) {
         this.processorFactory = processorFactory;
@@ -80,19 +92,26 @@ public class ProcessService implements ProgressHandler {
                 //clean up processor
                 currentProcessor.set(null);
 
-                try {
-                    logger.debug("Saving processing info");
-                    processInfoRepository.save(processInfo);
-                    logger.debug("Saved processing info");
-                } catch (Exception e) {
-                    logger.error("Error saving processing info: " + e.getMessage());
-                    e.printStackTrace();
-                }
+                //log process info
+                dbLogProcessInfo(processInfo);
 
                 logger.debug("Finished executing: " + processorType);
             }
         } else {
             logger.debug("Another processor is running: " + currentProcessor.get().getClass().getName());
+        }
+    }
+
+    private void dbLogProcessInfo(ProcessInfo processInfo) {
+        if (this.dbProcessLogging) {
+            try {
+                logger.debug("Saving processing info");
+                processInfoRepository.save(processInfo);
+                logger.debug("Saved processing info");
+            } catch (Exception e) {
+                logger.error("Error saving processing info: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 
