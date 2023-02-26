@@ -63,7 +63,7 @@ public class ServiceProcessLoadMP3Test {
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         assertThat(pi.getProgressDetails().get(0)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Started MP3 Loader", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Started MP3 Loader"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -71,7 +71,7 @@ public class ServiceProcessLoadMP3Test {
 
         assertThat(pi.getProgressDetails().get(1)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artists loaded", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artists loaded"),
                         ProcessingStatus.INFO,
                         2,
                         null)
@@ -80,7 +80,7 @@ public class ServiceProcessLoadMP3Test {
 
         assertThat(pi.getProgressDetails().get(2)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artifacts loaded", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artifacts loaded"),
                         ProcessingStatus.INFO,
                         3,
                         null)
@@ -88,7 +88,7 @@ public class ServiceProcessLoadMP3Test {
 
         assertThat(pi.getProgressDetails().get(3)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Compositions loaded", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Compositions loaded"),
                         ProcessingStatus.INFO,
                         40,
                         null)
@@ -96,7 +96,7 @@ public class ServiceProcessLoadMP3Test {
 
         assertThat(pi.getProgressDetails().get(4)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
                         null,
                         null)
@@ -124,12 +124,12 @@ public class ServiceProcessLoadMP3Test {
 
         assertThat(pi.getProgressDetails().get(1)).isIn(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artist Aerosmith not found", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artist Aerosmith not found"),
                         ProcessingStatus.WARNING,
                         null,
                         new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Aerosmith")),
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artist Kosheen not found", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artist Kosheen not found"),
                         ProcessingStatus.WARNING,
                         null,
                         new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Kosheen"))
@@ -137,12 +137,12 @@ public class ServiceProcessLoadMP3Test {
 
         assertThat(pi.getProgressDetails().get(2)).isIn(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artist Aerosmith not found", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artist Aerosmith not found"),
                         ProcessingStatus.WARNING,
                         null,
                         new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Aerosmith")),
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artist Kosheen not found", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artist Kosheen not found"),
                         ProcessingStatus.WARNING,
                         null,
                         new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Kosheen"))
@@ -150,7 +150,7 @@ public class ServiceProcessLoadMP3Test {
 
         assertThat(pi.getProgressDetails().get(3)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artists loaded", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artists loaded"),
                         ProcessingStatus.INFO,
                         0,
                         null)
@@ -158,7 +158,7 @@ public class ServiceProcessLoadMP3Test {
 
         assertThat(pi.getProgressDetails().get(4)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.WARNING,
                         null,
                         null)
@@ -212,7 +212,7 @@ public class ServiceProcessLoadMP3Test {
 
         assertThat(processDetail.get(1)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artists loaded", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artists loaded"),
                         ProcessingStatus.INFO,
                         1,
                         null)
@@ -220,7 +220,7 @@ public class ServiceProcessLoadMP3Test {
 
         assertThat(processDetail.get(2)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Error parsing artifact name",
                                 List.of("Aerosmith >> 2004  Honkin'On Bobo")),
                         ProcessingStatus.FAILURE,
@@ -230,7 +230,7 @@ public class ServiceProcessLoadMP3Test {
 
         assertThat(pi.getProgressDetails().get(3)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artifacts loaded", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artifacts loaded"),
                         ProcessingStatus.INFO,
                         0,
                         null)
@@ -238,7 +238,7 @@ public class ServiceProcessLoadMP3Test {
 
         assertThat(pi.getProgressDetails().get(4)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.FAILURE,
                         null,
                         null)

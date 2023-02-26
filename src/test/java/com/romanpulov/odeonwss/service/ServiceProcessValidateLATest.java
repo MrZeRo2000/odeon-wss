@@ -9,10 +9,7 @@ import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.repository.CompositionRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
-import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
-import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
-import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
-import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
+import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -94,14 +91,14 @@ public class ServiceProcessValidateLATest {
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         assertThat(processDetails.get(0)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Started LA Validator", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Started LA Validator"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(1)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Artists not in database or have no artifacts and compositions",
                                 TEST_ARTISTS.stream().sorted().collect(Collectors.toList())),
                         ProcessingStatus.FAILURE,
@@ -110,7 +107,7 @@ public class ServiceProcessValidateLATest {
         );
         assertThat(processDetails.get(2)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -134,42 +131,42 @@ public class ServiceProcessValidateLATest {
         int id = 0;
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Started LA Validator", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Started LA Validator"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artists validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artists validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artifacts validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artifacts validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Media files validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Media files validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artifact media files validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artifact media files validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
                         null,
                         null)
@@ -199,35 +196,34 @@ public class ServiceProcessValidateLATest {
         int id = 0;
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Started LA Validator", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Started LA Validator"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artists validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artists validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artifacts validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artifacts validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Media files not in database",
                                 List.of(errorString)),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
         );
-
 
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
     }
@@ -247,28 +243,28 @@ public class ServiceProcessValidateLATest {
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Started LA Validator", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Started LA Validator"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artists validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artists validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artifacts validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artifacts validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Media files not in database",
                                 List.of(errorString)),
                         ProcessingStatus.FAILURE,
@@ -296,42 +292,42 @@ public class ServiceProcessValidateLATest {
         int id = 0;
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Started LA Validator", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Started LA Validator"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artists validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artists validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artifacts validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artifacts validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Media files validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Media files validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artifact media files validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artifact media files validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
                         null,
                         null)
@@ -349,7 +345,7 @@ public class ServiceProcessValidateLATest {
         assertThat(processDetails.get(1).getInfo().getMessage()).contains("Expected directory, found");
         assertThat(processDetails.get(2)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Artists not in files or have no artifacts and compositions",
                                 TEST_ARTISTS.stream().sorted().collect(Collectors.toList())),
                         ProcessingStatus.FAILURE,
@@ -382,14 +378,14 @@ public class ServiceProcessValidateLATest {
         int id = 1;
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artists validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artists validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Artifacts not in files",
                                 List.of(artist.getName() + " >> 2000 New Artifact")),
                         ProcessingStatus.FAILURE,
@@ -398,7 +394,7 @@ public class ServiceProcessValidateLATest {
         );
         assertThat(processDetails.get(id)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -425,14 +421,14 @@ public class ServiceProcessValidateLATest {
         int id = 1;
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artists validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artists validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Artifacts not in database",
                                 List.of("Evanescence >> 2000 Origin")),
                         ProcessingStatus.FAILURE,
@@ -441,7 +437,7 @@ public class ServiceProcessValidateLATest {
         );
         assertThat(processDetails.get(id)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -478,7 +474,7 @@ public class ServiceProcessValidateLATest {
 
         assertThat(processDetails.get(3)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Media files not in files",
                                 List.of("Evanescence >> 2011 Evanescence >> " + mediaFile.getName())),
                         ProcessingStatus.FAILURE,
@@ -506,7 +502,7 @@ public class ServiceProcessValidateLATest {
 
         assertThat(processDetails.get(3)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Media files not in database",
                                 List.of("Evanescence >> 2011 Evanescence >> " + mediaFile.getName())),
                         ProcessingStatus.FAILURE,
@@ -516,7 +512,7 @@ public class ServiceProcessValidateLATest {
 
         assertThat(processDetails.get(4)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Artifact media files not in database",
                                 List.of("Evanescence >> 2011 Evanescence >> " + mediaFile.getName())),
                         ProcessingStatus.FAILURE,
@@ -549,7 +545,7 @@ public class ServiceProcessValidateLATest {
 
         assertThat(processDetails.get(4)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Artifact media files not in files",
                                 List.of("Abigail Williams >> 2010 In The Absence Of Light >> Another media file.flac")),
                         ProcessingStatus.FAILURE,
@@ -576,7 +572,7 @@ public class ServiceProcessValidateLATest {
 
         assertThat(pi.getProgressDetails().get(4)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Artifact media files not in database",
                                 List.of("Abigail Williams >> 2010 In The Absence Of Light >> 01 Hope The Great Betrayal.flac")),
                         ProcessingStatus.FAILURE,

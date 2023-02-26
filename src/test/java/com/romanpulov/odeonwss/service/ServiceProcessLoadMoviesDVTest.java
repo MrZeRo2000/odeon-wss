@@ -8,6 +8,7 @@ import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.CompositionRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.ValueValidator;
+import com.romanpulov.odeonwss.service.processor.model.ProcessDetailInfo;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
@@ -81,15 +82,15 @@ public class ServiceProcessLoadMoviesDVTest {
 
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
         Assertions.assertEquals(
-                new ProcessDetail(ProcessDetail.ProcessInfo.fromMessage("Artifacts loaded"), ProcessingStatus.INFO, 3, null),
+                new ProcessDetail(ProcessDetailInfo.fromMessage("Artifacts loaded"), ProcessingStatus.INFO, 3, null),
                 processService.getProcessInfo().getProgressDetails().get(1)
         );
         Assertions.assertEquals(
-                new ProcessDetail(ProcessDetail.ProcessInfo.fromMessage("Compositions loaded"), ProcessingStatus.INFO, 3, null),
+                new ProcessDetail(ProcessDetailInfo.fromMessage("Compositions loaded"), ProcessingStatus.INFO, 3, null),
                 processService.getProcessInfo().getProgressDetails().get(2)
         );
         Assertions.assertEquals(
-                new ProcessDetail(ProcessDetail.ProcessInfo.fromMessage("Media files loaded"), ProcessingStatus.INFO, 4, null),
+                new ProcessDetail(ProcessDetailInfo.fromMessage("Media files loaded"), ProcessingStatus.INFO, 4, null),
                 processService.getProcessInfo().getProgressDetails().get(3)
         );
 
@@ -118,15 +119,15 @@ public class ServiceProcessLoadMoviesDVTest {
 
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
         Assertions.assertEquals(
-                new ProcessDetail(ProcessDetail.ProcessInfo.fromMessage("Artifacts loaded"), ProcessingStatus.INFO, 0, null),
+                new ProcessDetail(ProcessDetailInfo.fromMessage("Artifacts loaded"), ProcessingStatus.INFO, 0, null),
                 processService.getProcessInfo().getProgressDetails().get(1)
         );
         Assertions.assertEquals(
-                new ProcessDetail(ProcessDetail.ProcessInfo.fromMessage("Compositions loaded"), ProcessingStatus.INFO, 0, null),
+                new ProcessDetail(ProcessDetailInfo.fromMessage("Compositions loaded"), ProcessingStatus.INFO, 0, null),
                 processService.getProcessInfo().getProgressDetails().get(2)
         );
         Assertions.assertEquals(
-                new ProcessDetail(ProcessDetail.ProcessInfo.fromMessage("Media files loaded"), ProcessingStatus.INFO, 0, null),
+                new ProcessDetail(ProcessDetailInfo.fromMessage("Media files loaded"), ProcessingStatus.INFO, 0, null),
                 processService.getProcessInfo().getProgressDetails().get(3)
         );
 

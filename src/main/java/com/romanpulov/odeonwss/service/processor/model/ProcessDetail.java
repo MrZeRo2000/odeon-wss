@@ -1,56 +1,11 @@
 package com.romanpulov.odeonwss.service.processor.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ProcessDetail {
-
-    public static class ProcessInfo {
-        private final String message;
-
-        public String getMessage() {
-            return message;
-        }
-
-        private final List<String> items;
-
-        public List<String> getItems() {
-            return items;
-        }
-
-        public ProcessInfo(String message, List<String> items) {
-            this.message = message;
-            this.items = items;
-        }
-
-        public static ProcessInfo fromMessage(String message) {
-            return new ProcessInfo(message, new ArrayList<>());
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            ProcessInfo that = (ProcessInfo) o;
-            return message.equals(that.message) && items.equals(that.items);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(message, items);
-        }
-
-        @Override
-        public String toString() {
-            return "ProgressInfo{" +
-                    "message='" + message + '\'' +
-                    ", items=" + items +
-                    '}';
-        }
-    }
 
     private final LocalDateTime time;
 
@@ -58,9 +13,9 @@ public class ProcessDetail {
         return time;
     }
 
-    private final ProcessInfo info;
+    private final ProcessDetailInfo info;
 
-    public ProcessInfo getInfo() {
+    public ProcessDetailInfo getInfo() {
         return info;
     }
 
@@ -82,21 +37,20 @@ public class ProcessDetail {
         return processingAction;
     }
 
-    public ProcessDetail(LocalDateTime time, ProcessInfo info, ProcessingStatus status, Integer rows, ProcessingAction processingAction) {
+    public ProcessDetail(LocalDateTime time, ProcessDetailInfo info, ProcessingStatus status, Integer rows, ProcessingAction processingAction) {
         this.time = time;
         this.info = info;
         this.status = status;
         this.rows = rows;
         this.processingAction = processingAction;
-
     }
 
-    public ProcessDetail(ProcessInfo info, ProcessingStatus status, Integer rows, ProcessingAction processingAction) {
+    public ProcessDetail(ProcessDetailInfo info, ProcessingStatus status, Integer rows, ProcessingAction processingAction) {
         this(LocalDateTime.now(), info, status, rows, processingAction);
     }
 
     public static ProcessDetail fromMessageAndStatus(String message, ProcessingStatus status) {
-        return new ProcessDetail(ProcessInfo.fromMessage(message), status, null, null);
+        return new ProcessDetail(ProcessDetailInfo.fromMessage(message), status, null, null);
     }
 
     public static ProcessDetail fromException(Exception e) {
@@ -108,7 +62,7 @@ public class ProcessDetail {
     }
 
     public static ProcessDetail fromInfoMessage(String infoMessage, int rows) {
-        return new ProcessDetail(ProcessInfo.fromMessage(infoMessage), ProcessingStatus.INFO, rows, null);
+        return new ProcessDetail(ProcessDetailInfo.fromMessage(infoMessage), ProcessingStatus.INFO, rows, null);
     }
 
     public static ProcessDetail fromInfoMessage(String errorMessage, Object ...args) {
@@ -120,7 +74,7 @@ public class ProcessDetail {
     }
 
     public static ProcessDetail fromErrorMessage(String errorMessage, List<String> items) {
-        return new ProcessDetail(new ProcessInfo(errorMessage, items), ProcessingStatus.FAILURE, null, null);
+        return new ProcessDetail(ProcessDetailInfo.fromMessageItems(errorMessage, items), ProcessingStatus.FAILURE, null, null);
     }
 
     public static ProcessDetail fromErrorMessage(String errorMessage, Object ...args) {
@@ -131,12 +85,8 @@ public class ProcessDetail {
         return fromMessageAndStatus(warningMessage, ProcessingStatus.WARNING);
     }
 
-    public static ProcessDetail fromWarningMessage(String warningMessage, Object ...args) {
-        return fromWarningMessage(String.format(warningMessage, args));
-    }
-
     public static ProcessDetail fromWarningMessageWithAction(String warningMessage, ProcessingActionType processingActionType, String actionValue) {
-        return new ProcessDetail(ProcessInfo.fromMessage(warningMessage), ProcessingStatus.WARNING, null, new ProcessingAction(processingActionType, actionValue));
+        return new ProcessDetail(ProcessDetailInfo.fromMessage(warningMessage), ProcessingStatus.WARNING, null, new ProcessingAction(processingActionType, actionValue));
     }
 
     public static ProcessingStatus getFinalProcessingStatus(List<ProcessDetail> processDetails) {

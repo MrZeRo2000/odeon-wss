@@ -64,7 +64,7 @@ public class ServiceProcessLoadLATest {
 
         List<ProcessDetail> expectedProcessDetails = Stream.of(ARTIST_LIST)
                 .map(v -> new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artist " + v + " not found", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artist " + v + " not found"),
                         ProcessingStatus.WARNING,
                         null,
                         new ProcessingAction(ProcessingActionType.ADD_ARTIST, v))
@@ -163,7 +163,7 @@ public class ServiceProcessLoadLATest {
         int item = 0;
         assertThat(processDetails.get(item++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Started LA Loader", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Started LA Loader"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -171,7 +171,7 @@ public class ServiceProcessLoadLATest {
 
         assertThat(processDetails.get(item++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artists loaded", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artists loaded"),
                         ProcessingStatus.INFO,
                         7,
                         null)
@@ -179,7 +179,7 @@ public class ServiceProcessLoadLATest {
 
         assertThat(processDetails.get(item++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artifacts loaded", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artifacts loaded"),
                         ProcessingStatus.INFO,
                         9,
                         null)
@@ -187,7 +187,7 @@ public class ServiceProcessLoadLATest {
 
         assertThat(processDetails.get(item++)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Compositions loaded", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Compositions loaded"),
                         ProcessingStatus.INFO,
                         116,
                         null)
@@ -195,7 +195,7 @@ public class ServiceProcessLoadLATest {
 
         assertThat(processDetails.get(item)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
                         null,
                         null)

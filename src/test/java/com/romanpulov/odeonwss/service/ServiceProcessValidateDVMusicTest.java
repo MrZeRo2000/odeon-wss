@@ -5,10 +5,7 @@ import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
-import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
-import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
-import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
-import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
+import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -107,7 +104,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(processDetails.get(0)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Started Video music validator", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Started Video music validator"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -123,7 +120,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProgressDetails().get(3)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -140,7 +137,7 @@ public class ServiceProcessValidateDVMusicTest {
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         assertThat(pi.getProgressDetails().get(0)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Started Video music validator", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Started Video music validator"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -148,7 +145,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProgressDetails().get(1)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Media files size validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Media files size validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -156,7 +153,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProgressDetails().get(2)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artifacts validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artifacts validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -164,7 +161,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProgressDetails().get(3)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Media files validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Media files validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -172,7 +169,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProgressDetails().get(4)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Artifact media files validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Artifact media files validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -180,7 +177,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProgressDetails().get(5)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
                         null,
                         null)
@@ -198,9 +195,8 @@ public class ServiceProcessValidateDVMusicTest {
         List<ProcessDetail> processDetails = pi.getProgressDetails();
         assertThat(processDetails.get(1)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
-                                "Expected file, found: ..\\odeon-test-data\\ok\\MP3 Music\\Aerosmith\\2004 Honkin'On Bobo",
-                                new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage(
+                                "Expected file, found: ..\\odeon-test-data\\ok\\MP3 Music\\Aerosmith\\2004 Honkin'On Bobo"),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -208,7 +204,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProgressDetails().get(2)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Media files size validated", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Media files size validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -219,7 +215,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProgressDetails().get(4)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo("Task status", new ArrayList<>()),
+                        ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -243,14 +239,13 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProgressDetails().get(2)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Artifacts without artists",
                                 List.of("Artifact no artist")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
         );
-
     }
 
     @Test
@@ -273,7 +268,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProgressDetails().get(2)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Artifacts not in files",
                                 List.of("New Artifact")),
                         ProcessingStatus.FAILURE,
@@ -295,7 +290,7 @@ public class ServiceProcessValidateDVMusicTest {
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         assertThat(pi.getProgressDetails().get(2)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Artifacts not in database",
                                 List.of(artifact.getTitle())),
                         ProcessingStatus.FAILURE,
@@ -331,7 +326,7 @@ public class ServiceProcessValidateDVMusicTest {
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         assertThat(pi.getProgressDetails().get(3)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Media files not in files",
                                 List.of(artifact.getTitle() + " >> " + mediaFile.getName())),
                         ProcessingStatus.FAILURE,
@@ -372,7 +367,7 @@ public class ServiceProcessValidateDVMusicTest {
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         assertThat(pi.getProgressDetails().get(3)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Media files not in database",
                                 List.of("Tori Amos - Fade to Red 2006 >> Tori Amos - Fade to Red Disk 2 2006.mkv")),
                         ProcessingStatus.FAILURE,
@@ -382,14 +377,13 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProgressDetails().get(4)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Artifact media files not in database",
                                 List.of("Tori Amos - Fade to Red Disk 2 2006.mkv")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
         );
-
     }
 
     @Test
@@ -415,7 +409,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProgressDetails().get(4)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Artifact media files not in files",
                                 List.of("Another media file.mkv")),
                         ProcessingStatus.FAILURE,
@@ -442,7 +436,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProgressDetails().get(4)).isEqualTo(
                 new ProcessDetail(
-                        new ProcessDetail.ProcessInfo(
+                        ProcessDetailInfo.fromMessageItems(
                                 "Artifact media files not in database",
                                 List.of("The Cure - Picture Show 1991.mp4")),
                         ProcessingStatus.FAILURE,
