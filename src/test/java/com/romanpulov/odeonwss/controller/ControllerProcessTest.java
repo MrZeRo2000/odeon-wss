@@ -81,8 +81,8 @@ public class ControllerProcessTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.processorType", Matchers.is("MP3_VALIDATOR")))
                 .andExpect(jsonPath("$.processingStatus", Matchers.is("FAILURE")))
-                .andExpect(jsonPath("$.progressDetails").isArray())
-                .andExpect(jsonPath("$.progressDetails[0].info.message", Matchers.is("Started MP3 Validator")))
+                .andExpect(jsonPath("$.processDetails").isArray())
+                .andExpect(jsonPath("$.processDetails[0].info.message", Matchers.is("Started MP3 Validator")))
                 .andReturn();
         logger.debug("Get result after execute: " + mvcResult.getResponse().getContentAsString());
     }
