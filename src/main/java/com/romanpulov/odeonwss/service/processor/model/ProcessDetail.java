@@ -65,8 +65,8 @@ public class ProcessDetail {
         return new ProcessDetail(ProcessDetailInfo.fromMessage(infoMessage), ProcessingStatus.INFO, rows, null);
     }
 
-    public static ProcessDetail fromInfoMessage(String errorMessage, Object ...args) {
-        return fromInfoMessage(String.format(errorMessage, args));
+    public static ProcessDetail fromInfoMessage(String errorMessage, String s) {
+        return fromInfoMessage(String.format(errorMessage, s));
     }
 
     public static ProcessDetail fromErrorMessage(String errorMessage) {

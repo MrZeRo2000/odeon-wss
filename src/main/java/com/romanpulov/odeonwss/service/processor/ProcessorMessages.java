@@ -27,10 +27,10 @@ public class ProcessorMessages {
     static final String ERROR_ARTISTS_ARTIFACTS_COMPOSITIONS_NOT_IN_FILES = "Artists not in files or have no artifacts and compositions";
     static final String INFO_ARTISTS_VALIDATED = "Artists validated";
 
-    static final String INFO_ARTISTS_IMPORTED = "Artists imported: %d";
-    static final String INFO_ARTIST_DETAILS_IMPORTED = "Artist details imported: %d";
-    static final String INFO_ARTIST_CATEGORIES_IMPORTED = "Artist categories imported: %d";
-    static final String INFO_ARTIST_LYRICS_IMPORTED = "Artist lyrics imported: %d";
+    static final String INFO_ARTISTS_IMPORTED = "Artists imported";
+    static final String INFO_ARTIST_DETAILS_IMPORTED = "Artist details imported";
+    static final String INFO_ARTIST_CATEGORIES_IMPORTED = "Artist categories imported";
+    static final String INFO_ARTIST_LYRICS_IMPORTED = "Artist lyrics imported";
 
     static final String ERROR_ARTIFACTS_NOT_IN_DB = "Artifacts not in database";
     static final String ERROR_ARTIFACTS_NOT_IN_FILES = "Artifacts not in files";

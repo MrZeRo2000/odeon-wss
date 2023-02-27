@@ -1,15 +1,13 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.config.AppConfiguration;
-import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtistCategoryRepository;
 import com.romanpulov.odeonwss.repository.ArtistDetailRepository;
 import com.romanpulov.odeonwss.repository.ArtistLyricsRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
-import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
+import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +18,8 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -50,27 +50,50 @@ public class ServiceProcessMDBImportArtistsTest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     void testLoad() {
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_IMPORTED_ARTISTS, () -> {
-            service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
-            Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
-            log.info("Artist Importer Processing info: " + service.getProcessInfo());
+        service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
+        ProcessInfo processInfo = service.getProcessInfo();
+        List<ProcessDetail> processDetails = processInfo.getProcessDetails();
 
-            Assertions.assertTrue(service.getProcessInfo().getProcessDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("Artists imported")));
-            Assertions.assertTrue(service.getProcessInfo().getProcessDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("Artist details imported")));
-            Assertions.assertTrue(service.getProcessInfo().getProcessDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("Artist categories imported")));
-            Assertions.assertTrue(service.getProcessInfo().getProcessDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("Artist lyrics imported")));
-            log.info("Processing info: " + service.getProcessInfo());
-        });
+        assertThat(processInfo.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+        log.info("Artist Importer Processing info: " + service.getProcessInfo());
+
+        assertThat(processDetails.get(0)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Started Artists importer"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(processDetails.get(1).getInfo().getMessage()).isEqualTo("Artists imported");
+        assertThat(processDetails.get(1).getRows()).isGreaterThan(0);
+
+        assertThat(processDetails.get(2).getInfo().getMessage()).isEqualTo("Artist details imported");
+        assertThat(processDetails.get(2).getRows()).isGreaterThan(0);
+
+        assertThat(processDetails.get(3).getInfo().getMessage()).isEqualTo("Artist categories imported");
+        assertThat(processDetails.get(3).getRows()).isGreaterThan(0);
+
+        assertThat(processDetails.get(4).getInfo().getMessage()).isEqualTo("Artist lyrics imported");
+        assertThat(processDetails.get(4).getRows()).isGreaterThan(0);
+
+        assertThat(processDetails.get(5)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Task status"),
+                        ProcessingStatus.SUCCESS,
+                        null,
+                        null)
+        );
     }
 
     @Test
     @Order(2)
     void testValidate() {
-        Assertions.assertEquals(0, artistRepository.getAllByType(ArtistType.CLASSICS).size());
+        assertThat(artistRepository.getAllByType(ArtistType.CLASSICS).size()).isEqualTo(0);
 
         List<Artist> artists = artistRepository.getAllByType(ArtistType.ARTIST);
-        Assertions.assertTrue(artists.size() > 0);
-        Assertions.assertEquals(artists.size(), artists.stream().map(Artist::getMigrationId).collect(Collectors.toSet()).size());
+        assertThat(artists.size()).isGreaterThan(0);
+        assertThat(artists.size()).isEqualTo(artists.stream().map(Artist::getMigrationId).collect(Collectors.toSet()).size());
     }
 
     @Test
@@ -82,12 +105,11 @@ public class ServiceProcessMDBImportArtistsTest {
         long artistLyricsCount = StreamSupport.stream(artistLyricsRepository.findAll().spliterator(), false).count();
 
         service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+        assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
 
-        Assertions.assertEquals(artistCount, StreamSupport.stream(artistRepository.findAll().spliterator(), false).count());
-        Assertions.assertEquals(artistDetailCount, StreamSupport.stream(artistDetailRepository.findAll().spliterator(), false).count());
-        Assertions.assertEquals(artistCategoryCount, StreamSupport.stream(artistCategoryRepository.findAll().spliterator(), false).count());
-        Assertions.assertEquals(artistLyricsCount, StreamSupport.stream(artistLyricsRepository.findAll().spliterator(), false).count());
+        assertThat(StreamSupport.stream(artistRepository.findAll().spliterator(), false).count()).isEqualTo(artistCount);
+        assertThat(StreamSupport.stream(artistDetailRepository.findAll().spliterator(), false).count()).isEqualTo(artistDetailCount);
+        assertThat(StreamSupport.stream(artistCategoryRepository.findAll().spliterator(), false).count()).isEqualTo(artistCategoryCount);
+        assertThat(StreamSupport.stream(artistLyricsRepository.findAll().spliterator(), false).count()).isEqualTo(artistLyricsCount);
     }
-
 }
