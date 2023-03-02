@@ -16,6 +16,7 @@ import static com.romanpulov.odeonwss.service.processor.MDBConst.*;
 @Component
 public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
     private static final int DV_MUSIC_REC_ID = 1253;
+    public static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMusic();
 
     private final ArtistRepository artistRepository;
 
@@ -31,9 +32,9 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private Map<Long, Artist> migratedArtists;
 
-    private Map<Integer, DVDet> dvDet;
-
     private Map<Long, DVType> dvTypeMap;
+
+    private Map<Integer, Artifact> dvContArtifactMap;
 
     public DVMusicMDBImportProcessor(
             ArtistRepository artistRepository,
@@ -58,13 +59,7 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
         }
 
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_IMPORTED, importArtifacts(mdbReader));
-    }
-
-    private static class DVCont {
-        private int id;
-        private String artifactName;
-        private Artist artist;
-        private Long year;
+        infoHandler(ProcessorMessages.INFO_COMPOSITIONS_IMPORTED, importCompositionsAndMediaFiles(mdbReader));
     }
 
     private static class DVDet {
@@ -96,6 +91,7 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
         Table table = mdbReader.getTable(DVCONT_TABLE_NAME);
         AtomicInteger counter = new AtomicInteger(0);
         migratedArtists = new HashMap<>();
+        dvContArtifactMap = new HashMap<>();
 
         for (Row row: table) {
             if (row.getInt(REC_ID_COLUMN_NAME) == DV_MUSIC_REC_ID) {
@@ -106,14 +102,14 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
                 Long year = row.getInt(YEAR_COLUMN_NAME) == null ? null : row.getInt(YEAR_COLUMN_NAME).longValue();
 
                 Artifact artifact = artifactRepository.findFirstByArtifactTypeAndArtistAndTitleAndYear(
-                        ArtifactType.withDVMusic(),
+                        ARTIFACT_TYPE,
                         artist,
                         artifactName,
                         year
                 ).orElseGet(() -> {
                     Artifact newArtifact = new Artifact();
 
-                    newArtifact.setArtifactType(ArtifactType.withDVMusic());
+                    newArtifact.setArtifactType(ARTIFACT_TYPE);
                     newArtifact.setArtist(artist);
                     newArtifact.setTitle(artifactName);
                     newArtifact.setYear(year);
@@ -126,10 +122,7 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
 
                 int compositionsSize = compositionRepository.findAllByArtifact(artifact).size();
                 if (compositionsSize == 0) {
-                    infoHandler(
-                            ProcessorMessages.INFO_COMPOSITIONS_IMPORTED,
-                            importCompositionsAndMediaFiles(mdbReader, row.getInt(DVCONT_ID_COLUMN_NAME), artifact)
-                    );
+                    dvContArtifactMap.put(row.getInt(DVCONT_ID_COLUMN_NAME), artifact);
                 }
             }
         }
@@ -137,13 +130,60 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
         return counter.get();
     }
 
-    private List<DVDet> loadDVDet(MDBReader mdbReader, int dvContId) throws ProcessorException {
+    public int importCompositionsAndMediaFiles(MDBReader mdbReader)
+            throws ProcessorException {
+        AtomicInteger counter = new AtomicInteger(0);
+        Map<Integer, List<DVDet>> dvDetMap = loadDVDetMap(mdbReader);
+
+        //by artifacts
+        for (int dvContId: dvContArtifactMap.keySet()) {
+            Artifact artifact = dvContArtifactMap.get(dvContId);
+            List<DVDet> dvDetList = dvDetMap.get(dvContId);
+
+            dvDetList.sort(Comparator.comparingInt(o -> o.id));
+            long compNum = 0;
+
+            for (DVDet dvDet: dvDetList) {
+                Composition composition = new Composition();
+
+                composition.setArtifact(artifact);
+                composition.setArtist(dvDet.artist);
+                composition.setTitle(dvDet.title);
+                composition.setDvType(dvTypeMap.get((long)dvDet.videoTypeId));
+
+                composition.setNum(++compNum);
+
+                MediaFile mediaFile = mediaFileRepository.findFirstByArtifactAndName(
+                        artifact,
+                        dvDet.fileName
+                ).orElseGet(() -> {
+                    MediaFile newMediaFile = new MediaFile();
+
+                    newMediaFile.setArtifact(artifact);
+                    newMediaFile.setName(dvDet.fileName);
+                    newMediaFile.setFormat(getExtension(dvDet.fileName).toUpperCase());
+                    newMediaFile.setSize(0L);
+
+                    return newMediaFile;
+                });
+
+                compositionService.insertCompositionWithMedia(composition, mediaFile);
+                counter.getAndIncrement();
+            }
+        }
+
+        return counter.get();
+    }
+
+    private Map<Integer, List<DVDet>> loadDVDetMap(MDBReader mdbReader) throws ProcessorException {
+        Map<Integer, List<DVDet>> result = new HashMap<>();
         Table table = mdbReader.getTable(DVDET_TABLE_NAME);
-        List<DVDet> dvDetTable = new ArrayList<>();
 
         for (Row row: table) {
-            if (row.getInt(DVCONT_ID_COLUMN_NAME) == dvContId) {
-                dvDetTable.add (
+            int id = row.getInt(DVCONT_ID_COLUMN_NAME);
+            if (dvContArtifactMap.containsKey(id)) {
+                List<DVDet> dvDetList = result.computeIfAbsent(id, k -> new ArrayList<>());
+                dvDetList.add (
                         new DVDet(
                                 row.getInt(DVDET_ID_COLUMN_NAME),
                                 getArtistByMigrationId(row.getInt(ARTISTLIST_ID_COLUMN_NAME).longValue()),
@@ -155,44 +195,6 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
             }
         }
 
-        return dvDetTable;
-    }
-
-    public int importCompositionsAndMediaFiles(MDBReader mdbReader, int dvContId, Artifact artifact) throws ProcessorException {
-        AtomicInteger counter = new AtomicInteger(0);
-
-        List<DVDet> dvDetList = loadDVDet(mdbReader, dvContId);
-        dvDetList.sort(Comparator.comparingInt(o -> o.id));
-        long compNum = 0;
-
-        for (DVDet dvDet: dvDetList) {
-            Composition composition = new Composition();
-
-            composition.setArtifact(artifact);
-            composition.setArtist(dvDet.artist);
-            composition.setTitle(dvDet.title);
-            composition.setDvType(dvTypeMap.get((long)dvDet.videoTypeId));
-
-            composition.setNum(++compNum);
-
-            MediaFile mediaFile = mediaFileRepository.findFirstByArtifactAndName(
-                    artifact,
-                    dvDet.fileName
-            ).orElseGet(() -> {
-                MediaFile newMediaFile = new MediaFile();
-
-                newMediaFile.setArtifact(artifact);
-                newMediaFile.setName(dvDet.fileName);
-                newMediaFile.setFormat(getExtension(dvDet.fileName).toUpperCase());
-                newMediaFile.setSize(0L);
-
-                return newMediaFile;
-            });
-
-            compositionService.insertCompositionWithMedia(composition, mediaFile);
-            counter.getAndIncrement();
-        }
-
-        return counter.get();
+        return result;
     }
 }
