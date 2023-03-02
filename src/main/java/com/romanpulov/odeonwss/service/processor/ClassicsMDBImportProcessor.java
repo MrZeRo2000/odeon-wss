@@ -117,7 +117,7 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
 
         RENAME_ARTISTS_MAP.forEach((key, value) -> {
             Artist artist = migratedArtists.get(key);
-            if (artist != null) {
+            if ((artist != null) && (!artist.getName().equals(value))) {
                 artist.setName(value);
                 artistRepository.save(artist);
                 counter.getAndIncrement();

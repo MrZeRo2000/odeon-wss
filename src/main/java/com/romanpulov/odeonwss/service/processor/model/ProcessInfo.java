@@ -7,6 +7,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ProcessInfo {
+    private final static int MAX_PROCESS_ITEMS = 10;
+    private final static String MAX_PROCESS_ITEMS_STRING = "...";
+
     private final ProcessorType processorType;
 
     public ProcessorType getProcessorType() {
@@ -45,6 +48,25 @@ public class ProcessInfo {
                 .filter(d -> processingAction.equals(d.getProcessingAction()))
                 .findFirst()
                 .ifPresent(processDetails::remove);
+    }
+
+    public void finalizeProcess() {
+        // set final status
+        ProcessDetail finalProcessDetail = ProcessDetail.createFinalProgressDetail(getProcessDetails());
+        addProcessDetails(finalProcessDetail);
+        setProcessingStatus(finalProcessDetail.getStatus());
+
+        // truncate long items
+        getProcessDetails().forEach(processDetail -> {
+            List<String> items = processDetail.getInfo().getItems();
+
+            if (items.size() > MAX_PROCESS_ITEMS) {
+                while (items.size() > MAX_PROCESS_ITEMS) {
+                    items.remove(items.size() - 1);
+                }
+                items.set(items.size() - 1, MAX_PROCESS_ITEMS_STRING);
+            }
+        });
     }
 
     public ProcessInfo(ProcessorType processorType) {

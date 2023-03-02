@@ -85,9 +85,7 @@ public class ProcessService implements ProgressHandler {
                 processInfo.addProcessDetails(ProcessDetail.fromException(e));
             } finally {
                 // final status
-                ProcessDetail finalProcessDetail = ProcessDetail.createFinalProgressDetail(processInfo.getProcessDetails());
-                processInfo.addProcessDetails(finalProcessDetail);
-                processInfo.setProcessingStatus(finalProcessDetail.getStatus());
+                processInfo.finalizeProcess();
 
                 //clean up processor
                 currentProcessor.set(null);

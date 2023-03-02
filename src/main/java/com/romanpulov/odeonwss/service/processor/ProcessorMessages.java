@@ -55,11 +55,11 @@ public class ProcessorMessages {
     static final String INFO_MEDIA_FILES_SIZE_VALIDATED = "Media files size validated";
 
     static final String INFO_ARTISTS_LOADED = "Artists loaded";
-    static final String INFO_ARTISTS_CLEANSED = "Artists cleansed: %d";
+    static final String INFO_ARTISTS_CLEANSED = "Artists cleansed";
 
     static final String INFO_ARTIFACTS_LOADED = "Artifacts loaded";
 
-    static final String INFO_ARTIFACTS_IMPORTED = "Artifacts imported: %d";
+    static final String INFO_ARTIFACTS_IMPORTED = "Artifacts imported";
     static final String INFO_COMPOSITIONS_IMPORTED = "Compositions imported: %d";
     static final String INFO_PRODUCTS_COMPOSITIONS_IMPORTED = "Products for compositions imported: %d";
     static final String INFO_MEDIA_FILES_IMPORTED = "Media files imported: %d";
