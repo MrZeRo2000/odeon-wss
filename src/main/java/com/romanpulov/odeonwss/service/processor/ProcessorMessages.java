@@ -60,10 +60,10 @@ public class ProcessorMessages {
     static final String INFO_ARTIFACTS_LOADED = "Artifacts loaded";
 
     static final String INFO_ARTIFACTS_IMPORTED = "Artifacts imported";
-    static final String INFO_COMPOSITIONS_IMPORTED = "Compositions imported: %d";
-    static final String INFO_PRODUCTS_COMPOSITIONS_IMPORTED = "Products for compositions imported: %d";
-    static final String INFO_MEDIA_FILES_IMPORTED = "Media files imported: %d";
+    static final String INFO_COMPOSITIONS_IMPORTED = "Compositions imported";
+    static final String INFO_PRODUCTS_COMPOSITIONS_IMPORTED = "Products for compositions imported";
+    static final String INFO_MEDIA_FILES_IMPORTED = "Media files imported";
 
-    static final String INFO_CATEGORIES_IMPORTED = "Categories imported: %d";
-    static final String INFO_PRODUCTS_IMPORTED = "Products imported: %d";
+    static final String INFO_CATEGORIES_IMPORTED = "Categories imported";
+    static final String INFO_PRODUCTS_IMPORTED = "Products imported";
 }

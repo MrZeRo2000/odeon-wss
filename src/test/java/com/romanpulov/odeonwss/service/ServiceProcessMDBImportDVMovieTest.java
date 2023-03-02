@@ -6,19 +6,23 @@ import com.romanpulov.odeonwss.entity.Composition;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.CompositionRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
-import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
-import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
+import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.DisabledIf;
 
+import java.util.List;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisabledIf(value = "${full.tests.disabled}", loadContext = true)
 public class ServiceProcessMDBImportDVMovieTest {
 
+    public static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MOVIES_IMPORTER;
     @Autowired
     ProcessService service;
 
@@ -34,12 +38,56 @@ public class ServiceProcessMDBImportDVMovieTest {
     @Autowired
     AppConfiguration appConfiguration;
 
+    private ProcessInfo executeProcessor() {
+        service.executeProcessor(PROCESSOR_TYPE);
+        return service.getProcessInfo();
+    }
+
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
-    void testImportDVMovie() throws Exception {
-        service.executeProcessor(ProcessorType.DV_MOVIES_IMPORTER);
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+    void testImportDVMovie() {
+        ProcessInfo pi = executeProcessor();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
+
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+
+        assertThat(processDetails.get(0)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Started Movies importer"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(processDetails.get(1).getInfo().getMessage()).isEqualTo("Categories imported");
+        assertThat(processDetails.get(1).getRows()).isGreaterThan(0);
+
+        assertThat(processDetails.get(2).getInfo().getMessage()).isEqualTo("Products imported");
+        assertThat(processDetails.get(2).getRows()).isGreaterThan(0);
+        assertThat(processDetails.get(2).getRows()).isGreaterThan(processDetails.get(1).getRows());
+
+        assertThat(processDetails.get(3).getInfo().getMessage()).isEqualTo("Artifacts imported");
+        assertThat(processDetails.get(3).getRows()).isGreaterThan(0);
+
+        assertThat(processDetails.get(4).getInfo().getMessage()).isEqualTo("Compositions imported");
+        assertThat(processDetails.get(4).getRows()).isGreaterThan(0);
+        assertThat(processDetails.get(4).getRows()).isEqualTo(processDetails.get(3).getRows());
+
+        assertThat(processDetails.get(5).getInfo().getMessage()).isEqualTo("Products for compositions imported");
+        assertThat(processDetails.get(5).getRows()).isGreaterThan(0);
+
+        assertThat(processDetails.get(6).getInfo().getMessage()).isEqualTo("Media files imported");
+        assertThat(processDetails.get(6).getRows()).isGreaterThan(0);
+        assertThat(processDetails.get(6).getRows()).isGreaterThanOrEqualTo(processDetails.get(4).getRows());
+
+        assertThat(processDetails.get(7)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Task status"),
+                        ProcessingStatus.SUCCESS,
+                        null,
+                        null)
+        );
     }
 
     @Test
@@ -49,32 +97,41 @@ public class ServiceProcessMDBImportDVMovieTest {
         int oldCompositions = compositionRepository.getCompositionsByArtifactType(ArtifactType.withDVMovies()).size();
         int oldMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ArtifactType.withDVMovies()).size();
 
-        Assertions.assertTrue(oldArtifacts > 0);
-        Assertions.assertTrue(oldCompositions > 0);
-        Assertions.assertTrue(oldMediaFiles > 0);
-        Assertions.assertEquals(oldCompositions, oldArtifacts);
-        Assertions.assertTrue(oldMediaFiles >= oldCompositions);
+        assertThat(oldArtifacts).isGreaterThan(0);
+        assertThat(oldCompositions).isGreaterThan(0);
+        assertThat(oldMediaFiles).isGreaterThan(0);
+        assertThat(oldCompositions).isEqualTo(oldArtifacts);
+        assertThat(oldMediaFiles).isGreaterThanOrEqualTo(oldCompositions);
 
-        service.executeProcessor(ProcessorType.DV_MOVIES_IMPORTER);
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+        ProcessInfo pi = executeProcessor();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
+
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+
+        assertThat(processDetails.get(1).getRows()).isEqualTo(0);
+        assertThat(processDetails.get(2).getRows()).isEqualTo(0);
+        assertThat(processDetails.get(3).getRows()).isEqualTo(0);
+        assertThat(processDetails.get(4).getRows()).isEqualTo(0);
+        assertThat(processDetails.get(5).getRows()).isEqualTo(0);
+        assertThat(processDetails.get(6).getRows()).isEqualTo(0);
 
         int newArtifacts = artifactRepository.getAllByArtifactType(ArtifactType.withDVMovies()).size();
         int newCompositions = compositionRepository.getCompositionsByArtifactType(ArtifactType.withDVMovies()).size();
         int newMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ArtifactType.withDVMovies()).size();
 
-        Assertions.assertEquals(oldArtifacts, newArtifacts);
-        Assertions.assertEquals(oldCompositions, newCompositions);
-        Assertions.assertEquals(oldMediaFiles, newMediaFiles);
-        Assertions.assertEquals(newCompositions, newArtifacts);
+        assertThat(newArtifacts).isEqualTo(oldArtifacts);
+        assertThat(newCompositions).isEqualTo(oldCompositions);
+        assertThat(newMediaFiles).isEqualTo(oldMediaFiles);
+        assertThat(newCompositions).isEqualTo(oldCompositions);
     }
 
     @Test
     @Order(3)
-    void testProductsForAll() throws Exception {
+    void testProductsForAll() {
         compositionRepository.getCompositionsByArtifactType(ArtifactType.withDVMovies()).forEach(
                 c -> {
                     Composition composition = compositionRepository.findByIdWithProducts(c.getId()).orElseThrow();
-                    Assertions.assertEquals(1L, composition.getDvProducts().size());
+                    assertThat(composition.getDvProducts().size()).isEqualTo(1);
                 }
         );
     }
