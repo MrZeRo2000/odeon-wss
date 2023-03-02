@@ -61,9 +61,7 @@ public class ProcessInfo {
             List<String> items = processDetail.getInfo().getItems();
 
             if (items.size() > MAX_PROCESS_ITEMS) {
-                while (items.size() > MAX_PROCESS_ITEMS) {
-                    items.remove(items.size() - 1);
-                }
+                items.subList(MAX_PROCESS_ITEMS, items.size()).clear();
                 items.set(items.size() - 1, MAX_PROCESS_ITEMS_STRING);
             }
         });
