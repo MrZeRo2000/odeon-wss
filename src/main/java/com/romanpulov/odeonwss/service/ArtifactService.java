@@ -21,9 +21,9 @@ public class ArtifactService implements EditableObjectService<ArtifactEditDTO> {
 
     @Override
     public ArtifactEditDTO getById(Long id) throws CommonEntityNotFoundException {
-        Optional<ArtifactEditDTO> existingAED = artifactRepository.getArtifactEditById(id);
-        if (existingAED.isPresent()) {
-            return existingAED.get();
+        Optional<Artifact> existingArtifact = artifactRepository.findArtifactEditById(id);
+        if (existingArtifact.isPresent()) {
+            return ArtifactMapper.toEditDTO(existingArtifact.get());
         } else {
             throw new CommonEntityNotFoundException("Artifact", id);
         }

@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
 import com.romanpulov.odeonwss.dto.ArtifactTableDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
@@ -71,25 +70,14 @@ public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifa
     List<IdTitleView> getArtifactsByArtistType(@Param("artistType") ArtistType artistType);
 
     @Query(
-            "SELECT new com.romanpulov.odeonwss.dto.ArtifactEditDTO(" +
-                    "a.id, " +
-                    "a.artifactType.id, " +
-                    "a.artist.type, " +
-                    "a.artist.id, " +
-                    "ar.name, " +
-                    "a.performerArtist.id, " +
-                    "par.name, " +
-                    "a.title, " +
-                    "a.year, " +
-                    "a.duration, " +
-                    "a.size" +
-                    ") " +
+            "SELECT a " +
                     "FROM Artifact as a " +
-                    "INNER JOIN Artist as ar ON a.artist = ar " +
-                    "LEFT OUTER JOIN Artist as par ON a.performerArtist = par " +
+                    "INNER JOIN FETCH a.artifactType " +
+                    "LEFT JOIN FETCH a.artist " +
+                    "LEFT JOIN FETCH a.performerArtist " +
                     "WHERE a.id = :id"
     )
-    Optional<ArtifactEditDTO> getArtifactEditById(Long id);
+    Optional<Artifact> findArtifactEditById(Long id);
 
     @Query("SELECT a FROM Artifact a INNER JOIN FETCH a.artist LEFT JOIN FETCH a.performerArtist WHERE a.title = :title")
     Optional<Artifact> getArtifactWithArtistByTitle(String title);

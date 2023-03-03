@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
 import com.romanpulov.odeonwss.dto.ArtifactTableDTO;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
@@ -188,6 +189,9 @@ public class RepositoryArtifactTests {
         List<ArtifactTableDTO> artifactTable = artifactRepository
                 .getArtifactTableByArtistTypeAndArtifactTypes(ArtistType.ARTIST, List.of(ArtifactType.withDVMovies()));
         assertThat(artifactTable.size()).isEqualTo(1);
+
+        Artifact savedArtifact = artifactRepository.findById(artifact.getId()).orElseThrow();
+        assertThat(savedArtifact).isNotNull();
     }
 
     @Test

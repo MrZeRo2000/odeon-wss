@@ -66,14 +66,12 @@ public class ServiceArtifactTest {
 
     @Test
     @Order(2)
-    void testInsertWithoutArtistShouldFail() {
-        Assertions.assertThrows(Exception.class, () -> {
-            artifactService.insert(new ArtifactEditDTOBuilder()
-                    .withArtifactTypeId(ArtifactType.withMP3().getId())
-                    .withTitle("Title 2")
-                    .build()
-            );
-        });
+    void testInsertWithoutArtistShouldBeOk() throws Exception {
+        ArtifactEditDTO aed = artifactService.insert(new ArtifactEditDTOBuilder()
+                .withArtifactTypeId(ArtifactType.withDVMovies().getId())
+                .withTitle("Title 2")
+                .build()
+        );
     }
 
     @Test
