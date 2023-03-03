@@ -115,7 +115,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(processDetails.get(2).getInfo().getMessage()).isEqualTo("Artifacts not in files");
         assertThat(processDetails.get(2).getInfo().getItems())
-                .contains("Beauty In Darkness Vol.5", "Scorpions - Acoustica (Live in Lisboa) 2001");
+                .contains("A-HA - Ending On A High Note The Final Concert 2010", "A-HA - Headlines And Deadlines The Hits Of A-HA 1991");
 
         assertThat(pi.getProcessDetails().get(3)).isEqualTo(
                 new ProcessDetail(
