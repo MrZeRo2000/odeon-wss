@@ -55,9 +55,9 @@ public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifa
                 ") " +
                 "FROM Artifact as a " +
                 "INNER JOIN ArtifactType as at ON a.artifactType = at " +
-                "INNER JOIN Artist as ar ON a.artist = ar " +
+                "LEFT OUTER JOIN Artist as ar ON a.artist = ar " +
                 "LEFT OUTER JOIN Artist as par ON a.performerArtist = par " +
-                "WHERE ar.type=:artistType " +
+                "WHERE (at.parentId = 200 OR ar.type=:artistType) " +
                 "AND a.artifactType IN (:artifactTypes) " +
                 "ORDER BY ar.name, a.year, a.title"
     )

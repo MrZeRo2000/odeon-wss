@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RepositoryArtifactTests {
@@ -165,6 +167,27 @@ public class RepositoryArtifactTests {
 
         Assertions.assertEquals("Title No Year", getArtifact.getTitle());
         Assertions.assertNull(getArtifact.getYear());
+    }
+
+    @Test
+    @Order(7)
+    void testArtifactWithoutArtist() {
+        List<ArtifactTableDTO> prevArtifactTable = artifactRepository
+                .getArtifactTableByArtistTypeAndArtifactTypes(ArtistType.ARTIST, List.of(ArtifactType.withDVMovies()));
+        assertThat(prevArtifactTable.size()).isEqualTo(0);
+        Artifact artifact = new EntityArtifactBuilder()
+                .withArtifactType(ArtifactType.withDVMovies())
+                .withTitle("Title No Artist")
+                .withDuration(77743L)
+                .withInsertDate(LocalDate.now().minusDays(5))
+                .withMigrationId(732L)
+                .build();
+
+        artifactRepository.save(artifact);
+
+        List<ArtifactTableDTO> artifactTable = artifactRepository
+                .getArtifactTableByArtistTypeAndArtifactTypes(ArtistType.ARTIST, List.of(ArtifactType.withDVMovies()));
+        assertThat(artifactTable.size()).isEqualTo(1);
     }
 
     @Test

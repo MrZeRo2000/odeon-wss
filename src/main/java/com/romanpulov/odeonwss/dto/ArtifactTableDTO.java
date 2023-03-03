@@ -108,7 +108,7 @@ public class ArtifactTableDTO {
     public ArtifactTableDTO(Long id, String artifactTypeName, ArtistType artistType, String artistName, String performerArtistName, String title, Long year, Long duration, Long size, LocalDate insertDate) {
         this.id = id;
         this.artifactTypeName = artifactTypeName;
-        this.artistTypeCode = artistType.getCode();
+        this.artistTypeCode = artistType == null ? null : artistType.getCode();
         this.artistName = artistName;
         this.performerArtistName = performerArtistName;
         this.title = title;
