@@ -1,12 +1,12 @@
 package com.romanpulov.odeonwss.repository;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.romanpulov.odeonwss.dto.CompositionTableDTO;
-import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
+import com.romanpulov.odeonwss.dto.TrackTableDTO;
+import com.romanpulov.odeonwss.dto.TrackValidationDTO;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityCompositionBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityTrackBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import java.util.stream.StreamSupport;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class RepositoryCompositionTests {
+public class RepositoryTrackTests {
 
     @Autowired
     private ArtifactTypeRepository artifactTypeRepository;
@@ -39,7 +39,7 @@ public class RepositoryCompositionTests {
     private MediaFileRepository mediaFileRepository;
 
     @Autowired
-    private CompositionRepository compositionRepository;
+    private TrackRepository trackRepository;
 
     @Test
     @Order(1)
@@ -85,78 +85,78 @@ public class RepositoryCompositionTests {
                         .build()
         );
 
-        //validation DTO without composition
-        List<CompositionValidationDTO> compositionValidationList = compositionRepository.getCompositionValidationMusic(ArtifactType.withMP3());
-        Assertions.assertNotNull(compositionValidationList.get(0).getArtistName());
-        Assertions.assertNotNull(compositionValidationList.get(0).getArtifactTitle());
-        Assertions.assertNull(compositionValidationList.get(0).getCompositionNum());
-        Assertions.assertNull(compositionValidationList.get(0).getCompositionTitle());
+        //validation DTO without track
+        List<TrackValidationDTO> trackValidationList = trackRepository.getTrackValidationMusic(ArtifactType.withMP3());
+        Assertions.assertNotNull(trackValidationList.get(0).getArtistName());
+        Assertions.assertNotNull(trackValidationList.get(0).getArtifactTitle());
+        Assertions.assertNull(trackValidationList.get(0).getTrackNum());
+        Assertions.assertNull(trackValidationList.get(0).getTrackTitle());
 
-        //Composition 1
-        Composition wrong_composition = new EntityCompositionBuilder()
-                .withTitle("Composition title")
+        //Track 1
+        Track wrong_track = new EntityTrackBuilder()
+                .withTitle("Track title")
                 .build();
-        Assertions.assertThrows(Exception.class, () -> compositionRepository.save(wrong_composition));
+        Assertions.assertThrows(Exception.class, () -> trackRepository.save(wrong_track));
 
-        //Composition 1
-        Composition composition = new EntityCompositionBuilder()
+        //Track 1
+        Track track = new EntityTrackBuilder()
                 .withArtifact(savedArtifact)
                 .withArtist(artist)
                 .withPerformerArtist(performerArtist)
-                .withTitle("Composition title")
+                .withTitle("Track title")
                 .withDiskNum(1L)
                 .withNum(8L)
                 .withDuration(123456L)
                 .withMigrationId(4321L)
                 .build();
-        Composition savedComposition = compositionRepository.save(composition);
-        Assertions.assertNotNull(savedComposition.getId());
-        Assertions.assertEquals(savedComposition.getArtifact(), savedArtifact);
-        assert savedComposition.getArtist() != null;
-        assert savedComposition.getPerformerArtist() != null;
-        Assertions.assertEquals("Name1", savedComposition.getArtist().getName());
-        Assertions.assertEquals("PerformerName1", savedComposition.getPerformerArtist().getName());
-        Assertions.assertEquals("Composition title", savedComposition.getTitle());
-        Assertions.assertEquals(1L, savedComposition.getDiskNum());
-        Assertions.assertEquals(8, savedComposition.getNum());
-        Assertions.assertEquals(123456L, savedComposition.getDuration());
-        Assertions.assertEquals(4321L, savedComposition.getMigrationId());
+        Track savedTrack = trackRepository.save(track);
+        Assertions.assertNotNull(savedTrack.getId());
+        Assertions.assertEquals(savedTrack.getArtifact(), savedArtifact);
+        assert savedTrack.getArtist() != null;
+        assert savedTrack.getPerformerArtist() != null;
+        Assertions.assertEquals("Name1", savedTrack.getArtist().getName());
+        Assertions.assertEquals("PerformerName1", savedTrack.getPerformerArtist().getName());
+        Assertions.assertEquals("Track title", savedTrack.getTitle());
+        Assertions.assertEquals(1L, savedTrack.getDiskNum());
+        Assertions.assertEquals(8, savedTrack.getNum());
+        Assertions.assertEquals(123456L, savedTrack.getDuration());
+        Assertions.assertEquals(4321L, savedTrack.getMigrationId());
 
-        //Composition 2
-        Composition composition2 = new EntityCompositionBuilder()
+        //Track 2
+        Track track2 = new EntityTrackBuilder()
                 .withArtifact(savedArtifact)
-                .withTitle("Composition title 2")
+                .withTitle("Track title 2")
                 .withDiskNum(2L)
                 .withNum(5L)
                 .withDuration(777L)
                 .build();
-        Composition savedComposition2 = compositionRepository.save(composition2);
-        Assertions.assertNotNull(savedComposition2.getId());
-        Assertions.assertEquals(savedComposition2.getArtifact(), savedArtifact);
-        Assertions.assertEquals("Composition title 2", savedComposition2.getTitle());
-        Assertions.assertEquals(2, savedComposition2.getDiskNum());
-        Assertions.assertEquals(5, savedComposition2.getNum());
-        Assertions.assertEquals(777, savedComposition2.getDuration());
+        Track savedTrack2 = trackRepository.save(track2);
+        Assertions.assertNotNull(savedTrack2.getId());
+        Assertions.assertEquals(savedTrack2.getArtifact(), savedArtifact);
+        Assertions.assertEquals("Track title 2", savedTrack2.getTitle());
+        Assertions.assertEquals(2, savedTrack2.getDiskNum());
+        Assertions.assertEquals(5, savedTrack2.getNum());
+        Assertions.assertEquals(777, savedTrack2.getDuration());
 
-        Assertions.assertEquals(2, compositionRepository.getCompositionsByArtifactType(ArtifactType.withMP3()).size());
-        Assertions.assertEquals(0, compositionRepository.getCompositionsByArtifactType(ArtifactType.withDVMovies()).size());
+        Assertions.assertEquals(2, trackRepository.getTracksByArtifactType(ArtifactType.withMP3()).size());
+        Assertions.assertEquals(0, trackRepository.getTracksByArtifactType(ArtifactType.withDVMovies()).size());
     }
 
     @Test
     @Order(2)
     void testValidationDTO() {
-        List<CompositionValidationDTO> compositionValidationList = compositionRepository.getCompositionValidationMusic(ArtifactType.withMP3());
-        Assertions.assertEquals(3, compositionValidationList.size());
-        Assertions.assertEquals(1982, compositionValidationList.get(0).getArtifactYear());
+        List<TrackValidationDTO> trackValidationList = trackRepository.getTrackValidationMusic(ArtifactType.withMP3());
+        Assertions.assertEquals(3, trackValidationList.size());
+        Assertions.assertEquals(1982, trackValidationList.get(0).getArtifactYear());
     }
 
     @Test
     @Order(3)
-    void testCompositionTableDTO() {
-        List<CompositionTableDTO> compositions = compositionRepository.getCompositionTableByArtifactId(1L);
-        Assertions.assertEquals(2, compositions.size());
-        Assertions.assertEquals(0, compositionRepository.getCompositionTableByArtifactId(2L).size());
-        Assertions.assertEquals(0, compositionRepository.getCompositionTableByArtifactId(3L).size());
+    void testTrackTableDTO() {
+        List<TrackTableDTO> tracks = trackRepository.getTrackTableByArtifactId(1L);
+        Assertions.assertEquals(2, tracks.size());
+        Assertions.assertEquals(0, trackRepository.getTrackTableByArtifactId(2L).size());
+        Assertions.assertEquals(0, trackRepository.getTrackTableByArtifactId(3L).size());
     }
 
     @Test
@@ -165,10 +165,10 @@ public class RepositoryCompositionTests {
         Artifact artifact = artifactRepository.findById(1L).orElseThrow();
 
         Assertions.assertThrows(JpaSystemException.class, () -> {
-            compositionRepository.save(
-                    new EntityCompositionBuilder()
+            trackRepository.save(
+                    new EntityTrackBuilder()
                             .withArtifact(artifact)
-                            .withTitle("Composition title 22")
+                            .withTitle("Track title 22")
                             .withDiskNum(2L)
                             .withNum(5L)
                             .withDuration(757L)
@@ -181,10 +181,10 @@ public class RepositoryCompositionTests {
     @Order(5)
     @Transactional
     @Rollback(false)
-    void testUpdateComposition() {
-        Composition composition = compositionRepository.findById(1L).orElseThrow();
-        composition.setTitle("Composition updated title");
-        compositionRepository.save(composition);
+    void testUpdateTrack() {
+        Track track = trackRepository.findById(1L).orElseThrow();
+        track.setTitle("Track updated title");
+        trackRepository.save(track);
     }
 
     @Test
@@ -195,7 +195,7 @@ public class RepositoryCompositionTests {
         MediaFile mediaFile = new EntityMediaFileBuilder()
                 .withArtifact(artifactRepository.findById(1L).orElseThrow())
                 .withFormat("mp3")
-                .withName("Composition.mp3")
+                .withName("Track.mp3")
                 .withDuration(75L)
                 .withSize(5234L)
                 .withBitrate(128L)
@@ -203,18 +203,18 @@ public class RepositoryCompositionTests {
 
         mediaFileRepository.save(mediaFile);
 
-        Composition composition = compositionRepository.findById(1L).orElseThrow();
-        Assertions.assertEquals(0, composition.getMediaFiles().size());
+        Track track = trackRepository.findById(1L).orElseThrow();
+        Assertions.assertEquals(0, track.getMediaFiles().size());
 
-        Set<MediaFile> mediaFiles = composition.getMediaFiles();
+        Set<MediaFile> mediaFiles = track.getMediaFiles();
         mediaFiles.add(mediaFile);
-        composition.setMediaFiles(mediaFiles);
-        composition.setTitle("Composition title updated");
+        track.setMediaFiles(mediaFiles);
+        track.setTitle("Track title updated");
 
-        compositionRepository.save(composition);
+        trackRepository.save(track);
 
-        composition = compositionRepository.findById(composition.getId()).orElseThrow();
-        Assertions.assertEquals(1, composition.getMediaFiles().size());
+        track = trackRepository.findById(track.getId()).orElseThrow();
+        Assertions.assertEquals(1, track.getMediaFiles().size());
     }
 
     @Test
@@ -222,22 +222,22 @@ public class RepositoryCompositionTests {
     @Transactional
     @Rollback(false)
     void testDeleteMediaFileShouldBeOk() throws Exception {
-        Composition composition = compositionRepository.findById(1L).orElseThrow();
-        Assertions.assertEquals(1, composition.getMediaFiles().size());
+        Track track = trackRepository.findById(1L).orElseThrow();
+        Assertions.assertEquals(1, track.getMediaFiles().size());
 
-        composition.getMediaFiles().clear();
-        compositionRepository.save(composition);
+        track.getMediaFiles().clear();
+        trackRepository.save(track);
 
-        Assertions.assertEquals(0, composition.getMediaFiles().size());
+        Assertions.assertEquals(0, track.getMediaFiles().size());
     }
 
     @Test
     @Order(100)
     @Disabled("Not actual after DB structure change, to delete")
     void testCascade() {
-        Iterable<Composition> compositions = compositionRepository.findAll();
-        List<Composition> compositionList = StreamSupport.stream(compositions.spliterator(), false).collect(Collectors.toList());
-        Assertions.assertEquals(2, compositionList.size());
+        Iterable<Track> tracks = trackRepository.findAll();
+        List<Track> trackList = StreamSupport.stream(tracks.spliterator(), false).collect(Collectors.toList());
+        Assertions.assertEquals(2, trackList.size());
 
         MediaFile mediaFile = new EntityMediaFileBuilder()
                 .withArtifact(artifactRepository.findById(1L).orElseThrow())
@@ -253,10 +253,10 @@ public class RepositoryCompositionTests {
         Assertions.assertEquals(1, mediaFileRepository.findAllByArtifact(artifactRepository.findById(1L).orElseThrow()).size());
         Assertions.assertEquals(1, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
 
-        //delete composition
-        compositionRepository.delete(compositionList.get(0));
-        compositionList = StreamSupport.stream(compositionRepository.findAll().spliterator(), false).collect(Collectors.toList());
-        Assertions.assertEquals(1, compositionList.size());
+        //delete track
+        trackRepository.delete(trackList.get(0));
+        trackList = StreamSupport.stream(trackRepository.findAll().spliterator(), false).collect(Collectors.toList());
+        Assertions.assertEquals(1, trackList.size());
 
         //media file deleted
         Assertions.assertEquals(0, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());

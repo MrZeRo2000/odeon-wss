@@ -25,7 +25,8 @@ public class DVProductMDBImportProcessor extends AbstractMDBImportProcessor {
     private static final Map<Integer, ArtifactType> PRODUCT_ARTIFACT_TYPE_MAP = Map.of(
             11, ArtifactType.withDVMovies(),
             12, ArtifactType.withDVAnimation(),
-            14, ArtifactType.withDVDocumentary()
+            13, ArtifactType.withDVDocumentary(),
+            14, ArtifactType.withDVOther()
     );
 
     private final DVOriginRepository dvOriginRepository;

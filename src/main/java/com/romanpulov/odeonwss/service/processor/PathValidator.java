@@ -50,8 +50,8 @@ public class PathValidator {
             d.getArtistName(),
             d.getArtifactYear(),
             d.getArtifactTitle(),
-            d.getCompositionNum(),
-            formatNullable(d.getCompositionTitle()));
+            d.getTrackNum(),
+            formatNullable(d.getTrackTitle()));
 
     private static final MediaFileValidationDTOMapper MEDIA_FILE_MUSIC_MAPPER = d -> String.format(
             MUSIC_ARTIFACT_ENTITY_FORMAT,
@@ -87,7 +87,7 @@ public class PathValidator {
         );
     }
 
-    public static boolean validateArtistNamesArtifactsCompositions(
+    public static boolean validateArtistNamesArtifactsTracks(
             AbstractProcessor processor,
             List<MediaFileValidationDTO> pathValidation,
             List<MediaFileValidationDTO> dbValidation) {
@@ -129,7 +129,7 @@ public class PathValidator {
         );
     }
 
-    public static boolean validateCompositionsMusic(
+    public static boolean validateTracksMusic(
             AbstractProcessor processor,
             List<MediaFileValidationDTO> pathValidation,
             List<MediaFileValidationDTO> dbValidation) {

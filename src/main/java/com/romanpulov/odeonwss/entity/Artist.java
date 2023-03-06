@@ -83,14 +83,14 @@ public class Artist extends AbstractBaseMigratedEntity {
     }
 
     @OneToMany(mappedBy = "artist", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    private List<Composition> compositions;
+    private List<Track> tracks;
 
-    public List<Composition> getCompositions() {
-        return compositions;
+    public List<Track> getTracks() {
+        return tracks;
     }
 
-    public void setCompositions(List<Composition> compositions) {
-        this.compositions = compositions;
+    public void setTracks(List<Track> tracks) {
+        this.tracks = tracks;
     }
 
     @PreRemove
@@ -98,8 +98,8 @@ public class Artist extends AbstractBaseMigratedEntity {
         if (artifacts != null && artifacts.size() > 0) {
             throw new HibernateException("Unable to delete " + this + " because it has child artifacts");
         }
-        if (compositions != null && compositions.size() > 0) {
-            throw new HibernateException("Unable to delete " + this + " because it has child compositions");
+        if (tracks != null && tracks.size() > 0) {
+            throw new HibernateException("Unable to delete " + this + " because it has child tracks");
         }
     }
 

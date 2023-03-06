@@ -3,7 +3,7 @@ package com.romanpulov.odeonwss.service.processor;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import org.springframework.stereotype.Component;
@@ -15,14 +15,14 @@ public class DVMusicMediaFilesLoadProcessor extends AbstractDVMediaFilesLoadProc
 
     public DVMusicMediaFilesLoadProcessor(
             ArtifactRepository artifactRepository,
-            CompositionRepository compositionRepository,
+            TrackRepository trackRepository,
             MediaFileRepository mediaFileRepository,
             MediaParser mediaParser
     ) {
         super(
                 ArtifactType.withDVMusic(),
                 artifactRepository,
-                compositionRepository,
+                trackRepository,
                 mediaFileRepository,
                 mediaParser
         );

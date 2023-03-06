@@ -21,7 +21,7 @@ public class RepositoryArtifactTypeTest {
         List<ArtifactType> artifactTypes = new ArrayList<>();
         artifactTypeRepository.findAll().forEach(artifactTypes::add);
 
-        assertThat(artifactTypes.size()).isEqualTo(8);
+        assertThat(artifactTypes.size()).isEqualTo(9);
     }
 
     @Test

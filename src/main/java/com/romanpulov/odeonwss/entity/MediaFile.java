@@ -26,14 +26,14 @@ public class MediaFile extends AbstractBaseMigratedEntity {
     }
 
     @ManyToMany(mappedBy = "mediaFiles")
-    private Set<Composition> compositions = new HashSet<>();
+    private Set<Track> tracks = new HashSet<>();
 
-    public Set<Composition> getCompositions() {
-        return compositions;
+    public Set<Track> getTracks() {
+        return tracks;
     }
 
-    public void setCompositions(Set<Composition> compositions) {
-        this.compositions = compositions;
+    public void setTracks(Set<Track> tracks) {
+        this.tracks = tracks;
     }
 
     @Column(name = "mdfl_name")

@@ -34,13 +34,13 @@ public interface MediaFileRepository extends CrudRepository<MediaFile, Long> {
             "m.format) " +
             "FROM Artist AS ar " +
             "INNER JOIN Artifact af ON af.artist = ar " +
-            "LEFT OUTER JOIN Composition c ON c.artifact = af " +
-            "LEFT OUTER JOIN CompositionMediaFile cm ON cm.compositionId = c.id " +
+            "LEFT OUTER JOIN Track c ON c.artifact = af " +
+            "LEFT OUTER JOIN TrackMediaFile cm ON cm.trackId = c.id " +
             "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
             "WHERE ar.type = :artistType AND af.artifactType = :artifactType " +
             "ORDER BY ar.name, af.year, af.title, c.num"
     )
-    List<MediaFileValidationDTO> getCompositionMediaFileValidationMusic(ArtistType artistType, ArtifactType artifactType);
+    List<MediaFileValidationDTO> getTrackMediaFileValidationMusic(ArtistType artistType, ArtifactType artifactType);
 
     @Query("SELECT " +
             "new com.romanpulov.odeonwss.dto.MediaFileValidationDTO(" +
@@ -49,13 +49,13 @@ public interface MediaFileRepository extends CrudRepository<MediaFile, Long> {
             "m.name, " +
             "m.format) " +
             "FROM Artifact af " +
-            "LEFT OUTER JOIN Composition c ON c.artifact = af " +
-            "LEFT OUTER JOIN CompositionMediaFile cm ON cm.compositionId = c.id " +
+            "LEFT OUTER JOIN Track c ON c.artifact = af " +
+            "LEFT OUTER JOIN TrackMediaFile cm ON cm.trackId = c.id " +
             "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
             "WHERE af.artifactType = :artifactType " +
             "ORDER BY af.title"
     )
-    List<MediaFileValidationDTO> getCompositionMediaFileValidationDV(ArtifactType artifactType);
+    List<MediaFileValidationDTO> getTrackMediaFileValidationDV(ArtifactType artifactType);
 
     @Query("SELECT " +
             "new com.romanpulov.odeonwss.dto.MediaFileValidationDTO(" +

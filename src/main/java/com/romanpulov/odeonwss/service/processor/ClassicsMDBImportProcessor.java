@@ -44,7 +44,7 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private final ArtifactRepository artifactRepository;
 
-    private final CompositionRepository compositionRepository;
+    private final TrackRepository trackRepository;
 
     private Map<Long, Artist> migratedArtists;
 
@@ -54,14 +54,14 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
             ArtistCategoryRepository artistCategoryRepository,
             ArtistLyricsRepository artistLyricsRepository,
             ArtifactRepository artifactRepository,
-            CompositionRepository compositionRepository)
+            TrackRepository trackRepository)
     {
         this.artistRepository = artistRepository;
         this.artistDetailRepository = artistDetailRepository;
         this.artistCategoryRepository = artistCategoryRepository;
         this.artistLyricsRepository = artistLyricsRepository;
         this.artifactRepository = artifactRepository;
-        this.compositionRepository = compositionRepository;
+        this.trackRepository = trackRepository;
     }
 
     @Override
@@ -83,12 +83,12 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
 
         infoHandler(ProcessorMessages.INFO_ARTISTS_CLEANSED, cleanseArtistNames());
 
-        infoHandler(ProcessorMessages.INFO_ARTIFACTS_IMPORTED, importArtifactsAndCompositions(mdbReader));
+        infoHandler(ProcessorMessages.INFO_ARTIFACTS_IMPORTED, importArtifactsAndTracks(mdbReader));
     }
 
     private static class ClassicsData {
         Artifact artifact;
-        final List<Composition> compositions = new ArrayList<>();
+        final List<Track> tracks = new ArrayList<>();
 
         public static ClassicsData withArtifact(Artifact artifact) {
             ClassicsData instance = new ClassicsData();
@@ -143,7 +143,7 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
     }
 
     @Transactional
-    public int importArtifactsAndCompositions(MDBReader mdbReader) throws ProcessorException {
+    public int importArtifactsAndTracks(MDBReader mdbReader) throws ProcessorException {
         Table table = mdbReader.getTable(CLASSICS_TABLE_NAME);
         AtomicInteger counter = new AtomicInteger(0);
         Map<String, ClassicsData> classicsDataMap = new HashMap<>();
@@ -188,23 +188,23 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
 
                     classicsDataMap.put(artifactName, (classicsData = ClassicsData.withArtifact(artifact)));
                 }
-                String compositionTitle = row.getString(TITLE_COLUMN_NAME);
-                Composition composition = compositionRepository
-                        .findCompositionByArtifactAndTitle(classicsData.artifact, compositionTitle)
+                String trackTitle = row.getString(TITLE_COLUMN_NAME);
+                Track track = trackRepository
+                        .findTrackByArtifactAndTitle(classicsData.artifact, trackTitle)
                         .orElseGet(() -> {
-                            Composition newComposition = new Composition();
+                            Track newTrack = new Track();
 
-                            newComposition.setArtifact(classicsDataMap.get(artifactName).artifact);
-                            newComposition.setArtist(artist);
-                            newComposition.setPerformerArtist(performerArtist);
-                            newComposition.setTitle(row.getString(TITLE_COLUMN_NAME));
+                            newTrack.setArtifact(classicsDataMap.get(artifactName).artifact);
+                            newTrack.setArtist(artist);
+                            newTrack.setPerformerArtist(performerArtist);
+                            newTrack.setTitle(row.getString(TITLE_COLUMN_NAME));
 
-                            newComposition.setDiskNum(1L);
-                            newComposition.setNum(classicsDataMap.get(artifactName).compositions.size() + 1L);
+                            newTrack.setDiskNum(1L);
+                            newTrack.setNum(classicsDataMap.get(artifactName).tracks.size() + 1L);
 
-                            compositionRepository.save(newComposition);
+                            trackRepository.save(newTrack);
 
-                            return newComposition;
+                            return newTrack;
                         });
 
                 logger.debug("Processing " + artist);
@@ -229,7 +229,7 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
                     artifactRepository.save(classicsData.artifact);
                 }
 
-                classicsData.compositions.add(composition);
+                classicsData.tracks.add(track);
             }
         }
 

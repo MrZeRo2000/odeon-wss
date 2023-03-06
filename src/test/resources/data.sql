@@ -15,6 +15,9 @@ INSERT INTO artifact_types (attp_id, attp_name, attp_parent_id)
 VALUES (203, 'Animation', 200);
 INSERT INTO artifact_types (attp_id, attp_name, attp_parent_id)
 VALUES (204, 'Documentary', 200);
+INSERT INTO artifact_types (attp_id, attp_name, attp_parent_id)
+VALUES (205, 'Other', 200);
+
 
 INSERT INTO dv_types(dvtp_id, dvtp_name)
 VALUES(1, 'VHS');

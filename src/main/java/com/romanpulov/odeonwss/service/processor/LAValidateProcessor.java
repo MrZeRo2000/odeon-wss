@@ -35,11 +35,11 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
         Path path = validateAndGetPath();
 
         List<MediaFileValidationDTO> dbValidation = mediaFileRepository
-                .getCompositionMediaFileValidationMusic(ArtistType.ARTIST, ARTIFACT_TYPE);
+                .getTrackMediaFileValidationMusic(ArtistType.ARTIST, ARTIFACT_TYPE);
         List<MediaFileValidationDTO> pathValidation = loadFromPath(path);
 
         logger.info("Validating ArtistNames");
-        if (PathValidator.validateArtistNamesArtifactsCompositions(this, pathValidation, dbValidation)) {
+        if (PathValidator.validateArtistNamesArtifactsTracks(this, pathValidation, dbValidation)) {
             infoHandler(ProcessorMessages.INFO_ARTISTS_VALIDATED);
 
             if (PathValidator.validateArtifactsMusic(this, pathValidation, dbValidation)) {
@@ -86,10 +86,10 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
             );
         } else {
             List<Path> directoryFolderDisksPaths = null;
-            List<Path> compositionPaths = new ArrayList<>();
-            if (PathReader.readPathAll(artifactPath, compositionPaths)) {
+            List<Path> trackPaths = new ArrayList<>();
+            if (PathReader.readPathAll(artifactPath, trackPaths)) {
                 if (parentYT == null) {
-                    directoryFolderDisksPaths = compositionPaths
+                    directoryFolderDisksPaths = trackPaths
                             .stream()
                             .filter(p -> NamesParser.getDiskNumFromFolderName(p.getFileName().toString()) > 0)
                             .collect(Collectors.toList());
@@ -100,22 +100,22 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                         loadFromArtifactPathParent(artistPath, directoryFolderDiskPath, yt, result);
                     }
                 } else {
-                    List<String> compositionFileNames = compositionPaths
+                    List<String> trackFileNames = trackPaths
                             .stream()
                             .map(f -> f.getFileName().toString())
                             .filter(f -> f.contains("."))
                             .filter(f -> MEDIA_FORMATS.contains(f.substring(f.lastIndexOf(".") + 1).toLowerCase()))
                             .collect(Collectors.toList());
-                    if (compositionFileNames.size() == 0) {
+                    if (trackFileNames.size() == 0) {
                         errorHandler(ProcessorMessages.ERROR_COMPOSITION_FILES_NOT_FOUND_FOR_ARTIFACT, artifactPath.getFileName().toString());
                     } else {
-                        compositionFileNames.forEach(compositionFileName -> result.add(new MediaFileValidationDTO(
+                        trackFileNames.forEach(trackFileName -> result.add(new MediaFileValidationDTO(
                                 artistPath.getFileName().toString(),
                                 yt.getTitle(),
                                 (long) yt.getYear(),
                                 null,
                                 null,
-                                compositionFileName,
+                                trackFileName,
                                 null
                         )));
                     }

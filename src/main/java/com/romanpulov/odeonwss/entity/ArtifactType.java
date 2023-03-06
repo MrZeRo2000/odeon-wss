@@ -116,4 +116,13 @@ public class ArtifactType extends AbstractBaseEntity {
 
         return artifactType;
     }
+
+    public static ArtifactType withDVOther() {
+        ArtifactType artifactType = new ArtifactType();
+        artifactType.setId(205L);
+        artifactType.setName("Documentary");
+        artifactType.setParentId(200L);
+
+        return artifactType;
+    }
 }

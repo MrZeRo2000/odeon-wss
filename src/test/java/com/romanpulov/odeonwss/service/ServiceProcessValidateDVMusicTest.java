@@ -42,7 +42,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Autowired
     private ArtifactTypeRepository artifactTypeRepository;
     @Autowired
-    private CompositionRepository compositionRepository;
+    private TrackRepository trackRepository;
     @Autowired
     private MediaFileRepository mediaFileRepository;
 
@@ -303,12 +303,12 @@ public class ServiceProcessValidateDVMusicTest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInDbShouldFail() {
         this.internalPrepareExisting();
-        Artifact artifact = artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)
+        Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(ARTIFACT_TYPE)
                 .stream()
                 .filter(a -> a.getTitle().equals("Beautiful Voices 1"))
                 .findFirst().orElseThrow();
-        Composition composition = compositionRepository
-                .findByIdWithMediaFiles(artifact.getCompositions().get(0).getId())
+        Track track = trackRepository
+                .findByIdWithMediaFiles(artifact.getTracks().get(0).getId())
                 .orElseThrow();
 
         MediaFile mediaFile = new MediaFile();
@@ -318,8 +318,8 @@ public class ServiceProcessValidateDVMusicTest {
         mediaFile.setBitrate(2235L);
         mediaFileRepository.save(mediaFile);
 
-        composition.getMediaFiles().add(mediaFile);
-        compositionRepository.save(composition);
+        track.getMediaFiles().add(mediaFile);
+        trackRepository.save(track);
 
         ProcessInfo pi = executeProcessor();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -353,10 +353,10 @@ public class ServiceProcessValidateDVMusicTest {
                 .findFirst()
                 .orElseThrow();
 
-        compositionRepository.findAllByArtifact(artifact).forEach(c -> {
-            Composition composition = compositionRepository.findByIdWithMediaFiles(c.getId()).orElseThrow();
-            if (composition.getMediaFiles().contains(mediaFile)) {
-                compositionRepository.delete(composition);
+        trackRepository.findAllByArtifact(artifact).forEach(c -> {
+            Track track = trackRepository.findByIdWithMediaFiles(c.getId()).orElseThrow();
+            if (track.getMediaFiles().contains(mediaFile)) {
+                trackRepository.delete(track);
             }
         });
         mediaFile.setArtifact(null);

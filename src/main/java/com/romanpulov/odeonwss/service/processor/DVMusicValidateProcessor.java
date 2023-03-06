@@ -30,7 +30,7 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
     public void execute() throws ProcessorException {
         Path path = validateAndGetPath();
 
-        final List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getCompositionMediaFileValidationMusic(
+        final List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getTrackMediaFileValidationMusic(
                 ArtistType.ARTIST, ARTIFACT_TYPE
         );
         final List<MediaFileValidationDTO> pathValidation = PathLoader.loadFromPath(this, path);

@@ -69,11 +69,11 @@ public class NamesParser {
         return String.format(FORMAT_MUSIC_ARTIFACT, year, title);
     }
 
-    public static boolean validateMusicComposition(String name) {
+    public static boolean validateMusicTrack(String name) {
         return REGEXP_PATTERN_MUSIC_COMPOSITION.matcher(name).matches();
     }
 
-    public static NumberTitle parseMusicComposition(String name) {
+    public static NumberTitle parseMusicTrack(String name) {
         Matcher matcher = REGEXP_PATTERN_MUSIC_COMPOSITION.matcher(name);
         if (matcher.find() && matcher.groupCount() == 2) {
             return new NumberTitle(Integer.parseInt(matcher.group(1)), matcher.group(2));
@@ -82,11 +82,11 @@ public class NamesParser {
         }
     }
 
-    public static String formatMusicComposition(long num, String title) {
+    public static String formatMusicTrack(long num, String title) {
         return String.format(FORMAT_MUSIC_COMPOSITION, num, title);
     }
 
-    public static String formatMusicCompositionWithFile(Long num, String title, String fileName) {
+    public static String formatMusicTrackWithFile(Long num, String title, String fileName) {
         if (fileName == null) {
             return String.format(FORMAT_MUSIC_WITHOUT_FILE_NAME, Objects.toString(num, "-"), Objects.toString(title, "-"));
         } else {

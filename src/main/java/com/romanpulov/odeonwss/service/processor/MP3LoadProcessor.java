@@ -2,12 +2,12 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Composition;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.service.CompositionService;
+import com.romanpulov.odeonwss.service.TrackService;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
@@ -30,11 +30,11 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MP3LoadProcessor.class);
     public static final String MEDIA_FILE_FORMAT = "mp3";
 
-    private final CompositionService compositionService;
+    private final TrackService trackService;
 
     private final MediaParser mediaParser;
 
-    private static class CompositionsSummary {
+    private static class TracksSummary {
         private long duration;
         private long size;
     }
@@ -42,11 +42,11 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
     public MP3LoadProcessor(
             ArtistRepository artistRepository,
             ArtifactRepository artifactRepository,
-            CompositionService compositionService,
+            TrackService trackService,
             MediaParser mediaParser )
     {
         super(artistRepository, artifactRepository);
-        this.compositionService = compositionService;
+        this.trackService = trackService;
         this.mediaParser = mediaParser;
     }
 
@@ -56,62 +56,62 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
     }
 
     @Override
-    protected int processCompositions(List<Pair<Path, Artifact>> pathArtifacts) throws ProcessorException {
+    protected int processTracks(List<Pair<Path, Artifact>> pathArtifacts) throws ProcessorException {
         AtomicInteger counter = new AtomicInteger(0);
 
-        // load composition files to flat list
+        // load track files to flat list
         List<Pair<Path, Pair<Artifact, NamesParser.NumberTitle>>> flatPathArtifacts = new ArrayList<>();
-        List<Path> flatPathCompositions = new ArrayList<>();
+        List<Path> flatPathTracks = new ArrayList<>();
         for (Pair<Path, Artifact> pathArtifactPair: pathArtifacts) {
-            List<Path> compositionFiles = new ArrayList<>();
-            if (!PathReader.readPathFilesOnly(this, pathArtifactPair.getFirst(), compositionFiles)) {
+            List<Path> trackFiles = new ArrayList<>();
+            if (!PathReader.readPathFilesOnly(this, pathArtifactPair.getFirst(), trackFiles)) {
                 return counter.get();
             }
 
-            for (Path p: compositionFiles) {
-                String compositionFileName = p.getFileName().toString();
-                if (!compositionFileName.endsWith(MEDIA_FILE_FORMAT)) {
+            for (Path p: trackFiles) {
+                String trackFileName = p.getFileName().toString();
+                if (!trackFileName.endsWith(MEDIA_FILE_FORMAT)) {
                     errorHandler(ProcessorMessages.ERROR_WRONG_FILE_TYPE, p.toAbsolutePath());
                     return counter.get();
                 }
 
-                NamesParser.NumberTitle nt = NamesParser.parseMusicComposition(compositionFileName);
+                NamesParser.NumberTitle nt = NamesParser.parseMusicTrack(trackFileName);
                 if (nt == null) {
                     errorHandler(ProcessorMessages.ERROR_PARSING_COMPOSITION_NAME, p.toAbsolutePath().getFileName());
                     return counter.get();
                 }
 
                 flatPathArtifacts.add(Pair.of(p, Pair.of(pathArtifactPair.getSecond(), nt)));
-                flatPathCompositions.add(p);
+                flatPathTracks.add(p);
             }
         }
 
-        Map<Path, MediaFileInfo> parsedCompositionMediaInfo = mediaParser.parseCompositions(flatPathCompositions);
+        Map<Path, MediaFileInfo> parsedTrackMediaInfo = mediaParser.parseTracks(flatPathTracks);
 
         Map<Artifact, List<Pair<Path, Pair<Artifact, NamesParser.NumberTitle>>>> pathArtifactsMap =
                 flatPathArtifacts
                         .stream()
                         .collect(Collectors.groupingBy(v -> v.getSecond().getFirst(), Collectors.toList()));
 
-        //process composition files
+        //process track files
         for (Artifact artifact: pathArtifactsMap.keySet()) {
-            CompositionsSummary summary = new CompositionsSummary();
+            TracksSummary summary = new TracksSummary();
 
             for (Pair<Path, Pair<Artifact, NamesParser.NumberTitle>> flatPathArtifact: pathArtifactsMap.get(artifact)) {
-                MediaFileInfo mediaFileInfo = parsedCompositionMediaInfo.get(flatPathArtifact.getFirst());
+                MediaFileInfo mediaFileInfo = parsedTrackMediaInfo.get(flatPathArtifact.getFirst());
                 if (mediaFileInfo != null) {
                     MediaFile mediaFile = MediaFileMapper.fromMediaFileInfo(mediaFileInfo);
                     mediaFile.setArtifact(artifact);
                     mediaFile.setName(flatPathArtifact.getFirst().getFileName().toString());
 
-                    Composition composition = new Composition();
-                    composition.setArtifact(artifact);
-                    composition.setTitle(flatPathArtifact.getSecond().getSecond().getTitle());
-                    composition.setDiskNum(1L);
-                    composition.setNum(flatPathArtifact.getSecond().getSecond().getNumber());
-                    composition.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
+                    Track track = new Track();
+                    track.setArtifact(artifact);
+                    track.setTitle(flatPathArtifact.getSecond().getSecond().getTitle());
+                    track.setDiskNum(1L);
+                    track.setNum(flatPathArtifact.getSecond().getSecond().getNumber());
+                    track.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
 
-                    compositionService.insertCompositionWithMedia(composition, mediaFile);
+                    trackService.insertTrackWithMedia(track, mediaFile);
                     counter.getAndIncrement();
 
                     summary.duration += mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration();

@@ -1,11 +1,7 @@
 package com.romanpulov.odeonwss.dto;
 
-import java.util.Set;
-
-public class CompositionEditDTO {
+public class TrackTableDTO {
     private Long id;
-
-    private Long artifactId;
 
     private Long diskNum;
 
@@ -27,7 +23,11 @@ public class CompositionEditDTO {
 
     private Long duration;
 
-    private Set<Long> mediaFileIds;
+    private Long size;
+
+    private Long bitrate;
+
+    private String fileName;
 
     public Long getId() {
         return id;
@@ -35,14 +35,6 @@ public class CompositionEditDTO {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getArtifactId() {
-        return artifactId;
-    }
-
-    public void setArtifactId(Long artifactId) {
-        this.artifactId = artifactId;
     }
 
     public Long getDiskNum() {
@@ -61,16 +53,16 @@ public class CompositionEditDTO {
         this.num = num;
     }
 
+    public String getArtistName() {
+        return artistName;
+    }
+
     public Long getArtistId() {
         return artistId;
     }
 
     public void setArtistId(Long artistId) {
         this.artistId = artistId;
-    }
-
-    public String getArtistName() {
-        return artistName;
     }
 
     public void setArtistName(String artistName) {
@@ -125,17 +117,32 @@ public class CompositionEditDTO {
         this.duration = duration;
     }
 
-    public Set<Long> getMediaFileIds() {
-        return mediaFileIds;
+    public Long getSize() {
+        return size;
     }
 
-    public void setMediaFiles(Set<Long> mediaFileIds) {
-        this.mediaFileIds = mediaFileIds;
+    public void setSize(Long size) {
+        this.size = size;
     }
 
-    public CompositionEditDTO(Long id, Long artifactId, Long diskNum, Long num, Long artistId, String artistName, Long performerArtistId, String performerArtistName, Long dvTypeId, String dvTypeName, String title, Long duration, Set<Long> mediaFileIds) {
+    public Long getBitrate() {
+        return bitrate;
+    }
+
+    public void setBitrate(Long bitrate) {
+        this.bitrate = bitrate;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public TrackTableDTO(Long id, Long diskNum, Long num, Long artistId, String artistName, Long performerArtistId, String performerArtistName, Long dvTypeId, String dvTypeName, String title, Long duration, Long size, Long bitrate, String fileName) {
         this.id = id;
-        this.artifactId = artifactId;
         this.diskNum = diskNum;
         this.num = num;
         this.artistId = artistId;
@@ -146,17 +153,18 @@ public class CompositionEditDTO {
         this.dvTypeName = dvTypeName;
         this.title = title;
         this.duration = duration;
-        this.mediaFileIds = mediaFileIds;
+        this.size = size;
+        this.bitrate = bitrate;
+        this.fileName = fileName;
     }
 
-    public CompositionEditDTO() {
+    public TrackTableDTO() {
     }
 
     @Override
     public String toString() {
-        return "CompositionEditDTO{" +
+        return "TrackTableDTO{" +
                 "id=" + id +
-                ", artifactId=" + artifactId +
                 ", diskNum=" + diskNum +
                 ", num=" + num +
                 ", artistId=" + artistId +
@@ -167,7 +175,9 @@ public class CompositionEditDTO {
                 ", dvTypeName='" + dvTypeName + '\'' +
                 ", title='" + title + '\'' +
                 ", duration=" + duration +
-                ", mediaFileIds=" + mediaFileIds +
+                ", size=" + size +
+                ", bitrate=" + bitrate +
+                ", fileName='" + fileName + '\'' +
                 '}';
     }
 }

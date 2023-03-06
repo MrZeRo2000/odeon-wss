@@ -4,23 +4,23 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Table(name = "compositions_media_files")
-public class CompositionMediaFile {
+@Table(name = "tracks_media_files")
+public class TrackMediaFile {
     @Id
     @Column(name = "mdfl_id")
     private Long mediaFileId;
 
 
-    @Column(name = "comp_id")
-    private Long compositionId;
+    @Column(name = "trck_id")
+    private Long trackId;
 
 
-    public Long getCompositionId() {
-        return compositionId;
+    public Long getTrackId() {
+        return trackId;
     }
 
-    public void setCompositionId(Long compositionId) {
-        this.compositionId = compositionId;
+    public void setTrackId(Long trackId) {
+        this.trackId = trackId;
     }
 
     public Long getMediaFileId() {
@@ -35,19 +35,19 @@ public class CompositionMediaFile {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CompositionMediaFile that = (CompositionMediaFile) o;
-        return compositionId.equals(that.compositionId) && mediaFileId.equals(that.mediaFileId);
+        TrackMediaFile that = (TrackMediaFile) o;
+        return trackId.equals(that.trackId) && mediaFileId.equals(that.mediaFileId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(compositionId, mediaFileId);
+        return Objects.hash(trackId, mediaFileId);
     }
 
     @Override
     public String toString() {
-        return "CompositionMediaFile{" +
-                "compositionId=" + compositionId +
+        return "TrackMediaFile{" +
+                "trackId=" + trackId +
                 ", mediaFileId=" + mediaFileId +
                 '}';
     }

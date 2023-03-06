@@ -8,10 +8,10 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "compositions")
-@AttributeOverride(name = "id", column = @Column(name = "comp_id"))
-@AttributeOverride(name = "migrationId", column = @Column(name = "comp_migration_id"))
-public class Composition extends AbstractBaseMigratedEntity {
+@Table(name = "tracks")
+@AttributeOverride(name = "id", column = @Column(name = "trck_id"))
+@AttributeOverride(name = "migrationId", column = @Column(name = "trck_migration_id"))
+public class Track extends AbstractBaseMigratedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artf_id", referencedColumnName = "artf_id")
     @NotNull
@@ -67,7 +67,7 @@ public class Composition extends AbstractBaseMigratedEntity {
         this.dvType = dvType;
     }
 
-    @Column(name = "comp_title")
+    @Column(name = "trck_title")
     @NotNull
     private String title;
 
@@ -79,7 +79,7 @@ public class Composition extends AbstractBaseMigratedEntity {
         this.title = title;
     }
 
-    @Column(name = "comp_duration")
+    @Column(name = "trck_duration")
     @Nullable
     private Long duration;
 
@@ -92,7 +92,7 @@ public class Composition extends AbstractBaseMigratedEntity {
         this.duration = duration;
     }
 
-    @Column(name = "comp_disk_num")
+    @Column(name = "trck_disk_num")
     @Nullable
     private Long diskNum;
 
@@ -105,7 +105,7 @@ public class Composition extends AbstractBaseMigratedEntity {
         this.diskNum = diskNum;
     }
 
-    @Column(name = "comp_num")
+    @Column(name = "trck_num")
     @Nullable
     private Long num;
 
@@ -119,8 +119,8 @@ public class Composition extends AbstractBaseMigratedEntity {
     }
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
-    @JoinTable(name = "compositions_media_files",
-            joinColumns = @JoinColumn(name = "comp_id"),
+    @JoinTable(name = "tracks_media_files",
+            joinColumns = @JoinColumn(name = "trck_id"),
             inverseJoinColumns = @JoinColumn(name = "mdfl_id")
     )
     private Set<MediaFile> mediaFiles = new HashSet<>();
@@ -134,8 +134,8 @@ public class Composition extends AbstractBaseMigratedEntity {
     }
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
-    @JoinTable(name = "compositions_dv_products",
-            joinColumns = @JoinColumn(name = "comp_id"),
+    @JoinTable(name = "tracks_dv_products",
+            joinColumns = @JoinColumn(name = "trck_id"),
             inverseJoinColumns = @JoinColumn(name = "dvpd_id")
     )
     private Set<DVProduct> dvProducts = new HashSet<>();
@@ -152,7 +152,7 @@ public class Composition extends AbstractBaseMigratedEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Composition that = (Composition) o;
+        Track that = (Track) o;
         return getId().equals(that.getId());
     }
 
@@ -163,7 +163,7 @@ public class Composition extends AbstractBaseMigratedEntity {
 
     @Override
     public String toString() {
-        return "Composition{" +
+        return "Track{" +
                 "id=" + getId() +
                 ", artifact=" + artifact +
                 ", title='" + title + '\'' +

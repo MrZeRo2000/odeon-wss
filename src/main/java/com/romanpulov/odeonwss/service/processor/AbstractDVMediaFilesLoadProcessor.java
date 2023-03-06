@@ -2,10 +2,10 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Composition;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
@@ -27,7 +27,7 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
 
     private final ArtifactRepository artifactRepository;
 
-    private final CompositionRepository compositionRepository;
+    private final TrackRepository trackRepository;
 
     private final MediaFileRepository mediaFileRepository;
 
@@ -36,13 +36,13 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
     public AbstractDVMediaFilesLoadProcessor(
             ArtifactType artifactType,
             ArtifactRepository artifactRepository,
-            CompositionRepository compositionRepository,
+            TrackRepository trackRepository,
             MediaFileRepository mediaFileRepository,
             MediaParser mediaParser
     ) {
         this.artifactType = artifactType;
         this.artifactRepository = artifactRepository;
-        this.compositionRepository = compositionRepository;
+        this.trackRepository = trackRepository;
         this.mediaFileRepository = mediaFileRepository;
         this.mediaParser = mediaParser;
     }
@@ -77,10 +77,10 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
 
         // update media files
         for (MediaFile emptyMediaFile: emptyMediaFiles) {
-            Path compositionPath = Paths.get(rootMediaPath, emptyMediaFile.getArtifact().getTitle(), emptyMediaFile.getName());
-            if (Files.exists(compositionPath)) {
+            Path trackPath = Paths.get(rootMediaPath, emptyMediaFile.getArtifact().getTitle(), emptyMediaFile.getName());
+            if (Files.exists(trackPath)) {
                 try {
-                    MediaFileInfo mediaFileInfo = mediaParser.parseComposition(compositionPath);
+                    MediaFileInfo mediaFileInfo = mediaParser.parseTrack(trackPath);
                     //MediaFile getMediaFile = mediaFileRepository.findById(emptyMediaFile.getId()).orElseThrow();
 
                     emptyMediaFile.setSize(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
@@ -96,7 +96,7 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
 
                     counter.getAndIncrement();
                 } catch (MediaFileInfoException e) {
-                    errorHandler(ERROR_PARSING_FILE, compositionPath.toAbsolutePath().toString());
+                    errorHandler(ERROR_PARSING_FILE, trackPath.toAbsolutePath().toString());
                 }
             }
         }
@@ -119,15 +119,15 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
         }
     }
 
-    protected void updateCompositionsDuration(Map<Artifact, SizeDuration> artifactSizeDurationMap) {
+    protected void updateTracksDuration(Map<Artifact, SizeDuration> artifactSizeDurationMap) {
         artifactSizeDurationMap.keySet().forEach(artifact -> {
-            List<Composition> compositions =
-                    artifactRepository.getByIdsWithCompositions(artifact.getId()).orElseThrow().getCompositions();
-            if (compositions.size() == 1) {
-                Composition composition = compositions.get(0);
-                composition.setDuration(artifact.getDuration());
+            List<Track> tracks =
+                    artifactRepository.getByIdsWithTracks(artifact.getId()).orElseThrow().getTracks();
+            if (tracks.size() == 1) {
+                Track track = tracks.get(0);
+                track.setDuration(artifact.getDuration());
 
-                compositionRepository.save(composition);
+                trackRepository.save(track);
             }
         });
     }

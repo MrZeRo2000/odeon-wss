@@ -3,9 +3,9 @@ package com.romanpulov.odeonwss.service;
 import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Composition;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.ValueValidator;
 import com.romanpulov.odeonwss.service.processor.model.ProcessDetailInfo;
@@ -41,7 +41,7 @@ public class ServiceProcessLoadMoviesDVTest {
     @Autowired
     private ArtifactRepository artifactRepository;
     @Autowired
-    private CompositionRepository compositionRepository;
+    private TrackRepository trackRepository;
     @Autowired
     private MediaFileRepository mediaFileRepository;
 
@@ -86,7 +86,7 @@ public class ServiceProcessLoadMoviesDVTest {
                 processService.getProcessInfo().getProcessDetails().get(1)
         );
         Assertions.assertEquals(
-                new ProcessDetail(ProcessDetailInfo.fromMessage("Compositions loaded"), ProcessingStatus.INFO, 3, null),
+                new ProcessDetail(ProcessDetailInfo.fromMessage("Tracks loaded"), ProcessingStatus.INFO, 3, null),
                 processService.getProcessInfo().getProcessDetails().get(2)
         );
         Assertions.assertEquals(
@@ -94,9 +94,9 @@ public class ServiceProcessLoadMoviesDVTest {
                 processService.getProcessInfo().getProcessDetails().get(3)
         );
 
-        compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE).forEach(c -> {
-            Composition productsComposition = compositionRepository.findByIdWithProducts(c.getId()).orElseThrow();
-            Assertions.assertEquals(1, productsComposition.getDvProducts().size());
+        trackRepository.getTracksByArtifactType(ARTIFACT_TYPE).forEach(c -> {
+            Track productsTrack = trackRepository.findByIdWithProducts(c.getId()).orElseThrow();
+            Assertions.assertEquals(1, productsTrack.getDvProducts().size());
         });
     }
 
@@ -107,13 +107,13 @@ public class ServiceProcessLoadMoviesDVTest {
         int oldArtifacts = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE).size();
         Assertions.assertTrue(oldArtifacts > 0);
 
-        int oldCompositions = compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE).size();
-        Assertions.assertTrue(oldCompositions > 0);
-        Assertions.assertEquals(oldArtifacts, oldCompositions);
+        int oldTracks = trackRepository.getTracksByArtifactType(ARTIFACT_TYPE).size();
+        Assertions.assertTrue(oldTracks > 0);
+        Assertions.assertEquals(oldArtifacts, oldTracks);
 
         int oldMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE).size();
         Assertions.assertTrue(oldMediaFiles > 0);
-        Assertions.assertTrue(oldMediaFiles >= oldCompositions);
+        Assertions.assertTrue(oldMediaFiles >= oldTracks);
 
         processService.executeProcessor(PROCESSOR_TYPE);
 
@@ -123,7 +123,7 @@ public class ServiceProcessLoadMoviesDVTest {
                 processService.getProcessInfo().getProcessDetails().get(1)
         );
         Assertions.assertEquals(
-                new ProcessDetail(ProcessDetailInfo.fromMessage("Compositions loaded"), ProcessingStatus.INFO, 0, null),
+                new ProcessDetail(ProcessDetailInfo.fromMessage("Tracks loaded"), ProcessingStatus.INFO, 0, null),
                 processService.getProcessInfo().getProcessDetails().get(2)
         );
         Assertions.assertEquals(
@@ -131,16 +131,16 @@ public class ServiceProcessLoadMoviesDVTest {
                 processService.getProcessInfo().getProcessDetails().get(3)
         );
 
-        compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE).forEach(c -> {
-            Composition composition = compositionRepository.findByIdWithProducts(c.getId()).orElseThrow();
-            Assertions.assertEquals(1, composition.getDvProducts().size());
+        trackRepository.getTracksByArtifactType(ARTIFACT_TYPE).forEach(c -> {
+            Track track = trackRepository.findByIdWithProducts(c.getId()).orElseThrow();
+            Assertions.assertEquals(1, track.getDvProducts().size());
         });
 
         int newArtifacts = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE).size();
         Assertions.assertEquals(oldArtifacts, newArtifacts);
 
-        int newCompositions = compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE).size();
-        Assertions.assertEquals(oldCompositions, newCompositions);
+        int newTracks = trackRepository.getTracksByArtifactType(ARTIFACT_TYPE).size();
+        Assertions.assertEquals(oldTracks, newTracks);
 
         int newMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE).size();
         Assertions.assertEquals(oldMediaFiles, newMediaFiles);
@@ -150,16 +150,16 @@ public class ServiceProcessLoadMoviesDVTest {
     @Order(5)
     @Rollback(value = true)
     void testSizeDuration() {
-        artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)
+        artifactRepository.getAllByArtifactTypeWithTracks(ARTIFACT_TYPE)
                 .forEach(artifact -> {
                     Assertions.assertFalse(ValueValidator.isEmpty(artifact.getSize()));
                     Assertions.assertFalse(ValueValidator.isEmpty(artifact.getDuration()));
 
-                    Assertions.assertEquals(artifact.getDuration(), artifact.getCompositions().get(0).getDuration());
+                    Assertions.assertEquals(artifact.getDuration(), artifact.getTracks().get(0).getDuration());
                 });
-        compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE)
-                .forEach(composition -> {
-                    Assertions.assertFalse(ValueValidator.isEmpty(composition.getDuration()));
+        trackRepository.getTracksByArtifactType(ARTIFACT_TYPE)
+                .forEach(track -> {
+                    Assertions.assertFalse(ValueValidator.isEmpty(track.getDuration()));
                 });
     }
 }

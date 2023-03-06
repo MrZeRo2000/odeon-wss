@@ -4,7 +4,7 @@ import com.healthmarketscience.jackcess.Row;
 import com.healthmarketscience.jackcess.Table;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
-import com.romanpulov.odeonwss.service.CompositionService;
+import com.romanpulov.odeonwss.service.TrackService;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -22,9 +22,9 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private final ArtifactRepository artifactRepository;
 
-    private final CompositionRepository compositionRepository;
+    private final TrackRepository trackRepository;
 
-    private final CompositionService compositionService;
+    private final TrackService trackService;
 
     private final MediaFileRepository mediaFileRepository;
 
@@ -39,15 +39,15 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
     public DVMusicMDBImportProcessor(
             ArtistRepository artistRepository,
             ArtifactRepository artifactRepository,
-            CompositionRepository compositionRepository,
-            CompositionService compositionService,
+            TrackRepository trackRepository,
+            TrackService trackService,
             MediaFileRepository mediaFileRepository,
             DVTypeRepository dvTypeRepository
     ) {
         this.artistRepository = artistRepository;
         this.artifactRepository = artifactRepository;
-        this.compositionRepository = compositionRepository;
-        this.compositionService = compositionService;
+        this.trackRepository = trackRepository;
+        this.trackService = trackService;
         this.mediaFileRepository = mediaFileRepository;
         this.dvTypeRepository = dvTypeRepository;
     }
@@ -59,7 +59,7 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
         }
 
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_IMPORTED, importArtifacts(mdbReader));
-        infoHandler(ProcessorMessages.INFO_COMPOSITIONS_IMPORTED, importCompositionsAndMediaFiles(mdbReader));
+        infoHandler(ProcessorMessages.INFO_COMPOSITIONS_IMPORTED, importTracksAndMediaFiles(mdbReader));
     }
 
     private static class DVDet {
@@ -120,8 +120,8 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
                     return newArtifact;
                 });
 
-                int compositionsSize = compositionRepository.findAllByArtifact(artifact).size();
-                if (compositionsSize == 0) {
+                int tracksSize = trackRepository.findAllByArtifact(artifact).size();
+                if (tracksSize == 0) {
                     dvContArtifactMap.put(row.getInt(DVCONT_ID_COLUMN_NAME), artifact);
                 }
             }
@@ -130,7 +130,7 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
         return counter.get();
     }
 
-    public int importCompositionsAndMediaFiles(MDBReader mdbReader)
+    public int importTracksAndMediaFiles(MDBReader mdbReader)
             throws ProcessorException {
         AtomicInteger counter = new AtomicInteger(0);
         Map<Integer, List<DVDet>> dvDetMap = loadDVDetMap(mdbReader);
@@ -144,14 +144,14 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
             long compNum = 0;
 
             for (DVDet dvDet: dvDetList) {
-                Composition composition = new Composition();
+                Track track = new Track();
 
-                composition.setArtifact(artifact);
-                composition.setArtist(dvDet.artist);
-                composition.setTitle(dvDet.title);
-                composition.setDvType(dvTypeMap.get((long)dvDet.videoTypeId));
+                track.setArtifact(artifact);
+                track.setArtist(dvDet.artist);
+                track.setTitle(dvDet.title);
+                track.setDvType(dvTypeMap.get((long)dvDet.videoTypeId));
 
-                composition.setNum(++compNum);
+                track.setNum(++compNum);
 
                 MediaFile mediaFile = mediaFileRepository.findFirstByArtifactAndName(
                         artifact,
@@ -167,7 +167,7 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
                     return newMediaFile;
                 });
 
-                compositionService.insertCompositionWithMedia(composition, mediaFile);
+                trackService.insertTrackWithMedia(track, mediaFile);
                 counter.getAndIncrement();
             }
         }

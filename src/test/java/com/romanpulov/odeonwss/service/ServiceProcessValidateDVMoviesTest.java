@@ -5,10 +5,10 @@ import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Composition;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
@@ -41,7 +41,7 @@ public class ServiceProcessValidateDVMoviesTest {
     private ArtifactRepository artifactRepository;
 
     @Autowired
-    private CompositionRepository compositionRepository;
+    private TrackRepository trackRepository;
     @Autowired
     private MediaFileRepository mediaFileRepository;
 
@@ -197,12 +197,12 @@ public class ServiceProcessValidateDVMoviesTest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInDbShouldFail() {
         this.internalPrepare();
-        Artifact artifact = artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)
+        Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(ARTIFACT_TYPE)
                 .stream()
                 .filter(a -> a.getTitle().equals("Крепкий орешек"))
                 .findFirst().orElseThrow();
-        Composition composition = compositionRepository
-                .findByIdWithMediaFiles(artifact.getCompositions().get(0).getId())
+        Track track = trackRepository
+                .findByIdWithMediaFiles(artifact.getTracks().get(0).getId())
                 .orElseThrow();
 
         MediaFile mediaFile = new MediaFile();
@@ -212,8 +212,8 @@ public class ServiceProcessValidateDVMoviesTest {
         mediaFile.setBitrate(245L);
         mediaFileRepository.save(mediaFile);
 
-        composition.getMediaFiles().add(mediaFile);
-        compositionRepository.save(composition);
+        track.getMediaFiles().add(mediaFile);
+        trackRepository.save(track);
 
         service.executeProcessor(PROCESSOR_TYPE);
 
@@ -235,17 +235,17 @@ public class ServiceProcessValidateDVMoviesTest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInFilesShouldFail() {
         this.internalPrepare();
-        Composition composition = compositionRepository
+        Track track = trackRepository
                 .findByIdWithMediaFiles(
-                        compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE)
+                        trackRepository.getTracksByArtifactType(ARTIFACT_TYPE)
                         .stream()
                         .filter(c -> c.getTitle().equals("Обыкновенное чудо"))
                         .findFirst()
                         .orElseThrow()
                         .getId()
                 ).orElseThrow();
-        composition.getMediaFiles().removeIf(m -> m.getName().equals("Part 2.avi"));
-        compositionRepository.save(composition);
+        track.getMediaFiles().removeIf(m -> m.getName().equals("Part 2.avi"));
+        trackRepository.save(track);
 
         service.executeProcessor(PROCESSOR_TYPE);
 

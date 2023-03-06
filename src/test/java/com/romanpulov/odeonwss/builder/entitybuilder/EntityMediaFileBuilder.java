@@ -2,7 +2,7 @@ package com.romanpulov.odeonwss.builder.entitybuilder;
 
 import com.romanpulov.odeonwss.builder.AbstractClassBuilder;
 import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.Composition;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
 
 public class EntityMediaFileBuilder extends AbstractClassBuilder<MediaFile> {

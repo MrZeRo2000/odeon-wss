@@ -5,7 +5,7 @@ import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class ServiceProcessMDBImportClassicsTest {
     ArtifactRepository artifactRepository;
 
     @Autowired
-    CompositionRepository compositionRepository;
+    TrackRepository trackRepository;
 
     private ProcessInfo executeProcessor() {
         service.executeProcessor(PROCESSOR_TYPE);
@@ -98,7 +98,7 @@ public class ServiceProcessMDBImportClassicsTest {
 
         assertThat(StreamSupport.stream(artistRepository.findAll().spliterator(), false).count()).isEqualTo(99);
         assertThat(artifactRepository.findAll().size()).isEqualTo(73);
-        assertThat(StreamSupport.stream(compositionRepository.findAll().spliterator(), false).count()).isEqualTo(157);
+        assertThat(StreamSupport.stream(trackRepository.findAll().spliterator(), false).count()).isEqualTo(157);
     }
 
     @Test
@@ -106,7 +106,7 @@ public class ServiceProcessMDBImportClassicsTest {
     void testRunSecondTime() {
         long artistCount = StreamSupport.stream(artistRepository.findAll().spliterator(), false).count();
         long artifactCount = artifactRepository.findAll().size();
-        long compositionCount = StreamSupport.stream(compositionRepository.findAll().spliterator(), false).count();
+        long trackCount = StreamSupport.stream(trackRepository.findAll().spliterator(), false).count();
 
         ProcessInfo pi = executeProcessor();
         List<ProcessDetail> processDetails = pi.getProcessDetails();
@@ -129,6 +129,6 @@ public class ServiceProcessMDBImportClassicsTest {
 
         assertThat(StreamSupport.stream(artistRepository.findAll().spliterator(), false).count()).isEqualTo(artistCount);
         assertThat(artifactRepository.findAll().size()).isEqualTo(artifactCount);
-        assertThat(StreamSupport.stream(compositionRepository.findAll().spliterator(), false).count()).isEqualTo(compositionCount);
+        assertThat(StreamSupport.stream(trackRepository.findAll().spliterator(), false).count()).isEqualTo(trackCount);
     }
 }

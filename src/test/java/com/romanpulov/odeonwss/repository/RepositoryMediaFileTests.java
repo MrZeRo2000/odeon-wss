@@ -6,7 +6,7 @@ import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityCompositionBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityTrackBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
 import com.romanpulov.odeonwss.view.IdNameView;
 import org.junit.jupiter.api.*;
@@ -30,7 +30,7 @@ public class RepositoryMediaFileTests {
     ArtifactRepository artifactRepository;
 
     @Autowired
-    CompositionRepository compositionRepository;
+    TrackRepository trackRepository;
 
     @Autowired
     MediaFileRepository mediaFileRepository;
@@ -66,15 +66,15 @@ public class RepositoryMediaFileTests {
                 .withMigrationId(230L)
                 .build();
 
-        Composition composition = new EntityCompositionBuilder()
+        Track track = new EntityTrackBuilder()
                 .withArtifact(artifact)
-                .withTitle("Composition title")
+                .withTitle("Track title")
                 .withNum(1L)
                 .withDiskNum(1L)
                 .withDuration(123456L)
                 .build();
 
-        compositionRepository.save(composition);
+        trackRepository.save(track);
 
         MediaFile savedMediaFile = mediaFileRepository.save(mediaFile);
         Assertions.assertNotNull(savedMediaFile.getId());
@@ -115,8 +115,8 @@ public class RepositoryMediaFileTests {
 
     @Test
     @Order(3)
-    void testCompositionValidation() {
-        List<MediaFileValidationDTO> mediaFileValidation = mediaFileRepository.getCompositionMediaFileValidationMusic(ArtistType.ARTIST, ArtifactType.withMP3());
+    void testTrackValidation() {
+        List<MediaFileValidationDTO> mediaFileValidation = mediaFileRepository.getTrackMediaFileValidationMusic(ArtistType.ARTIST, ArtifactType.withMP3());
         Assertions.assertEquals(1, mediaFileValidation.size());
     }
 

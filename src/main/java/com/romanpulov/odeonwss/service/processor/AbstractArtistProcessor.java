@@ -44,7 +44,7 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
             infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED, pathArtifacts.size());
 
             if (pathArtifacts.size() > 0) {
-                infoHandler(ProcessorMessages.INFO_COMPOSITIONS_LOADED, processCompositions(pathArtifacts));
+                infoHandler(ProcessorMessages.INFO_COMPOSITIONS_LOADED, processTracks(pathArtifacts));
             }
         }
     }
@@ -125,5 +125,5 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
         return result;
     }
 
-    protected abstract int processCompositions(List<Pair<Path, Artifact>> pathArtifacts) throws ProcessorException;
+    protected abstract int processTracks(List<Pair<Path, Artifact>> pathArtifacts) throws ProcessorException;
 }

@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class MediaFileValidationDTO extends CompositionValidationDTO {
+public class MediaFileValidationDTO extends TrackValidationDTO {
     private static final String FORMAT_DELIMITER = " >> ";
 
     private String mediaFileName;
@@ -30,8 +30,8 @@ public class MediaFileValidationDTO extends CompositionValidationDTO {
         this.mediaFileFormat = mediaFileFormat;
     }
 
-    public MediaFileValidationDTO(String artistName, String artifactTitle, Long artifactYear, Long compositionNum, String compositionTitle, String mediaFileName, String mediaFileFormat) {
-        super(artistName, artifactTitle, artifactYear, compositionNum, compositionTitle);
+    public MediaFileValidationDTO(String artistName, String artifactTitle, Long artifactYear, Long trackNum, String trackTitle, String mediaFileName, String mediaFileFormat) {
+        super(artistName, artifactTitle, artifactYear, trackNum, trackTitle);
         this.mediaFileName = mediaFileName;
         this.mediaFileFormat = mediaFileFormat;
     }
@@ -66,14 +66,14 @@ public class MediaFileValidationDTO extends CompositionValidationDTO {
                 .collect(Collectors.toSet());
     }
 
-    public static Set<String> getMusicCompositions(List<MediaFileValidationDTO> data) {
+    public static Set<String> getMusicTracks(List<MediaFileValidationDTO> data) {
         return data.stream()
                 .map(d ->
                 d.getArtistName() +
                         FORMAT_DELIMITER +
                         NamesParser.formatMusicArtifact(d.getArtifactYear(), d.getArtifactTitle()) +
                         FORMAT_DELIMITER +
-                        NamesParser.formatMusicCompositionWithFile(d.getCompositionNum(), d.getCompositionTitle(), d.getMediaFileName()))
+                        NamesParser.formatMusicTrackWithFile(d.getTrackNum(), d.getTrackTitle(), d.getMediaFileName()))
                 .collect(Collectors.toSet());
     }
 
@@ -97,8 +97,8 @@ public class MediaFileValidationDTO extends CompositionValidationDTO {
                 "artistName='" + getArtistName() + '\'' +
                 ", artifactTitle='" + getArtifactTitle() + '\'' +
                 ", artifactYear=" + getArtifactYear() +
-                ", compositionNum=" + getCompositionNum() +
-                ", compositionTitle='" + getCompositionTitle() + '\'' +
+                ", trackNum=" + getTrackNum() +
+                ", trackTitle='" + getTrackTitle() + '\'' +
                 ", mediaFileName='" + mediaFileName + '\'' +
                 ", mediaFileFormat='" + mediaFileFormat + '\'' +
                 '}';

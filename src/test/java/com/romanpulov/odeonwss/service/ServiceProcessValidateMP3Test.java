@@ -6,7 +6,7 @@ import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
@@ -33,7 +33,7 @@ public class ServiceProcessValidateMP3Test {
     ArtifactRepository artifactRepository;
 
     @Autowired
-    CompositionRepository compositionRepository;
+    TrackRepository trackRepository;
 
     @Autowired
     MediaFileRepository mediaFileRepository;
@@ -95,7 +95,7 @@ public class ServiceProcessValidateMP3Test {
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
-                                "Artists not in database or have no artifacts and compositions",
+                                "Artists not in database or have no artifacts and tracks",
                                 artistNames.stream().sorted().collect(Collectors.toList())),
                         ProcessingStatus.FAILURE,
                         null,
@@ -155,7 +155,7 @@ public class ServiceProcessValidateMP3Test {
 
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Compositions validated"),
+                        ProcessDetailInfo.fromMessage("Tracks validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -208,7 +208,7 @@ public class ServiceProcessValidateMP3Test {
         assertThat(processDetails.get(2)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
-                                "Artists not in files or have no artifacts and compositions",
+                                "Artists not in files or have no artifacts and tracks",
                                 List.of("Kosheen")),
                         ProcessingStatus.FAILURE,
                         null,
@@ -228,7 +228,7 @@ public class ServiceProcessValidateMP3Test {
         assertThat(processDetails.get(1)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
-                                "Artists not in files or have no artifacts and compositions",
+                                "Artists not in files or have no artifacts and tracks",
                                 List.of("Kosheen")),
                         ProcessingStatus.FAILURE,
                         null,
@@ -248,7 +248,7 @@ public class ServiceProcessValidateMP3Test {
         assertThat(processDetails.get(1)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
-                                "Artists not in database or have no artifacts and compositions",
+                                "Artists not in database or have no artifacts and tracks",
                                 List.of("Accept")),
                         ProcessingStatus.FAILURE,
                         null,
@@ -285,8 +285,8 @@ public class ServiceProcessValidateMP3Test {
 
     @Test
     @Order(8)
-    void testMissingFileCompositions() throws Exception {
-        service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/validation_mp3_missing_compositions/");
+    void testMissingFileTracks() throws Exception {
+        service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/validation_mp3_missing_tracks/");
         ProcessInfo pi = service.getProcessInfo();
         List<ProcessDetail> processDetails = pi.getProcessDetails();
 
@@ -312,7 +312,7 @@ public class ServiceProcessValidateMP3Test {
         assertThat(processDetails.get(id)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
-                                "Compositions not in files",
+                                "Tracks not in files",
                                 List.of(
                                         "Kosheen >> 2004 Kokopelli >> 02 - All In My Head (Radio Edit)",
                                         "Kosheen >> 2004 Kokopelli >> 03 - Crawling",
@@ -357,7 +357,7 @@ public class ServiceProcessValidateMP3Test {
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Compositions validated"),
+                        ProcessDetailInfo.fromMessage("Tracks validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -398,7 +398,7 @@ public class ServiceProcessValidateMP3Test {
         assertThat(processDetails.get(2)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
-                                "Artists not in files or have no artifacts and compositions",
+                                "Artists not in files or have no artifacts and tracks",
                                 artistNames),
                         ProcessingStatus.FAILURE,
                         null,
@@ -501,12 +501,12 @@ public class ServiceProcessValidateMP3Test {
     @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
     void testNewFileInDbShouldFail() {
         this.prepareInternal();
-        Artifact artifact = artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)
+        Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(ARTIFACT_TYPE)
                 .stream()
                 .filter(a -> a.getTitle().equals("Kokopelli") && !Objects.isNull(a.getYear()) && a.getYear().equals(2004L))
                 .findFirst().orElseThrow();
-        Composition composition = compositionRepository
-                .findByIdWithMediaFiles(artifact.getCompositions().get(0).getId())
+        Track track = trackRepository
+                .findByIdWithMediaFiles(artifact.getTracks().get(0).getId())
                 .orElseThrow();
 
         MediaFile mediaFile = new MediaFile();
@@ -516,8 +516,8 @@ public class ServiceProcessValidateMP3Test {
         mediaFile.setBitrate(320L);
         mediaFileRepository.save(mediaFile);
 
-        composition.getMediaFiles().add(mediaFile);
-        compositionRepository.save(composition);
+        track.getMediaFiles().add(mediaFile);
+        trackRepository.save(track);
 
         ProcessInfo pi = executeProcessor();
         List<ProcessDetail> processDetails = pi.getProcessDetails();

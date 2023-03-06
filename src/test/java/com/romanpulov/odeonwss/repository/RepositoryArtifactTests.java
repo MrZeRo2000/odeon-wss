@@ -5,7 +5,7 @@ import com.romanpulov.odeonwss.dto.ArtifactTableDTO;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityCompositionBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityTrackBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class RepositoryArtifactTests {
     ArtifactRepository artifactRepository;
 
     @Autowired
-    CompositionRepository compositionRepository;
+    TrackRepository trackRepository;
 
     @Autowired
     MediaFileRepository mediaFileRepository;
@@ -200,7 +200,7 @@ public class RepositoryArtifactTests {
         Artifact artifact = artifactRepository.findAll().iterator().next();
         Assertions.assertNotNull(artifact);
 
-        Composition composition = new EntityCompositionBuilder()
+        Track track = new EntityTrackBuilder()
                 .withArtifact(artifact)
                 .withTitle("Artifact title")
                 .withDiskNum(1L)
@@ -208,9 +208,9 @@ public class RepositoryArtifactTests {
                 .withDuration(12345L)
                 .build();
 
-        compositionRepository.save(composition);
+        trackRepository.save(track);
 
-        composition = new EntityCompositionBuilder()
+        track = new EntityTrackBuilder()
                 .withArtifact(artifact)
                 .withTitle("Artifact title 2")
                 .withDiskNum(1L)
@@ -218,9 +218,9 @@ public class RepositoryArtifactTests {
                 .withDuration(123458L)
                 .build();
 
-        compositionRepository.save(composition);
+        trackRepository.save(track);
 
-        Assertions.assertEquals(2, compositionRepository.findAllByArtifact(artifact).size());
+        Assertions.assertEquals(2, trackRepository.findAllByArtifact(artifact).size());
 
         //insert media file
         Assertions.assertEquals(0, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
@@ -236,8 +236,8 @@ public class RepositoryArtifactTests {
 
         artifactRepository.delete(artifact);
 
-        //compositions deleted
-        Assertions.assertEquals(0, compositionRepository.findAllByArtifact(artifact).size());
+        //tracks deleted
+        Assertions.assertEquals(0, trackRepository.findAllByArtifact(artifact).size());
 
         //media files deleted
         Assertions.assertEquals(0, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());

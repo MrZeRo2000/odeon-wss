@@ -122,14 +122,14 @@ public class Artifact extends AbstractBaseMigratedEntity {
     }
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "artifact", fetch = FetchType.LAZY)
-    private List<Composition> compositions;
+    private List<Track> tracks;
 
-    public List<Composition> getCompositions() {
-        return compositions;
+    public List<Track> getTracks() {
+        return tracks;
     }
 
-    public void setCompositions(List<Composition> compositions) {
-        this.compositions = compositions;
+    public void setTracks(List<Track> tracks) {
+        this.tracks = tracks;
     }
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "artifact", fetch = FetchType.LAZY)
@@ -159,7 +159,7 @@ public class Artifact extends AbstractBaseMigratedEntity {
                 ", duration=" + duration +
                 ", size=" + size +
                 ", insertDate=" + insertDate +
-                ", compositions=" + (Hibernate.isInitialized(compositions) ? compositions : "not initialized") +
+                ", tracks=" + (Hibernate.isInitialized(tracks) ? tracks : "not initialized") +
                 ", mediaFiles=" + (Hibernate.isInitialized(mediaFiles) ? mediaFiles : "not initialized") +
                 '}';
     }

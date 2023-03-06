@@ -25,15 +25,15 @@ public class MediaParser {
         this.mediaFileParser = mediaFileParser;
     }
 
-    public MediaFileInfo parseComposition(Path compositionPath) throws MediaFileInfoException {
-        return mediaFileParser.parseMediaFile(compositionPath);
+    public MediaFileInfo parseTrack(Path trackPath) throws MediaFileInfoException {
+        return mediaFileParser.parseMediaFile(trackPath);
     }
 
-    public Map<Path, MediaFileInfo> parseCompositions(List<Path> compositionPaths)
+    public Map<Path, MediaFileInfo> parseTracks(List<Path> trackPaths)
             throws ProcessorException {
         List<Callable<Pair<Path, MediaFileInfo>>> callables = new ArrayList<>();
 
-        for (Path path: compositionPaths) {
+        for (Path path: trackPaths) {
             Callable<Pair<Path, MediaFileInfo>> callable = () -> {
                 MediaFileInfo mediafileInfo = mediaFileParser.parseMediaFile(path);
                 return Pair.of(path, mediafileInfo);

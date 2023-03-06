@@ -1,36 +1,36 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.dto.CompositionTableDTO;
-import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
+import com.romanpulov.odeonwss.dto.TrackTableDTO;
+import com.romanpulov.odeonwss.dto.TrackValidationDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Composition;
+import com.romanpulov.odeonwss.entity.Track;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface CompositionRepository extends CrudRepository<Composition, Long> {
+public interface TrackRepository extends CrudRepository<Track, Long> {
 
-    @Query("SELECT c FROM Composition AS c LEFT JOIN FETCH c.dvProducts WHERE c.id = :id")
-    Optional<Composition> findByIdWithProducts(Long id);
+    @Query("SELECT c FROM Track AS c LEFT JOIN FETCH c.dvProducts WHERE c.id = :id")
+    Optional<Track> findByIdWithProducts(Long id);
 
-    @Query("SELECT c FROM Composition AS c LEFT JOIN FETCH c.mediaFiles WHERE c.id = :id")
-    Optional<Composition> findByIdWithMediaFiles(Long id);
+    @Query("SELECT c FROM Track AS c LEFT JOIN FETCH c.mediaFiles WHERE c.id = :id")
+    Optional<Track> findByIdWithMediaFiles(Long id);
 
-    List<Composition> findAllByArtifact(Artifact artifact);
+    List<Track> findAllByArtifact(Artifact artifact);
 
     @Query(
             "SELECT c " +
-            "FROM Composition c " +
+            "FROM Track c " +
             "INNER JOIN Artifact a ON c.artifact = a " +
             "WHERE a.artifactType=:artifactType"
     )
-    List<Composition> getCompositionsByArtifactType(ArtifactType artifactType);
+    List<Track> getTracksByArtifactType(ArtifactType artifactType);
 
     @Query("SELECT " +
-            "new com.romanpulov.odeonwss.dto.CompositionValidationDTO(" +
+            "new com.romanpulov.odeonwss.dto.TrackValidationDTO(" +
             "ar.name, " +
             "af.title, " +
             "af.year, " +
@@ -38,13 +38,13 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
             "c.title) " +
             "FROM Artist AS ar " +
             "INNER JOIN Artifact af ON af.artist = ar " +
-            "LEFT OUTER JOIN Composition c ON c.artifact = af " +
+            "LEFT OUTER JOIN Track c ON c.artifact = af " +
             "WHERE af.artifactType = ?1 " +
             "ORDER BY ar.name, af.year, af.title, c.num"
     )
-    List<CompositionValidationDTO> getCompositionValidationMusic(ArtifactType artifactType);
+    List<TrackValidationDTO> getTrackValidationMusic(ArtifactType artifactType);
 
-    @Query("SELECT new com.romanpulov.odeonwss.dto.CompositionTableDTO(" +
+    @Query("SELECT new com.romanpulov.odeonwss.dto.TrackTableDTO(" +
             "c.id, " +
             "c.diskNum, " +
             "c.num, " +
@@ -60,17 +60,17 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
             "m.bitrate, " +
             "m.name " +
             ") " +
-            "FROM Composition c " +
-            "LEFT OUTER JOIN CompositionMediaFile cm ON cm.compositionId = c.id " +
+            "FROM Track c " +
+            "LEFT OUTER JOIN TrackMediaFile cm ON cm.trackId = c.id " +
             "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
             "LEFT OUTER JOIN Artist ar ON ar = c.artist " +
             "LEFT OUTER JOIN Artist par ON par = c.performerArtist " +
             "LEFT OUTER JOIN DVType dvt ON dvt = c.dvType " +
             "WHERE c.artifact.id = :id " +
             "ORDER BY c.diskNum, c.num, ar.name, c.title")
-    List<CompositionTableDTO> getCompositionTableByArtifactId(Long id);
+    List<TrackTableDTO> getTrackTableByArtifactId(Long id);
 
-    @Query("SELECT new com.romanpulov.odeonwss.dto.CompositionTableDTO(" +
+    @Query("SELECT new com.romanpulov.odeonwss.dto.TrackTableDTO(" +
             "c.id, " +
             "c.diskNum, " +
             "c.num, " +
@@ -86,15 +86,15 @@ public interface CompositionRepository extends CrudRepository<Composition, Long>
             "m.bitrate, " +
             "m.name " +
             ") " +
-            "FROM Composition c " +
-            "LEFT OUTER JOIN CompositionMediaFile cm ON cm.compositionId = c.id " +
+            "FROM Track c " +
+            "LEFT OUTER JOIN TrackMediaFile cm ON cm.trackId = c.id " +
             "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
             "LEFT OUTER JOIN Artist ar ON ar = c.artist " +
             "LEFT OUTER JOIN Artist par ON par = c.performerArtist " +
             "LEFT OUTER JOIN DVType dvt ON dvt = c.dvType " +
             "WHERE c.artifact = :artifact " +
             "ORDER BY c.diskNum, c.num, ar.name, c.title")
-    List<CompositionTableDTO> getCompositionTableByArtifact(Artifact artifact);
+    List<TrackTableDTO> getTrackTableByArtifact(Artifact artifact);
 
-    Optional<Composition> findCompositionByArtifactAndTitle(Artifact artifact, String title);
+    Optional<Track> findTrackByArtifactAndTitle(Artifact artifact, String title);
 }

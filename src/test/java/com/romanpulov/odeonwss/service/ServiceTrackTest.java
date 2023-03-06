@@ -1,15 +1,15 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.builder.dtobuilder.CompositionEditDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.TrackEditDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
-import com.romanpulov.odeonwss.dto.CompositionEditDTO;
+import com.romanpulov.odeonwss.dto.TrackEditDTO;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ import java.util.stream.StreamSupport;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ServiceCompositionTest {
+public class ServiceTrackTest {
 
     @Autowired
     private ArtistRepository artistRepository;
@@ -41,10 +41,10 @@ public class ServiceCompositionTest {
     private ArtifactService artifactService;
 
     @Autowired
-    private CompositionService compositionService;
+    private TrackService trackService;
 
     @Autowired
-    private CompositionRepository compositionRepository;
+    private TrackRepository trackRepository;
 
     @Autowired
     private MediaFileRepository mediaFileRepository;
@@ -98,8 +98,8 @@ public class ServiceCompositionTest {
                         .build()
         );
 
-        CompositionEditDTO comp11 = compositionService.insert(
-            new CompositionEditDTOBuilder()
+        TrackEditDTO comp11 = trackService.insert(
+            new TrackEditDTOBuilder()
                     .withArtifactId(artifact1.getId())
                     .withArtistId(artist.getId())
                     .withPerformerArtistId(performerArtist.getId())
@@ -133,8 +133,8 @@ public class ServiceCompositionTest {
                         .build()
         );
 
-        CompositionEditDTO comp12 = compositionService.insert(
-                new CompositionEditDTOBuilder()
+        TrackEditDTO comp12 = trackService.insert(
+                new TrackEditDTOBuilder()
                         .withArtifactId(artifact1.getId())
                         .withTitle("Comp 1-2")
                         .withDiskNum(1L)
@@ -144,7 +144,7 @@ public class ServiceCompositionTest {
                         .build()
         );
 
-        Assertions.assertEquals(2, compositionService.getById(2L).getId());
+        Assertions.assertEquals(2, trackService.getById(2L).getId());
     }
 
     @Test
@@ -154,11 +154,11 @@ public class ServiceCompositionTest {
     void testRemoveMediaFile() throws Exception {
         Assertions.assertEquals(2, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
 
-        CompositionEditDTO dto = compositionService.getById(1L);
-        Assertions.assertEquals(1, compositionRepository.findById(1L).orElseThrow().getMediaFiles().size());
+        TrackEditDTO dto = trackService.getById(1L);
+        Assertions.assertEquals(1, trackRepository.findById(1L).orElseThrow().getMediaFiles().size());
 
         dto.getMediaFileIds().clear();
-        dto = compositionService.update(dto);
+        dto = trackService.update(dto);
 
         Assertions.assertEquals(0, dto.getMediaFileIds().size());
     }
@@ -169,8 +169,8 @@ public class ServiceCompositionTest {
     @Transactional
     @Rollback(value = false)
     void testInsertMediaFile() throws Exception {
-        Assertions.assertEquals(0, compositionRepository.findById(1L).orElseThrow().getMediaFiles().size());
-        CompositionEditDTO dto = compositionService.getById(1L);
+        Assertions.assertEquals(0, trackRepository.findById(1L).orElseThrow().getMediaFiles().size());
+        TrackEditDTO dto = trackService.getById(1L);
 
         MediaFile mediaFile = mediaFileRepository.save(
                 new EntityMediaFileBuilder()
@@ -184,18 +184,18 @@ public class ServiceCompositionTest {
         );
 
         dto.setMediaFiles(Set.of(mediaFile.getId()));
-        dto = compositionService.update(dto);
-        Assertions.assertEquals(1, compositionRepository.findById(1L).orElseThrow().getMediaFiles().size());
+        dto = trackService.update(dto);
+        Assertions.assertEquals(1, trackRepository.findById(1L).orElseThrow().getMediaFiles().size());
     }
     @Test
     @Order(4)
     void testDelete() throws Exception {
-        Assertions.assertThrows(CommonEntityNotFoundException.class, () -> compositionService.deleteById(5L));
+        Assertions.assertThrows(CommonEntityNotFoundException.class, () -> trackService.deleteById(5L));
 
-        Assertions.assertEquals(2, compositionRepository.findAllByArtifact(artifactRepository.findById(1L).orElseThrow()).size());
-        compositionService.deleteById(1L);
+        Assertions.assertEquals(2, trackRepository.findAllByArtifact(artifactRepository.findById(1L).orElseThrow()).size());
+        trackService.deleteById(1L);
         //TODO orphan deletion procedure
         //Assertions.assertEquals(1, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
-        Assertions.assertEquals(1, compositionRepository.findAllByArtifact(artifactRepository.findById(1L).orElseThrow()).size());
+        Assertions.assertEquals(1, trackRepository.findAllByArtifact(artifactRepository.findById(1L).orElseThrow()).size());
     }
 }

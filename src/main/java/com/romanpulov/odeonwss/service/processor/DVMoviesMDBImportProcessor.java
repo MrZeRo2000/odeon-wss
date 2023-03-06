@@ -30,7 +30,7 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private final ArtifactRepository artifactRepository;
 
-    private final CompositionRepository compositionRepository;
+    private final TrackRepository trackRepository;
 
     private final MediaFileRepository mediaFileRepository;
 
@@ -39,8 +39,8 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
     private Map<Long, DVType> dvTypeMap;
 
     private Map<Long, Artifact> artifacts;
-    private Map<String, Composition> compositions;
-    private Map<Long, Composition> contentCompositions;
+    private Map<String, Track> tracks;
+    private Map<Long, Track> contentTracks;
     private Map<Long, MediaFile> mediaFiles;
     private Map<Long, DVProduct> dvProducts;
 
@@ -48,14 +48,14 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
             DVTypeRepository dvTypeRepository,
             DVProductMDBImportProcessor dvProductMDBImportProcessor,
             ArtifactRepository artifactRepository,
-            CompositionRepository compositionRepository,
+            TrackRepository trackRepository,
             MediaFileRepository mediaFileRepository,
             DVProductRepository dvProductRepository
     ) {
         this.dvTypeRepository = dvTypeRepository;
         this.dvProductMDBImportProcessor = dvProductMDBImportProcessor;
         this.artifactRepository = artifactRepository;
-        this.compositionRepository = compositionRepository;
+        this.trackRepository = trackRepository;
         this.mediaFileRepository = mediaFileRepository;
         this.dvProductRepository = dvProductRepository;
     }
@@ -66,10 +66,10 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
             dvTypeMap = dvTypeRepository.findAllMap();
         }
         artifacts = artifactRepository.findAllByArtifactTypeMigrationIdMap(ARTIFACT_TYPE);
-        compositions = compositionRepository.getCompositionsByArtifactType(ARTIFACT_TYPE)
+        tracks = trackRepository.getTracksByArtifactType(ARTIFACT_TYPE)
                 .stream()
-                .collect(Collectors.toMap(Composition::getTitle, v-> v));
-        contentCompositions = new HashMap<>();
+                .collect(Collectors.toMap(Track::getTitle, v-> v));
+        contentTracks = new HashMap<>();
         mediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE)
                         .stream()
                         .collect(Collectors.toMap(MediaFile::getMigrationId, v ->v));
@@ -81,8 +81,8 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
         dvProducts = dvProductRepository.findAllMigrationIdMap();
 
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_IMPORTED, importArtifacts(mdbReader));
-        infoHandler(ProcessorMessages.INFO_COMPOSITIONS_IMPORTED, importCompositions(mdbReader));
-        infoHandler(ProcessorMessages.INFO_PRODUCTS_COMPOSITIONS_IMPORTED, importProductsCompositions(mdbReader));
+        infoHandler(ProcessorMessages.INFO_COMPOSITIONS_IMPORTED, importTracks(mdbReader));
+        infoHandler(ProcessorMessages.INFO_PRODUCTS_COMPOSITIONS_IMPORTED, importProductsTracks(mdbReader));
         infoHandler(ProcessorMessages.INFO_MEDIA_FILES_IMPORTED, importMediaFiles(mdbReader));
     }
 
@@ -115,7 +115,7 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
         return counter.get();
     }
 
-    public int importCompositions(MDBReader mdbReader) throws ProcessorException {
+    public int importTracks(MDBReader mdbReader) throws ProcessorException {
         Table table = mdbReader.getTable(DVDET_TABLE_NAME);
         AtomicInteger counter = new AtomicInteger(0);
 
@@ -125,22 +125,22 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
 
             if (this.artifacts.containsKey(contId)) {
                 String title = row.getString(TITLE_COLUMN_NAME);
-                Composition composition = this.compositions.get(title);
-                if (composition == null) {
-                    composition = new Composition();
-                    composition.setArtifact(this.artifacts.get(contId));
-                    composition.setTitle(row.getString(TITLE_COLUMN_NAME));
-                    composition.setDuration(0L);
-                    composition.setDvType(dvTypeMap.get(row.getInt(VIDEOTYPE_ID_COLUMN_NAME).longValue()));
-                    composition.setMigrationId(id);
+                Track track = this.tracks.get(title);
+                if (track == null) {
+                    track = new Track();
+                    track.setArtifact(this.artifacts.get(contId));
+                    track.setTitle(row.getString(TITLE_COLUMN_NAME));
+                    track.setDuration(0L);
+                    track.setDvType(dvTypeMap.get(row.getInt(VIDEOTYPE_ID_COLUMN_NAME).longValue()));
+                    track.setMigrationId(id);
 
-                    compositionRepository.save(composition);
-                    this.compositions.put(title, composition);
+                    trackRepository.save(track);
+                    this.tracks.put(title, track);
 
                     counter.getAndIncrement();
                 }
 
-                this.contentCompositions.put(id, composition);
+                this.contentTracks.put(id, track);
             }
         }
 
@@ -158,8 +158,8 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
             if (this.artifacts.containsKey(contId)) {
                 String title = row.getString(TITLE_COLUMN_NAME);
                 String fileName = row.getString(FILE_NAME_COLUMN_NAME);
-                Composition composition = this.compositions.get(title);
-                if ((composition != null) && !this.mediaFiles.containsKey(id)) {
+                Track track = this.tracks.get(title);
+                if ((track != null) && !this.mediaFiles.containsKey(id)) {
                     MediaFile mediaFile = new MediaFile();
                     mediaFile.setArtifact(artifacts.get(contId));
                     mediaFile.setName(fileName);
@@ -169,16 +169,16 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
 
                     mediaFileRepository.save(mediaFile);
 
-                    Set<MediaFile> mediaFiles = composition.getMediaFiles();
+                    Set<MediaFile> mediaFiles = track.getMediaFiles();
                     mediaFiles.add(mediaFile);
 
                     if (mediaFiles.size() > 1) {
-                        composition.setMediaFiles(new HashSet<>());
-                        compositionRepository.save(composition);
+                        track.setMediaFiles(new HashSet<>());
+                        trackRepository.save(track);
                     }
 
-                    composition.setMediaFiles(mediaFiles);
-                    compositionRepository.save(composition);
+                    track.setMediaFiles(mediaFiles);
+                    trackRepository.save(track);
 
                     counter.getAndIncrement();
                 }
@@ -188,34 +188,34 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
         return counter.get();
     }
 
-    public int importProductsCompositions(MDBReader mdbReader) throws ProcessorException {
+    public int importProductsTracks(MDBReader mdbReader) throws ProcessorException {
         Table table = mdbReader.getTable(PRODUCT_DVDET_TABLE_NAME);
 
-        Set<Composition> savedCompositions = new HashSet<>();
+        Set<Track> savedTracks = new HashSet<>();
 
         for (Row row: table) {
             long id = row.getInt(DVDET_ID_COLUMN_NAME);
             long productId = row.getInt(VPRODUCT_ID_COLUMN_NAME);
             log.info(String.format("Loading %s DVDetId=%d, VProductId=%d", PRODUCT_DVDET_TABLE_NAME, id, productId));
 
-            Composition composition = null;
-            if (this.contentCompositions.containsKey(id)) {
-                composition = compositionRepository.findByIdWithProducts(this.contentCompositions.get(id).getId()).orElse(null);
+            Track track = null;
+            if (this.contentTracks.containsKey(id)) {
+                track = trackRepository.findByIdWithProducts(this.contentTracks.get(id).getId()).orElse(null);
             }
             DVProduct dvProduct = this.dvProducts.get(productId);
 
             if (
-                    (composition != null)
+                    (track != null)
                             && (dvProduct != null)
-                            && (!savedCompositions.contains(composition))
-                            && (composition.getDvProducts().size() == 0)) {
-                composition.getDvProducts().add(dvProduct);
-                compositionRepository.save(composition);
+                            && (!savedTracks.contains(track))
+                            && (track.getDvProducts().size() == 0)) {
+                track.getDvProducts().add(dvProduct);
+                trackRepository.save(track);
 
-                savedCompositions.add(composition);
+                savedTracks.add(track);
             }
         }
 
-        return savedCompositions.size();
+        return savedTracks.size();
     }
 }

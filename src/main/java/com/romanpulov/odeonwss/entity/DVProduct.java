@@ -123,14 +123,14 @@ public class DVProduct extends AbstractBaseMigratedEntity {
     }
 
     @ManyToMany(mappedBy = "dvProducts")
-    private Set<Composition> compositions = new HashSet<>();
+    private Set<Track> tracks = new HashSet<>();
 
-    public Set<Composition> getCompositions() {
-        return compositions;
+    public Set<Track> getTracks() {
+        return tracks;
     }
 
-    public void setCompositions(Set<Composition> compositions) {
-        this.compositions = compositions;
+    public void setTracks(Set<Track> tracks) {
+        this.tracks = tracks;
     }
 
     public DVProduct() {

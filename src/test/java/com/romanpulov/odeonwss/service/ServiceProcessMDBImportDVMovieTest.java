@@ -2,9 +2,9 @@ package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Composition;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
@@ -30,7 +30,7 @@ public class ServiceProcessMDBImportDVMovieTest {
     ArtifactRepository artifactRepository;
 
     @Autowired
-    CompositionRepository compositionRepository;
+    TrackRepository trackRepository;
 
     @Autowired
     MediaFileRepository mediaFileRepository;
@@ -70,11 +70,11 @@ public class ServiceProcessMDBImportDVMovieTest {
         assertThat(processDetails.get(3).getInfo().getMessage()).isEqualTo("Artifacts imported");
         assertThat(processDetails.get(3).getRows()).isGreaterThan(0);
 
-        assertThat(processDetails.get(4).getInfo().getMessage()).isEqualTo("Compositions imported");
+        assertThat(processDetails.get(4).getInfo().getMessage()).isEqualTo("Tracks imported");
         assertThat(processDetails.get(4).getRows()).isGreaterThan(0);
         assertThat(processDetails.get(4).getRows()).isEqualTo(processDetails.get(3).getRows());
 
-        assertThat(processDetails.get(5).getInfo().getMessage()).isEqualTo("Products for compositions imported");
+        assertThat(processDetails.get(5).getInfo().getMessage()).isEqualTo("Products for tracks imported");
         assertThat(processDetails.get(5).getRows()).isGreaterThan(0);
 
         assertThat(processDetails.get(6).getInfo().getMessage()).isEqualTo("Media files imported");
@@ -94,14 +94,14 @@ public class ServiceProcessMDBImportDVMovieTest {
     @Order(2)
     void testImportDVMovieRepeated() {
         int oldArtifacts = artifactRepository.getAllByArtifactType(ArtifactType.withDVMovies()).size();
-        int oldCompositions = compositionRepository.getCompositionsByArtifactType(ArtifactType.withDVMovies()).size();
+        int oldTracks = trackRepository.getTracksByArtifactType(ArtifactType.withDVMovies()).size();
         int oldMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ArtifactType.withDVMovies()).size();
 
         assertThat(oldArtifacts).isGreaterThan(0);
-        assertThat(oldCompositions).isGreaterThan(0);
+        assertThat(oldTracks).isGreaterThan(0);
         assertThat(oldMediaFiles).isGreaterThan(0);
-        assertThat(oldCompositions).isEqualTo(oldArtifacts);
-        assertThat(oldMediaFiles).isGreaterThanOrEqualTo(oldCompositions);
+        assertThat(oldTracks).isEqualTo(oldArtifacts);
+        assertThat(oldMediaFiles).isGreaterThanOrEqualTo(oldTracks);
 
         ProcessInfo pi = executeProcessor();
         List<ProcessDetail> processDetails = pi.getProcessDetails();
@@ -116,22 +116,22 @@ public class ServiceProcessMDBImportDVMovieTest {
         assertThat(processDetails.get(6).getRows()).isEqualTo(0);
 
         int newArtifacts = artifactRepository.getAllByArtifactType(ArtifactType.withDVMovies()).size();
-        int newCompositions = compositionRepository.getCompositionsByArtifactType(ArtifactType.withDVMovies()).size();
+        int newTracks = trackRepository.getTracksByArtifactType(ArtifactType.withDVMovies()).size();
         int newMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ArtifactType.withDVMovies()).size();
 
         assertThat(newArtifacts).isEqualTo(oldArtifacts);
-        assertThat(newCompositions).isEqualTo(oldCompositions);
+        assertThat(newTracks).isEqualTo(oldTracks);
         assertThat(newMediaFiles).isEqualTo(oldMediaFiles);
-        assertThat(newCompositions).isEqualTo(oldCompositions);
+        assertThat(newTracks).isEqualTo(oldTracks);
     }
 
     @Test
     @Order(3)
     void testProductsForAll() {
-        compositionRepository.getCompositionsByArtifactType(ArtifactType.withDVMovies()).forEach(
+        trackRepository.getTracksByArtifactType(ArtifactType.withDVMovies()).forEach(
                 c -> {
-                    Composition composition = compositionRepository.findByIdWithProducts(c.getId()).orElseThrow();
-                    assertThat(composition.getDvProducts().size()).isEqualTo(1);
+                    Track track = trackRepository.findByIdWithProducts(c.getId()).orElseThrow();
+                    assertThat(track.getDvProducts().size()).isEqualTo(1);
                 }
         );
     }

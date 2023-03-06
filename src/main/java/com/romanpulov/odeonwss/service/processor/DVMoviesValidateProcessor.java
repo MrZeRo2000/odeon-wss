@@ -25,7 +25,7 @@ public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {
     public void execute() throws ProcessorException {
         Path path = validateAndGetPath();
 
-        List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getCompositionMediaFileValidationDV(
+        List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getTrackMediaFileValidationDV(
                 ARTIFACT_TYPE);
         logger.info("dbValidation:" + dbValidation);
 

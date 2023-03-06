@@ -45,33 +45,33 @@ public class UnitNamesParserTest {
     }
 
     @Test
-    void testMusicCompositionValidator() {
-        Assertions.assertTrue(NamesParser.validateMusicComposition("02 - Title.mp3"));
-        Assertions.assertTrue(NamesParser.validateMusicComposition("21 - Title can be long.flac"));
+    void testMusicTrackValidator() {
+        Assertions.assertTrue(NamesParser.validateMusicTrack("02 - Title.mp3"));
+        Assertions.assertTrue(NamesParser.validateMusicTrack("21 - Title can be long.flac"));
 
-        Assertions.assertFalse(NamesParser.validateMusicComposition("1980 Title"));
-        Assertions.assertFalse(NamesParser.validateMusicComposition(" 02 - Title"));
-        Assertions.assertFalse(NamesParser.validateMusicComposition("02  - Title"));
-        Assertions.assertFalse(NamesParser.validateMusicComposition("02- Title"));
-        Assertions.assertFalse(NamesParser.validateMusicComposition("02 -Title"));
-        Assertions.assertFalse(NamesParser.validateMusicComposition("02 -  Title"));
-        Assertions.assertFalse(NamesParser.validateMusicComposition("102 -  Title"));
-        Assertions.assertFalse(NamesParser.validateMusicComposition("d2 - Title"));
-        Assertions.assertFalse(NamesParser.validateMusicComposition("02 - Title"));
+        Assertions.assertFalse(NamesParser.validateMusicTrack("1980 Title"));
+        Assertions.assertFalse(NamesParser.validateMusicTrack(" 02 - Title"));
+        Assertions.assertFalse(NamesParser.validateMusicTrack("02  - Title"));
+        Assertions.assertFalse(NamesParser.validateMusicTrack("02- Title"));
+        Assertions.assertFalse(NamesParser.validateMusicTrack("02 -Title"));
+        Assertions.assertFalse(NamesParser.validateMusicTrack("02 -  Title"));
+        Assertions.assertFalse(NamesParser.validateMusicTrack("102 -  Title"));
+        Assertions.assertFalse(NamesParser.validateMusicTrack("d2 - Title"));
+        Assertions.assertFalse(NamesParser.validateMusicTrack("02 - Title"));
     }
 
     @Test
-    void testMusicCompositionParser() {
+    void testMusicTrackParser() {
         NamesParser.NumberTitle nt;
-        nt = NamesParser.parseMusicComposition("02 - Title.mp3");
+        nt = NamesParser.parseMusicTrack("02 - Title.mp3");
         Assertions.assertNotNull(nt);
         Assertions.assertEquals(2, nt.getNumber());
         Assertions.assertEquals("Title", nt.getTitle());
 
-        Assertions.assertNull(NamesParser.parseMusicComposition("02  - Title"));
-        Assertions.assertNull(NamesParser.parseMusicComposition("t2 - Title"));
+        Assertions.assertNull(NamesParser.parseMusicTrack("02  - Title"));
+        Assertions.assertNull(NamesParser.parseMusicTrack("t2 - Title"));
 
-        nt = NamesParser.parseMusicComposition("22 - Title. Can have dots.mp3");
+        nt = NamesParser.parseMusicTrack("22 - Title. Can have dots.mp3");
         Assertions.assertNotNull(nt);
         Assertions.assertEquals(22, nt.getNumber());
         Assertions.assertEquals("Title. Can have dots", nt.getTitle());

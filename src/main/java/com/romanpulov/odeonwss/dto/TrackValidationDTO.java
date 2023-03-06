@@ -2,7 +2,7 @@ package com.romanpulov.odeonwss.dto;
 
 import java.util.Objects;
 
-public class CompositionValidationDTO {
+public class TrackValidationDTO {
     private String artistName;
 
     public String getArtistName() {
@@ -33,57 +33,57 @@ public class CompositionValidationDTO {
         this.artifactYear = artifactYear;
     }
 
-    private Long compositionNum;
+    private Long trackNum;
 
-    public Long getCompositionNum() {
-        return compositionNum;
+    public Long getTrackNum() {
+        return trackNum;
     }
 
-    public void setCompositionNum(Long compositionNum) {
-        this.compositionNum = compositionNum;
+    public void setTrackNum(Long trackNum) {
+        this.trackNum = trackNum;
     }
 
-    private String compositionTitle;
+    private String trackTitle;
 
-    public String getCompositionTitle() {
-        return compositionTitle;
+    public String getTrackTitle() {
+        return trackTitle;
     }
 
-    public void setCompositionTitle(String compositionTitle) {
-        this.compositionTitle = compositionTitle;
+    public void setTrackTitle(String trackTitle) {
+        this.trackTitle = trackTitle;
     }
 
-    public CompositionValidationDTO(String artistName, String artifactTitle, Long artifactYear, Long compositionNum, String compositionTitle) {
+    public TrackValidationDTO(String artistName, String artifactTitle, Long artifactYear, Long trackNum, String trackTitle) {
         this.artistName = artistName;
         this.artifactTitle = artifactTitle;
         this.artifactYear = artifactYear;
-        this.compositionNum = compositionNum;
-        this.compositionTitle = compositionTitle;
+        this.trackNum = trackNum;
+        this.trackTitle = trackTitle;
     }
 
-    public CompositionValidationDTO() {}
+    public TrackValidationDTO() {}
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CompositionValidationDTO that = (CompositionValidationDTO) o;
-        return artistName.equals(that.artistName) && artifactTitle.equals(that.artifactTitle) && artifactYear.equals(that.artifactYear) && compositionNum.equals(that.compositionNum) && compositionTitle.equals(that.compositionTitle);
+        TrackValidationDTO that = (TrackValidationDTO) o;
+        return artistName.equals(that.artistName) && artifactTitle.equals(that.artifactTitle) && artifactYear.equals(that.artifactYear) && trackNum.equals(that.trackNum) && trackTitle.equals(that.trackTitle);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(artistName, artifactTitle, artifactYear, compositionNum, compositionTitle);
+        return Objects.hash(artistName, artifactTitle, artifactYear, trackNum, trackTitle);
     }
 
     @Override
     public String toString() {
-        return "CompositionValidationDTO{" +
+        return "TrackValidationDTO{" +
                 "artistName='" + artistName + '\'' +
                 ", artifactTitle='" + artifactTitle + '\'' +
                 ", artifactYear=" + artifactYear +
-                ", compositionNum=" + compositionNum +
-                ", compositionTitle='" + compositionTitle + '\'' +
+                ", trackNum=" + trackNum +
+                ", trackTitle='" + trackTitle + '\'' +
                 '}';
     }
 }

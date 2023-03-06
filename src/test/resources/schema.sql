@@ -51,24 +51,24 @@ CREATE INDEX idx_artifact_arts ON artifacts (arts_id);
 
 CREATE UNIQUE INDEX idx_artifact_attp_arts_title_year ON artifacts(attp_id, arts_id, artf_title, artf_year);
 
-DROP TABLE IF EXISTS compositions;
+DROP TABLE IF EXISTS tracks;
 
-CREATE TABLE compositions (
-    comp_id INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE tracks (
+    trck_id INTEGER PRIMARY KEY AUTOINCREMENT,
     artf_id INTEGER NOT NULL,
     arts_id INTEGER NULL,
     perf_arts_id INTEGER NULL,
     dvtp_id INTEGER NULL,
-    comp_title TEXT NOT NULL,
-    comp_duration INTEGER NULL,
-    comp_disk_num INTEGER NULL,
-    comp_num INTEGER NULL,
-    comp_migration_id INTEGER NULL
+    trck_title TEXT NOT NULL,
+    trck_duration INTEGER NULL,
+    trck_disk_num INTEGER NULL,
+    trck_num INTEGER NULL,
+    trck_migration_id INTEGER NULL
 );
 
-CREATE INDEX idx_composition_artf ON compositions(artf_id);
+CREATE INDEX idx_track_artf ON tracks(artf_id);
 
-CREATE UNIQUE INDEX idx_composition_artf_id_disk_num_num ON compositions(artf_id, comp_disk_num, comp_num);
+CREATE UNIQUE INDEX idx_track_artf_id_disk_num_num ON tracks(artf_id, trck_disk_num, trck_num);
 
 DROP TABLE IF EXISTS media_files;
 
@@ -85,12 +85,12 @@ CREATE TABLE media_files (
 
 CREATE UNIQUE INDEX idx_media_files_artf_name ON media_files(artf_id, mdfl_name);
 
-DROP TABLE IF EXISTS compositions_media_files;
+DROP TABLE IF EXISTS tracks_media_files;
 
-CREATE TABLE compositions_media_files(
-    comp_id INTEGER NOT NULL,
+CREATE TABLE tracks_media_files(
+    trck_id INTEGER NOT NULL,
     mdfl_id INTEGER NOT NULL,
-    PRIMARY KEY (comp_id, mdfl_id)
+    PRIMARY KEY (trck_id, mdfl_id)
 );
 
 DROP TABLE IF EXISTS artist_categories;
@@ -176,17 +176,17 @@ CREATE TABLE dv_products_dv_categories(
 
 CREATE INDEX idx_dv_products_dv_categories_dvpd_id ON dv_products_dv_categories(dvpd_id);
 
-DROP TABLE IF EXISTS compositions_dv_products;
+DROP TABLE IF EXISTS tracks_dv_products;
 
-CREATE TABLE compositions_dv_products(
-    comp_id INTEGER NOT NULL,
+CREATE TABLE tracks_dv_products(
+    trck_id INTEGER NOT NULL,
     dvpd_id INTEGER NOT NULL,
-    PRIMARY KEY (comp_id, dvpd_id)
+    PRIMARY KEY (trck_id, dvpd_id)
 );
 
-CREATE UNIQUE INDEX idx_compositions_dv_products_comp_id ON compositions_dv_products(comp_id);
+CREATE UNIQUE INDEX idx_tracks_dv_products_trck_id ON tracks_dv_products(trck_id);
 
-CREATE UNIQUE INDEX idx_compositions_dv_products_dvpd_id ON compositions_dv_products(dvpd_id);
+CREATE UNIQUE INDEX idx_tracks_dv_products_dvpd_id ON tracks_dv_products(dvpd_id);
 
 -- PROCESSING --
 

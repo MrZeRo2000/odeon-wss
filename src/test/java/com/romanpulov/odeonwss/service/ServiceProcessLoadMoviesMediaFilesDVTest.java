@@ -4,7 +4,7 @@ import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Composition;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
@@ -99,8 +99,8 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
     @Test
     @Order(4)
     @Rollback(false)
-    void testEmptyCompositions() {
-        List<Artifact> artifacts = artifactRepository.getAllByArtifactTypeWithCompositions(ArtifactType.withDVMovies());
+    void testEmptyTracks() {
+        List<Artifact> artifacts = artifactRepository.getAllByArtifactTypeWithTracks(ArtifactType.withDVMovies());
         Assertions.assertTrue(artifacts.size() > 0);
 
         List<Artifact> emptyDurationArtifacts = artifacts
@@ -108,15 +108,15 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
                 .filter(a -> a.getDuration() != null && a.getDuration() == 0)
                 .collect(Collectors.toList());
 
-        List<Composition> compositions = artifacts.stream().map(Artifact::getCompositions).flatMap(List::stream).collect(Collectors.toList());
-        Assertions.assertTrue(compositions.size() > 0);
-        Assertions.assertEquals(artifacts.size(), compositions.size());
+        List<Track> tracks = artifacts.stream().map(Artifact::getTracks).flatMap(List::stream).collect(Collectors.toList());
+        Assertions.assertTrue(tracks.size() > 0);
+        Assertions.assertEquals(artifacts.size(), tracks.size());
 
-        List<Composition> emptyDurationCompositions = compositions
+        List<Track> emptyDurationTracks = tracks
                 .stream()
                 .filter(c -> c.getDuration() == null || c.getDuration() == 0)
                 .collect(Collectors.toList());
-        Assertions.assertTrue(emptyDurationCompositions.size() < compositions.size());
-        Assertions.assertEquals(emptyDurationArtifacts.size(), emptyDurationCompositions.size());
+        Assertions.assertTrue(emptyDurationTracks.size() < tracks.size());
+        Assertions.assertEquals(emptyDurationArtifacts.size(), emptyDurationTracks.size());
     }
 }

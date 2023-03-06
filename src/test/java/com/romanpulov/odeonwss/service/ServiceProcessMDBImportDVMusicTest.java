@@ -4,7 +4,7 @@ import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
@@ -32,7 +32,7 @@ public class ServiceProcessMDBImportDVMusicTest {
     ArtifactRepository artifactRepository;
 
     @Autowired
-    CompositionRepository compositionRepository;
+    TrackRepository trackRepository;
 
     @Autowired
     MediaFileRepository mediaFileRepository;
@@ -91,7 +91,7 @@ public class ServiceProcessMDBImportDVMusicTest {
 
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Compositions imported"),
+                        ProcessDetailInfo.fromMessage("Tracks imported"),
                         ProcessingStatus.INFO,
                         2208,
                         null)
@@ -114,8 +114,8 @@ public class ServiceProcessMDBImportDVMusicTest {
         int oldArtifactsCount = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE).size();
         assertThat(oldArtifactsCount).isGreaterThan(0);
 
-        long oldCompositionsCount = StreamSupport.stream(compositionRepository.findAll().spliterator(), false).count();
-        assertThat(oldCompositionsCount).isGreaterThan(0);
+        long oldTracksCount = StreamSupport.stream(trackRepository.findAll().spliterator(), false).count();
+        assertThat(oldTracksCount).isGreaterThan(0);
 
         long oldMediaFilesCount = StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count();
         assertThat(oldMediaFilesCount).isGreaterThan(0);
@@ -133,9 +133,9 @@ public class ServiceProcessMDBImportDVMusicTest {
         assertThat(newArtifactsCount).isGreaterThan(0);
         assertThat(newArtifactsCount).isEqualTo(oldArtifactsCount);
 
-        long newCompositionsCount = StreamSupport.stream(compositionRepository.findAll().spliterator(), false).count();
-        assertThat(newCompositionsCount).isGreaterThan(0);
-        assertThat(newCompositionsCount).isEqualTo(oldCompositionsCount);
+        long newTracksCount = StreamSupport.stream(trackRepository.findAll().spliterator(), false).count();
+        assertThat(newTracksCount).isGreaterThan(0);
+        assertThat(newTracksCount).isEqualTo(oldTracksCount);
 
         long newMediaFilesCount = StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count();
         assertThat(newMediaFilesCount).isGreaterThan(0);

@@ -6,7 +6,7 @@ import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
@@ -37,7 +37,7 @@ public class ServiceProcessLoadMP3Test {
     ArtifactRepository artifactRepository;
 
     @Autowired
-    CompositionRepository compositionRepository;
+    TrackRepository trackRepository;
 
     @Autowired
     MediaFileRepository mediaFileRepository;
@@ -87,7 +87,7 @@ public class ServiceProcessLoadMP3Test {
 
         assertThat(pi.getProcessDetails().get(3)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Compositions loaded"),
+                        ProcessDetailInfo.fromMessage("Tracks loaded"),
                         ProcessingStatus.INFO,
                         40,
                         null)
@@ -105,7 +105,7 @@ public class ServiceProcessLoadMP3Test {
         Artist kosheenArtist = artistRepository.findFirstByName("Kosheen").orElseThrow();
 
         Artifact honkinArtifact = artifactRepository.getArtifactsByArtist(aerosmithArtist).get(0);
-        Assertions.assertEquals(compositionRepository.findAllByArtifact(honkinArtifact).size(), mediaFileRepository.findAllByArtifact(honkinArtifact).size());
+        Assertions.assertEquals(trackRepository.findAllByArtifact(honkinArtifact).size(), mediaFileRepository.findAllByArtifact(honkinArtifact).size());
     }
 
     @Test

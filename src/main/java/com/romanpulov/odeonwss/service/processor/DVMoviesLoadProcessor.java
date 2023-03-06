@@ -26,7 +26,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
 
     private final ArtifactRepository artifactRepository;
 
-    private final CompositionRepository compositionRepository;
+    private final TrackRepository trackRepository;
 
     private final MediaFileRepository mediaFileRepository;
 
@@ -38,14 +38,14 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
 
     public DVMoviesLoadProcessor(
             ArtifactRepository artifactRepository,
-            CompositionRepository compositionRepository,
+            TrackRepository trackRepository,
             MediaFileRepository mediaFileRepository,
             DVTypeRepository dvTypeRepository,
             DVProductRepository dVProductRepository,
             MediaParser mediaParser)
     {
         this.artifactRepository = artifactRepository;
-        this.compositionRepository = compositionRepository;
+        this.trackRepository = trackRepository;
         this.mediaFileRepository = mediaFileRepository;
         this.dvTypeRepository = dvTypeRepository;
         this.dVProductRepository = dVProductRepository;
@@ -57,7 +57,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
         Path path = validateAndGetPath();
 
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED, processArtifactsPath(path));
-        infoHandler(ProcessorMessages.INFO_COMPOSITIONS_LOADED, processCompositions());
+        infoHandler(ProcessorMessages.INFO_COMPOSITIONS_LOADED, processTracks());
         infoHandler(ProcessorMessages.INFO_MEDIA_FILES_LOADED, processMediaFiles(path));
     }
 
@@ -96,25 +96,25 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
         return counter.get();
     }
 
-    private int processCompositions() {
+    private int processTracks() {
         AtomicInteger counter = new AtomicInteger(0);
         DVType dvType = dvTypeRepository.getById(7L);
 
-        this.artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)
+        this.artifactRepository.getAllByArtifactTypeWithTracks(ARTIFACT_TYPE)
                 .stream()
-                .filter(a -> a.getCompositions().size() == 0)
+                .filter(a -> a.getTracks().size() == 0)
                 .forEach(artifact -> {
-                    Composition composition = new Composition();
-                    composition.setArtifact(artifact);
-                    composition.setDvType(dvType);
-                    composition.setTitle(artifact.getTitle());
-                    composition.setDuration(artifact.getDuration());
-                    dVProductRepository.getFirstByTitle(composition.getTitle())
-                            .ifPresent(p -> composition.setDvProducts(Set.of(p)));
+                    Track track = new Track();
+                    track.setArtifact(artifact);
+                    track.setDvType(dvType);
+                    track.setTitle(artifact.getTitle());
+                    track.setDuration(artifact.getDuration());
+                    dVProductRepository.getFirstByTitle(track.getTitle())
+                            .ifPresent(p -> track.setDvProducts(Set.of(p)));
 
-                    compositionRepository.save(composition);
+                    trackRepository.save(track);
 
-                    artifact.getCompositions().add(composition);
+                    artifact.getTracks().add(track);
                     artifactRepository.save(artifact);
 
                     counter.getAndIncrement();
@@ -126,7 +126,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
     private int processMediaFiles(Path path) throws ProcessorException {
         AtomicInteger counter = new AtomicInteger(0);
 
-        for (Artifact a: artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)) {
+        for (Artifact a: artifactRepository.getAllByArtifactTypeWithTracks(ARTIFACT_TYPE)) {
             Path mediaFilesRootPath = Paths.get(path.toAbsolutePath().toString(), a.getTitle());
 
             List<Path> mediaFilesPaths = new ArrayList<>();
@@ -141,7 +141,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
 
                 if (mediaFileRepository.findFirstByArtifactAndName(a, fileName).isEmpty()) {
                     try {
-                        MediaFileInfo mediaFileInfo = mediaParser.parseComposition(mediaFilePath);
+                        MediaFileInfo mediaFileInfo = mediaParser.parseTrack(mediaFilePath);
 
                         mediaFile = MediaFileMapper.fromMediaFileInfo(mediaFileInfo);
                         mediaFile.setArtifact(a);
@@ -161,13 +161,13 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
                 }
             }
 
-            if (a.getCompositions().size() == 1) {
-                Composition composition = compositionRepository
-                        .findByIdWithMediaFiles(a.getCompositions().get(0).getId()).orElseThrow();
-                if (!composition.getMediaFiles().equals(mediaFiles)) {
-                    composition.setMediaFiles(mediaFiles);
+            if (a.getTracks().size() == 1) {
+                Track track = trackRepository
+                        .findByIdWithMediaFiles(a.getTracks().get(0).getId()).orElseThrow();
+                if (!track.getMediaFiles().equals(mediaFiles)) {
+                    track.setMediaFiles(mediaFiles);
 
-                    compositionRepository.save(composition);
+                    trackRepository.save(track);
                 }
             }
 
@@ -184,11 +184,11 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
             }
 
             if (
-                    (a.getCompositions().size() == 1) &&
-                    ValueValidator.isEmpty(a.getCompositions().get(0).getDuration())) {
-                a.getCompositions().get(0).setDuration(totalDuration);
+                    (a.getTracks().size() == 1) &&
+                    ValueValidator.isEmpty(a.getTracks().get(0).getDuration())) {
+                a.getTracks().get(0).setDuration(totalDuration);
 
-                compositionRepository.save(a.getCompositions().get(0));
+                trackRepository.save(a.getTracks().get(0));
             }
         }
 

@@ -3,7 +3,7 @@ package com.romanpulov.odeonwss.service.processor;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import org.springframework.stereotype.Component;
@@ -14,14 +14,14 @@ import java.util.Map;
 public class DVMoviesMediaFilesLoadProcessor extends AbstractDVMediaFilesLoadProcessor {
     public DVMoviesMediaFilesLoadProcessor(
             ArtifactRepository artifactRepository,
-            CompositionRepository compositionRepository,
+            TrackRepository trackRepository,
             MediaFileRepository mediaFileRepository,
             MediaParser mediaParser)
     {
         super(
                 ArtifactType.withDVMovies(),
                 artifactRepository,
-                compositionRepository,
+                trackRepository,
                 mediaFileRepository,
                 mediaParser
         );
@@ -30,6 +30,6 @@ public class DVMoviesMediaFilesLoadProcessor extends AbstractDVMediaFilesLoadPro
     @Override
     protected void processArtifactSizeDuration(Map<Artifact, AbstractDVMediaFilesLoadProcessor.SizeDuration> artifactSizeDurationMap) {
         this.updateArtifactsDuration(artifactSizeDurationMap);
-        this.updateCompositionsDuration(artifactSizeDurationMap);
+        this.updateTracksDuration(artifactSizeDurationMap);
     }
 }

@@ -7,7 +7,7 @@ import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
@@ -50,7 +50,7 @@ public class ServiceProcessValidateLATest {
     private MediaFileRepository mediaFileRepository;
 
     @Autowired
-    private CompositionRepository compositionRepository;
+    private TrackRepository trackRepository;
 
     @Autowired
     private ArtifactRepository artifactRepository;
@@ -98,7 +98,7 @@ public class ServiceProcessValidateLATest {
         assertThat(processDetails.get(1)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
-                                "Artists not in database or have no artifacts and compositions",
+                                "Artists not in database or have no artifacts and tracks",
                                 TEST_ARTISTS.stream().sorted().collect(Collectors.toList())),
                         ProcessingStatus.FAILURE,
                         null,
@@ -172,23 +172,23 @@ public class ServiceProcessValidateLATest {
         );
     }
 
-    private String getErrorStringFromCompositionId(long id) {
-        Composition composition = compositionRepository.findByIdWithMediaFiles(1L).orElseThrow();
-        Artifact artifact = artifactRepository.findById(composition.getArtifact().getId()).orElseThrow();
+    private String getErrorStringFromTrackId(long id) {
+        Track track = trackRepository.findByIdWithMediaFiles(1L).orElseThrow();
+        Artifact artifact = artifactRepository.findById(track.getArtifact().getId()).orElseThrow();
         assert artifact.getArtist() != null;
         Artist artist = artistRepository.findById(artifact.getArtist().getId()).orElseThrow();
         return artist.getName() + " >> " +
                artifact.getYear() + " " + artifact.getTitle() + " >> " +
-               composition.getMediaFiles().stream().findFirst().orElseThrow().getName();
+               track.getMediaFiles().stream().findFirst().orElseThrow().getName();
     }
 
     @Test
     @Order(4)
     @Transactional
-    void testNoCompositionMediaFileShouldFail() throws Exception {
-        String errorString = getErrorStringFromCompositionId(1L);
+    void testNoTrackMediaFileShouldFail() throws Exception {
+        String errorString = getErrorStringFromTrackId(1L);
 
-        em.createNativeQuery("delete from compositions_media_files WHERE comp_id = 1").executeUpdate();
+        em.createNativeQuery("delete from tracks_media_files WHERE trck_id = 1").executeUpdate();
         service.executeProcessor(ProcessorType.LA_VALIDATOR);
         ProcessInfo pi = service.getProcessInfo();
         List<ProcessDetail> processDetails = pi.getProcessDetails();
@@ -230,10 +230,10 @@ public class ServiceProcessValidateLATest {
     @Test
     @Order(5)
     @Transactional
-    void testNoCompositionShouldFail() throws Exception {
-        String errorString = getErrorStringFromCompositionId(1L);
+    void testNoTrackShouldFail() throws Exception {
+        String errorString = getErrorStringFromTrackId(1L);
 
-        em.createNativeQuery("delete from compositions WHERE comp_id = 1").executeUpdate();
+        em.createNativeQuery("delete from tracks WHERE trck_id = 1").executeUpdate();
         service.executeProcessor(ProcessorType.LA_VALIDATOR);
         ProcessInfo pi = service.getProcessInfo();
         List<ProcessDetail> processDetails = pi.getProcessDetails();
@@ -345,7 +345,7 @@ public class ServiceProcessValidateLATest {
         assertThat(processDetails.get(2)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
-                                "Artists not in files or have no artifacts and compositions",
+                                "Artists not in files or have no artifacts and tracks",
                                 TEST_ARTISTS.stream().sorted().collect(Collectors.toList())),
                         ProcessingStatus.FAILURE,
                         null,
@@ -449,12 +449,12 @@ public class ServiceProcessValidateLATest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInDbShouldFail() {
         this.prepareInternal();
-        Artifact artifact = artifactRepository.getAllByArtifactTypeWithCompositions(ARTIFACT_TYPE)
+        Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(ARTIFACT_TYPE)
                 .stream()
                 .filter(a -> a.getTitle().equals("Evanescence") && !Objects.isNull(a.getYear()) && a.getYear().equals(2011L))
                 .findFirst().orElseThrow();
-        Composition composition = compositionRepository
-                .findByIdWithMediaFiles(artifact.getCompositions().get(0).getId())
+        Track track = trackRepository
+                .findByIdWithMediaFiles(artifact.getTracks().get(0).getId())
                 .orElseThrow();
 
         MediaFile mediaFile = new MediaFile();
@@ -464,8 +464,8 @@ public class ServiceProcessValidateLATest {
         mediaFile.setBitrate(1048L);
         mediaFileRepository.save(mediaFile);
 
-        composition.getMediaFiles().add(mediaFile);
-        compositionRepository.save(composition);
+        track.getMediaFiles().add(mediaFile);
+        trackRepository.save(track);
 
         ProcessInfo pi = executeProcessor();
         List<ProcessDetail> processDetails = pi.getProcessDetails();

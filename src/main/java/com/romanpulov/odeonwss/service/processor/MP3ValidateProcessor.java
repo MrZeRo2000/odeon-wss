@@ -34,15 +34,15 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
         List<MediaFileValidationDTO> pathValidation =
                 PathLoader.loadFromPathArtistArtifacts(this, path, this);
         List<MediaFileValidationDTO> dbValidation = mediaFileRepository
-                .getCompositionMediaFileValidationMusic(ArtistType.ARTIST, ARTIFACT_TYPE);
+                .getTrackMediaFileValidationMusic(ArtistType.ARTIST, ARTIFACT_TYPE);
 
-        if (PathValidator.validateArtistNamesArtifactsCompositions(this, pathValidation, dbValidation)) {
+        if (PathValidator.validateArtistNamesArtifactsTracks(this, pathValidation, dbValidation)) {
             infoHandler(ProcessorMessages.INFO_ARTISTS_VALIDATED);
 
             if (PathValidator.validateArtifactsMusic(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
-                if (PathValidator.validateCompositionsMusic(this, pathValidation, dbValidation)) {
+                if (PathValidator.validateTracksMusic(this, pathValidation, dbValidation)) {
                     infoHandler(ProcessorMessages.INFO_COMPOSITIONS_VALIDATED);
                 }
 
@@ -77,17 +77,17 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
         } else {
             int oldResultSize = result.size();
 
-            List<Path> compositionPaths = new ArrayList<>();
-            if (PathReader.readPathFilesOnly(this, artifactPath, compositionPaths)) {
-                for (Path compositionPath: compositionPaths) {
-                    String compositionFileName = compositionPath.getFileName().toString();
+            List<Path> trackPaths = new ArrayList<>();
+            if (PathReader.readPathFilesOnly(this, artifactPath, trackPaths)) {
+                for (Path trackPath: trackPaths) {
+                    String trackFileName = trackPath.getFileName().toString();
 
-                    if (!compositionFileName.endsWith(MEDIA_FILE_FORMAT)) {
-                        errorHandler(ProcessorMessages.ERROR_WRONG_FILE_TYPE, compositionPath.toAbsolutePath());
+                    if (!trackFileName.endsWith(MEDIA_FILE_FORMAT)) {
+                        errorHandler(ProcessorMessages.ERROR_WRONG_FILE_TYPE, trackPath.toAbsolutePath());
                     } else {
-                        NamesParser.NumberTitle nt = NamesParser.parseMusicComposition(compositionFileName);
+                        NamesParser.NumberTitle nt = NamesParser.parseMusicTrack(trackFileName);
                         if (nt == null) {
-                            errorHandler(ProcessorMessages.ERROR_PARSING_COMPOSITION_NAME, compositionPath.toAbsolutePath().getFileName());
+                            errorHandler(ProcessorMessages.ERROR_PARSING_COMPOSITION_NAME, trackPath.toAbsolutePath().getFileName());
                             result.add(
                                     new MediaFileValidationDTOBuilder()
                                             .withArtistName(artistPath.getFileName().toString())
@@ -102,7 +102,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
                                     (long)yt.getYear(),
                                     nt.getNumber(),
                                     nt.getTitle(),
-                                    compositionPath.getFileName().toString(),
+                                    trackPath.getFileName().toString(),
                                     MEDIA_FILE_FORMAT
                             ));
                         }

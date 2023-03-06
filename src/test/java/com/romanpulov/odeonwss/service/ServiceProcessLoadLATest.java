@@ -4,7 +4,7 @@ import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.CompositionRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
@@ -43,7 +43,7 @@ public class ServiceProcessLoadLATest {
     private ArtifactRepository artifactRepository;
 
     @Autowired
-    private CompositionRepository compositionRepository;
+    private TrackRepository trackRepository;
 
     @Autowired
     private MediaFileRepository mediaFileRepository;
@@ -88,13 +88,13 @@ public class ServiceProcessLoadLATest {
         }
     }
 
-    void testSizeDuration(Artifact artifact, List<Composition> compositions, List<MediaFile> mediaFiles, long size) {
+    void testSizeDuration(Artifact artifact, List<Track> tracks, List<MediaFile> mediaFiles, long size) {
         //duration
-        assertThat(compositions.stream().collect(Collectors.summarizingLong(Composition::getDuration)).getSum()).isEqualTo(
+        assertThat(tracks.stream().collect(Collectors.summarizingLong(Track::getDuration)).getSum()).isEqualTo(
                 mediaFiles.stream().collect(Collectors.summarizingLong(MediaFile::getDuration)).getSum()
         );
         assertThat(artifact.getDuration()).isEqualTo(
-                compositions.stream().collect(Collectors.summarizingLong(Composition::getDuration)).getSum()
+                tracks.stream().collect(Collectors.summarizingLong(Track::getDuration)).getSum()
         );
 
         //size
@@ -106,8 +106,8 @@ public class ServiceProcessLoadLATest {
         }
     }
 
-    void testOneMediaFilePerOneComposition(String artistName, String artifactName, int compositionCount, long size) {
-        log.info("testOneMediaFilePerOneComposition: artistName=" + artistName + ", artifactName=" + artifactName);
+    void testOneMediaFilePerOneTrack(String artistName, String artifactName, int trackCount, long size) {
+        log.info("testOneMediaFilePerOneTrack: artistName=" + artistName + ", artifactName=" + artifactName);
         Artist artist = artistRepository.findFirstByTypeAndName(ArtistType.ARTIST, artistName).orElseThrow();
         List<Artifact> artifacts = artifactRepository
                 .getArtifactsByArtist(artist)
@@ -117,15 +117,15 @@ public class ServiceProcessLoadLATest {
         Assertions.assertEquals(1, artifacts.size());
 
         List<MediaFile> mediaFiles = mediaFileRepository.findAllByArtifact(artifacts.get(0));
-        Assertions.assertEquals(compositionCount, mediaFiles.size());
+        Assertions.assertEquals(trackCount, mediaFiles.size());
 
-        List<Composition> compositions = compositionRepository.findAllByArtifact(artifacts.get(0));
-        Assertions.assertEquals(compositionCount, compositions.size());
+        List<Track> tracks = trackRepository.findAllByArtifact(artifacts.get(0));
+        Assertions.assertEquals(trackCount, tracks.size());
 
-        testSizeDuration(artifacts.get(0), compositions, mediaFiles, size);
+        testSizeDuration(artifacts.get(0), tracks, mediaFiles, size);
     }
 
-    void testOneMediaFilePerAllCompositions(String artistName, String artifactName, int compositionCount, int diskCount, long size) {
+    void testOneMediaFilePerAllTracks(String artistName, String artifactName, int trackCount, int diskCount, long size) {
         Artist artist = artistRepository.findFirstByTypeAndName(ArtistType.ARTIST, artistName).orElseThrow();
         List<Artifact> artifacts = artifactRepository
                 .getArtifactsByArtist(artist)
@@ -137,10 +137,10 @@ public class ServiceProcessLoadLATest {
         List<MediaFile> mediaFiles = mediaFileRepository.findAllByArtifact(artifacts.get(0));
         Assertions.assertEquals(diskCount, mediaFiles.size());
 
-        List<Composition> compositions = compositionRepository.findAllByArtifact(artifacts.get(0));
-        Assertions.assertEquals(compositionCount, compositions.size());
+        List<Track> tracks = trackRepository.findAllByArtifact(artifacts.get(0));
+        Assertions.assertEquals(trackCount, tracks.size());
 
-        testSizeDuration(artifacts.get(0), compositions, mediaFiles, size);
+        testSizeDuration(artifacts.get(0), tracks, mediaFiles, size);
     }
 
 
@@ -186,7 +186,7 @@ public class ServiceProcessLoadLATest {
 
         assertThat(processDetails.get(item++)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Compositions loaded"),
+                        ProcessDetailInfo.fromMessage("Tracks loaded"),
                         ProcessingStatus.INFO,
                         116,
                         null)
@@ -200,15 +200,15 @@ public class ServiceProcessLoadLATest {
                         null)
         );
 
-        testOneMediaFilePerOneComposition("Abigail Williams", "In The Absence Of Light", 8, 400492832L);
-        testOneMediaFilePerAllCompositions("Agua De Annique", "Air", 13, 1, 317793966);
-        testOneMediaFilePerOneComposition("Christina Aguilera", "Back To Basics", 22, 322883508 + 214576534);
-        testOneMediaFilePerAllCompositions("Evanescence", "Origin", 11, 1, 324579670);
-        testOneMediaFilePerOneComposition("Evanescence", "Evanescence", 16, 466334102);
-        testOneMediaFilePerAllCompositions("Pink Floyd", "Delicate Sound Of Thunder", 15, 2, 294597930 + 338702030);
-        testOneMediaFilePerAllCompositions("Therapy", "Nurse", 10, 1, 267984588);
-        testOneMediaFilePerAllCompositions("Therapy", "Infernal Love", 11, 1, 330812393);
-        testOneMediaFilePerAllCompositions("Tori Amos", "Y Kant Tori Read", 10, 1, 286331932);
+        testOneMediaFilePerOneTrack("Abigail Williams", "In The Absence Of Light", 8, 400492832L);
+        testOneMediaFilePerAllTracks("Agua De Annique", "Air", 13, 1, 317793966);
+        testOneMediaFilePerOneTrack("Christina Aguilera", "Back To Basics", 22, 322883508 + 214576534);
+        testOneMediaFilePerAllTracks("Evanescence", "Origin", 11, 1, 324579670);
+        testOneMediaFilePerOneTrack("Evanescence", "Evanescence", 16, 466334102);
+        testOneMediaFilePerAllTracks("Pink Floyd", "Delicate Sound Of Thunder", 15, 2, 294597930 + 338702030);
+        testOneMediaFilePerAllTracks("Therapy", "Nurse", 10, 1, 267984588);
+        testOneMediaFilePerAllTracks("Therapy", "Infernal Love", 11, 1, 330812393);
+        testOneMediaFilePerAllTracks("Tori Amos", "Y Kant Tori Read", 10, 1, 286331932);
     }
 
 }

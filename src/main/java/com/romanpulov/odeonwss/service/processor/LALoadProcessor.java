@@ -2,12 +2,12 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Composition;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.service.CompositionService;
+import com.romanpulov.odeonwss.service.TrackService;
 import com.romanpulov.odeonwss.service.processor.parser.CueParser;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
@@ -29,16 +29,16 @@ public class LALoadProcessor extends AbstractArtistProcessor {
     private static final Logger logger = LoggerFactory.getLogger(LALoadProcessor.class);
 
 
-    private final CompositionService compositionService;
+    private final TrackService trackService;
 
     private final MediaParser mediaParser;
 
-    private static class CompositionsSummary {
+    private static class TracksSummary {
         private int count;
         private long duration;
         private long size;
 
-        private void add(CompositionsSummary v) {
+        private void add(TracksSummary v) {
             this.count += v.count;
             this.duration += v.duration;
             this.size += v.size;
@@ -50,7 +50,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
 
         @Override
         public String toString() {
-            return "CompositionsSummary{" +
+            return "TracksSummary{" +
                     "count=" + count +
                     ", duration=" + duration +
                     ", size=" + size +
@@ -61,11 +61,11 @@ public class LALoadProcessor extends AbstractArtistProcessor {
     public LALoadProcessor(
             ArtistRepository artistRepository,
             ArtifactRepository artifactRepository,
-            CompositionService compositionService,
+            TrackService trackService,
             MediaParser mediaParser
     ) {
         super(artistRepository, artifactRepository);
-        this.compositionService = compositionService;
+        this.trackService = trackService;
         this.mediaParser = mediaParser;
     }
 
@@ -75,14 +75,14 @@ public class LALoadProcessor extends AbstractArtistProcessor {
     }
 
     @Override
-    protected int processCompositions(List<Pair<Path, Artifact>> pathArtifacts) throws ProcessorException {
+    protected int processTracks(List<Pair<Path, Artifact>> pathArtifacts) throws ProcessorException {
         int counter = 0;
         for (Pair<Path, Artifact> pathArtifactPair: pathArtifacts) {
             Path path = pathArtifactPair.getFirst();
             Artifact artifact = pathArtifactPair.getSecond();
 
-            CompositionsSummary summary = processCompositionsPathWithDiskNum(path, artifact,0);
-            logger.info("Artifact:" + pathArtifactPair.getSecond().getTitle() + ", composition summary: " + summary);
+            TracksSummary summary = processTracksPathWithDiskNum(path, artifact,0);
+            logger.info("Artifact:" + pathArtifactPair.getSecond().getTitle() + ", track summary: " + summary);
 
             artifact.setDuration(summary.duration);
             artifact.setSize(summary.size);
@@ -94,10 +94,10 @@ public class LALoadProcessor extends AbstractArtistProcessor {
         return counter;
     }
 
-    private CompositionsSummary processCompositionsPathWithDiskNum(Path path, Artifact artifact, int diskNum) throws ProcessorException {
-        logger.debug("Processing composition path:" + path + " with artifact:" + artifact);
+    private TracksSummary processTracksPathWithDiskNum(Path path, Artifact artifact, int diskNum) throws ProcessorException {
+        logger.debug("Processing track path:" + path + " with artifact:" + artifact);
 
-        CompositionsSummary summary = new CompositionsSummary();
+        TracksSummary summary = new TracksSummary();
 
         List<Path> directoryPaths = new ArrayList<>();
         if (!PathReader.readPathAll(path, directoryPaths)) {
@@ -123,7 +123,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                 errorHandler(ProcessorMessages.ERROR_FOLDER_WITH_DISK_NUMBERS_CONTAINS_OTHER, path.toString());
             } else {
                 for (Map.Entry<Path, Integer> entry: directoryFolderDisksPaths.entrySet()) {
-                    summary.add(processCompositionsPathWithDiskNum(entry.getKey(), artifact, entry.getValue()));
+                    summary.add(processTracksPathWithDiskNum(entry.getKey(), artifact, entry.getValue()));
                 }
             }
         } else {
@@ -156,7 +156,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
             } else {
                 logger.debug("Cue files not found, processing files");
                 //no cue files,
-                summary.add(processCompositions(path, artifact, directoryPaths, diskNum));
+                summary.add(processTracks(path, artifact, directoryPaths, diskNum));
             }
 
             if (summary.isEmpty()) {
@@ -167,7 +167,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
         return summary;
     }
 
-    private CompositionsSummary processCueFile(
+    private TracksSummary processCueFile(
             Path path,
             Artifact artifact,
             List<Path> directoryPaths,
@@ -176,27 +176,27 @@ public class LALoadProcessor extends AbstractArtistProcessor {
             List<String> cueFiles,
             int diskNum
     ) throws ProcessorException {
-        CompositionsSummary summary = new CompositionsSummary();
+        TracksSummary summary = new TracksSummary();
 
         logger.debug("Processing Cue");
 
         Set<String> cueFileNames = cueTracks.stream().map(CueParser.CueTrack::getFileName).collect(Collectors.toSet());
 
-        // get only files which are compositions
-        List<Path> compositionPaths = directoryPaths
+        // get only files which are tracks
+        List<Path> trackPaths = directoryPaths
                 .stream()
                 .filter(p -> cueFileNames.contains(p.getFileName().toString()))
                 .collect(Collectors.toList());
 
-        Map<String, MediaFileInfo> parsedCompositionMediaInfo = mediaParser.parseCompositions(compositionPaths)
+        Map<String, MediaFileInfo> parsedTrackMediaInfo = mediaParser.parseTracks(trackPaths)
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(e -> e.getKey().getFileName().toString(), Map.Entry::getValue));
 
         Map<String, MediaFile> mediaFiles = new HashMap<>();
-        List<Composition> compositions = new ArrayList<>();
+        List<Track> tracks = new ArrayList<>();
 
-        logger.debug("Composition paths: " + compositionPaths);
+        logger.debug("Track paths: " + trackPaths);
 
         int firstSection = 0;
         for (int i = 0; i < cueTracks.size(); i++) {
@@ -210,7 +210,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
 
             String fileName = cueTrack.getFileName();
 
-            MediaFileInfo mediaFileInfo = parsedCompositionMediaInfo.get(fileName);
+            MediaFileInfo mediaFileInfo = parsedTrackMediaInfo.get(fileName);
             if (mediaFileInfo == null) {
                 throw new ProcessorException(ProcessorMessages.ERROR_NO_DATA_FOR_FILE, cueTrack.getFileName());
             } else {
@@ -225,17 +225,17 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                 }
 
                 logger.debug("MediaFile saved: " + mediaFile);
-                Composition composition = new Composition();
-                composition.setArtifact(artifact);
-                composition.setTitle(cueTrack.getTitle());
+                Track track = new Track();
+                track.setArtifact(artifact);
+                track.setTitle(cueTrack.getTitle());
 
                 // disk num
-                long compositionDiskNum = diskNum > 0 ?
+                long trackDiskNum = diskNum > 0 ?
                         diskNum :
                         Integer.valueOf(NamesParser.getDiskNumFromFileName(cuePath.getFileName().toString())).longValue();
-                composition.setDiskNum(compositionDiskNum);
+                track.setDiskNum(trackDiskNum);
 
-                composition.setNum(Integer.valueOf(cueTrack.getNum()).longValue());
+                track.setNum(Integer.valueOf(cueTrack.getNum()).longValue());
 
                 // duration
                 long mediaDuration = mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration();
@@ -246,70 +246,70 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                     cueDuration = mediaDuration - cueTrack.getSection() + firstSection;
                 }
                 long duration = cueDuration > 0 ? cueDuration : mediaDuration;
-                composition.setDuration(duration);
+                track.setDuration(duration);
 
                 summary.count ++;
                 summary.duration += duration;
 
-                composition.getMediaFiles().add(mediaFile);
+                track.getMediaFiles().add(mediaFile);
 
-                compositions.add(composition);
+                tracks.add(track);
             }
         }
 
-        compositionService.insertCompositionsWithMedia(compositions, mediaFiles.values());
+        trackService.insertTracksWithMedia(tracks, mediaFiles.values());
         return summary;
     }
 
-    CompositionsSummary processCompositions(
+    TracksSummary processTracks(
             Path path,
             Artifact artifact,
             List<Path> directoryPaths,
             int diskNum
     ) throws ProcessorException {
-        CompositionsSummary summary = new CompositionsSummary();
+        TracksSummary summary = new TracksSummary();
 
-        Map<String, NamesParser.NumberTitle> parsedCompositionFileNames = parseCompositionFileNames(directoryPaths);
-        if (parsedCompositionFileNames.size() > 0) {
+        Map<String, NamesParser.NumberTitle> parsedTrackFileNames = parseTrackFileNames(directoryPaths);
+        if (parsedTrackFileNames.size() > 0) {
             List<MediaFile> mediaFiles = new ArrayList<>();
-            List<Composition> compositions = new ArrayList<>();
+            List<Track> tracks = new ArrayList<>();
 
-            List<Path> directoryCompositionsPaths = directoryPaths
+            List<Path> directoryTracksPaths = directoryPaths
                     .stream()
-                    .filter(p -> parsedCompositionFileNames.containsKey(p.getFileName().toString()))
+                    .filter(p -> parsedTrackFileNames.containsKey(p.getFileName().toString()))
                     .collect(Collectors.toList());
-            Map<String, MediaFileInfo> parsedCompositionMediaInfo = mediaParser.parseCompositions(directoryCompositionsPaths)
+            Map<String, MediaFileInfo> parsedTrackMediaInfo = mediaParser.parseTracks(directoryTracksPaths)
                     .entrySet()
                     .stream()
                     .collect(Collectors.toMap(e -> e.getKey().getFileName().toString(), Map.Entry::getValue));
 
-            for (Map.Entry<String, NamesParser.NumberTitle> compositionFile: parsedCompositionFileNames.entrySet()) {
-                MediaFileInfo mediaFileInfo = parsedCompositionMediaInfo.get(compositionFile.getKey());
+            for (Map.Entry<String, NamesParser.NumberTitle> trackFile: parsedTrackFileNames.entrySet()) {
+                MediaFileInfo mediaFileInfo = parsedTrackMediaInfo.get(trackFile.getKey());
                 MediaFile mediaFile = MediaFileMapper.fromMediaFileInfo(mediaFileInfo);
                 mediaFile.setArtifact(artifact);
 
                 mediaFiles.add(mediaFile);
 
-                Composition composition = new Composition();
-                composition.setArtifact(artifact);
-                composition.setTitle(compositionFile.getValue().getTitle());
+                Track track = new Track();
+                track.setArtifact(artifact);
+                track.setTitle(trackFile.getValue().getTitle());
 
-                int compositionDiskNum = diskNum == 0 ? 1 : diskNum;
-                composition.setDiskNum(Integer.valueOf(compositionDiskNum).longValue());
+                int trackDiskNum = diskNum == 0 ? 1 : diskNum;
+                track.setDiskNum(Integer.valueOf(trackDiskNum).longValue());
 
-                composition.setNum(compositionFile.getValue().getNumber());
-                composition.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
+                track.setNum(trackFile.getValue().getNumber());
+                track.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
 
-                composition.getMediaFiles().add(mediaFile);
+                track.getMediaFiles().add(mediaFile);
 
-                compositions.add(composition);
+                tracks.add(track);
 
                 summary.count ++;
                 summary.duration += mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration();
                 summary.size += mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize();
             }
 
-            compositionService.insertCompositionsWithMedia(compositions, mediaFiles);
+            trackService.insertTracksWithMedia(tracks, mediaFiles);
         } else {
             errorHandler(ProcessorMessages.ERROR_NO_DATA_FOR_FOLDER, path.toString());
         }
@@ -317,14 +317,14 @@ public class LALoadProcessor extends AbstractArtistProcessor {
         return summary;
     }
 
-    private Map<String, NamesParser.NumberTitle> parseCompositionFileNames(List<Path> compositionPaths) {
+    private Map<String, NamesParser.NumberTitle> parseTrackFileNames(List<Path> trackPaths) {
         Map<String, NamesParser.NumberTitle> result = new HashMap<>();
 
-        for (Path path: compositionPaths) {
-            String compositionFileName = path.getFileName().toString();
-            NamesParser.NumberTitle nt = NamesParser.parseMusicComposition(compositionFileName);
+        for (Path path: trackPaths) {
+            String trackFileName = path.getFileName().toString();
+            NamesParser.NumberTitle nt = NamesParser.parseMusicTrack(trackFileName);
             if (nt != null) {
-                result.put(compositionFileName, nt);
+                result.put(trackFileName, nt);
             }
         }
 

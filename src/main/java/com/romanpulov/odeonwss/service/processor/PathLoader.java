@@ -19,13 +19,13 @@ public class PathLoader {
         List<Path> artifactPaths = new ArrayList<>();
         if (PathReader.readPathFoldersOnly(processor, path, artifactPaths)) {
             for (Path artifactPath: artifactPaths) {
-                List<Path> compositionPaths = new ArrayList<>();
-                if (PathReader.readPathFilesOnly(processor, artifactPath, compositionPaths)) {
-                    compositionPaths.forEach(compositionPath ->
+                List<Path> trackPaths = new ArrayList<>();
+                if (PathReader.readPathFilesOnly(processor, artifactPath, trackPaths)) {
+                    trackPaths.forEach(trackPath ->
                             result.add(MediaFileValidationDTO.fromDVMediaFile(
                                     artifactPath.getFileName().toString(),
                                     null,
-                                    compositionPath.getFileName().toString())));
+                                    trackPath.getFileName().toString())));
                 } else {
                     break;
                 }
