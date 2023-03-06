@@ -107,7 +107,7 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                             .filter(f -> MEDIA_FORMATS.contains(f.substring(f.lastIndexOf(".") + 1).toLowerCase()))
                             .collect(Collectors.toList());
                     if (trackFileNames.size() == 0) {
-                        errorHandler(ProcessorMessages.ERROR_COMPOSITION_FILES_NOT_FOUND_FOR_ARTIFACT, artifactPath.getFileName().toString());
+                        errorHandler(ProcessorMessages.ERROR_TRACK_FILES_NOT_FOUND_FOR_ARTIFACT, artifactPath.getFileName().toString());
                     } else {
                         trackFileNames.forEach(trackFileName -> result.add(new MediaFileValidationDTO(
                                 artistPath.getFileName().toString(),

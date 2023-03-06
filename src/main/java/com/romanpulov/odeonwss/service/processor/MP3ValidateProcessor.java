@@ -43,7 +43,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
                 if (PathValidator.validateTracksMusic(this, pathValidation, dbValidation)) {
-                    infoHandler(ProcessorMessages.INFO_COMPOSITIONS_VALIDATED);
+                    infoHandler(ProcessorMessages.INFO_TRACKS_VALIDATED);
                 }
 
                 if (PathValidator.validateMediaFilesMusic(this, pathValidation, dbValidation)) {
@@ -87,7 +87,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
                     } else {
                         NamesParser.NumberTitle nt = NamesParser.parseMusicTrack(trackFileName);
                         if (nt == null) {
-                            errorHandler(ProcessorMessages.ERROR_PARSING_COMPOSITION_NAME, trackPath.toAbsolutePath().getFileName());
+                            errorHandler(ProcessorMessages.ERROR_PARSING_TRACK_NAME, trackPath.toAbsolutePath().getFileName());
                             result.add(
                                     new MediaFileValidationDTOBuilder()
                                             .withArtistName(artistPath.getFileName().toString())
@@ -111,7 +111,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
             }
 
             if (result.size() == oldResultSize) {
-                errorHandler(ProcessorMessages.ERROR_COMPOSITIONS_NOT_FOUND_FOR_ARTIFACT, artifactPath.getFileName().toString());
+                errorHandler(ProcessorMessages.ERROR_TRACKS_NOT_FOUND_FOR_ARTIFACT, artifactPath.getFileName().toString());
             }
         }
     }

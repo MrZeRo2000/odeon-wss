@@ -81,8 +81,8 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
         dvProducts = dvProductRepository.findAllMigrationIdMap();
 
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_IMPORTED, importArtifacts(mdbReader));
-        infoHandler(ProcessorMessages.INFO_COMPOSITIONS_IMPORTED, importTracks(mdbReader));
-        infoHandler(ProcessorMessages.INFO_PRODUCTS_COMPOSITIONS_IMPORTED, importProductsTracks(mdbReader));
+        infoHandler(ProcessorMessages.INFO_TRACKS_IMPORTED, importTracks(mdbReader));
+        infoHandler(ProcessorMessages.INFO_PRODUCTS_TRACKS_IMPORTED, importProductsTracks(mdbReader));
         infoHandler(ProcessorMessages.INFO_MEDIA_FILES_IMPORTED, importMediaFiles(mdbReader));
     }
 

@@ -44,7 +44,7 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
             infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED, pathArtifacts.size());
 
             if (pathArtifacts.size() > 0) {
-                infoHandler(ProcessorMessages.INFO_COMPOSITIONS_LOADED, processTracks(pathArtifacts));
+                infoHandler(ProcessorMessages.INFO_TRACKS_LOADED, processTracks(pathArtifacts));
             }
         }
     }

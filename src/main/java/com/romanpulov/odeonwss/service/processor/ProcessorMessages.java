@@ -10,7 +10,7 @@ public class ProcessorMessages {
     static final String ERROR_EXPECTED_FILE = "Expected file, found: %s";
     static final String ERROR_ARTIST_NOT_FOUND = "Artist %s not found";
     static final String ERROR_PARSING_ARTIFACT_NAME = "Error parsing artifact name";
-    static final String ERROR_PARSING_COMPOSITION_NAME = "Error parsing track name: %s";
+    static final String ERROR_PARSING_TRACK_NAME = "Error parsing track name: %s";
     static final String ERROR_PARSING_FILE = "Error parsing file: %s";
     static final String ERROR_PROCESSING_FILES = "Error processing files: %s";
     static final String ERROR_WRONG_FILE_TYPE = "Wrong file type: %s";
@@ -23,8 +23,8 @@ public class ProcessorMessages {
     static final String ERROR_OPENING_MDB_TABLE = "Error opening MDB table %s: %s";
     static final String ERROR_PROCESSING_MDB_DATABASE = "Error processing MDB database: %s";
 
-    static final String ERROR_ARTISTS_ARTIFACTS_COMPOSITIONS_NOT_IN_DB = "Artists not in database or have no artifacts and tracks";
-    static final String ERROR_ARTISTS_ARTIFACTS_COMPOSITIONS_NOT_IN_FILES = "Artists not in files or have no artifacts and tracks";
+    static final String ERROR_ARTISTS_ARTIFACTS_TRACKS_NOT_IN_DB = "Artists not in database or have no artifacts and tracks";
+    static final String ERROR_ARTISTS_ARTIFACTS_TRACKS_NOT_IN_FILES = "Artists not in files or have no artifacts and tracks";
     static final String INFO_ARTISTS_VALIDATED = "Artists validated";
 
     static final String INFO_ARTISTS_IMPORTED = "Artists imported";
@@ -37,12 +37,12 @@ public class ProcessorMessages {
     static final String ERROR_ARTIFACTS_WITHOUT_ARTISTS = "Artifacts without artists";
     static final String INFO_ARTIFACTS_VALIDATED = "Artifacts validated";
 
-    static final String ERROR_COMPOSITIONS_NOT_IN_DB = "Tracks not in database";
-    static final String ERROR_COMPOSITIONS_NOT_IN_FILES = "Tracks not in files";
-    static final String ERROR_COMPOSITIONS_NOT_FOUND_FOR_ARTIFACT = "Tracks not found for artifact: %s";
-    static final String ERROR_COMPOSITION_FILES_NOT_FOUND_FOR_ARTIFACT = "Track files not found for artifact: %s";
-    static final String INFO_COMPOSITIONS_VALIDATED = "Tracks validated";
-    static final String INFO_COMPOSITIONS_LOADED = "Tracks loaded";
+    static final String ERROR_TRACKS_NOT_IN_DB = "Tracks not in database";
+    static final String ERROR_TRACKS_NOT_IN_FILES = "Tracks not in files";
+    static final String ERROR_TRACKS_NOT_FOUND_FOR_ARTIFACT = "Tracks not found for artifact: %s";
+    static final String ERROR_TRACK_FILES_NOT_FOUND_FOR_ARTIFACT = "Track files not found for artifact: %s";
+    static final String INFO_TRACKS_VALIDATED = "Tracks validated";
+    static final String INFO_TRACKS_LOADED = "Tracks loaded";
 
     static final String ERROR_MEDIA_FILES_NOT_IN_DB = "Media files not in database";
     static final String ERROR_MEDIA_FILES_NOT_IN_FILES = "Media files not in files";
@@ -60,8 +60,8 @@ public class ProcessorMessages {
     static final String INFO_ARTIFACTS_LOADED = "Artifacts loaded";
 
     static final String INFO_ARTIFACTS_IMPORTED = "Artifacts imported";
-    static final String INFO_COMPOSITIONS_IMPORTED = "Tracks imported";
-    static final String INFO_PRODUCTS_COMPOSITIONS_IMPORTED = "Products for tracks imported";
+    static final String INFO_TRACKS_IMPORTED = "Tracks imported";
+    static final String INFO_PRODUCTS_TRACKS_IMPORTED = "Products for tracks imported";
     static final String INFO_MEDIA_FILES_IMPORTED = "Media files imported";
 
     static final String INFO_CATEGORIES_IMPORTED = "Categories imported";

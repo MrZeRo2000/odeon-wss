@@ -57,7 +57,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
         Path path = validateAndGetPath();
 
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED, processArtifactsPath(path));
-        infoHandler(ProcessorMessages.INFO_COMPOSITIONS_LOADED, processTracks());
+        infoHandler(ProcessorMessages.INFO_TRACKS_LOADED, processTracks());
         infoHandler(ProcessorMessages.INFO_MEDIA_FILES_LOADED, processMediaFiles(path));
     }
 

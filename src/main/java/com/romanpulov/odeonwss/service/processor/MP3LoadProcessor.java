@@ -77,7 +77,7 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
 
                 NamesParser.NumberTitle nt = NamesParser.parseMusicTrack(trackFileName);
                 if (nt == null) {
-                    errorHandler(ProcessorMessages.ERROR_PARSING_COMPOSITION_NAME, p.toAbsolutePath().getFileName());
+                    errorHandler(ProcessorMessages.ERROR_PARSING_TRACK_NAME, p.toAbsolutePath().getFileName());
                     return counter.get();
                 }
 

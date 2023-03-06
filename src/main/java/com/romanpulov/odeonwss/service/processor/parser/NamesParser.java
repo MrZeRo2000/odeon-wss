@@ -6,11 +6,11 @@ import java.util.regex.Pattern;
 
 public class NamesParser {
     private static final Pattern REGEXP_PATTERN_MUSIC_ARTIFACT = Pattern.compile("^((?:19|20)[0-9]{2})\\s(\\S.*)");
-    private static final Pattern REGEXP_PATTERN_MUSIC_COMPOSITION = Pattern.compile("^([0-9][0-9])\\s-\\s(\\S.*)(?:\\.\\S{2,4})$");
+    private static final Pattern REGEXP_PATTERN_MUSIC_TRACK = Pattern.compile("^([0-9][0-9])\\s-\\s(\\S.*)(?:\\.\\S{2,4})$");
     private static final Pattern REGEXP_PATTERN_FOLDER_NAME_DISK_NUM = Pattern.compile("^(?:CD)(\\d+)$");
     private static final Pattern REGEXP_PATTERN_FILE_NAME_DISK_NUM = Pattern.compile("(?:CD)(\\d+)\\.");
     private static final String FORMAT_MUSIC_ARTIFACT = "%d %s";
-    private static final String FORMAT_MUSIC_COMPOSITION = "%d - %s";
+    private static final String FORMAT_MUSIC_TRACK = "%d - %s";
     private static final String FORMAT_MUSIC_WITH_FILE_NAME = "%s - %s (%s)";
     private static final String FORMAT_MUSIC_WITHOUT_FILE_NAME = "%s - %s (no file name)";
 
@@ -70,11 +70,11 @@ public class NamesParser {
     }
 
     public static boolean validateMusicTrack(String name) {
-        return REGEXP_PATTERN_MUSIC_COMPOSITION.matcher(name).matches();
+        return REGEXP_PATTERN_MUSIC_TRACK.matcher(name).matches();
     }
 
     public static NumberTitle parseMusicTrack(String name) {
-        Matcher matcher = REGEXP_PATTERN_MUSIC_COMPOSITION.matcher(name);
+        Matcher matcher = REGEXP_PATTERN_MUSIC_TRACK.matcher(name);
         if (matcher.find() && matcher.groupCount() == 2) {
             return new NumberTitle(Integer.parseInt(matcher.group(1)), matcher.group(2));
         } else {
@@ -83,7 +83,7 @@ public class NamesParser {
     }
 
     public static String formatMusicTrack(long num, String title) {
-        return String.format(FORMAT_MUSIC_COMPOSITION, num, title);
+        return String.format(FORMAT_MUSIC_TRACK, num, title);
     }
 
     public static String formatMusicTrackWithFile(Long num, String title, String fileName) {

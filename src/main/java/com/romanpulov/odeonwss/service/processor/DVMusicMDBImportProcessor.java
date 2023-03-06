@@ -59,7 +59,7 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
         }
 
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_IMPORTED, importArtifacts(mdbReader));
-        infoHandler(ProcessorMessages.INFO_COMPOSITIONS_IMPORTED, importTracksAndMediaFiles(mdbReader));
+        infoHandler(ProcessorMessages.INFO_TRACKS_IMPORTED, importTracksAndMediaFiles(mdbReader));
     }
 
     private static class DVDet {
