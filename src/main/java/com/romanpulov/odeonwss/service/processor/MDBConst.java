@@ -36,4 +36,5 @@ public class MDBConst {
     public static final String VPRODUCT_ID_COLUMN_NAME = "VProductID";
     public static final String ORIG_TITLE_COLUMN_NAME = "OrigTitle";
     public static final String FRONT_INFO_COLUMN_NAME = "FrontInfo";
+    public static final String MC_PATH_ID_COLUMN_NAME = "MCPathID";
 }

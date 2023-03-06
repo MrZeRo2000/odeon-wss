@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.service.processor;
 
-import com.romanpulov.odeonwss.dto.CompositionValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
@@ -9,10 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {

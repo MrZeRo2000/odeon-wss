@@ -4,7 +4,6 @@ import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
-import java.util.stream.Stream;
 
 @Converter
 public class ProcessorTypeConverter implements AttributeConverter<ProcessorType, String> {

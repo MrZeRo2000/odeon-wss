@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.healthmarketscience.jackcess.Row;
 import com.healthmarketscience.jackcess.Table;
+import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.DVCategory;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import com.romanpulov.odeonwss.entity.DVProduct;
@@ -21,6 +22,11 @@ import static com.romanpulov.odeonwss.service.processor.MDBConst.*;
 @Component
 public class DVProductMDBImportProcessor extends AbstractMDBImportProcessor {
     private static final Set<Long> DV_ORIGIN_CODES = Stream.of(1L, 2L, 17L, 76L).collect(Collectors.toSet());
+    private static final Map<Integer, ArtifactType> PRODUCT_ARTIFACT_TYPE_MAP = Map.of(
+            11, ArtifactType.withDVMovies(),
+            12, ArtifactType.withDVAnimation(),
+            14, ArtifactType.withDVDocumentary()
+    );
 
     private final DVOriginRepository dvOriginRepository;
 
@@ -129,9 +135,10 @@ public class DVProductMDBImportProcessor extends AbstractMDBImportProcessor {
             DVProduct product = migrationProducts.get(id);
             if (product == null) {
                 product = new DVProduct();
+                product.setArtifactType(PRODUCT_ARTIFACT_TYPE_MAP.get(row.getInt(MC_PATH_ID_COLUMN_NAME)));
+                product.setDvOrigin(dvOrigins.get(dvOriginIds.get(id)));
                 product.setTitle(row.getString(TITLE_COLUMN_NAME));
                 product.setOriginalTitle(row.getString(ORIG_TITLE_COLUMN_NAME));
-                product.setDvOrigin(dvOrigins.get(dvOriginIds.get(id)));
 
                 String year = row.getString(YEAR_COLUMN_NAME);
                 if (year != null) {

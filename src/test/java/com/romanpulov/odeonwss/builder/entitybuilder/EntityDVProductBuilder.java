@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.builder.entitybuilder;
 
 import com.romanpulov.odeonwss.builder.AbstractClassBuilder;
+import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.DVCategory;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import com.romanpulov.odeonwss.entity.DVProduct;
@@ -10,6 +11,11 @@ import java.util.Set;
 public class EntityDVProductBuilder extends AbstractClassBuilder<DVProduct> {
     public EntityDVProductBuilder() {
         super(DVProduct.class);
+    }
+
+    public EntityDVProductBuilder withArtifactType(ArtifactType artifactType) {
+        this.instance.setArtifactType(artifactType);
+        return this;
     }
 
     public EntityDVProductBuilder withOrigin(DVOrigin dvOrigin) {

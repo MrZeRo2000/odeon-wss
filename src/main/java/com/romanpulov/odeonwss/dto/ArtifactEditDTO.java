@@ -1,7 +1,6 @@
 package com.romanpulov.odeonwss.dto;
 
 import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.ArtistType;
 
 public class ArtifactEditDTO {
     private Long id;

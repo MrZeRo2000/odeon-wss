@@ -14,6 +14,19 @@ import java.util.Set;
 @AttributeOverride(name = "migrationId", column = @Column(name = "dvpd_migration_id"))
 public class DVProduct extends AbstractBaseMigratedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "attp_id", referencedColumnName = "attp_id")
+    @NotNull
+    private ArtifactType artifactType;
+
+    public ArtifactType getArtifactType() {
+        return artifactType;
+    }
+
+    public void setArtifactType(ArtifactType artifactType) {
+        this.artifactType = artifactType;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dvor_id", referencedColumnName = "dvor_id")
     @NotNull
     private DVOrigin dvOrigin;

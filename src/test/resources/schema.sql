@@ -150,6 +150,7 @@ DROP TABLE IF EXISTS dv_products;
 
 CREATE TABLE dv_products(
     dvpd_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    attp_id INTEGER NOT NULL,
     dvor_id INTEGER NOT NULL,
     dvpd_title TEXT NOT NULL,
     dvpd_orig_title TEXT,
@@ -162,6 +163,7 @@ CREATE TABLE dv_products(
 
 CREATE UNIQUE INDEX idx_dv_products_dvpd_name ON dv_products(dvpd_title);
 
+CREATE INDEX idx_dv_products_attp_id ON dv_products(attp_id);
 CREATE INDEX idx_dv_products_dvor_id ON dv_products(dvor_id);
 
 DROP TABLE IF EXISTS dv_products_dv_categories;
