@@ -127,6 +127,18 @@ public class ServiceProcessMDBImportDVMovieTest {
 
     @Test
     @Order(3)
+    void testImportDVMovieWithMediaFiles() {
+        service.executeProcessor(ProcessorType.DV_MOVIES_MEDIA_LOADER);
+        assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+
+        ProcessInfo pi = executeProcessor();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
+
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+    }
+
+    @Test
+    @Order(10)
     void testProductsForAll() {
         trackRepository.getTracksByArtifactType(ArtifactType.withDVMovies()).forEach(
                 c -> {

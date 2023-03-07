@@ -130,6 +130,7 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
                     track = new Track();
                     track.setArtifact(this.artifacts.get(contId));
                     track.setTitle(row.getString(TITLE_COLUMN_NAME));
+                    track.setNum(1L);
                     track.setDuration(0L);
                     track.setDvType(dvTypeMap.get(row.getInt(VIDEOTYPE_ID_COLUMN_NAME).longValue()));
                     track.setMigrationId(id);

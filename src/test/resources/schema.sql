@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS compositions;
+DROP TABLE IF EXISTS compositions_media_files;
+DROP TABLE IF EXISTS compositions_dv_products;
+
 DROP TABLE IF EXISTS artists;
 
 CREATE TABLE artists (
