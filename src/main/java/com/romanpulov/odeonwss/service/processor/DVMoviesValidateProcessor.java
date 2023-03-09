@@ -29,7 +29,7 @@ public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {
                 ARTIFACT_TYPE);
         logger.info("dbValidation:" + dbValidation);
 
-        final List<MediaFileValidationDTO> pathValidation = PathLoader.loadFromPath(this, path);
+        final List<MediaFileValidationDTO> pathValidation = PathValidationLoader.loadFromPath(this, path);
         logger.info("pathValidation:" + pathValidation);
 
         if (PathValidator.validateArtifacts(this, pathValidation, dbValidation)) {

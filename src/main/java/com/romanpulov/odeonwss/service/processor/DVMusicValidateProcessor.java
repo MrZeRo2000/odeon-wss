@@ -33,7 +33,7 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
         final List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getTrackMediaFileValidationMusic(
                 ArtistType.ARTIST, ARTIFACT_TYPE
         );
-        final List<MediaFileValidationDTO> pathValidation = PathLoader.loadFromPath(this, path);
+        final List<MediaFileValidationDTO> pathValidation = PathValidationLoader.loadFromPath(this, path);
 
         if (validateEmptyMediaFiles()) {
             infoHandler(ProcessorMessages.INFO_MEDIA_FILES_SIZE_VALIDATED);

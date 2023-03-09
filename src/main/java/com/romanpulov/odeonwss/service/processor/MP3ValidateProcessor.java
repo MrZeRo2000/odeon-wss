@@ -16,7 +16,7 @@ import java.util.List;
 
 @Component
 public class MP3ValidateProcessor extends AbstractFileSystemProcessor
-        implements PathLoader.ArtistArtifactPathLoader {
+        implements PathValidationLoader.ArtistArtifactPathLoader {
     private static final Logger logger = LoggerFactory.getLogger(MP3ValidateProcessor.class);
     public static final ArtifactType ARTIFACT_TYPE = ArtifactType.withMP3();
     public static final String MEDIA_FILE_FORMAT = "mp3";
@@ -32,7 +32,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
         Path path = validateAndGetPath();
 
         List<MediaFileValidationDTO> pathValidation =
-                PathLoader.loadFromPathArtistArtifacts(this, path, this);
+                PathValidationLoader.loadFromPathArtistArtifacts(this, path, this);
         List<MediaFileValidationDTO> dbValidation = mediaFileRepository
                 .getTrackMediaFileValidationMusic(ArtistType.ARTIST, ARTIFACT_TYPE);
 

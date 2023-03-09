@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class LAValidateProcessor extends AbstractFileSystemProcessor implements PathLoader.ArtistArtifactPathLoader {
+public class LAValidateProcessor extends AbstractFileSystemProcessor implements PathValidationLoader.ArtistArtifactPathLoader {
     private static final Set<String> MEDIA_FORMATS = Set.of("ape", "flac", "wv");
 
     private static final Logger logger = LoggerFactory.getLogger(LAValidateProcessor.class);
@@ -61,7 +61,7 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
     }
 
     private List<MediaFileValidationDTO> loadFromPath(Path path) throws ProcessorException {
-        return PathLoader.loadFromPathArtistArtifacts(this, path, this);
+        return PathValidationLoader.loadFromPathArtistArtifacts(this, path, this);
     }
 
     @Override

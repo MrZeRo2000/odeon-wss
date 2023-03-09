@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PathLoader {
+public class PathValidationLoader {
 
     public interface ArtistArtifactPathLoader {
         void loadFromArtifactPath(Path artistPath, Path artifactPath, List<MediaFileValidationDTO> accumulator)
