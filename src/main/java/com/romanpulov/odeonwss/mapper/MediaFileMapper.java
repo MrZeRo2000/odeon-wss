@@ -1,7 +1,8 @@
 package com.romanpulov.odeonwss.mapper;
 
-import com.romanpulov.odeonwss.dto.TrackEditDTO;
+import com.romanpulov.jutilscore.io.FileUtils;
 import com.romanpulov.odeonwss.dto.MediaFileEditDTO;
+import com.romanpulov.odeonwss.dto.TrackEditDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
@@ -31,7 +32,7 @@ public class MediaFileMapper {
         MediaFile mediaFile = new MediaFile();
 
         mediaFile.setName(mediaFileInfo.getFileName());
-        mediaFile.setFormat(mediaFormatInfo.getFormatName());
+        mediaFile.setFormat(FileUtils.getExtension(mediaFileInfo.getFileName()).toUpperCase());
         mediaFile.setSize(mediaFormatInfo.getSize());
         mediaFile.setBitrate(mediaFormatInfo.getBitRate());
         mediaFile.setDuration(mediaFormatInfo.getDuration());
