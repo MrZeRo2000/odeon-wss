@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import static com.romanpulov.odeonwss.db.DbManagerService.DbType.DB_PRODUCTS;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisabledIf(value = "${full.tests.disabled}", loadContext = true)
 public class ServiceProcessLoadMoviesDVTest {

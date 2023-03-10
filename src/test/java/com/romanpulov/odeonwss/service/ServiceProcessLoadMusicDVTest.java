@@ -24,6 +24,7 @@ import static com.romanpulov.odeonwss.db.DbManagerService.DbType.DB_IMPORTED_ART
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisabledIf(value = "${full.tests.disabled}", loadContext = true)
 public class ServiceProcessLoadMusicDVTest {
