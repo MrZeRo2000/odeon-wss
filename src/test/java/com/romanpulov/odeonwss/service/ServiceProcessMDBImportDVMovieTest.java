@@ -4,6 +4,7 @@ import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
@@ -23,8 +24,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class ServiceProcessMDBImportDVMovieTest {
 
     public static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MOVIES_IMPORTER;
+
+    private ArtifactType artifactType;
+
     @Autowired
     ProcessService service;
+
+    @Autowired
+    ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
     ArtifactRepository artifactRepository;
@@ -47,6 +54,8 @@ public class ServiceProcessMDBImportDVMovieTest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     void testImportDVMovie() {
+        this.artifactType = artifactTypeRepository.getWithDVMovies();
+
         ProcessInfo pi = executeProcessor();
         List<ProcessDetail> processDetails = pi.getProcessDetails();
 
@@ -93,9 +102,9 @@ public class ServiceProcessMDBImportDVMovieTest {
     @Test
     @Order(2)
     void testImportDVMovieRepeated() {
-        int oldArtifacts = artifactRepository.getAllByArtifactType(ArtifactType.withDVMovies()).size();
-        int oldTracks = trackRepository.getTracksByArtifactType(ArtifactType.withDVMovies()).size();
-        int oldMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ArtifactType.withDVMovies()).size();
+        int oldArtifacts = artifactRepository.getAllByArtifactType(artifactType).size();
+        int oldTracks = trackRepository.getTracksByArtifactType(artifactType).size();
+        int oldMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(artifactType).size();
 
         assertThat(oldArtifacts).isGreaterThan(0);
         assertThat(oldTracks).isGreaterThan(0);
@@ -115,9 +124,9 @@ public class ServiceProcessMDBImportDVMovieTest {
         assertThat(processDetails.get(5).getRows()).isEqualTo(0);
         assertThat(processDetails.get(6).getRows()).isEqualTo(0);
 
-        int newArtifacts = artifactRepository.getAllByArtifactType(ArtifactType.withDVMovies()).size();
-        int newTracks = trackRepository.getTracksByArtifactType(ArtifactType.withDVMovies()).size();
-        int newMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ArtifactType.withDVMovies()).size();
+        int newArtifacts = artifactRepository.getAllByArtifactType(artifactType).size();
+        int newTracks = trackRepository.getTracksByArtifactType(artifactType).size();
+        int newMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(artifactType).size();
 
         assertThat(newArtifacts).isEqualTo(oldArtifacts);
         assertThat(newTracks).isEqualTo(oldTracks);
@@ -140,7 +149,7 @@ public class ServiceProcessMDBImportDVMovieTest {
     @Test
     @Order(10)
     void testProductsForAll() {
-        trackRepository.getTracksByArtifactType(ArtifactType.withDVMovies()).forEach(
+        trackRepository.getTracksByArtifactType(artifactType).forEach(
                 c -> {
                     Track track = trackRepository.findByIdWithProducts(c.getId()).orElseThrow();
                     assertThat(track.getDvProducts().size()).isEqualTo(1);

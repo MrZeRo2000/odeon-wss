@@ -22,6 +22,17 @@ public class ArtifactType extends AbstractBaseEntity {
         this.name = name;
     }
 
+    @Column(name = "attp_media_file_formats")
+    private String mediaFileFormats;
+
+    public String getMediaFileFormats() {
+        return mediaFileFormats;
+    }
+
+    public void setMediaFileFormats(String mediaFileFormats) {
+        this.mediaFileFormats = mediaFileFormats;
+    }
+
     @Column(name = "attp_parent_id")
     @Nullable
     private Long parentId;
@@ -62,67 +73,8 @@ public class ArtifactType extends AbstractBaseEntity {
         return "ArtifactType{" +
                 "id=" + getId() +
                 ", name='" + name + '\'' +
+                ", mediaFileFormats='" + mediaFileFormats + '\'' +
                 ", parentId=" + parentId +
                 '}';
-    }
-
-    public static ArtifactType withMP3() {
-        ArtifactType artifactType = new ArtifactType();
-        artifactType.setId(101L);
-        artifactType.setName("MP3");
-
-        return artifactType;
-    }
-
-    public static ArtifactType withLA() {
-        ArtifactType artifactType = new ArtifactType();
-        artifactType.setId(102L);
-        artifactType.setName("LA");
-
-        return artifactType;
-    }
-
-    public static ArtifactType withDVMusic() {
-        ArtifactType artifactType = new ArtifactType();
-        artifactType.setId(201L);
-        artifactType.setName("Music");
-
-        return artifactType;
-    }
-
-    public static ArtifactType withDVMovies() {
-        ArtifactType artifactType = new ArtifactType();
-        artifactType.setId(202L);
-        artifactType.setName("Movies");
-        artifactType.setParentId(200L);
-
-        return artifactType;
-   }
-
-    public static ArtifactType withDVAnimation() {
-        ArtifactType artifactType = new ArtifactType();
-        artifactType.setId(203L);
-        artifactType.setName("Animation");
-        artifactType.setParentId(200L);
-
-        return artifactType;
-   }
-
-    public static ArtifactType withDVDocumentary() {
-        ArtifactType artifactType = new ArtifactType();
-        artifactType.setId(204L);
-        artifactType.setName("Documentary");
-        artifactType.setParentId(200L);
-
-        return artifactType;
-    }
-
-    public static ArtifactType withDVOther() {
-        ArtifactType artifactType = new ArtifactType();
-        artifactType.setId(205L);
-        artifactType.setName("Documentary");
-        artifactType.setParentId(200L);
-
-        return artifactType;
     }
 }

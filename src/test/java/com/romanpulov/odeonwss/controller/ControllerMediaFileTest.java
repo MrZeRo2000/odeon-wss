@@ -8,6 +8,7 @@ import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.MediaFileService;
@@ -36,6 +37,9 @@ public class ControllerMediaFileTest {
     private MockMvc mockMvc;
 
     @Autowired
+    private ArtifactTypeRepository artifactTypeRepository;
+
+    @Autowired
     private ArtistRepository artistRepository;
 
     @Autowired
@@ -61,7 +65,7 @@ public class ControllerMediaFileTest {
         Artifact artifact1 = artifactRepository.save(
                 new EntityArtifactBuilder()
                         .withArtist(artist1)
-                        .withArtifactType(ArtifactType.withLA())
+                        .withArtifactType(artifactTypeRepository.getWithLA())
                         .withTitle("Title 1")
                         .withYear(2001L)
                         .withDuration(12345L)
@@ -71,7 +75,7 @@ public class ControllerMediaFileTest {
         Artifact artifact2 = artifactRepository.save(
                 new EntityArtifactBuilder()
                         .withArtist(artist1)
-                        .withArtifactType(ArtifactType.withLA())
+                        .withArtifactType(artifactTypeRepository.getWithLA())
                         .withTitle("Title 2")
                         .withYear(2001L)
                         .withDuration(4234L)

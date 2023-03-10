@@ -1,12 +1,11 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
-import com.romanpulov.odeonwss.dto.ArtifactTableDTO;
-import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityTrackBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityTrackBuilder;
+import com.romanpulov.odeonwss.dto.ArtifactTableDTO;
+import com.romanpulov.odeonwss.entity.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -70,7 +69,7 @@ public class RepositoryArtifactTests {
 
 
         Artifact artifact = new EntityArtifactBuilder()
-                .withArtifactType(ArtifactType.withMP3())
+                .withArtifactType(artifactTypeRepository.getWithMP3())
                 .withArtist(artist)
                 .withPerformerArtist(performerArtist)
                 .withTitle("Title 1")
@@ -87,7 +86,7 @@ public class RepositoryArtifactTests {
         Assertions.assertEquals(artist, artifact.getArtist());
         assert artifact.getPerformerArtist() != null;
         Assertions.assertEquals(performerArtist.getName(), artifact.getPerformerArtist().getName());
-        Assertions.assertEquals(artifactType, ArtifactType.withMP3());
+        Assertions.assertEquals(artifactType, artifactTypeRepository.getWithMP3());
         Assertions.assertEquals("Title 1", artifact.getTitle());
         Assertions.assertEquals(2000L, artifact.getYear());
         Assertions.assertEquals(54334L, artifact.getDuration());
@@ -116,21 +115,21 @@ public class RepositoryArtifactTests {
     void testArtifactTable() {
         List<ArtifactTableDTO> at = artifactRepository.getArtifactTableByArtistTypeAndArtifactTypes(
                 ArtistType.ARTIST,
-                List.of(ArtifactType.withMP3(), ArtifactType.withLA())
+                List.of(artifactTypeRepository.getWithMP3(), artifactTypeRepository.getWithLA())
         );
         Assertions.assertEquals(1, at.size());
 
         Assertions.assertEquals(0,
             artifactRepository.getArtifactTableByArtistTypeAndArtifactTypes(
                     ArtistType.ARTIST,
-                    List.of(ArtifactType.withLA())
+                    List.of(artifactTypeRepository.getWithLA())
             ).size()
         );
 
         Assertions.assertEquals(0,
                 artifactRepository.getArtifactTableByArtistTypeAndArtifactTypes(
                         ArtistType.CLASSICS,
-                        List.of(ArtifactType.withMP3())
+                        List.of(artifactTypeRepository.getWithMP3())
                 ).size()
         );
     }
@@ -149,7 +148,7 @@ public class RepositoryArtifactTests {
         Artist artist = artistRepository.getAllByType(ArtistType.ARTIST).get(0);
 
         Artifact artifact = new EntityArtifactBuilder()
-                .withArtifactType(ArtifactType.withDVMusic())
+                .withArtifactType(artifactTypeRepository.getWithDVMusic())
                 .withArtist(artist)
                 .withTitle("Title No Year")
                 .withDuration(77743L)
@@ -160,7 +159,7 @@ public class RepositoryArtifactTests {
         artifactRepository.save(artifact);
 
         Artifact getArtifact = artifactRepository.findFirstByArtifactTypeAndArtistAndTitleAndYear(
-                ArtifactType.withDVMusic(),
+                artifactTypeRepository.getWithDVMusic(),
                 artist,
                 "Title No Year",
                 null
@@ -174,10 +173,10 @@ public class RepositoryArtifactTests {
     @Order(7)
     void testArtifactWithoutArtist() {
         List<ArtifactTableDTO> prevArtifactTable = artifactRepository
-                .getArtifactTableByArtistTypeAndArtifactTypes(ArtistType.ARTIST, List.of(ArtifactType.withDVMovies()));
+                .getArtifactTableByArtistTypeAndArtifactTypes(ArtistType.ARTIST, List.of(artifactTypeRepository.getWithDVMovies()));
         assertThat(prevArtifactTable.size()).isEqualTo(0);
         Artifact artifact = new EntityArtifactBuilder()
-                .withArtifactType(ArtifactType.withDVMovies())
+                .withArtifactType(artifactTypeRepository.getWithDVMovies())
                 .withTitle("Title No Artist")
                 .withDuration(77743L)
                 .withInsertDate(LocalDate.now().minusDays(5))
@@ -187,7 +186,9 @@ public class RepositoryArtifactTests {
         artifactRepository.save(artifact);
 
         List<ArtifactTableDTO> artifactTable = artifactRepository
-                .getArtifactTableByArtistTypeAndArtifactTypes(ArtistType.ARTIST, List.of(ArtifactType.withDVMovies()));
+                .getArtifactTableByArtistTypeAndArtifactTypes(
+                        ArtistType.ARTIST,
+                        List.of(artifactTypeRepository.getWithDVMovies()));
         assertThat(artifactTable.size()).isEqualTo(1);
 
         Artifact savedArtifact = artifactRepository.findById(artifact.getId()).orElseThrow();

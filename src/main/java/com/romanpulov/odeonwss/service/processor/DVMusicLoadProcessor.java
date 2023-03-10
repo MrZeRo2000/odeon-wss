@@ -5,6 +5,7 @@ import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
@@ -28,8 +29,11 @@ import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.ERROR_
 @Component
 public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
     private static final Logger logger = LoggerFactory.getLogger(DVMusicLoadProcessor.class);
-    private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMusic();
     private static final Set<String> MEDIA_FORMATS = Set.of("AVI", "M4V", "MKV", "MP4", "MPG");
+
+    private ArtifactType artifactType;
+
+    private final ArtifactTypeRepository artifactTypeRepository;
 
     private final ArtifactRepository artifactRepository;
 
@@ -38,9 +42,11 @@ public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
     private final MediaParser mediaParser;
 
     public DVMusicLoadProcessor(
+            ArtifactTypeRepository artifactTypeRepository,
             ArtifactRepository artifactRepository,
             MediaFileRepository mediaFileRepository,
             MediaParser mediaParser) {
+        this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.mediaFileRepository = mediaFileRepository;
         this.mediaParser = mediaParser;
@@ -50,15 +56,19 @@ public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
     public void execute() throws ProcessorException {
         Path path = validateAndGetPath();
 
+        if (this.artifactType == null) {
+            this.artifactType = artifactTypeRepository.getWithDVMusic();
+        }
+
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED,
-                PathProcessUtil.processArtifactsPath(this, path, artifactRepository, ARTIFACT_TYPE));
+                PathProcessUtil.processArtifactsPath(this, path, artifactRepository, artifactType));
         infoHandler(ProcessorMessages.INFO_MEDIA_FILES_LOADED, processMediaFiles(path));
     }
 
     private int processMediaFiles(Path path) throws ProcessorException {
         AtomicInteger counter = new AtomicInteger(0);
 
-        for (Artifact a: artifactRepository.getAllByArtifactTypeWithTracks(ARTIFACT_TYPE)) {
+        for (Artifact a: artifactRepository.getAllByArtifactTypeWithTracks(artifactType)) {
             Path mediaFilesRootPath = Paths.get(path.toAbsolutePath().toString(), a.getTitle());
 
             List<Path> mediaFilesPaths = new ArrayList<>();

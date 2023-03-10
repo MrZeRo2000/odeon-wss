@@ -4,6 +4,7 @@ import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTOBuilder;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import org.slf4j.Logger;
@@ -18,23 +19,29 @@ import java.util.List;
 public class MP3ValidateProcessor extends AbstractFileSystemProcessor
         implements PathValidationLoader.ArtistArtifactPathLoader {
     private static final Logger logger = LoggerFactory.getLogger(MP3ValidateProcessor.class);
-    public static final ArtifactType ARTIFACT_TYPE = ArtifactType.withMP3();
-    public static final String MEDIA_FILE_FORMAT = "mp3";
+    public static final String MEDIA_FILE_FORMAT = "MP3";
+
+    private final ArtifactTypeRepository artifactTypeRepository;
 
     private final MediaFileRepository mediaFileRepository;
 
-    public MP3ValidateProcessor(MediaFileRepository mediaFileRepository) {
+    public MP3ValidateProcessor(
+            ArtifactTypeRepository artifactTypeRepository,
+            MediaFileRepository mediaFileRepository) {
+        this.artifactTypeRepository = artifactTypeRepository;
         this.mediaFileRepository = mediaFileRepository;
     }
 
     @Override
     public void execute() throws ProcessorException {
+        ArtifactType artifactType = artifactTypeRepository.getWithMP3();
+
         Path path = validateAndGetPath();
 
         List<MediaFileValidationDTO> pathValidation =
                 PathValidationLoader.loadFromPathArtistArtifacts(this, path, this);
         List<MediaFileValidationDTO> dbValidation = mediaFileRepository
-                .getTrackMediaFileValidationMusic(ArtistType.ARTIST, ARTIFACT_TYPE);
+                .getTrackMediaFileValidationMusic(ArtistType.ARTIST, artifactType);
 
         if (PathValidator.validateArtistNamesArtifactsTracks(this, pathValidation, dbValidation)) {
             infoHandler(ProcessorMessages.INFO_ARTISTS_VALIDATED);
@@ -51,7 +58,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
                 }
 
                 List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
-                        .getArtifactMediaFileValidationMusic(ARTIFACT_TYPE);
+                        .getArtifactMediaFileValidationMusic(artifactType);
 
                 if (PathValidator.validateArtifactMediaFilesMusic(this, pathValidation, dbArtifactValidation)) {
                     infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
@@ -82,7 +89,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
                 for (Path trackPath: trackPaths) {
                     String trackFileName = trackPath.getFileName().toString();
 
-                    if (!trackFileName.endsWith(MEDIA_FILE_FORMAT)) {
+                    if (!trackFileName.toUpperCase().endsWith(MEDIA_FILE_FORMAT)) {
                         errorHandler(ProcessorMessages.ERROR_WRONG_FILE_TYPE, trackPath.toAbsolutePath());
                     } else {
                         NamesParser.NumberTitle nt = NamesParser.parseMusicTrack(trackFileName);

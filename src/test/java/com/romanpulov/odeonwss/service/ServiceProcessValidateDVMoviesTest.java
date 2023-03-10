@@ -8,6 +8,7 @@ import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
@@ -28,11 +29,15 @@ import java.util.logging.Logger;
 @DisabledIf(value = "${full.tests.disabled}", loadContext = true)
 public class ServiceProcessValidateDVMoviesTest {
     private static final Logger log = Logger.getLogger(ServiceProcessValidateDVMoviesTest.class.getSimpleName());
-    private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMovies();
     private static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MOVIES_VALIDATOR;
+
+    private ArtifactType artifactType;
 
     @Autowired
     ProcessService service;
+
+    @Autowired
+    private ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
     private AppConfiguration appConfiguration;
@@ -42,6 +47,7 @@ public class ServiceProcessValidateDVMoviesTest {
 
     @Autowired
     private TrackRepository trackRepository;
+
     @Autowired
     private MediaFileRepository mediaFileRepository;
 
@@ -58,6 +64,7 @@ public class ServiceProcessValidateDVMoviesTest {
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
     void testPrepare() {
+        this.artifactType = artifactTypeRepository.getWithDVMovies();
         internalPrepare();
     }
 
@@ -150,7 +157,7 @@ public class ServiceProcessValidateDVMoviesTest {
     @Order(4)
     void testNewArtifactInDbShouldFail() {
         Artifact artifact = (new EntityArtifactBuilder())
-                .withArtifactType(ARTIFACT_TYPE)
+                .withArtifactType(artifactType)
                 .withTitle("New Artifact")
                 .build();
         artifactRepository.save(artifact);
@@ -197,7 +204,7 @@ public class ServiceProcessValidateDVMoviesTest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInDbShouldFail() {
         this.internalPrepare();
-        Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(ARTIFACT_TYPE)
+        Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
                 .stream()
                 .filter(a -> a.getTitle().equals("Крепкий орешек"))
                 .findFirst().orElseThrow();
@@ -237,7 +244,7 @@ public class ServiceProcessValidateDVMoviesTest {
         this.internalPrepare();
         Track track = trackRepository
                 .findByIdWithMediaFiles(
-                        trackRepository.getTracksByArtifactType(ARTIFACT_TYPE)
+                        trackRepository.getTracksByArtifactType(artifactType)
                         .stream()
                         .filter(c -> c.getTitle().equals("Обыкновенное чудо"))
                         .findFirst()
@@ -268,7 +275,7 @@ public class ServiceProcessValidateDVMoviesTest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInDbShouldFail() {
         this.internalPrepare();
-        Artifact artifact = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE)
+        Artifact artifact = artifactRepository.getAllByArtifactType(artifactType)
                 .stream()
                 .filter(a -> a.getTitle().equals("Крепкий орешек"))
                 .findFirst().orElseThrow();
@@ -301,7 +308,7 @@ public class ServiceProcessValidateDVMoviesTest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInFilesShouldFail() {
         this.internalPrepare();
-        MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE)
+        MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(artifactType)
                 .stream()
                 .filter(m -> m.getName().equals("Part 2.avi"))
                 .findFirst()

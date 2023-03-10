@@ -6,6 +6,7 @@ import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import org.springframework.stereotype.Component;
 
@@ -15,23 +16,33 @@ import java.util.stream.Collectors;
 
 @Component
 public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
-    private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMusic();
+    private ArtifactType artifactType;
 
-    private final MediaFileRepository mediaFileRepository;
+    private final ArtifactTypeRepository artifactTypeRepository;
+
     private final ArtifactRepository artifactRepository;
 
-    public DVMusicValidateProcessor(MediaFileRepository mediaFileRepository,
-                                    ArtifactRepository artifactRepository) {
-        this.mediaFileRepository = mediaFileRepository;
+    private final MediaFileRepository mediaFileRepository;
+
+    public DVMusicValidateProcessor(
+            ArtifactTypeRepository artifactTypeRepository,
+            ArtifactRepository artifactRepository,
+            MediaFileRepository mediaFileRepository) {
+        this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
+        this.mediaFileRepository = mediaFileRepository;
     }
 
     @Override
     public void execute() throws ProcessorException {
         Path path = validateAndGetPath();
 
+        if (this.artifactType == null) {
+            artifactType = artifactTypeRepository.getWithDVMusic();
+        }
+
         final List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getTrackMediaFileValidationMusic(
-                ArtistType.ARTIST, ARTIFACT_TYPE
+                ArtistType.ARTIST, artifactType
         );
         final List<MediaFileValidationDTO> pathValidation = PathValidationLoader.loadFromPath(this, path);
 
@@ -48,7 +59,7 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
                 }
 
                 List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
-                        .getArtifactMediaFileValidationMusic(ARTIFACT_TYPE);
+                        .getArtifactMediaFileValidationMusic(artifactType);
 
                 if (PathValidator.validateArtifactMediaFiles(this, pathValidation, dbArtifactValidation)) {
                     infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
@@ -59,7 +70,7 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
 
     private boolean validateEmptyMediaFiles() {
         List<MediaFile> mediaFiles = mediaFileRepository
-                .getMediaFilesWithEmptySizeByArtifactType(ARTIFACT_TYPE);
+                .getMediaFilesWithEmptySizeByArtifactType(artifactType);
         if (mediaFiles.isEmpty()) {
             return true;
         } else {
@@ -72,7 +83,7 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
     }
 
     private boolean validateArtifactsWithoutArtists() {
-        List<String> artifactsWithoutArtists = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE)
+        List<String> artifactsWithoutArtists = artifactRepository.getAllByArtifactType(artifactType)
                 .stream()
                 .filter(a -> a.getArtist() == null)
                 .map(Artifact::getTitle)

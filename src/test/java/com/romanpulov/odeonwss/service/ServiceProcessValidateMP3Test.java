@@ -4,10 +4,7 @@ import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.*;
-import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
-import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +21,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceProcessValidateMP3Test {
     public static final ProcessorType PROCESSOR_TYPE = ProcessorType.MP3_VALIDATOR;
-    private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withMP3();
+    private ArtifactType artifactType;
+
+    @Autowired
+    ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
     ArtistRepository artistRepository;
@@ -46,11 +46,15 @@ public class ServiceProcessValidateMP3Test {
     List<String> artistNames;
 
     @Autowired
-    public ServiceProcessValidateMP3Test(ProcessService service) {
+    public ServiceProcessValidateMP3Test(ProcessService service, ArtifactTypeRepository artifactTypeRepository) {
         this.service = service;
     }
 
     private void prepareInternal() {
+        if (this.artifactType == null) {
+            this.artifactType = artifactTypeRepository.getWithMP3();
+        }
+
         DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_LOADED_MP3, () -> {
             service.executeProcessor(ProcessorType.MP3_LOADER, null);
             assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
@@ -416,7 +420,7 @@ public class ServiceProcessValidateMP3Test {
         assertThat(artist).isNotNull();
 
         Artifact artifact = (new EntityArtifactBuilder())
-                .withArtifactType(ARTIFACT_TYPE)
+                .withArtifactType(artifactType)
                 .withArtist(artist)
                 .withTitle("New Artifact")
                 .withYear(2000L)
@@ -501,7 +505,7 @@ public class ServiceProcessValidateMP3Test {
     @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
     void testNewFileInDbShouldFail() {
         this.prepareInternal();
-        Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(ARTIFACT_TYPE)
+        Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
                 .stream()
                 .filter(a -> a.getTitle().equals("Kokopelli") && !Objects.isNull(a.getYear()) && a.getYear().equals(2004L))
                 .findFirst().orElseThrow();
@@ -541,7 +545,7 @@ public class ServiceProcessValidateMP3Test {
     void testNewFileInFilesShouldFail() {
         this.prepareInternal();
         MediaFile mediaFile = mediaFileRepository
-                .getMediaFilesByArtifactType(ARTIFACT_TYPE)
+                .getMediaFilesByArtifactType(artifactType)
                 .stream()
                 .filter(m -> m.getName().equals("07 - Swamp.mp3"))
                 .findFirst()
@@ -578,7 +582,7 @@ public class ServiceProcessValidateMP3Test {
     @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
     void testNewArtifactFileInDbShouldFail() {
         this.prepareInternal();
-        Artifact artifact = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE)
+        Artifact artifact = artifactRepository.getAllByArtifactType(artifactType)
                 .stream()
                 .filter(a -> a.getTitle().equals("Damage"))
                 .findFirst().orElseThrow();
@@ -611,7 +615,7 @@ public class ServiceProcessValidateMP3Test {
     @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
     void testNewArtifactFileInFilesShouldFail() {
         this.prepareInternal();
-        MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE)
+        MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(artifactType)
                 .stream()
                 .filter(m -> m.getName().equals("01 - Damage.mp3"))
                 .findFirst()

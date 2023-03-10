@@ -4,6 +4,7 @@ import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTOBuilder;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import org.slf4j.Logger;
@@ -18,14 +19,18 @@ import java.util.stream.Collectors;
 
 @Component
 public class LAValidateProcessor extends AbstractFileSystemProcessor implements PathValidationLoader.ArtistArtifactPathLoader {
-    private static final Set<String> MEDIA_FORMATS = Set.of("ape", "flac", "wv");
+    private static final Set<String> MEDIA_FORMATS = Set.of("APE", "FLAC", "WV");
 
     private static final Logger logger = LoggerFactory.getLogger(LAValidateProcessor.class);
-    public static final ArtifactType ARTIFACT_TYPE = ArtifactType.withLA();
+
+    private final ArtifactTypeRepository artifactTypeRepository;
 
     private final MediaFileRepository mediaFileRepository;
 
-    public LAValidateProcessor(MediaFileRepository mediaFileRepository) {
+    public LAValidateProcessor(
+            ArtifactTypeRepository artifactTypeRepository,
+            MediaFileRepository mediaFileRepository) {
+        this.artifactTypeRepository = artifactTypeRepository;
         this.mediaFileRepository = mediaFileRepository;
     }
 
@@ -34,8 +39,10 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
         logger.info("Started LAValidateProcessor execution");
         Path path = validateAndGetPath();
 
+        ArtifactType artifactType = artifactTypeRepository.getWithLA();
+
         List<MediaFileValidationDTO> dbValidation = mediaFileRepository
-                .getTrackMediaFileValidationMusic(ArtistType.ARTIST, ARTIFACT_TYPE);
+                .getTrackMediaFileValidationMusic(ArtistType.ARTIST, artifactType);
         List<MediaFileValidationDTO> pathValidation = loadFromPath(path);
 
         logger.info("Validating ArtistNames");
@@ -50,7 +57,7 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                 }
 
                 List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
-                        .getArtifactMediaFileValidationMusic(ARTIFACT_TYPE);
+                        .getArtifactMediaFileValidationMusic(artifactType);
 
                 if (PathValidator.validateArtifactMediaFilesMusic(this, pathValidation, dbArtifactValidation)) {
                         infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
@@ -104,7 +111,7 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                             .stream()
                             .map(f -> f.getFileName().toString())
                             .filter(f -> f.contains("."))
-                            .filter(f -> MEDIA_FORMATS.contains(f.substring(f.lastIndexOf(".") + 1).toLowerCase()))
+                            .filter(f -> MEDIA_FORMATS.contains(f.substring(f.lastIndexOf(".") + 1).toUpperCase()))
                             .collect(Collectors.toList());
                     if (trackFileNames.size() == 0) {
                         errorHandler(ProcessorMessages.ERROR_TRACK_FILES_NOT_FOUND_FOR_ARTIFACT, artifactPath.getFileName().toString());

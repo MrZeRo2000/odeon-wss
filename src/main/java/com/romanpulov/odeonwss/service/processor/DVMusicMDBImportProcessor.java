@@ -16,7 +16,8 @@ import static com.romanpulov.odeonwss.service.processor.MDBConst.*;
 @Component
 public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
     private static final int DV_MUSIC_REC_ID = 1253;
-    public static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMusic();
+
+    private final ArtifactTypeRepository artifactTypeRepository;
 
     private final ArtistRepository artistRepository;
 
@@ -37,6 +38,7 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
     private Map<Integer, Artifact> dvContArtifactMap;
 
     public DVMusicMDBImportProcessor(
+            ArtifactTypeRepository artifactTypeRepository,
             ArtistRepository artistRepository,
             ArtifactRepository artifactRepository,
             TrackRepository trackRepository,
@@ -44,6 +46,7 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
             MediaFileRepository mediaFileRepository,
             DVTypeRepository dvTypeRepository
     ) {
+        this.artifactTypeRepository = artifactTypeRepository;
         this.artistRepository = artistRepository;
         this.artifactRepository = artifactRepository;
         this.trackRepository = trackRepository;
@@ -90,6 +93,8 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
     public int importArtifacts(MDBReader mdbReader) throws ProcessorException {
         Table table = mdbReader.getTable(DVCONT_TABLE_NAME);
         AtomicInteger counter = new AtomicInteger(0);
+
+        ArtifactType artifactType = artifactTypeRepository.getWithDVMusic();
         migratedArtists = new HashMap<>();
         dvContArtifactMap = new HashMap<>();
 
@@ -102,14 +107,14 @@ public class DVMusicMDBImportProcessor extends AbstractMDBImportProcessor {
                 Long year = row.getInt(YEAR_COLUMN_NAME) == null ? null : row.getInt(YEAR_COLUMN_NAME).longValue();
 
                 Artifact artifact = artifactRepository.findFirstByArtifactTypeAndArtistAndTitleAndYear(
-                        ARTIFACT_TYPE,
+                        artifactType,
                         artist,
                         artifactName,
                         year
                 ).orElseGet(() -> {
                     Artifact newArtifact = new Artifact();
 
-                    newArtifact.setArtifactType(ARTIFACT_TYPE);
+                    newArtifact.setArtifactType(artifactType);
                     newArtifact.setArtist(artist);
                     newArtifact.setTitle(artifactName);
                     newArtifact.setYear(year);

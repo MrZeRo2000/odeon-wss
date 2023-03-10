@@ -7,6 +7,7 @@ import com.romanpulov.odeonwss.builder.dtobuilder.ArtistCategoriesDetailDTOBuild
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +19,9 @@ import java.util.logging.Logger;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceArtifactTest {
     private static final Logger log = Logger.getLogger(ServiceArtifactTest.class.getSimpleName());
+
+    @Autowired
+    ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
     ArtifactService artifactService;
@@ -51,7 +55,7 @@ public class ServiceArtifactTest {
 
 
         ArtifactEditDTO aed = new ArtifactEditDTOBuilder()
-                .withArtifactTypeId(ArtifactType.withMP3().getId())
+                .withArtifactTypeId(artifactTypeRepository.getWithMP3().getId())
                 .withArtistId(acd.getId())
                 .withPerformerArtistId(pacd.getId())
                 .withTitle("Title 1")
@@ -68,7 +72,7 @@ public class ServiceArtifactTest {
     @Order(2)
     void testInsertWithoutArtistShouldBeOk() throws Exception {
         ArtifactEditDTO aed = artifactService.insert(new ArtifactEditDTOBuilder()
-                .withArtifactTypeId(ArtifactType.withDVMovies().getId())
+                .withArtifactTypeId(artifactTypeRepository.getWithDVMovies().getId())
                 .withTitle("Title 2")
                 .build()
         );
@@ -80,7 +84,7 @@ public class ServiceArtifactTest {
         Assertions.assertThrows(Exception.class, () -> {
             artifactService.insert(new ArtifactEditDTOBuilder()
                     .withArtistId(1L)
-                    .withArtifactTypeId(ArtifactType.withMP3().getId())
+                    .withArtifactTypeId(artifactTypeRepository.getWithMP3().getId())
                     .build()
             );
         });

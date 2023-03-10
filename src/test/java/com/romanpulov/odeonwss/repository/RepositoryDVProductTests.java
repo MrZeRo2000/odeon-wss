@@ -27,6 +27,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class RepositoryDVProductTests {
 
     @Autowired
+    private ArtifactTypeRepository artifactTypeRepository;
+
+    @Autowired
     private DVProductRepository dvProductRepository;
 
     @Autowired
@@ -47,7 +50,7 @@ public class RepositoryDVProductTests {
                         .build()
         );
         DVProduct product = new EntityDVProductBuilder()
-                .withArtifactType(ArtifactType.withDVMusic())
+                .withArtifactType(artifactTypeRepository.getWithDVMusic())
                 .withOrigin(origin)
                 .withTitle("Title 1")
                 .build();
@@ -69,7 +72,7 @@ public class RepositoryDVProductTests {
         Set<DVCategory> categories = new HashSet<>(dVCategoryRepository.findAllMap().values());
 
         DVProduct product = new EntityDVProductBuilder()
-                .withArtifactType(ArtifactType.withDVMusic())
+                .withArtifactType(artifactTypeRepository.getWithDVMusic())
                 .withOrigin(origins.values().stream().findFirst().orElseThrow())
                 .withTitle("Product with categories")
                 .withCategories(categories)
@@ -83,7 +86,7 @@ public class RepositoryDVProductTests {
     void testInsertFields() {
         DVOrigin origin = dvOriginRepository.findAllMap().values().stream().findFirst().orElseThrow();
         DVProduct product = new EntityDVProductBuilder()
-                .withArtifactType(ArtifactType.withDVMovies())
+                .withArtifactType(artifactTypeRepository.getWithDVMovies())
                 .withOrigin(origin)
                 .withTitle("Product title")
                 .withOriginalTitle("Product original title")
@@ -97,7 +100,7 @@ public class RepositoryDVProductTests {
 
         DVProduct savedProduct = dvProductRepository.findById(3L).orElseThrow();
 
-        assertThat(savedProduct.getArtifactType().getId()).isEqualTo(ArtifactType.withDVMovies().getId());
+        assertThat(savedProduct.getArtifactType().getId()).isEqualTo(artifactTypeRepository.getWithDVMovies().getId());
         assertThat(savedProduct.getDvOrigin().getId()).isEqualTo(origin.getId());
         assertThat(savedProduct.getTitle()).isEqualTo("Product title");
         assertThat(savedProduct.getOriginalTitle()).isEqualTo("Product original title");

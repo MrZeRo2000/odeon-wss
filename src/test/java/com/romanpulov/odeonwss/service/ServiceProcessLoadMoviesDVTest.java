@@ -5,6 +5,7 @@ import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.ValueValidator;
@@ -31,17 +32,23 @@ public class ServiceProcessLoadMoviesDVTest {
     private static final Logger log = Logger.getLogger(ServiceProcessLoadMoviesDVTest.class.getSimpleName());
 
     private static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MOVIES_LOADER;
-    private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMovies();
+    private ArtifactType artifactType;
 
     @Autowired
     ProcessService processService;
 
     @Autowired
     private AppConfiguration appConfiguration;
+
+    @Autowired
+    private ArtifactTypeRepository artifactTypeRepository;
+
     @Autowired
     private ArtifactRepository artifactRepository;
+
     @Autowired
     private TrackRepository trackRepository;
+
     @Autowired
     private MediaFileRepository mediaFileRepository;
 
@@ -53,6 +60,8 @@ public class ServiceProcessLoadMoviesDVTest {
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(value = false)
     void testPrepare() throws Exception {
+        this.artifactType = artifactTypeRepository.getWithDVMovies();
+
         DbManagerService.loadOrPrepare(appConfiguration, DB_PRODUCTS, () -> {
             processService.executeProcessor(ProcessorType.DV_PRODUCT_IMPORTER);
             Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
@@ -64,13 +73,13 @@ public class ServiceProcessLoadMoviesDVTest {
     @Order(2)
     @Rollback(value = false)
     void testContainsFilesShouldFail() {
-        Assertions.assertEquals(0, artifactRepository.getAllByArtifactType(ARTIFACT_TYPE).size());
+        Assertions.assertEquals(0, artifactRepository.getAllByArtifactType(artifactType).size());
 
         processService.executeProcessor(PROCESSOR_TYPE, "");
         log.info("Movies Loader Processing info: " + processService.getProcessInfo());
 
         Assertions.assertEquals(ProcessingStatus.FAILURE, processService.getProcessInfo().getProcessingStatus());
-        Assertions.assertEquals(0, artifactRepository.getAllByArtifactType(ARTIFACT_TYPE).size());
+        Assertions.assertEquals(0, artifactRepository.getAllByArtifactType(artifactType).size());
     }
 
     @Test
@@ -94,7 +103,7 @@ public class ServiceProcessLoadMoviesDVTest {
                 processService.getProcessInfo().getProcessDetails().get(3)
         );
 
-        trackRepository.getTracksByArtifactType(ARTIFACT_TYPE).forEach(c -> {
+        trackRepository.getTracksByArtifactType(artifactType).forEach(c -> {
             Track productsTrack = trackRepository.findByIdWithProducts(c.getId()).orElseThrow();
             Assertions.assertEquals(1, productsTrack.getDvProducts().size());
         });
@@ -104,14 +113,14 @@ public class ServiceProcessLoadMoviesDVTest {
     @Order(4)
     @Rollback(value = false)
     void testSuccessRepeated() {
-        int oldArtifacts = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE).size();
+        int oldArtifacts = artifactRepository.getAllByArtifactType(artifactType).size();
         Assertions.assertTrue(oldArtifacts > 0);
 
-        int oldTracks = trackRepository.getTracksByArtifactType(ARTIFACT_TYPE).size();
+        int oldTracks = trackRepository.getTracksByArtifactType(artifactType).size();
         Assertions.assertTrue(oldTracks > 0);
         Assertions.assertEquals(oldArtifacts, oldTracks);
 
-        int oldMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE).size();
+        int oldMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(artifactType).size();
         Assertions.assertTrue(oldMediaFiles > 0);
         Assertions.assertTrue(oldMediaFiles >= oldTracks);
 
@@ -131,18 +140,18 @@ public class ServiceProcessLoadMoviesDVTest {
                 processService.getProcessInfo().getProcessDetails().get(3)
         );
 
-        trackRepository.getTracksByArtifactType(ARTIFACT_TYPE).forEach(c -> {
+        trackRepository.getTracksByArtifactType(artifactType).forEach(c -> {
             Track track = trackRepository.findByIdWithProducts(c.getId()).orElseThrow();
             Assertions.assertEquals(1, track.getDvProducts().size());
         });
 
-        int newArtifacts = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE).size();
+        int newArtifacts = artifactRepository.getAllByArtifactType(artifactType).size();
         Assertions.assertEquals(oldArtifacts, newArtifacts);
 
-        int newTracks = trackRepository.getTracksByArtifactType(ARTIFACT_TYPE).size();
+        int newTracks = trackRepository.getTracksByArtifactType(artifactType).size();
         Assertions.assertEquals(oldTracks, newTracks);
 
-        int newMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE).size();
+        int newMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(artifactType).size();
         Assertions.assertEquals(oldMediaFiles, newMediaFiles);
     }
 
@@ -150,14 +159,14 @@ public class ServiceProcessLoadMoviesDVTest {
     @Order(5)
     @Rollback(value = true)
     void testSizeDuration() {
-        artifactRepository.getAllByArtifactTypeWithTracks(ARTIFACT_TYPE)
+        artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
                 .forEach(artifact -> {
                     Assertions.assertFalse(ValueValidator.isEmpty(artifact.getSize()));
                     Assertions.assertFalse(ValueValidator.isEmpty(artifact.getDuration()));
 
                     Assertions.assertEquals(artifact.getDuration(), artifact.getTracks().get(0).getDuration());
                 });
-        trackRepository.getTracksByArtifactType(ARTIFACT_TYPE)
+        trackRepository.getTracksByArtifactType(artifactType)
                 .forEach(track -> {
                     Assertions.assertFalse(ValueValidator.isEmpty(track.getDuration()));
                 });

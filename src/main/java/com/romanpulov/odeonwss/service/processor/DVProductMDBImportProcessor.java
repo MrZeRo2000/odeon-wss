@@ -6,6 +6,7 @@ import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.DVCategory;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import com.romanpulov.odeonwss.entity.DVProduct;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.DVCategoryRepository;
 import com.romanpulov.odeonwss.repository.DVOriginRepository;
 import com.romanpulov.odeonwss.repository.DVProductRepository;
@@ -22,12 +23,9 @@ import static com.romanpulov.odeonwss.service.processor.MDBConst.*;
 @Component
 public class DVProductMDBImportProcessor extends AbstractMDBImportProcessor {
     private static final Set<Long> DV_ORIGIN_CODES = Stream.of(1L, 2L, 17L, 76L).collect(Collectors.toSet());
-    private static final Map<Integer, ArtifactType> PRODUCT_ARTIFACT_TYPE_MAP = Map.of(
-            11, ArtifactType.withDVMovies(),
-            12, ArtifactType.withDVAnimation(),
-            13, ArtifactType.withDVDocumentary(),
-            14, ArtifactType.withDVOther()
-    );
+    private Map<Integer, ArtifactType> productArtifactTypeMap;
+
+    private final ArtifactTypeRepository artifactTypeRepository;
 
     private final DVOriginRepository dvOriginRepository;
 
@@ -43,10 +41,12 @@ public class DVProductMDBImportProcessor extends AbstractMDBImportProcessor {
     private Map<Long, Collection<Long>> dvCategoryIds;
 
     public DVProductMDBImportProcessor(
+            ArtifactTypeRepository artifactTypeRepository,
             DVOriginRepository dvOriginRepository,
             DVCategoryRepository dvCategoryRepository,
             DVProductRepository dvProductRepository
     ) {
+        this.artifactTypeRepository = artifactTypeRepository;
         this.dvOriginRepository = dvOriginRepository;
         this.dvCategoryRepository = dvCategoryRepository;
         this.dvProductRepository = dvProductRepository;
@@ -57,6 +57,11 @@ public class DVProductMDBImportProcessor extends AbstractMDBImportProcessor {
         dvOrigins = new HashMap<>();
         dvCategories = new HashMap<>();
         dvProducts = new HashMap<>();
+        productArtifactTypeMap = Map.of(
+                11, artifactTypeRepository.getWithDVMovies(),
+                12, artifactTypeRepository.getWithDVAnimation(),
+                13, artifactTypeRepository.getWithDVDocumentary(),
+                14, artifactTypeRepository.getWithDVOther());
 
         readProductCatOrigin(mdbReader);
 
@@ -136,7 +141,7 @@ public class DVProductMDBImportProcessor extends AbstractMDBImportProcessor {
             DVProduct product = migrationProducts.get(id);
             if (product == null) {
                 product = new DVProduct();
-                product.setArtifactType(PRODUCT_ARTIFACT_TYPE_MAP.get(row.getInt(MC_PATH_ID_COLUMN_NAME)));
+                product.setArtifactType(productArtifactTypeMap.get(row.getInt(MC_PATH_ID_COLUMN_NAME)));
                 product.setDvOrigin(dvOrigins.get(dvOriginIds.get(id)));
                 product.setTitle(row.getString(TITLE_COLUMN_NAME));
                 product.setOriginalTitle(row.getString(ORIG_TITLE_COLUMN_NAME));

@@ -6,6 +6,7 @@ import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.service.TrackService;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
@@ -28,7 +29,9 @@ import java.util.stream.Collectors;
 public class MP3LoadProcessor extends AbstractArtistProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(MP3LoadProcessor.class);
-    public static final String MEDIA_FILE_FORMAT = "mp3";
+    public static final String MEDIA_FORMAT = "MP3";
+
+    private final ArtifactTypeRepository artifactTypeRepository;
 
     private final TrackService trackService;
 
@@ -40,19 +43,21 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
     }
 
     public MP3LoadProcessor(
+            ArtifactTypeRepository artifactTypeRepository,
             ArtistRepository artistRepository,
             ArtifactRepository artifactRepository,
             TrackService trackService,
             MediaParser mediaParser )
     {
         super(artistRepository, artifactRepository);
+        this.artifactTypeRepository = artifactTypeRepository;
         this.trackService = trackService;
         this.mediaParser = mediaParser;
     }
 
     @Override
     protected ArtifactType getArtifactType() {
-        return ArtifactType.withMP3();
+        return artifactTypeRepository.getWithMP3();
     }
 
     @Override
@@ -70,7 +75,7 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
 
             for (Path p: trackFiles) {
                 String trackFileName = p.getFileName().toString();
-                if (!trackFileName.endsWith(MEDIA_FILE_FORMAT)) {
+                if (!trackFileName.toUpperCase().endsWith(MEDIA_FORMAT)) {
                     errorHandler(ProcessorMessages.ERROR_WRONG_FILE_TYPE, p.toAbsolutePath());
                     return counter.get();
                 }

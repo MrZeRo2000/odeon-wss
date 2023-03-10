@@ -24,6 +24,9 @@ public class RepositoryMediaFileTests {
     private static final Logger log = Logger.getLogger(RepositoryMediaFileTests.class.getSimpleName());
 
     @Autowired
+    ArtifactTypeRepository artifactTypeRepository;
+
+    @Autowired
     ArtistRepository artistRepository;
 
     @Autowired
@@ -47,7 +50,7 @@ public class RepositoryMediaFileTests {
         artistRepository.save(artist);
 
         Artifact artifact = new EntityArtifactBuilder()
-                .withArtifactType(ArtifactType.withMP3())
+                .withArtifactType(artifactTypeRepository.getWithMP3())
                 .withArtist(artist)
                 .withTitle("Title 1")
                 .withYear(2022L)
@@ -116,14 +119,16 @@ public class RepositoryMediaFileTests {
     @Test
     @Order(3)
     void testTrackValidation() {
-        List<MediaFileValidationDTO> mediaFileValidation = mediaFileRepository.getTrackMediaFileValidationMusic(ArtistType.ARTIST, ArtifactType.withMP3());
+        List<MediaFileValidationDTO> mediaFileValidation =
+                mediaFileRepository.getTrackMediaFileValidationMusic(ArtistType.ARTIST, artifactTypeRepository.getWithMP3());
         Assertions.assertEquals(1, mediaFileValidation.size());
     }
 
     @Test
     @Order(3)
     void testMediaFileValidation() {
-        List<MediaFileValidationDTO> mediaFileValidation = mediaFileRepository.getArtifactMediaFileValidationMusic(ArtifactType.withMP3());
+        List<MediaFileValidationDTO> mediaFileValidation =
+                mediaFileRepository.getArtifactMediaFileValidationMusic(artifactTypeRepository.getWithMP3());
         Assertions.assertEquals(3, mediaFileValidation.size());
     }
 

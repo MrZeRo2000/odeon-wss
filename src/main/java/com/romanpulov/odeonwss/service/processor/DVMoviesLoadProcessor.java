@@ -21,7 +21,10 @@ import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.ERROR_
 @Component
 public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
     private static final Logger logger = LoggerFactory.getLogger(DVMoviesLoadProcessor.class);
-    private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMovies();
+
+    private ArtifactType artifactType;
+
+    private final ArtifactTypeRepository artifactTypeRepository;
 
     private final ArtifactRepository artifactRepository;
 
@@ -36,6 +39,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
     private final MediaParser mediaParser;
 
     public DVMoviesLoadProcessor(
+            ArtifactTypeRepository artifactTypeRepository,
             ArtifactRepository artifactRepository,
             TrackRepository trackRepository,
             MediaFileRepository mediaFileRepository,
@@ -43,6 +47,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
             DVProductRepository dVProductRepository,
             MediaParser mediaParser)
     {
+        this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.trackRepository = trackRepository;
         this.mediaFileRepository = mediaFileRepository;
@@ -55,7 +60,11 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
     public void execute() throws ProcessorException {
         Path path = validateAndGetPath();
 
-        infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED, PathProcessUtil.processArtifactsPath(this, path, artifactRepository, ARTIFACT_TYPE));
+        if (this.artifactType == null) {
+             this.artifactType = artifactTypeRepository.getWithDVMovies();
+        }
+
+        infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED, PathProcessUtil.processArtifactsPath(this, path, artifactRepository, artifactType));
         infoHandler(ProcessorMessages.INFO_TRACKS_LOADED, processTracks());
         infoHandler(ProcessorMessages.INFO_MEDIA_FILES_LOADED, processMediaFiles(path));
     }
@@ -64,7 +73,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
         AtomicInteger counter = new AtomicInteger(0);
         DVType dvType = dvTypeRepository.getById(7L);
 
-        this.artifactRepository.getAllByArtifactTypeWithTracks(ARTIFACT_TYPE)
+        this.artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
                 .stream()
                 .filter(a -> a.getTracks().size() == 0)
                 .forEach(artifact -> {
@@ -91,7 +100,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
     private int processMediaFiles(Path path) throws ProcessorException {
         AtomicInteger counter = new AtomicInteger(0);
 
-        for (Artifact a: artifactRepository.getAllByArtifactTypeWithTracks(ARTIFACT_TYPE)) {
+        for (Artifact a: artifactRepository.getAllByArtifactTypeWithTracks(artifactType)) {
             Path mediaFilesRootPath = Paths.get(path.toAbsolutePath().toString(), a.getTitle());
 
             List<Path> mediaFilesPaths = new ArrayList<>();

@@ -7,6 +7,7 @@ import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
@@ -31,6 +32,9 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
 
     @Autowired
     ProcessService service;
+
+    @Autowired
+    ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
     MediaFileRepository mediaFileRepository;
@@ -60,13 +64,13 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
     @Order(2)
     @Rollback(false)
     void testLoadMediaFiles() {
-        int oldCount =  mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(ArtifactType.withDVMovies()).size();
+        int oldCount =  mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(artifactTypeRepository.getWithDVMovies()).size();
 
         service.executeProcessor(ProcessorType.DV_MOVIES_MEDIA_LOADER);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
         log.info("Movies Media Loader Processing info: " + service.getProcessInfo());
 
-        int newCount =  mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(ArtifactType.withDVMovies()).size();
+        int newCount =  mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(artifactTypeRepository.getWithDVMovies()).size();
 
         Assertions.assertTrue(newCount < oldCount);
     }
@@ -75,7 +79,7 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
     @Order(2)
     @Rollback(false)
     void testGetEmptyMediaFiles() {
-        List<MediaFile> mediaFiles = mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(ArtifactType.withDVMusic());
+        List<MediaFile> mediaFiles = mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(artifactTypeRepository.getWithDVMusic());
         log.info("Artifacts:" + mediaFiles.stream().map(v -> v.getArtifact().getTitle()).collect(Collectors.toList()));
         for (MediaFile mediaFile: mediaFiles) {
             MediaFile getMediaFile = mediaFileRepository.findById(mediaFile.getId()).orElseThrow();
@@ -88,7 +92,7 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
     @Order(3)
     @Rollback(false)
     void testEmptyArtifacts() {
-        List<Artifact> artifacts = artifactRepository.getAllByArtifactType(ArtifactType.withDVMovies());
+        List<Artifact> artifacts = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMovies());
         List<Artifact> emptyDurationArtifacts = artifacts
                 .stream()
                 .filter(a -> a.getDuration() != null && a.getDuration() == 0)
@@ -100,7 +104,7 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
     @Order(4)
     @Rollback(false)
     void testEmptyTracks() {
-        List<Artifact> artifacts = artifactRepository.getAllByArtifactTypeWithTracks(ArtifactType.withDVMovies());
+        List<Artifact> artifacts = artifactRepository.getAllByArtifactTypeWithTracks(artifactTypeRepository.getWithDVMovies());
         Assertions.assertTrue(artifacts.size() > 0);
 
         List<Artifact> emptyDurationArtifacts = artifacts

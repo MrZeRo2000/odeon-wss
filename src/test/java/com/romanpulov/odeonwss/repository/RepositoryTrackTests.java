@@ -46,7 +46,10 @@ public class RepositoryTrackTests {
     @Sql({"/schema.sql", "/data.sql"})
     void testInsertGet() {
         //ArtifactType
-        ArtifactType artifactType = artifactTypeRepository.findAllById(List.of(ArtifactType.withMP3().getId())).iterator().next();
+        ArtifactType artifactType = artifactTypeRepository
+                .findAllById(List.of(artifactTypeRepository.getWithMP3().getId()))
+                .iterator()
+                .next();
         Assertions.assertNotNull(artifactType);
 
         //Artist
@@ -86,7 +89,8 @@ public class RepositoryTrackTests {
         );
 
         //validation DTO without track
-        List<TrackValidationDTO> trackValidationList = trackRepository.getTrackValidationMusic(ArtifactType.withMP3());
+        List<TrackValidationDTO> trackValidationList =
+                trackRepository.getTrackValidationMusic(artifactTypeRepository.getWithMP3());
         Assertions.assertNotNull(trackValidationList.get(0).getArtistName());
         Assertions.assertNotNull(trackValidationList.get(0).getArtifactTitle());
         Assertions.assertNull(trackValidationList.get(0).getTrackNum());
@@ -138,14 +142,15 @@ public class RepositoryTrackTests {
         Assertions.assertEquals(5, savedTrack2.getNum());
         Assertions.assertEquals(777, savedTrack2.getDuration());
 
-        Assertions.assertEquals(2, trackRepository.getTracksByArtifactType(ArtifactType.withMP3()).size());
-        Assertions.assertEquals(0, trackRepository.getTracksByArtifactType(ArtifactType.withDVMovies()).size());
+        Assertions.assertEquals(2, trackRepository.getTracksByArtifactType(artifactTypeRepository.getWithMP3()).size());
+        Assertions.assertEquals(0, trackRepository.getTracksByArtifactType(artifactTypeRepository.getWithDVMovies()).size());
     }
 
     @Test
     @Order(2)
     void testValidationDTO() {
-        List<TrackValidationDTO> trackValidationList = trackRepository.getTrackValidationMusic(ArtifactType.withMP3());
+        List<TrackValidationDTO> trackValidationList =
+                trackRepository.getTrackValidationMusic(artifactTypeRepository.getWithMP3());
         Assertions.assertEquals(3, trackValidationList.size());
         Assertions.assertEquals(1982, trackValidationList.get(0).getArtifactYear());
     }

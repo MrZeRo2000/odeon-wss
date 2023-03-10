@@ -34,6 +34,8 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(ClassicsMDBImportProcessor.class);
 
+    private final ArtifactTypeRepository artifactTypeRepository;
+
     private final ArtistRepository artistRepository;
 
     private final ArtistDetailRepository artistDetailRepository;
@@ -49,6 +51,7 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
     private Map<Long, Artist> migratedArtists;
 
     public ClassicsMDBImportProcessor(
+            ArtifactTypeRepository artifactTypeRepository,
             ArtistRepository artistRepository,
             ArtistDetailRepository artistDetailRepository,
             ArtistCategoryRepository artistCategoryRepository,
@@ -56,6 +59,7 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
             ArtifactRepository artifactRepository,
             TrackRepository trackRepository)
     {
+        this.artifactTypeRepository = artifactTypeRepository;
         this.artistRepository = artistRepository;
         this.artistDetailRepository = artistDetailRepository;
         this.artistCategoryRepository = artistCategoryRepository;
@@ -171,7 +175,7 @@ public class ClassicsMDBImportProcessor extends AbstractMDBImportProcessor {
                             .orElseGet(() -> {
                                 Artifact newArtifact = new Artifact();
 
-                                newArtifact.setArtifactType(ArtifactType.withMP3());
+                                newArtifact.setArtifactType(artifactTypeRepository.getWithMP3());
                                 newArtifact.setTitle(artifactName);
                                 newArtifact.setArtist(artist);
                                 newArtifact.setPerformerArtist(performerArtist);

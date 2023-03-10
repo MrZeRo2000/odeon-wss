@@ -5,10 +5,7 @@ import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.*;
-import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
-import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +23,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceProcessValidateLATest {
-    private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withLA();
     private static final List<String> TEST_ARTISTS =
             List.of(
                     "Evanescence",
@@ -36,6 +32,9 @@ public class ServiceProcessValidateLATest {
                     "Abigail Williams",
                     "Agua De Annique",
                     "Christina Aguilera");
+
+    @Autowired
+    ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
     ArtistRepository artistRepository;
@@ -358,12 +357,13 @@ public class ServiceProcessValidateLATest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactInDbShouldFail() {
         this.prepareInternal();
+        ArtifactType artifactType = artifactTypeRepository.getWithLA();
 
         Artist artist = artistRepository.findAll().iterator().next();
         assertThat(artist).isNotNull();
 
         Artifact artifact = (new EntityArtifactBuilder())
-                .withArtifactType(ARTIFACT_TYPE)
+                .withArtifactType(artifactType)
                 .withArtist(artist)
                 .withTitle("New Artifact")
                 .withYear(2000L)
@@ -449,7 +449,9 @@ public class ServiceProcessValidateLATest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInDbShouldFail() {
         this.prepareInternal();
-        Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(ARTIFACT_TYPE)
+        ArtifactType artifactType = artifactTypeRepository.getWithLA();
+
+        Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
                 .stream()
                 .filter(a -> a.getTitle().equals("Evanescence") && !Objects.isNull(a.getYear()) && a.getYear().equals(2011L))
                 .findFirst().orElseThrow();
@@ -487,8 +489,10 @@ public class ServiceProcessValidateLATest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInFilesShouldFail() {
         this.prepareInternal();
+        ArtifactType artifactType = artifactTypeRepository.getWithLA();
+
         MediaFile mediaFile = mediaFileRepository
-                .getMediaFilesByArtifactType(ARTIFACT_TYPE)
+                .getMediaFilesByArtifactType(artifactType)
                 .stream()
                 .filter(m -> m.getName().equals("16 - Secret Door.flac"))
                 .findFirst()
@@ -525,7 +529,9 @@ public class ServiceProcessValidateLATest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInDbShouldFail() {
         this.prepareInternal();
-        Artifact artifact = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE)
+        ArtifactType artifactType = artifactTypeRepository.getWithLA();
+
+        Artifact artifact = artifactRepository.getAllByArtifactType(artifactType)
                 .stream()
                 .filter(a -> a.getTitle().equals("In The Absence Of Light"))
                 .findFirst().orElseThrow();
@@ -558,7 +564,9 @@ public class ServiceProcessValidateLATest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInFilesShouldFail() {
         this.prepareInternal();
-        MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE)
+        ArtifactType artifactType = artifactTypeRepository.getWithLA();
+
+        MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(artifactType)
                 .stream()
                 .filter(m -> m.getName().equals("01 Hope The Great Betrayal.flac"))
                 .findFirst()

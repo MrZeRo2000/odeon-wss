@@ -5,6 +5,7 @@ import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
@@ -23,7 +24,7 @@ import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.ERROR_
 import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.INFO_MEDIA_FILES_LOADED;
 
 public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSystemProcessor {
-    private final ArtifactType artifactType;
+    protected final ArtifactTypeRepository artifactTypeRepository;
 
     private final ArtifactRepository artifactRepository;
 
@@ -34,13 +35,13 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
     private final MediaParser mediaParser;
 
     public AbstractDVMediaFilesLoadProcessor(
-            ArtifactType artifactType,
+            ArtifactTypeRepository artifactTypeRepository,
             ArtifactRepository artifactRepository,
             TrackRepository trackRepository,
             MediaFileRepository mediaFileRepository,
             MediaParser mediaParser
     ) {
-        this.artifactType = artifactType;
+        this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.trackRepository = trackRepository;
         this.mediaFileRepository = mediaFileRepository;
@@ -57,7 +58,6 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
     static class SizeDuration {
         long size;
         long duration;
-
         public SizeDuration(long size, long duration) {
             this.size = size;
             this.duration = duration;
@@ -65,12 +65,12 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
 
         public SizeDuration() {
         }
-    }
 
+    }
     public int processArtifactsPath(Path path) {
         AtomicInteger counter = new AtomicInteger(0);
 
-        List<MediaFile> emptyMediaFiles = mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(artifactType);
+        List<MediaFile> emptyMediaFiles = mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(getArtifactType());
         Map<Artifact, SizeDuration> artifactSizeDurationMap = new HashMap<>();
 
         String rootMediaPath = path.toAbsolutePath().toString();
@@ -105,6 +105,8 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
 
         return counter.get();
     }
+
+    protected abstract ArtifactType getArtifactType();
 
     protected abstract void processArtifactSizeDuration(Map<Artifact, SizeDuration> artifactSizeDurationMap);
 

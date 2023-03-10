@@ -24,10 +24,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisabledIf(value = "${full.tests.disabled}", loadContext = true)
 public class ServiceProcessValidateDVMusicTest {
     private static final Logger log = Logger.getLogger(ServiceProcessValidateDVMusicTest.class.getSimpleName());
-    private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMusic();
     private static final Set<String> EXISTING_ARTIFACT_TITLES = Set.of(
             "Beautiful Voices 1", "The Cure - Picture Show 1991", "Tori Amos - Fade to Red 2006");
     public static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MUSIC_VALIDATOR;
+
+    private ArtifactType artifactType;
 
     @Autowired
     ProcessService service;
@@ -36,13 +37,17 @@ public class ServiceProcessValidateDVMusicTest {
     AppConfiguration appConfiguration;
 
     @Autowired
+    ArtifactTypeRepository artifactTypeRepository;
+
+    @Autowired
     private ArtifactRepository artifactRepository;
+
     @Autowired
     private ArtistRepository artistRepository;
-    @Autowired
-    private ArtifactTypeRepository artifactTypeRepository;
+
     @Autowired
     private TrackRepository trackRepository;
+
     @Autowired
     private MediaFileRepository mediaFileRepository;
 
@@ -73,7 +78,7 @@ public class ServiceProcessValidateDVMusicTest {
     private void internalPrepareExisting() {
         internalPrepareImported();
         DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA_EXISTING, () -> {
-            artifactRepository.getAllByArtifactType(ARTIFACT_TYPE)
+            artifactRepository.getAllByArtifactType(artifactType)
                     .forEach(artifact -> {
                         if (!EXISTING_ARTIFACT_TITLES.contains(artifact.getTitle())) {
                             artifactRepository.delete(artifact);
@@ -87,6 +92,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
     void testPrepareImported() {
+        this.artifactType = artifactTypeRepository.getWithDVMusic();
         internalPrepareExisting();
     }
 
@@ -228,7 +234,7 @@ public class ServiceProcessValidateDVMusicTest {
     void testNewArtifactWithoutArtistShouldFail() {
         this.internalPrepareExisting();
         Artifact artifact = (new EntityArtifactBuilder())
-                .withArtifactType(ARTIFACT_TYPE)
+                .withArtifactType(artifactType)
                 .withTitle("Artifact no artist")
                 .build();
         artifactRepository.save(artifact);
@@ -256,7 +262,7 @@ public class ServiceProcessValidateDVMusicTest {
         assertThat(artist).isNotNull();
 
         Artifact artifact = (new EntityArtifactBuilder())
-                .withArtifactType(ARTIFACT_TYPE)
+                .withArtifactType(artifactType)
                 .withArtist(artist)
                 .withTitle("New Artifact")
                 .build();
@@ -303,7 +309,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInDbShouldFail() {
         this.internalPrepareExisting();
-        Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(ARTIFACT_TYPE)
+        Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
                 .stream()
                 .filter(a -> a.getTitle().equals("Beautiful Voices 1"))
                 .findFirst().orElseThrow();
@@ -390,7 +396,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInDbShouldFail() {
         this.internalPrepareExisting();
-        Artifact artifact = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE)
+        Artifact artifact = artifactRepository.getAllByArtifactType(artifactType)
                 .stream()
                 .filter(a -> a.getTitle().equals("The Cure - Picture Show 1991"))
                 .findFirst().orElseThrow();
@@ -422,7 +428,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInFilesShouldFail() {
         this.internalPrepareExisting();
-        MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE)
+        MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(artifactType)
                 .stream()
                 .filter(m -> m.getName().equals("The Cure - Picture Show 1991.mp4"))
                 .findFirst()

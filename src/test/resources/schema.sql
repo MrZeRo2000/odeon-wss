@@ -1,3 +1,4 @@
+
 DROP TABLE IF EXISTS compositions;
 DROP TABLE IF EXISTS compositions_media_files;
 DROP TABLE IF EXISTS compositions_dv_products;
@@ -19,6 +20,7 @@ DROP TABLE IF EXISTS artifact_types;
 CREATE TABLE artifact_types (
     attp_id INTEGER PRIMARY KEY AUTOINCREMENT,
     attp_name TEXT NOT NULL,
+    attp_media_file_formats TEXT NULL,
     attp_parent_id INTEGER NULL
 );
 

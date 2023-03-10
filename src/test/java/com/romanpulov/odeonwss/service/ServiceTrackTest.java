@@ -7,10 +7,7 @@ import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
-import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
-import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +24,9 @@ import java.util.stream.StreamSupport;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceTrackTest {
+
+    @Autowired
+    private ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
     private ArtistRepository artistRepository;
@@ -69,7 +69,7 @@ public class ServiceTrackTest {
 
         Artifact artifact1 = artifactRepository.save(
                 new EntityArtifactBuilder()
-                        .withArtifactType(ArtifactType.withMP3())
+                        .withArtifactType(artifactTypeRepository.getWithMP3())
                         .withArtist(artist)
                         .withTitle("Title 1")
                         .withYear(2001L)
@@ -79,7 +79,7 @@ public class ServiceTrackTest {
 
         Artifact artifact2 = artifactRepository.save(
                 new EntityArtifactBuilder()
-                        .withArtifactType(ArtifactType.withMP3())
+                        .withArtifactType(artifactTypeRepository.getWithMP3())
                         .withArtist(artist)
                         .withTitle("Title 2")
                         .withYear(2002L)

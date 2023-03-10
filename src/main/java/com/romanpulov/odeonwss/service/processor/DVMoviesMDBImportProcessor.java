@@ -22,11 +22,14 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
     private static final Logger log = Logger.getLogger(DVMoviesMDBImportProcessor.class.getSimpleName());
 
     private static final int DV_MOVIE_REC_ID = 1254;
-    private static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMovies();
+
+    private ArtifactType artifactType;
 
     private final DVTypeRepository dvTypeRepository;
 
     private final DVProductMDBImportProcessor dvProductMDBImportProcessor;
+
+    private final ArtifactTypeRepository artifactTypeRepository;
 
     private final ArtifactRepository artifactRepository;
 
@@ -47,6 +50,7 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
     public DVMoviesMDBImportProcessor(
             DVTypeRepository dvTypeRepository,
             DVProductMDBImportProcessor dvProductMDBImportProcessor,
+            ArtifactTypeRepository artifactTypeRepository,
             ArtifactRepository artifactRepository,
             TrackRepository trackRepository,
             MediaFileRepository mediaFileRepository,
@@ -54,6 +58,7 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
     ) {
         this.dvTypeRepository = dvTypeRepository;
         this.dvProductMDBImportProcessor = dvProductMDBImportProcessor;
+        this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.trackRepository = trackRepository;
         this.mediaFileRepository = mediaFileRepository;
@@ -62,15 +67,18 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
 
     @Override
     protected void importMDB(MDBReader mdbReader) throws ProcessorException {
+        if (this.artifactType == null) {
+            this.artifactType = artifactTypeRepository.getWithDVMovies();
+        }
         if (dvTypeMap == null) {
             dvTypeMap = dvTypeRepository.findAllMap();
         }
-        artifacts = artifactRepository.findAllByArtifactTypeMigrationIdMap(ARTIFACT_TYPE);
-        tracks = trackRepository.getTracksByArtifactType(ARTIFACT_TYPE)
+        artifacts = artifactRepository.findAllByArtifactTypeMigrationIdMap(artifactType);
+        tracks = trackRepository.getTracksByArtifactType(artifactType)
                 .stream()
                 .collect(Collectors.toMap(Track::getTitle, v-> v));
         contentTracks = new HashMap<>();
-        mediaFiles = mediaFileRepository.getMediaFilesByArtifactType(ARTIFACT_TYPE)
+        mediaFiles = mediaFileRepository.getMediaFilesByArtifactType(artifactType)
                         .stream()
                         .collect(Collectors.toMap(MediaFile::getMigrationId, v ->v));
 
@@ -98,7 +106,7 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
                 Artifact artifact = this.artifacts.get(id);
                 if (artifact == null) {
                     artifact = new Artifact();
-                    artifact.setArtifactType(ARTIFACT_TYPE);
+                    artifact.setArtifactType(artifactType);
                     artifact.setDuration(0L);
                     artifact.setTitle(artifactName);
                     artifact.setMigrationId(id);

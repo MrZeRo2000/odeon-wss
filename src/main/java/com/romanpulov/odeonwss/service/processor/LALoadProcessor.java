@@ -6,6 +6,7 @@ import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.service.TrackService;
 import com.romanpulov.odeonwss.service.processor.parser.CueParser;
@@ -28,6 +29,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(LALoadProcessor.class);
 
+    private final ArtifactTypeRepository artifactTypeRepository;
 
     private final TrackService trackService;
 
@@ -59,19 +61,21 @@ public class LALoadProcessor extends AbstractArtistProcessor {
     }
 
     public LALoadProcessor(
+            ArtifactTypeRepository artifactTypeRepository,
             ArtistRepository artistRepository,
             ArtifactRepository artifactRepository,
             TrackService trackService,
             MediaParser mediaParser
     ) {
         super(artistRepository, artifactRepository);
+        this.artifactTypeRepository = artifactTypeRepository;
         this.trackService = trackService;
         this.mediaParser = mediaParser;
     }
 
     @Override
     protected ArtifactType getArtifactType() {
-        return ArtifactType.withLA();
+        return artifactTypeRepository.getWithLA();
     }
 
     @Override

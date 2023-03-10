@@ -4,6 +4,7 @@ import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
@@ -25,8 +26,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @DisabledIf(value = "${full.tests.disabled}", loadContext = true)
 public class ServiceProcessMDBImportDVMusicTest {
     private static final Logger log = Logger.getLogger(ServiceProcessMDBImportClassicsTest.class.getSimpleName());
-    public static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MUSIC_IMPORTER;
-    public static final ArtifactType ARTIFACT_TYPE = ArtifactType.withDVMusic();
+    private static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MUSIC_IMPORTER;
+
+    private ArtifactType artifactType;
+
+    @Autowired
+    ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
     ArtifactRepository artifactRepository;
@@ -48,6 +53,8 @@ public class ServiceProcessMDBImportDVMusicTest {
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
     void testLoadArtists() {
+        this.artifactType = artifactTypeRepository.getWithDVMusic();
+
         DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_IMPORTED_ARTISTS, () -> {
             service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
             Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
@@ -111,7 +118,7 @@ public class ServiceProcessMDBImportDVMusicTest {
     @Order(3)
     @Rollback(false)
     void testLoadDVMusicTwo() {
-        int oldArtifactsCount = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE).size();
+        int oldArtifactsCount = artifactRepository.getAllByArtifactType(artifactType).size();
         assertThat(oldArtifactsCount).isGreaterThan(0);
 
         long oldTracksCount = StreamSupport.stream(trackRepository.findAll().spliterator(), false).count();
@@ -129,7 +136,7 @@ public class ServiceProcessMDBImportDVMusicTest {
         assertThat(processDetails.get(1).getRows()).isEqualTo(0);
         assertThat(processDetails.get(2).getRows()).isEqualTo(0);
 
-        int newArtifactsCount = artifactRepository.getAllByArtifactType(ARTIFACT_TYPE).size();
+        int newArtifactsCount = artifactRepository.getAllByArtifactType(artifactType).size();
         assertThat(newArtifactsCount).isGreaterThan(0);
         assertThat(newArtifactsCount).isEqualTo(oldArtifactsCount);
 

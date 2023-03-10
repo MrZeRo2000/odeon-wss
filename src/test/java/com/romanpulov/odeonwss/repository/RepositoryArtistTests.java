@@ -22,6 +22,9 @@ public class RepositoryArtistTests {
     EntityManager em;
 
     @Autowired
+    ArtifactTypeRepository artifactTypeRepository;
+
+    @Autowired
     ArtistRepository artistRepository;
 
     @Autowired
@@ -76,7 +79,7 @@ public class RepositoryArtistTests {
         Artist artist = artistRepository.findById(4L).orElseThrow();
 
         Artifact artifact = new EntityArtifactBuilder()
-                .withArtifactType(ArtifactType.withMP3())
+                .withArtifactType(artifactTypeRepository.getWithMP3())
                 .withArtist(artist)
                 .withTitle("Artifact title")
                 .withYear(1999L)

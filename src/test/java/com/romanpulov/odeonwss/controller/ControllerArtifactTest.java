@@ -1,12 +1,13 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
@@ -23,7 +24,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -37,6 +37,9 @@ public class ControllerArtifactTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
     private ArtistRepository artistRepository;
@@ -72,7 +75,7 @@ public class ControllerArtifactTest {
         artifactRepository.save(
                 new EntityArtifactBuilder()
                         .withArtist(artist1)
-                        .withArtifactType(ArtifactType.withLA())
+                        .withArtifactType(artifactTypeRepository.getWithLA())
                         .withTitle("Artist 1 LA Title 1")
                         .withYear(2000L)
                         .withDuration(7777L)
@@ -82,7 +85,7 @@ public class ControllerArtifactTest {
         artifactRepository.save(
                 new EntityArtifactBuilder()
                         .withArtist(artist1)
-                        .withArtifactType(ArtifactType.withMP3())
+                        .withArtifactType(artifactTypeRepository.getWithMP3())
                         .withTitle("Artist 1 MP3 Title 1")
                         .withYear(2001L)
                         .withDuration(6666L)
@@ -92,7 +95,7 @@ public class ControllerArtifactTest {
         artifactRepository.save(
                 new EntityArtifactBuilder()
                         .withArtist(artist1)
-                        .withArtifactType(ArtifactType.withMP3())
+                        .withArtifactType(artifactTypeRepository.getWithMP3())
                         .withTitle("Artist 1 MP3 Title 2")
                         .withYear(2002L)
                         .withDuration(5555L)
@@ -103,7 +106,7 @@ public class ControllerArtifactTest {
                 new EntityArtifactBuilder()
                         .withArtist(classics1)
                         .withPerformerArtist(performerArtist1)
-                        .withArtifactType(ArtifactType.withMP3())
+                        .withArtifactType(artifactTypeRepository.getWithMP3())
                         .withTitle("Classics Artist 1 Classics Title 1")
                         .withYear(1975L)
                         .withDuration(46534L)
