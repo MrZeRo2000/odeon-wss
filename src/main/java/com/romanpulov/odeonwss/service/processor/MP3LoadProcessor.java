@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 public class MP3LoadProcessor extends AbstractArtistProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(MP3LoadProcessor.class);
-    public static final String MEDIA_FORMAT = "MP3";
 
     private final ArtifactTypeRepository artifactTypeRepository;
 
@@ -75,7 +74,7 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
 
             for (Path p: trackFiles) {
                 String trackFileName = p.getFileName().toString();
-                if (!trackFileName.toUpperCase().endsWith(MEDIA_FORMAT)) {
+                if (!NamesParser.validateFileNameMediaFormat(trackFileName, getArtifactType().getMediaFileFormats())) {
                     errorHandler(ProcessorMessages.ERROR_WRONG_FILE_TYPE, p.toAbsolutePath());
                     return counter.get();
                 }

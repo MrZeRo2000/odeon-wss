@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {
@@ -32,15 +33,16 @@ public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {
     public void execute() throws ProcessorException {
         Path path = validateAndGetPath();
 
-        if (this.artifactType == null) {
-             this.artifactType = artifactTypeRepository.getWithDVMovies();
-        }
+        this.artifactType = Optional.ofNullable(this.artifactType).orElse(artifactTypeRepository.getWithDVMovies());
 
         List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getTrackMediaFileValidationDV(
-                artifactType);
+                this.artifactType);
         logger.info("dbValidation:" + dbValidation);
 
-        final List<MediaFileValidationDTO> pathValidation = PathValidationLoader.loadFromPath(this, path);
+        final List<MediaFileValidationDTO> pathValidation = PathValidationLoader.loadFromPath(
+                this,
+                path,
+                this.artifactType.getMediaFileFormats());
         logger.info("pathValidation:" + pathValidation);
 
         if (PathValidator.validateArtifacts(this, pathValidation, dbValidation)) {

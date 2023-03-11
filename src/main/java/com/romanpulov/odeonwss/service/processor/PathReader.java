@@ -30,11 +30,17 @@ public class PathReader {
             Collection<Path> paths) throws ProcessorException
     {
         try (Stream<Path> stream = Files.list(path)) {
-            for (Path p: stream.filter(filterPath).collect(Collectors.toList())) {
+            for (Path p: stream.collect(Collectors.toList())) {
                 if (ReadRule.validateRule(p, filterRule)) {
-                    paths.add(p);
                     if (!ReadRule.validateRule(p, validationRule)) {
+                        // add path to display in the error message
+                        paths.add(p);
                         return false;
+                    } else {
+                        // add considering filters
+                        if (filterPath.test(p)) {
+                            paths.add(p);
+                        }
                     }
                 }
             }

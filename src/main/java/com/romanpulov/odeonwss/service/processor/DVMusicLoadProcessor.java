@@ -8,6 +8,7 @@ import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
+import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
 import org.slf4j.Logger;
@@ -16,20 +17,15 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.romanpulov.jutilscore.io.FileUtils.getExtension;
 import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.ERROR_PARSING_FILE;
 
 @Component
 public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
     private static final Logger logger = LoggerFactory.getLogger(DVMusicLoadProcessor.class);
-    private static final Set<String> MEDIA_FORMATS = Set.of("AVI", "M4V", "MKV", "MP4", "MPG");
 
     private ArtifactType artifactType;
 
@@ -56,9 +52,7 @@ public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
     public void execute() throws ProcessorException {
         Path path = validateAndGetPath();
 
-        if (this.artifactType == null) {
-            this.artifactType = artifactTypeRepository.getWithDVMusic();
-        }
+        this.artifactType = Optional.ofNullable(this.artifactType).orElse(artifactTypeRepository.getWithDVMusic());
 
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED,
                 PathProcessUtil.processArtifactsPath(this, path, artifactRepository, artifactType));
@@ -75,7 +69,9 @@ public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
             if (!PathReader.readPathPredicateFilesOnly(
                     this,
                     mediaFilesRootPath,
-                    p -> MEDIA_FORMATS.contains(getExtension(p.getFileName().toString().toUpperCase())),
+                    p -> NamesParser.validateFileNameMediaFormat(
+                            p.getFileName().toString(),
+                            this.artifactType.getMediaFileFormats()),
                     mediaFilesPaths)) {
                 return counter.get();
             }

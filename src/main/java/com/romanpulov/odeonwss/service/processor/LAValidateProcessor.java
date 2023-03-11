@@ -14,14 +14,15 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class LAValidateProcessor extends AbstractFileSystemProcessor implements PathValidationLoader.ArtistArtifactPathLoader {
-    private static final Set<String> MEDIA_FORMATS = Set.of("APE", "FLAC", "WV");
-
     private static final Logger logger = LoggerFactory.getLogger(LAValidateProcessor.class);
+
+    private ArtifactType artifactType;
 
     private final ArtifactTypeRepository artifactTypeRepository;
 
@@ -39,7 +40,7 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
         logger.info("Started LAValidateProcessor execution");
         Path path = validateAndGetPath();
 
-        ArtifactType artifactType = artifactTypeRepository.getWithLA();
+        this.artifactType = Optional.ofNullable(this.artifactType).orElse(artifactTypeRepository.getWithLA());
 
         List<MediaFileValidationDTO> dbValidation = mediaFileRepository
                 .getTrackMediaFileValidationMusic(ArtistType.ARTIST, artifactType);
@@ -110,8 +111,7 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                     List<String> trackFileNames = trackPaths
                             .stream()
                             .map(f -> f.getFileName().toString())
-                            .filter(f -> f.contains("."))
-                            .filter(f -> MEDIA_FORMATS.contains(f.substring(f.lastIndexOf(".") + 1).toUpperCase()))
+                            .filter(f -> NamesParser.validateFileNameMediaFormat(f, this.artifactType.getMediaFileFormats()))
                             .collect(Collectors.toList());
                     if (trackFileNames.size() == 0) {
                         errorHandler(ProcessorMessages.ERROR_TRACK_FILES_NOT_FOUND_FOR_ARTIFACT, artifactPath.getFileName().toString());

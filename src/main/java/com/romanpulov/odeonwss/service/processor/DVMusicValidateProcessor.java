@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -37,14 +38,15 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
     public void execute() throws ProcessorException {
         Path path = validateAndGetPath();
 
-        if (this.artifactType == null) {
-            artifactType = artifactTypeRepository.getWithDVMusic();
-        }
+        this.artifactType = Optional.ofNullable(this.artifactType).orElse(artifactTypeRepository.getWithDVMusic());
 
         final List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getTrackMediaFileValidationMusic(
                 ArtistType.ARTIST, artifactType
         );
-        final List<MediaFileValidationDTO> pathValidation = PathValidationLoader.loadFromPath(this, path);
+        final List<MediaFileValidationDTO> pathValidation = PathValidationLoader.loadFromPath(
+                this,
+                path,
+                this.artifactType.getMediaFileFormats());
 
         if (validateEmptyMediaFiles()) {
             infoHandler(ProcessorMessages.INFO_MEDIA_FILES_SIZE_VALIDATED);

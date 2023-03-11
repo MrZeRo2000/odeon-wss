@@ -9,6 +9,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 public class UnitNamesParserTest {
 
     private static final Logger log = Logger.getLogger(UnitNamesParserTest.class.getSimpleName());
@@ -106,5 +108,20 @@ public class UnitNamesParserTest {
         Assertions.assertEquals(0, NamesParser.getDiskNumFromFolderName("CD2x"));
         Assertions.assertEquals(0, NamesParser.getDiskNumFromFolderName("CD2.exe"));
         Assertions.assertEquals(12, NamesParser.getDiskNumFromFolderName("CD12"));
+    }
+
+    @Test
+    void testFileExtensionPattern() {
+        Pattern pattern = Pattern.compile("(AVI|MKV)$");
+        Matcher matcher = pattern.matcher("something.MKV");
+        assertThat(matcher.find()).isTrue();
+    }
+
+    @Test
+    void testMediaFormatValidator() {
+        assertThat(NamesParser.validateFileNameMediaFormat("abc.mkv", "MKV|AVI")).isTrue();
+        assertThat(NamesParser.validateFileNameMediaFormat("abc.Avi", "MKV|AVI")).isTrue();
+        assertThat(NamesParser.validateFileNameMediaFormat("mkv.abc", "MKV|AVI")).isFalse();
+        assertThat(NamesParser.validateFileNameMediaFormat("abcmkv", "MKV|AVI")).isFalse();
     }
 }

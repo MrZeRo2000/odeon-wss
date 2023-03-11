@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
+import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -13,14 +14,21 @@ public class PathValidationLoader {
                 throws ProcessorException;
     }
 
-    public static List<MediaFileValidationDTO> loadFromPath(AbstractProcessor processor, Path path) throws ProcessorException {
+    public static List<MediaFileValidationDTO> loadFromPath(
+            AbstractProcessor processor,
+            Path path,
+            String mediaFileFormats) throws ProcessorException {
         List<MediaFileValidationDTO> result = new ArrayList<>();
 
         List<Path> artifactPaths = new ArrayList<>();
         if (PathReader.readPathFoldersOnly(processor, path, artifactPaths)) {
             for (Path artifactPath: artifactPaths) {
                 List<Path> trackPaths = new ArrayList<>();
-                if (PathReader.readPathFilesOnly(processor, artifactPath, trackPaths)) {
+                if (PathReader.readPathPredicateFilesOnly(
+                        processor,
+                        artifactPath,
+                        p -> NamesParser.validateFileNameMediaFormat(p.getFileName().toString(), mediaFileFormats),
+                        trackPaths)) {
                     trackPaths.forEach(trackPath ->
                             result.add(MediaFileValidationDTO.fromDVMediaFile(
                                     artifactPath.getFileName().toString(),

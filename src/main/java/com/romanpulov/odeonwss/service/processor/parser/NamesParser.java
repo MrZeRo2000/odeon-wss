@@ -1,8 +1,12 @@
 package com.romanpulov.odeonwss.service.processor.parser;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class NamesParser {
     private static final Pattern REGEXP_PATTERN_MUSIC_ARTIFACT = Pattern.compile("^((?:19|20)[0-9]{2})\\s(\\S.*)");
@@ -13,6 +17,9 @@ public class NamesParser {
     private static final String FORMAT_MUSIC_TRACK = "%d - %s";
     private static final String FORMAT_MUSIC_WITH_FILE_NAME = "%s - %s (%s)";
     private static final String FORMAT_MUSIC_WITHOUT_FILE_NAME = "%s - %s (no file name)";
+
+    private static final String FORMAT_MEDIA_FORMATS_REGEXP = "\\.(%s)$";
+    private static final Map<String, Pattern> MEDIA_FORMATS_PATTERN_MAP = new ConcurrentHashMap<>();
 
     public static class YearTitle {
         private final int year;
@@ -109,6 +116,20 @@ public class NamesParser {
             return Integer.parseInt(matcher.group(1));
         } else {
             return 0;
+        }
+    }
+
+    public static boolean validateFileNameMediaFormat(String fileName, String mediaFormats) {
+        try {
+            Pattern pattern = MEDIA_FORMATS_PATTERN_MAP.computeIfAbsent(
+                    mediaFormats,
+                    f -> Pattern.compile(
+                            String.format(FORMAT_MEDIA_FORMATS_REGEXP, mediaFormats),
+                            Pattern.CASE_INSENSITIVE));
+            return pattern.matcher(fileName).find();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }
