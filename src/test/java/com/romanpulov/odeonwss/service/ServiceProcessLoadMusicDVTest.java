@@ -99,7 +99,7 @@ public class ServiceProcessLoadMusicDVTest {
         int id = 0;
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Started Music Loader"),
+                        ProcessDetailInfo.fromMessage("Started Video music Loader"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -150,7 +150,7 @@ public class ServiceProcessLoadMusicDVTest {
         int id = 0;
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Started Music Loader"),
+                        ProcessDetailInfo.fromMessage("Started Video music Loader"),
                         ProcessingStatus.INFO,
                         null,
                         null)
