@@ -1,13 +1,9 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.fasterxml.jackson.core.JsonParseException;
+import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.dto.TrackTableDTO;
 import com.romanpulov.odeonwss.dto.TrackValidationDTO;
 import com.romanpulov.odeonwss.entity.*;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityTrackBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +17,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -40,6 +38,12 @@ public class RepositoryTrackTests {
 
     @Autowired
     private TrackRepository trackRepository;
+
+    @Autowired
+    private DVProductRepository dvProductRepository;
+
+    @Autowired
+    private DVOriginRepository dvOriginRepository;
 
     @Test
     @Order(1)
@@ -169,7 +173,7 @@ public class RepositoryTrackTests {
     void testInsertWithSameDiskAndNumShouldFail() {
         Artifact artifact = artifactRepository.findById(1L).orElseThrow();
 
-        Assertions.assertThrows(JpaSystemException.class, () -> {
+        Assertions.assertThrows(JpaSystemException.class, () ->
             trackRepository.save(
                     new EntityTrackBuilder()
                             .withArtifact(artifact)
@@ -178,8 +182,8 @@ public class RepositoryTrackTests {
                             .withNum(5L)
                             .withDuration(757L)
                             .build()
-            );
-        });
+            )
+        );
     }
 
     @Test
@@ -196,7 +200,7 @@ public class RepositoryTrackTests {
     @Order(6)
     @Transactional
     @Rollback(false)
-    void testInsertWithMediaFileShouldBeOk() throws Exception {
+    void testInsertWithMediaFileShouldBeOk() {
         MediaFile mediaFile = new EntityMediaFileBuilder()
                 .withArtifact(artifactRepository.findById(1L).orElseThrow())
                 .withFormat("mp3")
@@ -226,7 +230,7 @@ public class RepositoryTrackTests {
     @Order(7)
     @Transactional
     @Rollback(false)
-    void testDeleteMediaFileShouldBeOk() throws Exception {
+    void testDeleteMediaFileShouldBeOk() {
         Track track = trackRepository.findById(1L).orElseThrow();
         Assertions.assertEquals(1, track.getMediaFiles().size());
 
@@ -234,6 +238,45 @@ public class RepositoryTrackTests {
         trackRepository.save(track);
 
         Assertions.assertEquals(0, track.getMediaFiles().size());
+    }
+
+    @Test
+    @Order(8)
+    void testCreateWithProduct() {
+        assertThat(dvProductRepository.findAll().size()).isEqualTo(0);
+
+        // create product
+        DVOrigin origin = dvOriginRepository.save(
+                new EntityDVOriginBuilder()
+                        .withId(1)
+                        .withName("Origin 1")
+                        .build()
+        );
+        DVProduct product = new EntityDVProductBuilder()
+                .withArtifactType(artifactTypeRepository.getWithDVMusic())
+                .withOrigin(origin)
+                .withTitle("Title 1")
+                .build();
+        dvProductRepository.save(product);
+
+        assertThat(dvProductRepository.findAll().size()).isEqualTo(1);
+
+        Track track = trackRepository.findByIdWithProducts(1L).orElseThrow();
+        assertThat(track.getDvProducts().size()).isEqualTo(0);
+
+        track.getDvProducts().add(product);
+        trackRepository.save(track);
+
+        Track savedTrack = trackRepository.findByIdWithProducts(1L).orElseThrow();
+        assertThat(savedTrack.getDvProducts().size()).isEqualTo(1);
+
+        savedTrack.setDvProducts(Set.of());
+        trackRepository.save(savedTrack);
+
+        Track deletedTrack = trackRepository.findByIdWithProducts(1L).orElseThrow();
+        assertThat(deletedTrack.getDvProducts().size()).isEqualTo(0);
+
+
     }
 
     @Test
