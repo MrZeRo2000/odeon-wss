@@ -106,7 +106,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
         List<Path> directoryPaths = new ArrayList<>();
         if (!PathReader.readPathAll(path, directoryPaths)) {
             return summary;
-        };
+        }
 
         List<Path> directoryFolderPaths = directoryPaths
                 .stream()

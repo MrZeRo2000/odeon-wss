@@ -30,7 +30,6 @@ public class Artifact extends AbstractBaseMigratedEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "arts_id", referencedColumnName = "arts_id")
-    @Nullable
     private Artist artist;
 
     @Nullable
@@ -44,7 +43,6 @@ public class Artifact extends AbstractBaseMigratedEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "perf_arts_id", referencedColumnName = "arts_id")
-    @Nullable
     private Artist performerArtist;
 
     @Nullable

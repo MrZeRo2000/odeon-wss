@@ -5,7 +5,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ArtifactTypeRepository extends CrudRepository<ArtifactType, Long> {
     @Cacheable("artifactTypesIdsInList")

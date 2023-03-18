@@ -99,7 +99,7 @@ public class ProcessInfoRepository {
         DBProcessInfo dbProcessInfo = new DBProcessInfo();
         dbProcessInfo.setProcessorType(processInfo.getProcessorType());
         dbProcessInfo.setProcessingStatus(processInfo.getProcessingStatus());
-        dbProcessInfo.setUpdateDateTime(processInfo.getLastUpdated());;
+        dbProcessInfo.setUpdateDateTime(processInfo.getLastUpdated());
 
         dbProcessInfoRepository.save(dbProcessInfo);
         saveDbProcessDetails(processInfo, dbProcessInfo);

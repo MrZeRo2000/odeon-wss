@@ -2,7 +2,6 @@ package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.dto.MediaFileEditDTO;
 import com.romanpulov.odeonwss.dto.MediaFileTableDTO;
-import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.service.MediaFileService;
 import com.romanpulov.odeonwss.view.IdNameView;
@@ -45,7 +44,7 @@ public class MediaFileController {
 
     @PutMapping
     ResponseEntity<MediaFileEditDTO> put(@RequestBody MediaFileEditDTO dto)
-            throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException {
+            throws CommonEntityNotFoundException {
         return ResponseEntity.ok(mediaFileService.update(dto));
     }
 

@@ -2,7 +2,6 @@ package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.dto.TrackEditDTO;
 import com.romanpulov.odeonwss.dto.TrackTableDTO;
-import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.service.TrackService;
 import org.springframework.http.MediaType;
@@ -39,7 +38,7 @@ public class TrackController {
 
     @PutMapping
     ResponseEntity<TrackEditDTO> put(@RequestBody TrackEditDTO dto)
-            throws CommonEntityNotFoundException, CommonEntityAlreadyExistsException {
+            throws CommonEntityNotFoundException {
         return ResponseEntity.ok(trackService.update(dto));
     }
 

@@ -2,7 +2,6 @@ package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.dto.ArtistLyricsEditDTO;
 import com.romanpulov.odeonwss.dto.ArtistLyricsTableDTO;
-import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.service.ArtistLyricsService;
 import com.romanpulov.odeonwss.view.TextView;
@@ -45,13 +44,13 @@ public class ArtistLyricsController {
 
     @PostMapping
     ResponseEntity<ArtistLyricsEditDTO> post(@RequestBody ArtistLyricsEditDTO dto)
-            throws CommonEntityNotFoundException, CommonEntityAlreadyExistsException {
+            throws CommonEntityNotFoundException {
         return ResponseEntity.ok(artistLyricsService.insert(dto));
     }
 
     @PutMapping
     ResponseEntity<ArtistLyricsEditDTO> put(@RequestBody ArtistLyricsEditDTO dto)
-            throws CommonEntityNotFoundException, CommonEntityAlreadyExistsException {
+            throws CommonEntityNotFoundException {
         return ResponseEntity.ok(artistLyricsService.update(dto));
     }
 
