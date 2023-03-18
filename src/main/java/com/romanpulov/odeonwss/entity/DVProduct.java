@@ -136,6 +136,13 @@ public class DVProduct extends AbstractBaseMigratedEntity {
     public DVProduct() {
     }
 
+    public static DVProduct fromId(Long id) {
+        DVProduct dvProduct = new DVProduct();
+        dvProduct.setId(id);
+
+        return dvProduct;
+    }
+
     public DVProduct(Long id, DVOrigin dvOrigin, String title, String originalTitle, Long year, String frontInfo, String description, String notes) {
         this.setId(id);
         this.dvOrigin = dvOrigin;

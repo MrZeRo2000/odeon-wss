@@ -2,13 +2,9 @@ package com.romanpulov.odeonwss.builder.dtobuilder;
 
 import com.romanpulov.odeonwss.builder.AbstractClassBuilder;
 import com.romanpulov.odeonwss.dto.TrackEditDTO;
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.MediaFile;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.stream.Collectors;
 
 public class TrackEditDTOBuilder extends AbstractClassBuilder<TrackEditDTO> {
     public TrackEditDTOBuilder() {
@@ -57,6 +53,11 @@ public class TrackEditDTOBuilder extends AbstractClassBuilder<TrackEditDTO> {
 
     public TrackEditDTOBuilder withMediaFileIds(Collection<Long> mediaFileIds) {
         instance.setMediaFiles(new HashSet<>(mediaFileIds));
+        return this;
+    }
+
+    public TrackEditDTOBuilder withDvProductId(long dvProductId) {
+        instance.setDvProductId(dvProductId);
         return this;
     }
 }

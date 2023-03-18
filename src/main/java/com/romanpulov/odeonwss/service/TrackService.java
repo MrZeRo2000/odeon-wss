@@ -3,20 +3,24 @@ package com.romanpulov.odeonwss.service;
 import com.romanpulov.odeonwss.dto.TrackEditDTO;
 import com.romanpulov.odeonwss.dto.TrackTableDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.entity.DVProduct;
 import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.TrackMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.DVProductRepository;
 import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -28,10 +32,17 @@ public class TrackService implements EditableObjectService<TrackEditDTO>{
 
     private final MediaFileRepository mediaFileRepository;
 
-    public TrackService(ArtifactRepository artifactRepository, TrackRepository trackRepository, MediaFileRepository mediaFileRepository) {
+    private final DVProductRepository dvProductRepository;
+
+    public TrackService(
+            ArtifactRepository artifactRepository,
+            TrackRepository trackRepository,
+            MediaFileRepository mediaFileRepository,
+            DVProductRepository dvProductRepository) {
         this.artifactRepository = artifactRepository;
         this.trackRepository = trackRepository;
         this.mediaFileRepository = mediaFileRepository;
+        this.dvProductRepository = dvProductRepository;
     }
 
     public List<TrackTableDTO>getTable(Long artifactId) throws CommonEntityNotFoundException {
@@ -73,9 +84,15 @@ public class TrackService implements EditableObjectService<TrackEditDTO>{
                 .orElseThrow(() -> new CommonEntityNotFoundException("Artifact", o.getArtifactId()));
         Track track = trackRepository.findById(o.getId())
                 .orElseThrow(() -> new CommonEntityNotFoundException("Track", o.getId()));
-        Set<MediaFile> mediaFiles = StreamSupport.stream(mediaFileRepository.findAllById(o.getMediaFileIds()).spliterator(), false).collect(Collectors.toSet());
+        Set<MediaFile> mediaFiles = StreamSupport
+                .stream(mediaFileRepository.findAllById(o.getMediaFileIds()).spliterator(), false)
+                .collect(Collectors.toSet());
+        Set<DVProduct> dvProducts = o.getDvProductId() == null ? new HashSet<>() :
+                Stream
+                .ofNullable(dvProductRepository.findById(o.getDvProductId()).orElse(null))
+                .collect(Collectors.toSet());
 
-        TrackMapper.updateFromEditDTO(track, o, artifact, mediaFiles);
+        TrackMapper.updateFromEditDTO(track, o, artifact, mediaFiles, dvProducts);
 
         trackRepository.save(track);
 

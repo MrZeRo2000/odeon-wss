@@ -29,6 +29,8 @@ public class TrackEditDTO {
 
     private Set<Long> mediaFileIds;
 
+    private Long dvProductId;
+
     public Long getId() {
         return id;
     }
@@ -133,20 +135,12 @@ public class TrackEditDTO {
         this.mediaFileIds = mediaFileIds;
     }
 
-    public TrackEditDTO(Long id, Long artifactId, Long diskNum, Long num, Long artistId, String artistName, Long performerArtistId, String performerArtistName, Long dvTypeId, String dvTypeName, String title, Long duration, Set<Long> mediaFileIds) {
-        this.id = id;
-        this.artifactId = artifactId;
-        this.diskNum = diskNum;
-        this.num = num;
-        this.artistId = artistId;
-        this.artistName = artistName;
-        this.performerArtistId = performerArtistId;
-        this.performerArtistName = performerArtistName;
-        this.dvTypeId = dvTypeId;
-        this.dvTypeName = dvTypeName;
-        this.title = title;
-        this.duration = duration;
-        this.mediaFileIds = mediaFileIds;
+    public Long getDvProductId() {
+        return dvProductId;
+    }
+
+    public void setDvProductId(Long dvProductId) {
+        this.dvProductId = dvProductId;
     }
 
     public TrackEditDTO() {
@@ -168,6 +162,7 @@ public class TrackEditDTO {
                 ", title='" + title + '\'' +
                 ", duration=" + duration +
                 ", mediaFileIds=" + mediaFileIds +
+                ", dvProductId=" + dvProductId +
                 '}';
     }
 }

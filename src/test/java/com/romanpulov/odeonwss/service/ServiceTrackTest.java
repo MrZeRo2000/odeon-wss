@@ -1,11 +1,9 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.builder.dtobuilder.TrackEditDTOBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.dto.TrackEditDTO;
 import com.romanpulov.odeonwss.entity.*;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.repository.*;
 import org.junit.jupiter.api.*;
@@ -15,11 +13,12 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -35,12 +34,6 @@ public class ServiceTrackTest {
     private ArtifactRepository artifactRepository;
 
     @Autowired
-    private ArtistService artistService;
-
-    @Autowired
-    private ArtifactService artifactService;
-
-    @Autowired
     private TrackService trackService;
 
     @Autowired
@@ -48,6 +41,12 @@ public class ServiceTrackTest {
 
     @Autowired
     private MediaFileRepository mediaFileRepository;
+
+    @Autowired
+    private DVOriginRepository dvOriginRepository;
+
+    @Autowired
+    private DVProductRepository dvProductRepository;
 
     @Test
     @Order(1)
@@ -77,7 +76,7 @@ public class ServiceTrackTest {
                         .build()
         );
 
-        Artifact artifact2 = artifactRepository.save(
+        artifactRepository.save(
                 new EntityArtifactBuilder()
                         .withArtifactType(artifactTypeRepository.getWithMP3())
                         .withArtist(artist)
@@ -97,6 +96,20 @@ public class ServiceTrackTest {
                         .withDuration(123L)
                         .build()
         );
+
+        // create product
+        DVOrigin origin = dvOriginRepository.save(
+                new EntityDVOriginBuilder()
+                        .withId(1)
+                        .withName("Origin 1")
+                        .build()
+        );
+        DVProduct product = new EntityDVProductBuilder()
+                .withArtifactType(artifactTypeRepository.getWithDVMusic())
+                .withOrigin(origin)
+                .withTitle("Title 1")
+                .build();
+        dvProductRepository.save(product);
 
         TrackEditDTO comp11 = trackService.insert(
             new TrackEditDTOBuilder()
@@ -133,7 +146,7 @@ public class ServiceTrackTest {
                         .build()
         );
 
-        TrackEditDTO comp12 = trackService.insert(
+        trackService.insert(
                 new TrackEditDTOBuilder()
                         .withArtifactId(artifact1.getId())
                         .withTitle("Comp 1-2")
@@ -141,6 +154,7 @@ public class ServiceTrackTest {
                         .withNum(5L)
                         .withDuration(12L)
                         .withMediaFileIds(Stream.of(mediaFile12).map(MediaFile::getId).collect(Collectors.toSet()))
+                        .withDvProductId(product.getId())
                         .build()
         );
 
@@ -186,9 +200,29 @@ public class ServiceTrackTest {
         dto.setMediaFiles(Set.of(mediaFile.getId()));
         dto = trackService.update(dto);
         Assertions.assertEquals(1, trackRepository.findById(1L).orElseThrow().getMediaFiles().size());
+        assertThat(dto.getMediaFileIds().size()).isEqualTo(1);
     }
+
     @Test
-    @Order(4)
+    @Order(5)
+    void testAssignProduct() throws Exception {
+        TrackEditDTO dto = trackService.getById(2L);
+        assertThat(dto.getDvProductId()).isEqualTo(1L);
+
+        dto.setDvProductId(null);
+        dto = trackService.update(dto);
+
+        assertThat(dto.getDvProductId()).isNull();
+
+        dto.setDvProductId(1L);
+        dto = trackService.update(dto);
+
+        assertThat(dto.getDvProductId()).isEqualTo(1L);
+    }
+
+
+    @Test
+    @Order(6)
     void testDelete() throws Exception {
         Assertions.assertThrows(CommonEntityNotFoundException.class, () -> trackService.deleteById(5L));
 

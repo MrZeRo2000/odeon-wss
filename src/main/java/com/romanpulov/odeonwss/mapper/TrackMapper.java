@@ -5,9 +5,15 @@ import com.romanpulov.odeonwss.entity.*;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TrackMapper {
-    public static void updateFromEditDTO(Track track, TrackEditDTO editDTO, Artifact artifact, Set<MediaFile> mediaFiles) {
+    public static void updateFromEditDTO(
+            Track track,
+            TrackEditDTO editDTO,
+            Artifact artifact,
+            Set<MediaFile> mediaFiles,
+            Set<DVProduct> dvProducts) {
         track.setId(editDTO.getId());
         track.setArtifact(artifact);
 
@@ -41,6 +47,7 @@ public class TrackMapper {
         track.setNum(editDTO.getNum());
 
         track.setMediaFiles(mediaFiles);
+        track.setDvProducts(dvProducts);
     }
 
     public static Track createFromEditDTO(TrackEditDTO editDTO, Artifact artifact) {
@@ -72,7 +79,14 @@ public class TrackMapper {
         track.setDiskNum(editDTO.getDiskNum());
         track.setNum(editDTO.getNum());
 
-        track.setMediaFiles(editDTO.getMediaFileIds().stream().map(MediaFile::fromId).collect(Collectors.toSet()));
+        track.setMediaFiles(editDTO.getMediaFileIds()
+                .stream()
+                .map(MediaFile::fromId)
+                .collect(Collectors.toSet()));
+
+        track.setDvProducts(Stream.ofNullable(editDTO.getDvProductId())
+                .map(DVProduct::fromId)
+                .collect(Collectors.toSet()));
 
         return track;
     }
@@ -106,6 +120,7 @@ public class TrackMapper {
         dto.setDiskNum(track.getDiskNum());
         dto.setNum(track.getNum());
         dto.setMediaFiles(track.getMediaFiles().stream().map(MediaFile::getId).collect(Collectors.toSet()));
+        dto.setDvProductId(track.getDvProducts().stream().findFirst().orElse(new DVProduct()).getId());
 
         return dto;
     }
