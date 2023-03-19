@@ -83,7 +83,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
                     track.setTitle(artifact.getTitle());
                     track.setNum(1L);
                     track.setDuration(artifact.getDuration());
-                    dVProductRepository.getFirstByTitle(track.getTitle())
+                    dVProductRepository.findFirstByArtifactTypeAndTitle(artifactType, track.getTitle())
                             .ifPresent(p -> track.setDvProducts(Set.of(p)));
 
                     trackRepository.save(track);
