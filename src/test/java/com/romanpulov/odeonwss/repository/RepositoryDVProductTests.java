@@ -3,7 +3,6 @@ package com.romanpulov.odeonwss.repository;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVCategoryBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVProductBuilder;
-import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.DVCategory;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import com.romanpulov.odeonwss.entity.DVProduct;
@@ -17,8 +16,6 @@ import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -39,7 +36,7 @@ public class RepositoryDVProductTests {
 
     @Test
     @Order(1)
-    @Sql({"/schema.sql"})
+    @Sql({"/schema.sql", "/data.sql"})
     @Rollback(value = false)
     void testMinimumInsert() {
         Assertions.assertEquals(0, dvProductRepository.findAll().size());
@@ -50,7 +47,7 @@ public class RepositoryDVProductTests {
                         .build()
         );
         DVProduct product = new EntityDVProductBuilder()
-                .withArtifactType(artifactTypeRepository.getWithDVMusic())
+                .withArtifactType(artifactTypeRepository.getWithDVMovies())
                 .withOrigin(origin)
                 .withTitle("Title 1")
                 .build();
@@ -72,7 +69,7 @@ public class RepositoryDVProductTests {
         Set<DVCategory> categories = new HashSet<>(dVCategoryRepository.findAllMap().values());
 
         DVProduct product = new EntityDVProductBuilder()
-                .withArtifactType(artifactTypeRepository.getWithDVMusic())
+                .withArtifactType(artifactTypeRepository.getWithDVMovies())
                 .withOrigin(origins.values().stream().findFirst().orElseThrow())
                 .withTitle("Product with categories")
                 .withCategories(categories)
@@ -86,7 +83,7 @@ public class RepositoryDVProductTests {
     void testInsertFields() {
         DVOrigin origin = dvOriginRepository.findAllMap().values().stream().findFirst().orElseThrow();
         DVProduct product = new EntityDVProductBuilder()
-                .withArtifactType(artifactTypeRepository.getWithDVMovies())
+                .withArtifactType(artifactTypeRepository.getWithDVAnimation())
                 .withOrigin(origin)
                 .withTitle("Product title")
                 .withOriginalTitle("Product original title")
@@ -100,7 +97,7 @@ public class RepositoryDVProductTests {
 
         DVProduct savedProduct = dvProductRepository.findById(3L).orElseThrow();
 
-        assertThat(savedProduct.getArtifactType().getId()).isEqualTo(artifactTypeRepository.getWithDVMovies().getId());
+        assertThat(savedProduct.getArtifactType().getId()).isEqualTo(artifactTypeRepository.getWithDVAnimation().getId());
         assertThat(savedProduct.getDvOrigin().getId()).isEqualTo(origin.getId());
         assertThat(savedProduct.getTitle()).isEqualTo("Product title");
         assertThat(savedProduct.getOriginalTitle()).isEqualTo("Product original title");
@@ -137,5 +134,27 @@ public class RepositoryDVProductTests {
         assertThat(product.getDvCategories().size()).isEqualTo(2);
         assertThat(product.getDvCategories().stream().filter(c -> c.getId() == 1L).count()).isEqualTo(0);
         assertThat(product.getDvCategories().stream().filter(c -> c.getId() == 3L).count()).isEqualTo(1);
+    }
+
+    @Test
+    @Order(5)
+    void testFindByArtifactType() {
+        var moviesList = dvProductRepository
+                .findAllByArtifactTypeOrderByTitleAsc(artifactTypeRepository.getWithDVMovies());
+        assertThat(moviesList.size()).isEqualTo(2);
+        assertThat(moviesList.get(0).getTitle()).isEqualTo("Product with categories");
+        assertThat(moviesList.get(0).getId()).isEqualTo(2L);
+        assertThat(moviesList.get(1).getTitle()).isEqualTo("Title 1");
+        assertThat(moviesList.get(1).getId()).isEqualTo(1L);
+
+        var animationList = dvProductRepository
+                .findAllByArtifactTypeOrderByTitleAsc(artifactTypeRepository.getWithDVAnimation());
+        assertThat(animationList.size()).isEqualTo(1);
+        assertThat(animationList.get(0).getId()).isEqualTo(3L);
+        assertThat(animationList.get(0).getTitle()).isEqualTo("Product title");
+
+        assertThat(dvProductRepository
+                .findAllByArtifactTypeOrderByTitleAsc(artifactTypeRepository.getWithDVMusic()).size())
+                .isEqualTo(0);
     }
 }
