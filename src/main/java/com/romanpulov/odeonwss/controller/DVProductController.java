@@ -24,7 +24,7 @@ public class DVProductController {
         this.dvProductRepository = dvProductRepository;
     }
 
-    @GetMapping("/dvproducts/table-id-name")
+    @GetMapping("/dvproducts/table-id-title")
     ResponseEntity<List<IdTitleView>> getDvProducts(@RequestParam Long artifactTypeId)
             throws CommonEntityNotFoundException {
         ArtifactType artifactType = artifactTypeRepository.findById(artifactTypeId).orElseThrow(

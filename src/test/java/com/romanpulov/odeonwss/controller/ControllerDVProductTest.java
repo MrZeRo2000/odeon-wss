@@ -78,7 +78,7 @@ public class ControllerDVProductTest {
     @Order(2)
     @Rollback(value = false)
     void testValidateGetAllIdTitleExistingOk() throws Exception {
-        var result_202 = mockMvc.perform(get("/api/dvproduct/dvproducts/table-id-name")
+        var result_202 = mockMvc.perform(get("/api/dvproduct/dvproducts/table-id-title")
                         .param("artifactTypeId", "202"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -92,7 +92,7 @@ public class ControllerDVProductTest {
         ;
         logger.debug("Get 202 result:" + result_202.andReturn().getResponse().getContentAsString());
 
-        var result_203 = mockMvc.perform(get("/api/dvproduct/dvproducts/table-id-name")
+        var result_203 = mockMvc.perform(get("/api/dvproduct/dvproducts/table-id-title")
                         .param("artifactTypeId", "203"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
@@ -103,7 +103,7 @@ public class ControllerDVProductTest {
     @Order(3)
     @Rollback(value = false)
     void testValidateGetAllIdTitleNotExistingFailed() throws Exception {
-        mockMvc.perform(get("/api/dvproduct/dvproducts/table-id-name")
+        mockMvc.perform(get("/api/dvproduct/dvproducts/table-id-title")
                         .param("artifactTypeId", "1024"))
                 .andExpect(status().isNotFound())
         ;
