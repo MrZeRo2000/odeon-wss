@@ -31,6 +31,8 @@ public class TrackEditDTO {
 
     private Long dvProductId;
 
+    private String dvProductTitle;
+
     public Long getId() {
         return id;
     }
@@ -143,6 +145,14 @@ public class TrackEditDTO {
         this.dvProductId = dvProductId;
     }
 
+    public String getDvProductTitle() {
+        return dvProductTitle;
+    }
+
+    public void setDvProductTitle(String dvProductTitle) {
+        this.dvProductTitle = dvProductTitle;
+    }
+
     public TrackEditDTO() {
     }
 
@@ -163,6 +173,7 @@ public class TrackEditDTO {
                 ", duration=" + duration +
                 ", mediaFileIds=" + mediaFileIds +
                 ", dvProductId=" + dvProductId +
+                ", dvProductTitle=" + dvProductTitle +
                 '}';
     }
 }

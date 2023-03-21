@@ -120,7 +120,12 @@ public class TrackMapper {
         dto.setDiskNum(track.getDiskNum());
         dto.setNum(track.getNum());
         dto.setMediaFiles(track.getMediaFiles().stream().map(MediaFile::getId).collect(Collectors.toSet()));
-        dto.setDvProductId(track.getDvProducts().stream().findFirst().orElse(new DVProduct()).getId());
+
+        if (track.getDvProducts().size() > 0) {
+            DVProduct dvProduct = track.getDvProducts().stream().findFirst().orElseThrow();
+            dto.setDvProductId(dvProduct.getId());
+            dto.setDvProductTitle(dvProduct.getTitle());
+        }
 
         return dto;
     }
