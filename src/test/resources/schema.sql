@@ -192,7 +192,7 @@ CREATE TABLE tracks_dv_products(
 
 CREATE UNIQUE INDEX idx_tracks_dv_products_trck_id ON tracks_dv_products(trck_id);
 
-CREATE UNIQUE INDEX idx_tracks_dv_products_dvpd_id ON tracks_dv_products(dvpd_id);
+CREATE INDEX idx_tracks_dv_products_dvpd_id ON tracks_dv_products(dvpd_id);
 
 -- PROCESSING --
 
