@@ -1,20 +1,18 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.config.DatabaseConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
-
-import static org.assertj.core.api.Assertions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
@@ -23,6 +21,8 @@ import org.springframework.test.context.junit.jupiter.DisabledIf;
 
 import java.util.List;
 import java.util.logging.Logger;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -41,7 +41,7 @@ public class ServiceProcessValidateDVMoviesTest {
     private ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
-    private AppConfiguration appConfiguration;
+    private DatabaseConfiguration databaseConfiguration;;
 
     @Autowired
     private ArtifactRepository artifactRepository;
@@ -53,7 +53,7 @@ public class ServiceProcessValidateDVMoviesTest {
     private MediaFileRepository mediaFileRepository;
 
     private void internalPrepare() {
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_LOADED_MOVIES, () -> {
+        DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_LOADED_MOVIES, () -> {
             service.executeProcessor(ProcessorType.DV_MOVIES_LOADER);
             Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
             log.info("Movies Importer Processing info: " + service.getProcessInfo());

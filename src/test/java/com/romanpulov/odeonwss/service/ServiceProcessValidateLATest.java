@@ -2,7 +2,7 @@ package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.config.DatabaseConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
@@ -55,10 +55,10 @@ public class ServiceProcessValidateLATest {
     private ArtifactRepository artifactRepository;
 
     @Autowired
-    private AppConfiguration appConfiguration;
+    private DatabaseConfiguration databaseConfiguration;;
 
     private void prepareInternal() {
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_LOADED_LA, () -> {
+        DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_LOADED_LA, () -> {
             TEST_ARTISTS
                     .forEach(s -> artistRepository.save(
                             new EntityArtistBuilder().withType(ArtistType.ARTIST).withName(s).build()

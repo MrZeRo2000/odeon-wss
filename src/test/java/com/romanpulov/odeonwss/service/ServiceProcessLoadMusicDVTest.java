@@ -1,6 +1,6 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.config.DatabaseConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
@@ -37,7 +37,7 @@ public class ServiceProcessLoadMusicDVTest {
     ProcessService processService;
 
     @Autowired
-    private AppConfiguration appConfiguration;
+    private DatabaseConfiguration databaseConfiguration;;
 
     @Autowired
     private ArtifactTypeRepository artifactTypeRepository;
@@ -66,7 +66,7 @@ public class ServiceProcessLoadMusicDVTest {
     void testPrepare() throws Exception {
         this.artifactType = artifactTypeRepository.getWithDVMusic();
 
-        DbManagerService.loadOrPrepare(appConfiguration, DB_IMPORTED_ARTISTS, () -> {
+        DbManagerService.loadOrPrepare(databaseConfiguration, DB_IMPORTED_ARTISTS, () -> {
             processService.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
             assertThat(processService.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
             log.info("Artists Importer Processing info: " + processService.getProcessInfo());

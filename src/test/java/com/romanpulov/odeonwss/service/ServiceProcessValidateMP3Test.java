@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.config.DatabaseConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
@@ -40,7 +40,7 @@ public class ServiceProcessValidateMP3Test {
     MediaFileRepository mediaFileRepository;
 
     @Autowired
-    AppConfiguration appConfiguration;
+    DatabaseConfiguration databaseConfiguration;
 
     ProcessService service;
 
@@ -56,7 +56,7 @@ public class ServiceProcessValidateMP3Test {
             this.artifactType = artifactTypeRepository.getWithMP3();
         }
 
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_LOADED_MP3, () -> {
+        DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_LOADED_MP3, () -> {
             service.executeProcessor(ProcessorType.MP3_LOADER, null);
             assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         });

@@ -1,18 +1,18 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.config.DatabaseConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.processor.ValueValidator;
+import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
 import com.romanpulov.odeonwss.service.processor.model.ProcessDetailInfo;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
-import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,7 +39,7 @@ public class ServiceProcessLoadMoviesDVTest {
     ProcessService processService;
 
     @Autowired
-    private AppConfiguration appConfiguration;
+    private DatabaseConfiguration databaseConfiguration;
 
     @Autowired
     private ArtifactTypeRepository artifactTypeRepository;
@@ -63,7 +63,7 @@ public class ServiceProcessLoadMoviesDVTest {
     void testPrepare() throws Exception {
         this.artifactType = artifactTypeRepository.getWithDVMovies();
 
-        DbManagerService.loadOrPrepare(appConfiguration, DB_PRODUCTS, () -> {
+        DbManagerService.loadOrPrepare(databaseConfiguration, DB_PRODUCTS, () -> {
             processService.executeProcessor(ProcessorType.DV_PRODUCT_IMPORTER);
             Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
             log.info("Products Importer Processing info: " + processService.getProcessInfo());

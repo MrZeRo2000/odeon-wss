@@ -1,11 +1,10 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.config.DatabaseConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
@@ -46,14 +45,14 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
     private ArtifactRepository artifactRepository;
 
     @Autowired
-    private AppConfiguration appConfiguration;
+    private DatabaseConfiguration databaseConfiguration;;
 
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
     void testPrepare() throws Exception {
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_IMPORTED_MOVIES, () -> {
+        DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_IMPORTED_MOVIES, () -> {
             service.executeProcessor(ProcessorType.DV_MOVIES_IMPORTER);
             Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
             log.info("Movies Importer Processing info: " + service.getProcessInfo());

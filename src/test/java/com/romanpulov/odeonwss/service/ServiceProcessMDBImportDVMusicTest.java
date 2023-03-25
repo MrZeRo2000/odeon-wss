@@ -1,12 +1,12 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.config.DatabaseConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ public class ServiceProcessMDBImportDVMusicTest {
     ProcessService service;
 
     @Autowired
-    AppConfiguration appConfiguration;
+    DatabaseConfiguration databaseConfiguration;;
 
     @Test
     @Order(1)
@@ -56,7 +56,7 @@ public class ServiceProcessMDBImportDVMusicTest {
     void testLoadArtists() {
         this.artifactType = artifactTypeRepository.getWithDVMusic();
 
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_IMPORTED_ARTISTS, () -> {
+        DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_IMPORTED_ARTISTS, () -> {
             service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
             Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
             log.info("Artist Importer Processing info: " + service.getProcessInfo());

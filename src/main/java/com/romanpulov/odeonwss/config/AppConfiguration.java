@@ -31,13 +31,7 @@ public class AppConfiguration {
 
     private final Map<PathType, String> pathMap = new HashMap<>();
 
-    private final String dbUrl;
-
     private final String version;
-
-    public String getDbUrl() {
-        return dbUrl;
-    }
 
     public Map<PathType, String> getPathMap() {
         return pathMap;
@@ -48,8 +42,6 @@ public class AppConfiguration {
     }
 
     public AppConfiguration(ServletContext context, ProjectConfigurationProperties projectConfigurationProperties) {
-        dbUrl = context.getInitParameter("db-url");
-
         AppConfiguration.PATH_PARAMETER_MAP.forEach(
                 (key, value) -> this.pathMap.put(key, context.getInitParameter(value))
         );

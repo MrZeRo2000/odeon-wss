@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.config.DatabaseConfiguration;
 import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
@@ -35,7 +35,7 @@ public class ServiceProcessValidateDVMusicTest {
     ProcessService service;
 
     @Autowired
-    AppConfiguration appConfiguration;
+    DatabaseConfiguration databaseConfiguration;
 
     @Autowired
     ArtifactTypeRepository artifactTypeRepository;
@@ -58,7 +58,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     private void internalPrepareImported() {
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA, () -> {
+        DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA, () -> {
             // load artists
             service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
             Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
@@ -78,7 +78,7 @@ public class ServiceProcessValidateDVMusicTest {
 
     private void internalPrepareExisting() {
         internalPrepareImported();
-        DbManagerService.loadOrPrepare(appConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA_EXISTING, () -> {
+        DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA_EXISTING, () -> {
             artifactRepository.getAllByArtifactType(artifactType)
                     .forEach(artifact -> {
                         if (!EXISTING_ARTIFACT_TITLES.contains(artifact.getTitle())) {

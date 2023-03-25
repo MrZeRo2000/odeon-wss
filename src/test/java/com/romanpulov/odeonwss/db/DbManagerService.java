@@ -1,6 +1,6 @@
 package com.romanpulov.odeonwss.db;
 
-import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.config.DatabaseConfiguration;
 import org.hibernate.cfg.Environment;
 
 import java.io.File;
@@ -15,9 +15,9 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 public class DbManagerService {
     private static DbManagerService INSTANCE;
 
-    public static DbManagerService getInstance(AppConfiguration appConfiguration) {
+    public static DbManagerService getInstance(DatabaseConfiguration databaseConfiguration) {
         if (INSTANCE == null) {
-            INSTANCE = new DbManagerService(appConfiguration);
+            INSTANCE = new DbManagerService(databaseConfiguration);
         }
 
         return INSTANCE;
@@ -74,8 +74,8 @@ public class DbManagerService {
 
     private final String storageDbFolder;
 
-    private DbManagerService(AppConfiguration appConfiguration) {
-        this.dbPath = appConfiguration.getDbUrl().split(":")[2];
+    private DbManagerService(DatabaseConfiguration databaseConfiguration) {
+        this.dbPath = databaseConfiguration.getDbUrl().split(":")[2];
         this.storageDbFolder = Environment.getProperties().get("java.io.tmpdir").toString() +
                 PROJECT_NAME +
                 "-db" +
@@ -96,8 +96,8 @@ public class DbManagerService {
         return sourceExists;
     }
 
-    public static void loadOrPrepare(AppConfiguration appConfiguration, DbType dbType, Preparable preparable) {
-        DbManagerService dbManagerService = getInstance(appConfiguration);
+    public static void loadOrPrepare(DatabaseConfiguration databaseConfiguration, DbType dbType, Preparable preparable) {
+        DbManagerService dbManagerService = getInstance(databaseConfiguration);
         try {
             if (!dbManagerService.loadDb(dbType)) {
                 preparable.prepare();
