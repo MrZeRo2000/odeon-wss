@@ -4,7 +4,6 @@ import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
 import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
 import com.romanpulov.odeonwss.builder.dtobuilder.ArtifactEditDTOBuilder;
 import com.romanpulov.odeonwss.builder.dtobuilder.ArtistCategoriesDetailDTOBuilder;
-import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;

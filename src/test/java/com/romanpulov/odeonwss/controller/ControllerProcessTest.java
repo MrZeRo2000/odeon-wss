@@ -2,9 +2,7 @@ package com.romanpulov.odeonwss.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.odeonwss.dto.ProcessorRequestDTO;
-import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

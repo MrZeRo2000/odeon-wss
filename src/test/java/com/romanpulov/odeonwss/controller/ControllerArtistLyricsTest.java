@@ -2,7 +2,6 @@ package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.builder.dtobuilder.ArtistLyricsEditDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.dto.ArtistLyricsEditDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtistLyricsRepository;

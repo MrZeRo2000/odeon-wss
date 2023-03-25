@@ -1,7 +1,6 @@
 package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
-import com.romanpulov.odeonwss.entity.DVCategory;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
