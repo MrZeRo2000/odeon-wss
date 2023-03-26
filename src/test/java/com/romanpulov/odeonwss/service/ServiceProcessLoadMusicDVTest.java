@@ -6,7 +6,6 @@ import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.processor.ValueValidator;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
@@ -34,10 +33,13 @@ public class ServiceProcessLoadMusicDVTest {
     private ArtifactType artifactType;
 
     @Autowired
+    DataSource dataSource;
+
+    @Autowired
     ProcessService processService;
 
     @Autowired
-    private DatabaseConfiguration databaseConfiguration;;
+    private DatabaseConfiguration databaseConfiguration;
 
     @Autowired
     private ArtifactTypeRepository artifactTypeRepository;
@@ -46,13 +48,7 @@ public class ServiceProcessLoadMusicDVTest {
     private ArtifactRepository artifactRepository;
 
     @Autowired
-    private TrackRepository trackRepository;
-
-    @Autowired
     private MediaFileRepository mediaFileRepository;
-
-    @Autowired
-    DataSource dataSource;
 
     private ProcessInfo executeProcessor() {
         processService.executeProcessor(PROCESSOR_TYPE);
@@ -63,7 +59,7 @@ public class ServiceProcessLoadMusicDVTest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(value = false)
-    void testPrepare() throws Exception {
+    void testPrepare() {
         this.artifactType = artifactTypeRepository.getWithDVMusic();
 
         DbManagerService.loadOrPrepare(databaseConfiguration, DB_IMPORTED_ARTISTS, () -> {

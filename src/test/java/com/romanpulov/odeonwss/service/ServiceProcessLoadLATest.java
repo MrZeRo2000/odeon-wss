@@ -4,8 +4,8 @@ import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,7 @@ public class ServiceProcessLoadLATest {
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
-    void testNoArtists() throws Exception {
+    void testNoArtists() {
         List<ProcessDetail> processDetail;
 
         // warnings - no artists exist
@@ -147,7 +147,7 @@ public class ServiceProcessLoadLATest {
     @Test
     @Order(2)
     @Sql({"/schema.sql", "/data.sql"})
-    void testOk() throws Exception {
+    void testOk() {
         List.of(ARTIST_LIST)
                 .forEach(s -> artistRepository.save(
                         new EntityArtistBuilder().withType(ArtistType.ARTIST).withName(s).build()

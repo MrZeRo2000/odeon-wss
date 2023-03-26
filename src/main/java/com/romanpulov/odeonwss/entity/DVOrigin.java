@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.entity;
 
+import org.hibernate.Hibernate;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
@@ -21,32 +23,24 @@ public class DVOrigin extends AbstractBaseMigratedEntity {
         this.name = name;
     }
 
-    public DVOrigin() {
-    }
-
-    public DVOrigin(Long id, String name) {
-        this.setId(id);
-        this.name = name;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         DVOrigin dvOrigin = (DVOrigin) o;
-        return getId().equals(dvOrigin.getId()) && name.equals(dvOrigin.name);
+        return getId() != null && Objects.equals(getId(), dvOrigin.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId());
+        return getClass().hashCode();
     }
 
     @Override
     public String toString() {
-        return "DVOrigin{" +
-                "id=" + getId() +
-                ", name='" + name + '\'' +
-                '}';
+        return getClass().getSimpleName() + "(" +
+                "id = " + getId() + ", " +
+                "migrationId = " + getMigrationId() + ", " +
+                "name = " + getName() + ")";
     }
 }
