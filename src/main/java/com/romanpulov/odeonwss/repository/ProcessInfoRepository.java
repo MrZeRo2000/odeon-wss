@@ -7,14 +7,15 @@ import com.romanpulov.odeonwss.entity.DBProcessInfo;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
+@Transactional(readOnly = true)
 public class ProcessInfoRepository {
 
     private final DBProcessInfoRepository dbProcessInfoRepository;
@@ -105,7 +106,8 @@ public class ProcessInfoRepository {
         saveDbProcessDetails(processInfo, dbProcessInfo);
     }
 
-    private void saveDbProcessDetails(ProcessInfo processInfo, DBProcessInfo dbProcessInfo) {
+    @Transactional
+    void saveDbProcessDetails(ProcessInfo processInfo, DBProcessInfo dbProcessInfo) {
         processInfo.getProcessDetails().forEach(
                 processDetail -> {
                     DBProcessDetail dbProcessDetail = new DBProcessDetail();
@@ -125,7 +127,8 @@ public class ProcessInfoRepository {
         );
     }
 
-    private void saveDbProcessDetailItems(DBProcessDetail dbProcessDetail, List<String> items) {
+    @Transactional
+    void saveDbProcessDetailItems(DBProcessDetail dbProcessDetail, List<String> items) {
         items.forEach(item -> {
             DBProcessDetailItem dbProcessDetailItem = new DBProcessDetailItem();
             dbProcessDetailItem.setDbProcessDetail(dbProcessDetail);
@@ -135,7 +138,8 @@ public class ProcessInfoRepository {
         });
     }
 
-    private void saveDbProcessDetailActions(DBProcessDetail dbProcessDetail, ProcessingAction processingAction) {
+    @Transactional
+    void saveDbProcessDetailActions(DBProcessDetail dbProcessDetail, ProcessingAction processingAction) {
         DBProcessDetailAction dbProcessDetailAction = new DBProcessDetailAction();
         dbProcessDetailAction.setDbProcessDetail(dbProcessDetail);
         dbProcessDetailAction.setActionType(processingAction.getActionType());

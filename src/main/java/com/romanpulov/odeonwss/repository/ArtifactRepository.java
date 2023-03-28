@@ -8,12 +8,14 @@ import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.view.IdTitleView;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Transactional(readOnly = true)
 public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifact, Long> {
     List<Artifact> getAllByArtifactType(ArtifactType artifactType);
 

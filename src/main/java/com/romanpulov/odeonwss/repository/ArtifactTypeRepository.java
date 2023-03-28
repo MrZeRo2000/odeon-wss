@@ -3,9 +3,11 @@ package com.romanpulov.odeonwss.repository;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Transactional(readOnly = true)
 public interface ArtifactTypeRepository extends CrudRepository<ArtifactType, Long> {
     @Cacheable("artifactTypesIdsInList")
     List<ArtifactType> getAllByIdIsIn(List<Long> ids);

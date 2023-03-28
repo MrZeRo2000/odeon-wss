@@ -10,10 +10,12 @@ import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.view.IdNameView;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
+@Transactional(readOnly = true)
 public interface MediaFileRepository extends CrudRepository<MediaFile, Long> {
     Optional<MediaFile> findFirstByArtifact(Artifact artifact);
 

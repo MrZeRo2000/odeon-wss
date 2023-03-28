@@ -7,10 +7,12 @@ import com.romanpulov.odeonwss.entity.ArtistLyrics;
 import com.romanpulov.odeonwss.view.TextView;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
+@Transactional(readOnly = true)
 public interface ArtistLyricsRepository extends CrudRepository<ArtistLyrics, Long> {
     @Query("SELECT new com.romanpulov.odeonwss.dto.ArtistLyricsTableDTO (" +
             "al.id, " +
