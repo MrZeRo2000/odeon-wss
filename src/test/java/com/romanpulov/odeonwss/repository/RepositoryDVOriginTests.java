@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
 import com.romanpulov.odeonwss.entity.DVOrigin;
+import com.romanpulov.odeonwss.view.IdNameView;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,7 +11,10 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import javax.validation.ConstraintViolationException;
 
+import java.util.List;
 import java.util.Map;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -24,14 +28,14 @@ public class RepositoryDVOriginTests {
     @Sql({"/schema.sql"})
     @Rollback(value = false)
     void testInsert() {
-        Assertions.assertEquals(0, dvOriginRepository.getMaxId());
+        assertThat(dvOriginRepository.getMaxId()).isEqualTo(0);
 
         DVOrigin origin = new EntityDVOriginBuilder()
                 .withName("Origin 7")
                 .build();
         dvOriginRepository.save(origin);
 
-        Assertions.assertEquals(1, origin.getId());
+        assertThat(origin.getId()).isEqualTo(1);
 
         origin = new EntityDVOriginBuilder()
                 .withName("Origin 5")
@@ -39,40 +43,51 @@ public class RepositoryDVOriginTests {
                 .build();
         dvOriginRepository.save(origin);
 
-        Assertions.assertEquals(2, origin.getId());
+        assertThat(origin.getId()).isEqualTo(2);
 
         Map<Long, DVOrigin> dvOrigins = dvOriginRepository.findAllMap();
-        Assertions.assertEquals(2, dvOrigins.size());
-        Assertions.assertEquals(13, dvOrigins.get(2L).getMigrationId());
-        Assertions.assertEquals(2, dvOriginRepository.getMaxId());
+        assertThat(dvOrigins.size()).isEqualTo(2);
+        assertThat(dvOrigins.get(2L).getMigrationId()).isEqualTo(13);
+        assertThat(dvOriginRepository.getMaxId()).isEqualTo(2);
 
         Map<Long, DVOrigin> migrationIds = dvOriginRepository.findAllMigrationIdMap();
-        Assertions.assertEquals(1, migrationIds.size());
-        Assertions.assertNotNull(migrationIds.get(13L));
-        Assertions.assertNull(migrationIds.get(12L));
+        assertThat(migrationIds.size()).isEqualTo(1);
+        assertThat(migrationIds.get(13L)).isNotNull();
+        assertThat(migrationIds.get(12L)).isNull();
     }
 
     @Test
     @Order(2)
     void testDuplicateName() {
-        Assertions.assertThrows(JpaSystemException.class, () -> {
+        Assertions.assertThrows(JpaSystemException.class, () ->
             dvOriginRepository.save(
                     new EntityDVOriginBuilder()
                             .withId(55)
                             .withName("Origin 5")
                             .build()
-            );
-        });
+            )
+        );
     }
 
     @Test
     @Order(2)
     void testNoName() {
-        Assertions.assertThrows(ConstraintViolationException.class, () -> {
+        Assertions.assertThrows(ConstraintViolationException.class, () ->
             dvOriginRepository.save(
                     new EntityDVOriginBuilder()
                             .build()
-            );
-        });
+            )
+        );
+    }
+
+    @Test
+    @Order(3)
+    void testFindAllOrderByName() {
+        List<IdNameView> origins = dvOriginRepository.findAllByOrderByName();
+        assertThat(origins.size()).isEqualTo(2);
+        assertThat(origins.get(0).getName()).isEqualTo("Origin 5");
+        assertThat(origins.get(0).getId()).isEqualTo(2);
+        assertThat(origins.get(1).getName()).isEqualTo("Origin 7");
+        assertThat(origins.get(1).getId()).isEqualTo(1);
     }
 }
