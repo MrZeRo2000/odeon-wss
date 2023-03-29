@@ -2,7 +2,7 @@ package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
 import com.romanpulov.odeonwss.entity.DVOrigin;
-import com.romanpulov.odeonwss.view.IdNameView;
+import com.romanpulov.odeonwss.dto.IdNameDTO;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +13,7 @@ import javax.validation.ConstraintViolationException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -83,11 +84,18 @@ public class RepositoryDVOriginTests {
     @Test
     @Order(3)
     void testFindAllOrderByName() {
-        List<IdNameView> origins = dvOriginRepository.findAllByOrderByName();
+        List<IdNameDTO> origins = dvOriginRepository.findAllByOrderByName();
         assertThat(origins.size()).isEqualTo(2);
         assertThat(origins.get(0).getName()).isEqualTo("Origin 5");
         assertThat(origins.get(0).getId()).isEqualTo(2);
         assertThat(origins.get(1).getName()).isEqualTo("Origin 7");
         assertThat(origins.get(1).getId()).isEqualTo(1);
+    }
+
+    @Test
+    @Order(4)
+    void testFindDVOriginById() {
+        assertThat(dvOriginRepository.findDVOriginById(2).orElseThrow().getName()).isEqualTo("Origin 5");
+        Assertions.assertThrows(NoSuchElementException.class, () -> dvOriginRepository.findDVOriginById(40L).orElseThrow());
     }
 }

@@ -14,17 +14,18 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/artist-category", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ArtistCategoryController {
-
     private final ArtistCategoryRepository artistCategoryRepository;
+    private final ArtistCategoryMapper artistCategoryMapper;
 
-    public ArtistCategoryController(ArtistCategoryRepository artistCategoryRepository) {
+    public ArtistCategoryController(ArtistCategoryRepository artistCategoryRepository, ArtistCategoryMapper artistCategoryMapper) {
         this.artistCategoryRepository = artistCategoryRepository;
+        this.artistCategoryMapper = artistCategoryMapper;
     }
 
     @GetMapping("/all-with-artists")
     ResponseEntity<List<ArtistCategoryTableDTO>> getAllWithArtists() {
         return ResponseEntity.ok(
-                ArtistCategoryMapper.fromArtistCategoryArtistsDTO(
+                artistCategoryMapper.fromArtistCategoryArtistsDTO(
                         artistCategoryRepository.getAllWithArtistOrdered()
                 )
         );

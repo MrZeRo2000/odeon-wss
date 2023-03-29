@@ -3,18 +3,20 @@ package com.romanpulov.odeonwss.mapper;
 import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistDetail;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ArtistDetailMapper {
-    public static ArtistDetail createFromArtistCategoriesDetailDTO(Artist artist, ArtistCategoriesDetailDTO acd) {
+    public ArtistDetail fromArtistCategoriesDetailDTO(Artist artist, ArtistCategoriesDetailDTO dto) {
         ArtistDetail artistDetail = new ArtistDetail();
         artistDetail.setArtist(artist);
-        artistDetail.setBiography(acd.getArtistBiography());
+        artistDetail.setBiography(dto.getArtistBiography());
 
         return artistDetail;
     }
 
-    public static ArtistDetail updateFromArtistCategoriesDetailDTO(ArtistDetail artistDetail, ArtistCategoriesDetailDTO acd) {
-        artistDetail.setBiography(acd.getArtistBiography());
+    public ArtistDetail update(ArtistDetail artistDetail, ArtistCategoriesDetailDTO dto) {
+        artistDetail.setBiography(dto.getArtistBiography());
 
         return artistDetail;
     }

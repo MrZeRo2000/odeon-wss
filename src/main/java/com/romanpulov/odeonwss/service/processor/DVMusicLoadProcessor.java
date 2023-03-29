@@ -35,16 +35,20 @@ public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
 
     private final MediaFileRepository mediaFileRepository;
 
+    private final MediaFileMapper mediaFileMapper;
+
     private final MediaParser mediaParser;
 
     public DVMusicLoadProcessor(
             ArtifactTypeRepository artifactTypeRepository,
             ArtifactRepository artifactRepository,
             MediaFileRepository mediaFileRepository,
+            MediaFileMapper mediaFileMapper,
             MediaParser mediaParser) {
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.mediaFileRepository = mediaFileRepository;
+        this.mediaFileMapper = mediaFileMapper;
         this.mediaParser = mediaParser;
     }
 
@@ -85,7 +89,7 @@ public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
                     try {
                         MediaFileInfo mediaFileInfo = mediaParser.parseTrack(mediaFilePath);
 
-                        mediaFile = MediaFileMapper.fromMediaFileInfo(mediaFileInfo);
+                        mediaFile = mediaFileMapper.fromMediaFileInfo(mediaFileInfo);
                         mediaFile.setArtifact(a);
                         mediaFile.setName(fileName);
 

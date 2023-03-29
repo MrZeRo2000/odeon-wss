@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.repository.DVOriginRepository;
-import com.romanpulov.odeonwss.view.IdNameView;
+import com.romanpulov.odeonwss.dto.IdNameDTO;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,8 +21,8 @@ public class DVOriginController {
         this.dvOriginRepository = dvOriginRepository;
     }
 
-    @GetMapping("/dvorigins/table-id-name")
-    ResponseEntity<List<IdNameView>> getDvOrigins() {
+    @GetMapping("/table")
+    ResponseEntity<List<IdNameDTO>> getDvOrigins() {
         return ResponseEntity.ok(dvOriginRepository.findAllByOrderByName());
     }
 }

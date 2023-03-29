@@ -33,6 +33,8 @@ public class LALoadProcessor extends AbstractArtistProcessor {
 
     private final TrackService trackService;
 
+    private final MediaFileMapper mediaFileMapper;
+
     private final MediaParser mediaParser;
 
     private static class TracksSummary {
@@ -65,11 +67,13 @@ public class LALoadProcessor extends AbstractArtistProcessor {
             ArtistRepository artistRepository,
             ArtifactRepository artifactRepository,
             TrackService trackService,
+            MediaFileMapper mediaFileMapper,
             MediaParser mediaParser
     ) {
         super(artistRepository, artifactRepository);
         this.artifactTypeRepository = artifactTypeRepository;
         this.trackService = trackService;
+        this.mediaFileMapper = mediaFileMapper;
         this.mediaParser = mediaParser;
     }
 
@@ -222,7 +226,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                 if (mediaFiles.containsKey(fileName)) {
                     mediaFile = mediaFiles.get(fileName);
                 } else {
-                    mediaFile = MediaFileMapper.fromMediaFileInfo(mediaFileInfo);
+                    mediaFile = mediaFileMapper.fromMediaFileInfo(mediaFileInfo);
                     mediaFile.setArtifact(artifact);
                     mediaFiles.put(fileName, mediaFile);
                     summary.size += mediaFile.getSize();
@@ -289,7 +293,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
 
             for (Map.Entry<String, NamesParser.NumberTitle> trackFile: parsedTrackFileNames.entrySet()) {
                 MediaFileInfo mediaFileInfo = parsedTrackMediaInfo.get(trackFile.getKey());
-                MediaFile mediaFile = MediaFileMapper.fromMediaFileInfo(mediaFileInfo);
+                MediaFile mediaFile = mediaFileMapper.fromMediaFileInfo(mediaFileInfo);
                 mediaFile.setArtifact(artifact);
 
                 mediaFiles.add(mediaFile);

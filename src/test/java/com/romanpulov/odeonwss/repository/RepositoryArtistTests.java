@@ -3,7 +3,7 @@ package com.romanpulov.odeonwss.repository;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.view.IdNameView;
+import com.romanpulov.odeonwss.dto.IdNameDTO;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,7 +36,7 @@ public class RepositoryArtistTests {
     @Test
     @Order(1)
     @Sql(value = {"/schema.sql", "/data.sql"})
-    void testAutoIncrement() throws Exception {
+    void testAutoIncrement() {
         List<Artist> artists = artistRepository.getAllByType(ArtistType.ARTIST);
         artistRepository.deleteAll(artists);
 
@@ -103,7 +103,7 @@ public class RepositoryArtistTests {
         artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("aaa").build());
         artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("nnn").build());
 
-        List<IdNameView> artists = artistRepository.getByTypeOrderByName(ArtistType.ARTIST);
+        List<IdNameDTO> artists = artistRepository.getByTypeOrderByName(ArtistType.ARTIST);
         Assertions.assertEquals("zzz", artists.get(2).getName());
         Assertions.assertEquals("nnn", artists.get(1).getName());
         Assertions.assertEquals("aaa", artists.get(0).getName());

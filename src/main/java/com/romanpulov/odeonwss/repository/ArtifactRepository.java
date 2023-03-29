@@ -5,7 +5,7 @@ import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.view.IdTitleView;
+import com.romanpulov.odeonwss.dto.IdTitleDTO;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +69,7 @@ public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifa
             "FROM Artifact as a " +
             "WHERE a.artist.type = :artistType"
     )
-    List<IdTitleView> getArtifactsByArtistType(@Param("artistType") ArtistType artistType);
+    List<IdTitleDTO> getArtifactsByArtistType(@Param("artistType") ArtistType artistType);
 
     @Query(
             "SELECT a " +

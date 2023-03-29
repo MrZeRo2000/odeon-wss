@@ -4,7 +4,7 @@ import com.romanpulov.odeonwss.dto.ArtistLyricsEditDTO;
 import com.romanpulov.odeonwss.dto.ArtistLyricsTableDTO;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.service.ArtistLyricsService;
-import com.romanpulov.odeonwss.view.TextView;
+import com.romanpulov.odeonwss.dto.TextDTO;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +33,7 @@ public class ArtistLyricsController {
     }
 
     @GetMapping("/text/{id}")
-    ResponseEntity<TextView> getText(@PathVariable Long id) throws CommonEntityNotFoundException {
+    ResponseEntity<TextDTO> getText(@PathVariable Long id) throws CommonEntityNotFoundException {
         return ResponseEntity.ok(artistLyricsService.getText(id));
     }
 

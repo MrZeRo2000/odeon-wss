@@ -2,13 +2,15 @@ package com.romanpulov.odeonwss.mapper;
 
 import com.romanpulov.odeonwss.dto.TrackEditDTO;
 import com.romanpulov.odeonwss.entity.*;
+import org.springframework.stereotype.Component;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Component
 public class TrackMapper {
-    public static void updateFromEditDTO(
+    public void update(
             Track track,
             TrackEditDTO editDTO,
             Artifact artifact,
@@ -50,7 +52,7 @@ public class TrackMapper {
         track.setDvProducts(dvProducts);
     }
 
-    public static Track createFromEditDTO(TrackEditDTO editDTO, Artifact artifact) {
+    public Track fromDTO(TrackEditDTO editDTO, Artifact artifact) {
         Track track = new Track();
 
         track.setId(editDTO.getId());
@@ -91,7 +93,7 @@ public class TrackMapper {
         return track;
     }
 
-    public static TrackEditDTO toEditDTO(Track track) {
+    public TrackEditDTO toDTO(Track track) {
         TrackEditDTO dto = new TrackEditDTO();
 
         dto.setId(track.getId());

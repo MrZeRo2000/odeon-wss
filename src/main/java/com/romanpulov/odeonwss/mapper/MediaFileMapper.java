@@ -7,9 +7,11 @@ import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
 import com.romanpulov.odeonwss.utils.media.MediaFormatInfo;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MediaFileMapper {
-    public static MediaFile fromTrackEditDTO(TrackEditDTO editDTO) {
+    public MediaFile fromTrackEditDTO(TrackEditDTO editDTO) {
         MediaFile mediaFile = new MediaFile();
 
         Artifact artifact = new Artifact();
@@ -19,14 +21,14 @@ public class MediaFileMapper {
         return mediaFile;
     }
 
-    public static MediaFile fromTrackEditDTO(TrackEditDTO editDTO, MediaFile mediaFile) {
-        MediaFile updatedMediaFile = MediaFileMapper.fromTrackEditDTO(editDTO);
+    public MediaFile fromTrackEditDTO(TrackEditDTO editDTO, MediaFile mediaFile) {
+        MediaFile updatedMediaFile = fromTrackEditDTO(editDTO);
         updatedMediaFile.setId(mediaFile.getId());
 
         return updatedMediaFile;
     }
 
-    public static MediaFile fromMediaFileInfo(MediaFileInfo mediaFileInfo) {
+    public MediaFile fromMediaFileInfo(MediaFileInfo mediaFileInfo) {
         MediaFormatInfo mediaFormatInfo = mediaFileInfo.getMediaContentInfo().getMediaFormatInfo();
 
         MediaFile mediaFile = new MediaFile();
@@ -40,7 +42,7 @@ public class MediaFileMapper {
         return mediaFile;
     }
 
-    public static MediaFile fromMediaFileEditDTO(MediaFileEditDTO editDTO) {
+    public MediaFile fromMediaFileEditDTO(MediaFileEditDTO editDTO) {
         MediaFile mediaFile = new MediaFile();
 
         mediaFile.setId(editDTO.getId());

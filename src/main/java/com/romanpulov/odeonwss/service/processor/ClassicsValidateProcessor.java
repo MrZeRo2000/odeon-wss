@@ -2,7 +2,7 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.view.IdTitleView;
+import com.romanpulov.odeonwss.dto.IdTitleDTO;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
@@ -27,7 +27,7 @@ public class ClassicsValidateProcessor extends AbstractFileSystemProcessor {
         Set<String> pathValidation = loadFromPath(path);
         Set<String> dbValidation = artifactRepository.getArtifactsByArtistType(ArtistType.CLASSICS)
                 .stream()
-                .map(IdTitleView::getTitle)
+                .map(IdTitleDTO::getTitle)
                 .collect(Collectors.toSet());
 
         if (validateArtifacts(pathValidation, dbValidation)) {

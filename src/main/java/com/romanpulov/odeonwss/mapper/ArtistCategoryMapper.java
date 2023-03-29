@@ -8,14 +8,16 @@ import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
 import com.romanpulov.odeonwss.entity.ArtistCategoryType;
 import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Component
 public class ArtistCategoryMapper {
-    public static List<ArtistCategoryTableDTO> fromArtistCategoryArtistsDTO(List<ArtistCategoryArtistDTO> acaList) {
+    public List<ArtistCategoryTableDTO> fromArtistCategoryArtistsDTO(List<ArtistCategoryArtistDTO> acaList) {
         List<ArtistCategoryTableDTO> result = new ArrayList<>();
 
         acaList.forEach(aca -> {
@@ -32,7 +34,7 @@ public class ArtistCategoryMapper {
         return result;
     }
 
-    public static ArtistCategoriesDetailDTO fromArtistCategoryDetailDTO(List<ArtistCategoryDetailDTO> acdList) {
+    public ArtistCategoriesDetailDTO fromArtistCategoryDetailDTO(List<ArtistCategoryDetailDTO> acdList) {
         ArtistCategoriesDetailDTO result = null;
 
         for (ArtistCategoryDetailDTO acd: acdList) {
@@ -54,7 +56,7 @@ public class ArtistCategoryMapper {
         return result;
     }
 
-    public static List<ArtistCategory> createFromArtistCategoriesDetailDTO(Artist artist, ArtistCategoriesDetailDTO acd) {
+    public List<ArtistCategory> createFromArtistCategoriesDetailDTO(Artist artist, ArtistCategoriesDetailDTO acd) {
         List<ArtistCategory> artistCategories = new ArrayList<>();
 
         // artist category genre
@@ -79,11 +81,11 @@ public class ArtistCategoryMapper {
         return artistCategories;
     }
 
-    public static boolean categoryValueEquals(ArtistCategory category1, ArtistCategory category2) {
+    public boolean categoryValueEquals(ArtistCategory category1, ArtistCategory category2) {
         return (category1.getType() == category2.getType() && Objects.equals(category1.getName(), category2.getName()));
     }
 
-    public static Pair<List<ArtistCategory>, List<ArtistCategory>> mergeCategories(List<ArtistCategory> oldCategories, List<ArtistCategory> newCategories) {
+    public Pair<List<ArtistCategory>, List<ArtistCategory>> mergeCategories(List<ArtistCategory> oldCategories, List<ArtistCategory> newCategories) {
         List<ArtistCategory> createdCategories = new ArrayList<>();
         List<ArtistCategory> deletedCategories = new ArrayList<>();
 

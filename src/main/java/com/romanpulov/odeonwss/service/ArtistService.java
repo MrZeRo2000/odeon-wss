@@ -28,14 +28,29 @@ public class ArtistService implements EditableObjectService<ArtistCategoriesDeta
 
     private final ArtistCategoryRepository artistCategoryRepository;
 
+    private final ArtistCategoryMapper artistCategoryMapper;
+
     private final ArtistDetailRepository artistDetailRepository;
+
+    private final ArtistDetailMapper artistDetailMapper;
 
     private final ArtistRepository artistRepository;
 
-    public ArtistService(ArtistCategoryRepository artistCategoryRepository, ArtistDetailRepository artistDetailRepository, ArtistRepository artistRepository) {
+    private final ArtistMapper artistMapper;
+
+    public ArtistService(
+            ArtistCategoryRepository artistCategoryRepository,
+            ArtistCategoryMapper artistCategoryMapper,
+            ArtistDetailRepository artistDetailRepository,
+            ArtistDetailMapper artistDetailMapper,
+            ArtistRepository artistRepository,
+            ArtistMapper artistMapper) {
         this.artistCategoryRepository = artistCategoryRepository;
+        this.artistCategoryMapper = artistCategoryMapper;
         this.artistDetailRepository = artistDetailRepository;
+        this.artistDetailMapper = artistDetailMapper;
         this.artistRepository = artistRepository;
+        this.artistMapper = artistMapper;
     }
 
     @Override
@@ -44,7 +59,7 @@ public class ArtistService implements EditableObjectService<ArtistCategoriesDeta
         if (acdList.size() == 0) {
             throw new CommonEntityNotFoundException("Artist Category Details", id);
         } else {
-            return ArtistCategoryMapper.fromArtistCategoryDetailDTO(acdList);
+            return artistCategoryMapper.fromArtistCategoryDetailDTO(acdList);
         }
     }
 
@@ -60,15 +75,15 @@ public class ArtistService implements EditableObjectService<ArtistCategoriesDeta
         }
 
         // save artist
-        Artist artist = artistRepository.save(ArtistMapper.createFromArtistCategoriesDetailDTO(acd));
+        Artist artist = artistRepository.save(artistMapper.fromDTO(acd));
 
         // save artist detail
         if ((acd.getArtistBiography() != null) && !acd.getArtistBiography().isBlank()) {
-            artistDetailRepository.save(ArtistDetailMapper.createFromArtistCategoriesDetailDTO(artist, acd));
+            artistDetailRepository.save(artistDetailMapper.fromArtistCategoriesDetailDTO(artist, acd));
         }
 
         // save artist categories
-        List<ArtistCategory> artistCategories = ArtistCategoryMapper.createFromArtistCategoriesDetailDTO(artist, acd);
+        List<ArtistCategory> artistCategories = artistCategoryMapper.createFromArtistCategoriesDetailDTO(artist, acd);
         if (artistCategories.size() > 0) {
             artistCategoryRepository.saveAll(artistCategories);
         }
@@ -92,28 +107,28 @@ public class ArtistService implements EditableObjectService<ArtistCategoriesDeta
             }
 
             // save artist
-            artistRepository.save(ArtistMapper.updateFromArtistCategoriesDetailDTO(artist, acd));
+            artistRepository.save(artistMapper.update(artist, acd));
 
             // save artist detail
             Optional<ArtistDetail> existingArtistDetail = artistDetailRepository.findArtistDetailByArtist(artist);
             if (existingArtistDetail.isPresent()) {
                 if ((acd.getArtistBiography() != null) && !acd.getArtistBiography().isBlank()) {
-                    artistDetailRepository.save(ArtistDetailMapper.updateFromArtistCategoriesDetailDTO(existingArtistDetail.get(), acd));
+                    artistDetailRepository.save(artistDetailMapper.update(existingArtistDetail.get(), acd));
                 } else {
                     artistDetailRepository.delete(existingArtistDetail.get());
                 }
             } else {
                 if ((acd.getArtistBiography() != null) && !acd.getArtistBiography().isBlank()) {
-                    artistDetailRepository.save(ArtistDetailMapper.createFromArtistCategoriesDetailDTO(artist, acd));
+                    artistDetailRepository.save(artistDetailMapper.fromArtistCategoriesDetailDTO(artist, acd));
                 }
             }
 
             // get artist categories
             List<ArtistCategory> existingCategories = artistCategoryRepository.getArtistCategoriesByArtistOrderByTypeAscNameAsc(artist);
-            List<ArtistCategory> categories = ArtistCategoryMapper.createFromArtistCategoriesDetailDTO(artist, acd);
+            List<ArtistCategory> categories = artistCategoryMapper.createFromArtistCategoriesDetailDTO(artist, acd);
 
             // merge new with existing
-            Pair<List<ArtistCategory>, List<ArtistCategory>> mergedCategories = ArtistCategoryMapper.mergeCategories(existingCategories, categories);
+            Pair<List<ArtistCategory>, List<ArtistCategory>> mergedCategories = artistCategoryMapper.mergeCategories(existingCategories, categories);
 
             // artist categories deleted
             if (mergedCategories.getSecond().size() > 0) {

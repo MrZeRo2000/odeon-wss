@@ -2,7 +2,7 @@ package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.repository.ArtistDetailRepository;
-import com.romanpulov.odeonwss.view.BiographyView;
+import com.romanpulov.odeonwss.dto.BiographyDTO;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ public class ArtistDetailController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<BiographyView> get(@PathVariable Long id) throws CommonEntityNotFoundException {
+    ResponseEntity<BiographyDTO> get(@PathVariable Long id) throws CommonEntityNotFoundException {
         return ResponseEntity.ok(
                 artistDetailRepository.findArtistDetailById(id).orElseThrow(() ->
                         new CommonEntityNotFoundException("ArtistDetail", id))

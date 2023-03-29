@@ -32,6 +32,8 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
 
     private final MediaFileRepository mediaFileRepository;
 
+    private final MediaFileMapper mediaFileMapper;
+
     private final DVTypeRepository dvTypeRepository;
 
     private final DVProductRepository dVProductRepository;
@@ -43,6 +45,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
             ArtifactRepository artifactRepository,
             TrackRepository trackRepository,
             MediaFileRepository mediaFileRepository,
+            MediaFileMapper mediaFileMapper,
             DVTypeRepository dvTypeRepository,
             DVProductRepository dVProductRepository,
             MediaParser mediaParser)
@@ -51,6 +54,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
         this.artifactRepository = artifactRepository;
         this.trackRepository = trackRepository;
         this.mediaFileRepository = mediaFileRepository;
+        this.mediaFileMapper = mediaFileMapper;
         this.dvTypeRepository = dvTypeRepository;
         this.dVProductRepository = dVProductRepository;
         this.mediaParser = mediaParser;
@@ -117,7 +121,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
                     try {
                         MediaFileInfo mediaFileInfo = mediaParser.parseTrack(mediaFilePath);
 
-                        mediaFile = MediaFileMapper.fromMediaFileInfo(mediaFileInfo);
+                        mediaFile = mediaFileMapper.fromMediaFileInfo(mediaFileInfo);
                         mediaFile.setArtifact(a);
                         mediaFile.setName(fileName);
 

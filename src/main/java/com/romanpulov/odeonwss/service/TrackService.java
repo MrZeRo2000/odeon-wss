@@ -30,6 +30,8 @@ public class TrackService implements EditableObjectService<TrackEditDTO>{
 
     private final TrackRepository trackRepository;
 
+    private final TrackMapper trackMapper;
+
     private final MediaFileRepository mediaFileRepository;
 
     private final DVProductRepository dvProductRepository;
@@ -37,10 +39,12 @@ public class TrackService implements EditableObjectService<TrackEditDTO>{
     public TrackService(
             ArtifactRepository artifactRepository,
             TrackRepository trackRepository,
+            TrackMapper trackMapper,
             MediaFileRepository mediaFileRepository,
             DVProductRepository dvProductRepository) {
         this.artifactRepository = artifactRepository;
         this.trackRepository = trackRepository;
+        this.trackMapper = trackMapper;
         this.mediaFileRepository = mediaFileRepository;
         this.dvProductRepository = dvProductRepository;
     }
@@ -59,7 +63,7 @@ public class TrackService implements EditableObjectService<TrackEditDTO>{
     public TrackEditDTO getById(Long id) throws CommonEntityNotFoundException {
         Optional<Track> existingTrack = trackRepository.findById(id);
         if (existingTrack.isPresent()) {
-            return TrackMapper.toEditDTO(existingTrack.get());
+            return trackMapper.toDTO(existingTrack.get());
         } else {
             throw new CommonEntityNotFoundException("Track", id);
         }
@@ -70,7 +74,7 @@ public class TrackService implements EditableObjectService<TrackEditDTO>{
     public TrackEditDTO insert(TrackEditDTO o) throws CommonEntityNotFoundException {
         Artifact artifact = artifactRepository.findById(o.getArtifactId())
                 .orElseThrow(() -> new CommonEntityNotFoundException("Artifact", o.getArtifactId()));
-        Track track = TrackMapper.createFromEditDTO(o, artifact);
+        Track track = trackMapper.fromDTO(o, artifact);
 
         trackRepository.save(track);
 
@@ -92,7 +96,7 @@ public class TrackService implements EditableObjectService<TrackEditDTO>{
                 .ofNullable(dvProductRepository.findById(o.getDvProductId()).orElse(null))
                 .collect(Collectors.toSet());
 
-        TrackMapper.updateFromEditDTO(track, o, artifact, mediaFiles, dvProducts);
+        trackMapper.update(track, o, artifact, mediaFiles, dvProducts);
 
         trackRepository.save(track);
 

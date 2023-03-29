@@ -4,7 +4,7 @@ import com.romanpulov.odeonwss.dto.ArtistLyricsEditDTO;
 import com.romanpulov.odeonwss.dto.ArtistLyricsTableDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistLyrics;
-import com.romanpulov.odeonwss.view.TextView;
+import com.romanpulov.odeonwss.dto.TextDTO;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +46,7 @@ public interface ArtistLyricsRepository extends CrudRepository<ArtistLyrics, Lon
     )
     Optional<ArtistLyricsEditDTO> getArtistListEditById(Long id);
 
-    Optional<TextView> findArtistLyricsById(Long id);
+    Optional<TextDTO> findArtistLyricsById(Long id);
 
     List<ArtistLyrics> findAllByArtistOrderByTitle(Artist artist);
 

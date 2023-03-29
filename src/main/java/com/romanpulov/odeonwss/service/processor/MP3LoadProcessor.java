@@ -34,6 +34,8 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
 
     private final TrackService trackService;
 
+    private final MediaFileMapper mediaFileMapper;
+
     private final MediaParser mediaParser;
 
     private static class TracksSummary {
@@ -46,11 +48,13 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
             ArtistRepository artistRepository,
             ArtifactRepository artifactRepository,
             TrackService trackService,
+            MediaFileMapper mediaFileMapper,
             MediaParser mediaParser )
     {
         super(artistRepository, artifactRepository);
         this.artifactTypeRepository = artifactTypeRepository;
         this.trackService = trackService;
+        this.mediaFileMapper = mediaFileMapper;
         this.mediaParser = mediaParser;
     }
 
@@ -104,7 +108,7 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
             for (Pair<Path, Pair<Artifact, NamesParser.NumberTitle>> flatPathArtifact: pathArtifactsMap.get(artifact)) {
                 MediaFileInfo mediaFileInfo = parsedTrackMediaInfo.get(flatPathArtifact.getFirst());
                 if (mediaFileInfo != null) {
-                    MediaFile mediaFile = MediaFileMapper.fromMediaFileInfo(mediaFileInfo);
+                    MediaFile mediaFile = mediaFileMapper.fromMediaFileInfo(mediaFileInfo);
                     mediaFile.setArtifact(artifact);
                     mediaFile.setName(flatPathArtifact.getFirst().getFileName().toString());
 

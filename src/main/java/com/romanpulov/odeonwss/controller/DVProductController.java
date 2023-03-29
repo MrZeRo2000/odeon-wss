@@ -4,7 +4,7 @@ import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.DVProductRepository;
-import com.romanpulov.odeonwss.view.IdTitleView;
+import com.romanpulov.odeonwss.dto.IdTitleDTO;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +25,7 @@ public class DVProductController {
     }
 
     @GetMapping("/dvproducts/table-id-title")
-    ResponseEntity<List<IdTitleView>> getDvProducts(@RequestParam Long artifactTypeId)
+    ResponseEntity<List<IdTitleDTO>> getDvProducts(@RequestParam Long artifactTypeId)
             throws CommonEntityNotFoundException {
         ArtifactType artifactType = artifactTypeRepository.findById(artifactTypeId).orElseThrow(
                 () -> new CommonEntityNotFoundException("DVProduct", artifactTypeId));

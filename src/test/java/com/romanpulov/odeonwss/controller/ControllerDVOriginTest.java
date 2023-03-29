@@ -59,7 +59,7 @@ public class ControllerDVOriginTest {
     @Test
     @Order(2)
     void testValidateAllIdName() throws Exception {
-        var result = mockMvc.perform(get("/api/dvorigin/dvorigins/table-id-name"))
+        var result = mockMvc.perform(get("/api/dvorigin/table"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(2)))

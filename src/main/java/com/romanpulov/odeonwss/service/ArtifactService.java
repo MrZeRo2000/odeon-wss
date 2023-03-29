@@ -12,25 +12,27 @@ import java.util.Optional;
 
 @Service
 public class ArtifactService implements EditableObjectService<ArtifactEditDTO> {
-
     private final ArtifactRepository artifactRepository;
 
-    public ArtifactService(ArtifactRepository artifactRepository) {
+    private final ArtifactMapper artifactMapper;
+
+    public ArtifactService(ArtifactRepository artifactRepository, ArtifactMapper artifactMapper) {
         this.artifactRepository = artifactRepository;
+        this.artifactMapper = artifactMapper;
     }
 
     @Override
     public ArtifactEditDTO getById(Long id) throws CommonEntityNotFoundException {
         return artifactRepository
                 .findArtifactEditById(id)
-                .map(ArtifactMapper::toEditDTO)
+                .map(artifactMapper::toDTO)
                 .orElseThrow(() -> new CommonEntityNotFoundException("Artifact", id));
     }
 
     @Override
     @Transactional
     public ArtifactEditDTO insert(ArtifactEditDTO aed) throws CommonEntityNotFoundException {
-        Artifact artifact = ArtifactMapper.createFromArtifactEditDTO(aed);
+        Artifact artifact = artifactMapper.fromDTO(aed);
         artifactRepository.save(artifact);
         return getById(artifact.getId());
     }
@@ -40,7 +42,7 @@ public class ArtifactService implements EditableObjectService<ArtifactEditDTO> {
     public ArtifactEditDTO update(ArtifactEditDTO aed) throws CommonEntityNotFoundException {
         Optional<Artifact> existingArtifact = artifactRepository.findById(aed.getId());
         if (existingArtifact.isPresent()) {
-            Artifact artifact = ArtifactMapper.createFromArtifactEditDTO(aed);
+            Artifact artifact = artifactMapper.fromDTO(aed);
             artifact.setInsertDate(existingArtifact.get().getInsertDate());
             artifactRepository.save(artifact);
             return getById(artifact.getId());

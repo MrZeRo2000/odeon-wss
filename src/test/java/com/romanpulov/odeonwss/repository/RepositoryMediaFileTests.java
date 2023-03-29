@@ -8,7 +8,7 @@ import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityTrackBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
-import com.romanpulov.odeonwss.view.IdNameView;
+import com.romanpulov.odeonwss.dto.IdNameDTO;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -104,7 +104,7 @@ public class RepositoryMediaFileTests {
 
     @Test
     @Order(2)
-    void testCreateMinimal() throws Exception {
+    void testCreateMinimal() {
         Artifact artifact = artifactRepository.findById(1L).orElseThrow();
 
         MediaFile mediaFile = new EntityMediaFileBuilder()
@@ -155,7 +155,7 @@ public class RepositoryMediaFileTests {
     @Test
     @Order(6)
     void testGetIdName() {
-        List<IdNameView> idNames = mediaFileRepository.findByArtifactOrderByName(
+        List<IdNameDTO> idNames = mediaFileRepository.findByArtifactOrderByName(
                 new EntityArtifactBuilder().withId(1L).build()
         );
         Assertions.assertEquals(3, idNames.size());

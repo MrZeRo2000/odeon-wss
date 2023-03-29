@@ -4,11 +4,13 @@ import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
+@Component
 public class ArtifactMapper {
-    public static ArtifactEditDTO toEditDTO(Artifact a) {
+    public ArtifactEditDTO toDTO(Artifact a) {
         return new ArtifactEditDTO(
                 a.getId(),
                 a.getArtifactType().getId(),
@@ -21,7 +23,7 @@ public class ArtifactMapper {
         );
     }
 
-    public static Artifact createFromArtifactEditDTO(ArtifactEditDTO aed) {
+    public Artifact fromDTO(ArtifactEditDTO aed) {
         Artifact artifact = new Artifact();
         artifact.setId(aed.getId());
 

@@ -8,7 +8,7 @@ import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.ArtistLyricsMapper;
 import com.romanpulov.odeonwss.repository.ArtistLyricsRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.view.TextView;
+import com.romanpulov.odeonwss.dto.TextDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,9 +21,15 @@ public class ArtistLyricsService implements EditableObjectService <ArtistLyricsE
 
     private final ArtistLyricsRepository artistLyricsRepository;
 
-    public ArtistLyricsService(ArtistRepository artistRepository, ArtistLyricsRepository artistLyricsRepository) {
+    private final ArtistLyricsMapper artistLyricsMapper;
+
+    public ArtistLyricsService(
+            ArtistRepository artistRepository,
+            ArtistLyricsRepository artistLyricsRepository,
+            ArtistLyricsMapper artistLyricsMapper) {
         this.artistRepository = artistRepository;
         this.artistLyricsRepository = artistLyricsRepository;
+        this.artistLyricsMapper = artistLyricsMapper;
     }
 
     public List<ArtistLyricsTableDTO> getTable() {
@@ -34,8 +40,8 @@ public class ArtistLyricsService implements EditableObjectService <ArtistLyricsE
         return artistLyricsRepository.getArtistLyricsTableByArtistDTO(artistId);
     }
 
-    public TextView getText(Long id) throws CommonEntityNotFoundException {
-        Optional<TextView> textView = artistLyricsRepository.findArtistLyricsById(id);
+    public TextDTO getText(Long id) throws CommonEntityNotFoundException {
+        Optional<TextDTO> textView = artistLyricsRepository.findArtistLyricsById(id);
         if (textView.isPresent()) {
             return textView.get();
         } else {
@@ -55,7 +61,7 @@ public class ArtistLyricsService implements EditableObjectService <ArtistLyricsE
 
     @Override
     public ArtistLyricsEditDTO insert(ArtistLyricsEditDTO o) throws CommonEntityNotFoundException {
-        ArtistLyrics artistLyrics = ArtistLyricsMapper.fromEditDTO(o);
+        ArtistLyrics artistLyrics = artistLyricsMapper.fromDTO(o);
         artistLyricsRepository.save(artistLyrics);
         return getById(artistLyrics.getId());
     }
@@ -66,7 +72,7 @@ public class ArtistLyricsService implements EditableObjectService <ArtistLyricsE
         if (existingEntity.isPresent()) {
             Optional<Artist> existingArtistEntity = artistRepository.findById(o.getArtistId());
             if (existingArtistEntity.isPresent()) {
-                artistLyricsRepository.save(ArtistLyricsMapper.updateFromEditDTO(existingEntity.get(), o, existingArtistEntity.get()));
+                artistLyricsRepository.save(artistLyricsMapper.update(existingEntity.get(), o, existingArtistEntity.get()));
                 return getById(o.getId());
             } else {
                 throw new CommonEntityNotFoundException("Artist", o.getArtistId());

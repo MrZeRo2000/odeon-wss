@@ -2,7 +2,7 @@ package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.view.IdNameView;
+import com.romanpulov.odeonwss.dto.IdNameDTO;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +15,7 @@ public interface ArtistRepository extends PagingAndSortingRepository<Artist, Lon
 
     List<Artist> getAllByTypeOrderByName(ArtistType type);
 
-    List<IdNameView> getByTypeOrderByName(ArtistType type);
+    List<IdNameDTO> getByTypeOrderByName(ArtistType type);
 
     Optional<Artist> findFirstByTypeAndName(ArtistType type, String name);
 

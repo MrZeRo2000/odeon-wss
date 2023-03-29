@@ -8,7 +8,7 @@ import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
-import com.romanpulov.odeonwss.view.IdNameView;
+import com.romanpulov.odeonwss.dto.IdNameDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,9 +21,15 @@ public class MediaFileService implements EditableObjectService <MediaFileEditDTO
 
     private final MediaFileRepository mediaFileRepository;
 
-    public MediaFileService(ArtifactRepository artifactRepository, MediaFileRepository mediaFileRepository) {
+    private final MediaFileMapper mediaFileMapper;
+
+    public MediaFileService(
+            ArtifactRepository artifactRepository,
+            MediaFileRepository mediaFileRepository,
+            MediaFileMapper mediaFileMapper) {
         this.artifactRepository = artifactRepository;
         this.mediaFileRepository = mediaFileRepository;
+        this.mediaFileMapper = mediaFileMapper;
     }
 
     public List<MediaFileTableDTO> getTable(Long artifactId) throws CommonEntityNotFoundException {
@@ -35,7 +41,7 @@ public class MediaFileService implements EditableObjectService <MediaFileEditDTO
         }
     }
 
-    public List<IdNameView> getTableIdName(Long artifactId) throws CommonEntityNotFoundException {
+    public List<IdNameDTO> getTableIdName(Long artifactId) throws CommonEntityNotFoundException {
         Optional<Artifact> existingArtifact = artifactRepository.findById(artifactId);
         if (existingArtifact.isPresent()) {
             return mediaFileRepository.findByArtifactOrderByName(existingArtifact.get());
@@ -56,7 +62,7 @@ public class MediaFileService implements EditableObjectService <MediaFileEditDTO
 
     @Override
     public MediaFileEditDTO insert(MediaFileEditDTO o) throws CommonEntityNotFoundException {
-        MediaFile mediaFile = MediaFileMapper.fromMediaFileEditDTO(o);
+        MediaFile mediaFile = mediaFileMapper.fromMediaFileEditDTO(o);
         mediaFileRepository.save(mediaFile);
         return getById(mediaFile.getId());
     }
@@ -65,7 +71,7 @@ public class MediaFileService implements EditableObjectService <MediaFileEditDTO
     public MediaFileEditDTO update(MediaFileEditDTO o) throws CommonEntityNotFoundException {
         Optional<MediaFileEditDTO> existingDTO = mediaFileRepository.getMediaFileEditById(o.getId());
         if (existingDTO.isPresent()) {
-            MediaFile mediaFile = MediaFileMapper.fromMediaFileEditDTO(o);
+            MediaFile mediaFile = mediaFileMapper.fromMediaFileEditDTO(o);
             mediaFileRepository.save(mediaFile);
             return getById(mediaFile.getId());
         } else {

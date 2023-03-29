@@ -2,7 +2,7 @@ package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.view.IdNameView;
+import com.romanpulov.odeonwss.dto.IdNameDTO;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +21,7 @@ public class ArtistController {
     }
 
     @GetMapping("/artists/table-id-name")
-    ResponseEntity<List<IdNameView>> getArtistList(@RequestParam String artistTypeCode) {
+    ResponseEntity<List<IdNameDTO>> getArtistList(@RequestParam String artistTypeCode) {
         return ResponseEntity.ok(artistRepository.getByTypeOrderByName(ArtistType.fromCode(artistTypeCode)));
     }
 }
