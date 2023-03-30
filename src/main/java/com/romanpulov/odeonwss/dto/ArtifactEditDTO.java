@@ -2,7 +2,7 @@ package com.romanpulov.odeonwss.dto;
 
 import com.romanpulov.odeonwss.entity.Artist;
 
-public class ArtifactEditDTO {
+public class ArtifactEditDTO implements AbstractEntityDTO {
     private Long id;
     private Long artifactTypeId;
     private String artistTypeCode;

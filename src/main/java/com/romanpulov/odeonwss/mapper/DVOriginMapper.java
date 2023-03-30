@@ -5,7 +5,12 @@ import com.romanpulov.odeonwss.entity.DVOrigin;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DVOriginMapper {
+public class DVOriginMapper implements EntityDTOMapper<DVOrigin, IdNameDTO> {
+    @Override
+    public String getEntityName() {
+        return "DVOrigin";
+    }
+
     public DVOrigin fromDTO(IdNameDTO dto) {
         DVOrigin dvOrigin = new DVOrigin();
         dvOrigin.setId(dto.getId());

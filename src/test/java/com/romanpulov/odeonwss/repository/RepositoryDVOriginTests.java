@@ -95,7 +95,7 @@ public class RepositoryDVOriginTests {
     @Test
     @Order(4)
     void testFindDVOriginById() {
-        assertThat(dvOriginRepository.findDVOriginById(2).orElseThrow().getName()).isEqualTo("Origin 5");
-        Assertions.assertThrows(NoSuchElementException.class, () -> dvOriginRepository.findDVOriginById(40L).orElseThrow());
+        assertThat(dvOriginRepository.findDTOById(2).orElseThrow().getName()).isEqualTo("Origin 5");
+        Assertions.assertThrows(NoSuchElementException.class, () -> dvOriginRepository.findDTOById(40L).orElseThrow());
     }
 }
