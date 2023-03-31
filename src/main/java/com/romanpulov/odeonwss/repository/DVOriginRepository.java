@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.dto.DVOriginDTO;
 import com.romanpulov.odeonwss.entity.DVOrigin;
-import com.romanpulov.odeonwss.dto.IdNameDTO;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,12 +10,13 @@ import java.util.Optional;
 
 @Transactional(readOnly = true)
 public interface DVOriginRepository
-        extends MappedMigratedIdJpaRepository<DVOrigin, Long>, EntityDTORepository<DVOrigin, IdNameDTO> {
+        extends MappedMigratedIdJpaRepository<DVOrigin, Long>, EntityDTORepository<DVOrigin, DVOriginDTO> {
     @Query("SELECT COALESCE(MAX(o.id), 0) FROM DVOrigin o")
     Long getMaxId();
 
-    @Query("SELECT dvo FROM DVOrigin dvo WHERE dvo.id = :id")
-    Optional<IdNameDTO> findDTOById(long id);
+    @Query("SELECT dvo.id AS id, dvo.name AS name FROM DVOrigin dvo WHERE dvo.id = :id")
+    Optional<DVOriginDTO> findDTOById(long id);
 
-    List<IdNameDTO> findAllByOrderByName();
+    @Query("SELECT dvo.id AS id, dvo.name AS name FROM DVOrigin dvo ORDER BY dvo.name")
+    List<DVOriginDTO> findAllDTO();
 }

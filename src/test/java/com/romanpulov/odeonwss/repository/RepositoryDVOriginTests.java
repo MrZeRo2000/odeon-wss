@@ -1,8 +1,8 @@
 package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
+import com.romanpulov.odeonwss.dto.DVOriginDTO;
 import com.romanpulov.odeonwss.entity.DVOrigin;
-import com.romanpulov.odeonwss.dto.IdNameDTO;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -84,7 +84,7 @@ public class RepositoryDVOriginTests {
     @Test
     @Order(3)
     void testFindAllOrderByName() {
-        List<IdNameDTO> origins = dvOriginRepository.findAllByOrderByName();
+        List<DVOriginDTO> origins = dvOriginRepository.findAllDTO();
         assertThat(origins.size()).isEqualTo(2);
         assertThat(origins.get(0).getName()).isEqualTo("Origin 5");
         assertThat(origins.get(0).getId()).isEqualTo(2);

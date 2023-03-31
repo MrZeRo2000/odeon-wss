@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.dto;
 
-public interface IdTitleDTO extends AbstractEntityDTO {
+public interface IdTitleDTO {
+    Long getId();
     String getTitle();
 }
