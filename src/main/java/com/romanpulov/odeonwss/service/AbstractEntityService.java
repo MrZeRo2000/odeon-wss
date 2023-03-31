@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.dto.AbstractEntityDTO;
 import com.romanpulov.odeonwss.entity.AbstractBaseEntity;
+import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.EntityDTOMapper;
 import com.romanpulov.odeonwss.repository.EntityDTORepository;
@@ -32,10 +33,14 @@ public abstract class AbstractEntityService<
     }
 
     @Transactional
-    public DTO insert(DTO dto) throws CommonEntityNotFoundException {
-        E entity = mapper.fromDTO(dto);
-        repository.save(entity);
-        return getById(entity.getId());
+    public DTO insert(DTO dto) throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException {
+        if (dto.getId() != null && repository.existsById(dto.getId())) {
+            throw new CommonEntityAlreadyExistsException(entityName, dto.getId());
+        } else {
+            E entity = mapper.fromDTO(dto);
+            repository.save(entity);
+            return getById(entity.getId());
+        }
     }
 
     @Transactional

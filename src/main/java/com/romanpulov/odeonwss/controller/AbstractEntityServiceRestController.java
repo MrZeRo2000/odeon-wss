@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.dto.AbstractEntityDTO;
 import com.romanpulov.odeonwss.entity.AbstractBaseEntity;
+import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.repository.EntityDTORepository;
 import com.romanpulov.odeonwss.service.AbstractEntityService;
@@ -26,7 +27,8 @@ public class AbstractEntityServiceRestController<
     }
 
     @PostMapping
-    ResponseEntity<DTO> post(@RequestBody DTO dto) throws CommonEntityNotFoundException  {
+    ResponseEntity<DTO> post(@RequestBody DTO dto)
+            throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException {
         return ResponseEntity.ok(service.insert(dto));
     }
 
