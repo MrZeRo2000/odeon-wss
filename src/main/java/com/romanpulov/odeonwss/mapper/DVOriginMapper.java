@@ -12,14 +12,14 @@ public class DVOriginMapper implements EntityDTOMapper<DVOrigin, DVOriginDTO> {
     }
 
     public DVOrigin fromDTO(DVOriginDTO dto) {
-        DVOrigin dvOrigin = new DVOrigin();
-        dvOrigin.setId(dto.getId());
-        dvOrigin.setName(dto.getName());
+        DVOrigin entity = new DVOrigin();
+        entity.setId(dto.getId());
+        entity.setName(dto.getName());
 
-        return dvOrigin;
+        return entity;
     }
 
-    public void update(DVOrigin dvOrigin, DVOriginDTO dto) {
-        dvOrigin.setName(dto.getName());
+    public void update(DVOrigin entity, DVOriginDTO dto) {
+        entity.setName(dto.getName());
     }
 }
