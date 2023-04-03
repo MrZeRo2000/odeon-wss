@@ -3,6 +3,8 @@ package com.romanpulov.odeonwss.repository;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVCategoryBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVProductBuilder;
+import com.romanpulov.odeonwss.dto.DVProductDTO;
+import com.romanpulov.odeonwss.dto.DVProductFlatDTO;
 import com.romanpulov.odeonwss.entity.DVCategory;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import com.romanpulov.odeonwss.entity.DVProduct;
@@ -14,6 +16,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import javax.transaction.Transactional;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -72,6 +75,11 @@ public class RepositoryDVProductTests {
                 .withArtifactType(artifactTypeRepository.getWithDVMovies())
                 .withOrigin(origins.values().stream().findFirst().orElseThrow())
                 .withTitle("Product with categories")
+                .withOriginalTitle("Original product with categories")
+                .withYear(2003L)
+                .withFrontInfo("Adriano Celentano")
+                .withDescription("Best ever")
+                .withNotes("Good as always")
                 .withCategories(categories)
                 .build();
         dvProductRepository.save(product);
@@ -156,5 +164,50 @@ public class RepositoryDVProductTests {
         assertThat(dvProductRepository
                 .findAllByArtifactTypeOrderByTitleAsc(artifactTypeRepository.getWithDVMusic()).size())
                 .isEqualTo(0);
+    }
+
+    @Test
+    @Order(6)
+    void testFindDTOById() {
+        DVProductDTO dto = dvProductRepository.findDTOById(1L).orElseThrow();
+        assertThat(dto.getId()).isEqualTo(1L);
+    }
+
+    @Test
+    @Order(7)
+    @Transactional
+    /*
+    When annotated with transactional, it is possible to fetch lazy collections
+    It generates additional queries
+     */
+    void testFindById() {
+        DVProduct entity = dvProductRepository.findById(2L).orElseThrow();
+        assertThat(entity.getId()).isEqualTo(2L);
+        assertThat(entity.getDvCategories().size()).isEqualTo(2);
+    }
+
+    @Test
+    @Order(8)
+    void testFindFlatDTOById() {
+        List<DVProductFlatDTO> dtoList = dvProductRepository.findFlatDTOById(2L);
+        assertThat(dtoList.size()).isEqualTo(2);
+
+        DVProductFlatDTO dto1 = dtoList.get(0);
+        DVProductFlatDTO dto2 = dtoList.get(1);
+
+        assertThat(dto1.getArtifactTypeId()).isEqualTo(artifactTypeRepository.getWithDVMovies().getId());
+        assertThat(dto1.getDvOriginId()).isEqualTo(1L);
+        assertThat(dto1.getDvOriginName()).isEqualTo("Origin 1");
+        assertThat(dto1.getTitle()).isEqualTo("Product with categories");
+        assertThat(dto1.getOriginalTitle()).isEqualTo("Original product with categories");
+        assertThat(dto1.getYear()).isEqualTo(2003L);
+        assertThat(dto1.getFrontInfo()).isEqualTo("Adriano Celentano");
+        assertThat(dto1.getDescription()).isEqualTo("Best ever");
+        assertThat(dto1.getNotes()).isEqualTo("Good as always");
+        assertThat(dto1.getDvCategoryId()).isEqualTo(2L);
+        assertThat(dto1.getDvCategoryName()).isEqualTo("Cat 2");
+
+        assertThat(dto2.getDvCategoryId()).isEqualTo(3L);
+        assertThat(dto2.getDvCategoryName()).isEqualTo("Cat 3");
     }
 }
