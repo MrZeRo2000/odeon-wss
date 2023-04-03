@@ -7,8 +7,7 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(as = DVProductDTOImpl.class)
-public interface DVProductDTO {
-    Long getId();
+public interface DVProductDTO extends AbstractEntityDTO {
     Long getArtifactTypeId();
     DVOriginDTO getDvOrigin();
     String getTitle();

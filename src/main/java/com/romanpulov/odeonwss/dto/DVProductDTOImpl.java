@@ -36,7 +36,7 @@ public class DVProductDTOImpl implements DVProductDTO {
         return dvOrigin;
     }
 
-    public void setDvOriginId(DVOriginDTO dvOrigin) {
+    public void setDvOrigin(DVOriginDTO dvOrigin) {
         this.dvOrigin = dvOrigin;
     }
 

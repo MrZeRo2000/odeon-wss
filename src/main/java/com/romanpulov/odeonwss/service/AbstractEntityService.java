@@ -17,7 +17,7 @@ public abstract class AbstractEntityService<
 
     protected final EntityDTOMapper<E, DTO> mapper;
 
-    private final String entityName;
+    protected final String entityName;
 
     public AbstractEntityService(R repository, EntityDTOMapper<E, DTO> mapper) {
         this.repository = repository;

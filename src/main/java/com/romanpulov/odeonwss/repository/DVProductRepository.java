@@ -38,4 +38,21 @@ public interface DVProductRepository
             "WHERE dvp.id=:id " +
             "ORDER BY dvc.name")
     List<DVProductFlatDTO> findFlatDTOById(Long id);
+
+
+    @Query("SELECT " +
+            "dvp.id AS id, " +
+            "dvo.name AS dvOriginName, " +
+            "dvp.title AS title, " +
+            "dvp.originalTitle AS originalTitle, " +
+            "dvp.year AS year, " +
+            "dvp.frontInfo AS frontInfo, " +
+            "dvc.name AS dvCategoryName " +
+            "FROM DVProduct dvp " +
+            "LEFT JOIN DVProductDVCategory dvp_dvc ON dvp.id = dvp_dvc.dvProductId " +
+            "LEFT JOIN DVCategory dvc ON dvp_dvc.dvCategoryId = dvc.id " +
+            "LEFT JOIN DVOrigin dvo ON dvp.dvOrigin = dvo " +
+            "WHERE dvp.artifactType.id=:artifactTypeId " +
+            "ORDER BY dvp.title, dvc.name")
+    List<DVProductFlatDTO> findAllFlatDTOByArtifactTypeId(Long artifactTypeId);
 }

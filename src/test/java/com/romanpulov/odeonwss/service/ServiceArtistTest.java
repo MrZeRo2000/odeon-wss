@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceArtistTest {
-
     private static final Logger log = Logger.getLogger(ServiceArtistTest.class.getSimpleName());
 
     @Autowired
@@ -75,13 +74,13 @@ public class ServiceArtistTest {
 
     @Test
     @Order(5)
-    void deleteNotExistingShouldFail() throws Exception {
+    void deleteNotExistingShouldFail() {
         Assertions.assertThrows(CommonEntityNotFoundException.class, () -> artistService.deleteById(777L));
     }
 
     @Test
     @Order(6)
-    void insertWithConflictShouldFail() throws Exception {
+    void insertWithConflictShouldFail() {
         Assertions.assertThrows(CommonEntityAlreadyExistsException.class, () ->
                 artistService.insert(
                         new ArtistCategoriesDetailDTOBuilder()
