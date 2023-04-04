@@ -15,7 +15,7 @@ public class AbstractEntityServiceRestController<
         R extends EntityDTORepository<E, DTO>,
         S extends AbstractEntityService<E, DTO, R>> {
 
-    private final S service;
+    protected final S service;
 
     public AbstractEntityServiceRestController(S service) {
         this.service = service;

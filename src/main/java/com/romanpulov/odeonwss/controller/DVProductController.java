@@ -1,10 +1,11 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
-import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
-import com.romanpulov.odeonwss.repository.DVProductRepository;
+import com.romanpulov.odeonwss.dto.DVProductDTO;
 import com.romanpulov.odeonwss.dto.IdTitleDTO;
+import com.romanpulov.odeonwss.entity.DVProduct;
+import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
+import com.romanpulov.odeonwss.repository.DVProductRepository;
+import com.romanpulov.odeonwss.service.DVProductService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,21 +15,22 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping(value = "/api/dvproduct", produces = MediaType.APPLICATION_JSON_VALUE)
-public class DVProductController {
-    private final ArtifactTypeRepository artifactTypeRepository;
+public class DVProductController
+        extends AbstractEntityServiceRestController<DVProduct, DVProductDTO, DVProductRepository, DVProductService> {
 
-    private final DVProductRepository dvProductRepository;
-
-    public DVProductController(ArtifactTypeRepository artifactTypeRepository, DVProductRepository dvProductRepository) {
-        this.artifactTypeRepository = artifactTypeRepository;
-        this.dvProductRepository = dvProductRepository;
+    public DVProductController(DVProductService dvProductService) {
+        super(dvProductService);
     }
 
     @GetMapping("/dvproducts/table-id-title")
-    ResponseEntity<List<IdTitleDTO>> getDvProducts(@RequestParam Long artifactTypeId)
+    ResponseEntity<List<IdTitleDTO>> getTableIdTitle(@RequestParam Long artifactTypeId)
             throws CommonEntityNotFoundException {
-        ArtifactType artifactType = artifactTypeRepository.findById(artifactTypeId).orElseThrow(
-                () -> new CommonEntityNotFoundException("DVProduct", artifactTypeId));
-        return ResponseEntity.ok(dvProductRepository.findAllByArtifactTypeOrderByTitleAsc(artifactType));
+        return ResponseEntity.ok(service.getTableIdTitle(artifactTypeId));
+    }
+
+    @GetMapping("/dvproducts/table")
+    ResponseEntity<List<DVProductDTO>> getTable(@RequestParam Long artifactTypeId)
+            throws CommonEntityNotFoundException {
+        return ResponseEntity.ok(service.getTable(artifactTypeId));
     }
 }
