@@ -19,7 +19,10 @@ public class DVProductService
     private final DVProductRepository dvProductRepository;
     private final DVProductTransformer transformer;
 
-    public DVProductService(DVProductRepository repository, DVProductMapper mapper, DVProductTransformer transformer) {
+    public DVProductService(
+            DVProductRepository repository,
+            DVProductMapper mapper,
+            DVProductTransformer transformer) {
         super(repository, mapper);
         this.dvProductRepository = repository;
         this.transformer = transformer;

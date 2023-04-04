@@ -29,7 +29,7 @@ public class DVProductMapper implements EntityDTOMapper<DVProduct, DVProductDTO>
         // immutable fields
         entity.setId(dto.getId());
         ArtifactType artifactType = new ArtifactType();
-        artifactType.setId(dto.getId());
+        artifactType.setId(dto.getArtifactTypeId());
         entity.setArtifactType(artifactType);
 
         // mutable fields

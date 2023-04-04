@@ -13,6 +13,23 @@ public abstract class AbstractEntityService<
         DTO extends AbstractEntityDTO,
         R extends EntityDTORepository<E, DTO>> {
 
+    @FunctionalInterface
+    public interface OnProcessEntityHandler<E> {
+        void onProcessEntity(E entity) throws CommonEntityNotFoundException;
+    }
+
+    private OnProcessEntityHandler<E> onBeforeSaveEntityHandler;
+
+    @SuppressWarnings("unused")
+    public OnProcessEntityHandler<E> getOnBeforeSaveEntityHandler()  {
+        return onBeforeSaveEntityHandler;
+    }
+
+    @SuppressWarnings("unused")
+    public void setOnBeforeSaveEntityHandler(OnProcessEntityHandler<E> onBeforeSaveEntityHandler) {
+        this.onBeforeSaveEntityHandler = onBeforeSaveEntityHandler;
+    }
+
     protected final R repository;
 
     protected final EntityDTOMapper<E, DTO> mapper;
@@ -38,6 +55,9 @@ public abstract class AbstractEntityService<
             throw new CommonEntityAlreadyExistsException(entityName, dto.getId());
         } else {
             E entity = mapper.fromDTO(dto);
+            if (onBeforeSaveEntityHandler != null) {
+                onBeforeSaveEntityHandler.onProcessEntity(entity);
+            }
             repository.save(entity);
             return getById(entity.getId());
         }
@@ -48,6 +68,9 @@ public abstract class AbstractEntityService<
         E entity = repository.findById(dto.getId())
                 .orElseThrow(() -> new CommonEntityNotFoundException(this.entityName, dto.getId()));
         mapper.update(entity, dto);
+        if (onBeforeSaveEntityHandler != null) {
+            onBeforeSaveEntityHandler.onProcessEntity(entity);
+        }
         repository.save(entity);
         return getById(entity.getId());
     }

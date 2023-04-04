@@ -35,11 +35,12 @@ public class DVProductTransformer {
                 return newDTO;
             });
 
-            DVCategoryDTOImpl newDvCategoryDTO = new DVCategoryDTOImpl();
-            newDvCategoryDTO.setId(row.getDvCategoryId());
-            newDvCategoryDTO.setName(row.getDvCategoryName());
-            dto.getDvCategories().add(newDvCategoryDTO);
-
+            if (row.getDvCategoryId() != null) {
+                DVCategoryDTOImpl newDvCategoryDTO = new DVCategoryDTOImpl();
+                newDvCategoryDTO.setId(row.getDvCategoryId());
+                newDvCategoryDTO.setName(row.getDvCategoryName());
+                dto.getDvCategories().add(newDvCategoryDTO);
+            }
         }
 
         return new ArrayList<>(productDTOMap.values());
