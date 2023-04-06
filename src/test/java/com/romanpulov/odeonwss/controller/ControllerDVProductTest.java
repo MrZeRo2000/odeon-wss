@@ -148,7 +148,7 @@ public class ControllerDVProductTest {
 
     @Test
     @Order(2)
-    void testGetTableMovies() throws Exception {
+    void testGetTableMoviesNoCategories() throws Exception {
         var result = mockMvc.perform(get("/api/dvproduct/dvproducts/table")
                         .param("artifactTypeId", "202"))
                 .andExpect(status().isOk())
@@ -166,4 +166,48 @@ public class ControllerDVProductTest {
                 ;
         logger.debug("Get result:" + result.andReturn().getResponse().getContentAsString());
     }
+
+    @Test
+    @Order(3)
+    void testGetTableAnimationWithCategories() throws Exception {
+        var result = mockMvc.perform(get("/api/dvproduct/dvproducts/table")
+                        .param("artifactTypeId", "203"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(4)))
+                .andExpect(jsonPath("$[0].id", Matchers.equalTo(3)))
+                .andExpect(jsonPath("$[0].dvOrigin", Matchers.aMapWithSize(1)))
+                .andExpect(jsonPath("$[0].dvOrigin.name", Matchers.equalTo("Product Origin")))
+                .andExpect(jsonPath("$[0].title", Matchers.equalTo("Brown")))
+                .andExpect(jsonPath("$[0].dvCategories").isArray())
+                .andExpect(jsonPath("$[0].dvCategories", Matchers.hasSize(0)))
+                .andExpect(jsonPath("$[1]", Matchers.aMapWithSize(4)))
+                .andExpect(jsonPath("$[1].id", Matchers.equalTo(2)))
+                .andExpect(jsonPath("$[1].dvOrigin", Matchers.aMapWithSize(1)))
+                .andExpect(jsonPath("$[1].dvOrigin.name", Matchers.equalTo("Product Origin")))
+                .andExpect(jsonPath("$[1].title", Matchers.equalTo("White")))
+                .andExpect(jsonPath("$[1].dvCategories").isArray())
+                .andExpect(jsonPath("$[1].dvCategories", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[1].dvCategories[0]", Matchers.aMapWithSize(1)))
+                .andExpect(jsonPath("$[1].dvCategories[0].name", Matchers.equalTo("Another category")))
+                .andExpect(jsonPath("$[1].dvCategories[1]", Matchers.aMapWithSize(1)))
+                .andExpect(jsonPath("$[1].dvCategories[1].name", Matchers.equalTo("Third category")))
+
+                ;
+        logger.debug("Get result:" + result.andReturn().getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(4)
+    void testGetTableNoData() throws Exception {
+        var result = mockMvc.perform(get("/api/dvproduct/dvproducts/table")
+                        .param("artifactTypeId", "204"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(0)))
+                ;
+        logger.debug("Get result:" + result.andReturn().getResponse().getContentAsString());
+    }
+
 }

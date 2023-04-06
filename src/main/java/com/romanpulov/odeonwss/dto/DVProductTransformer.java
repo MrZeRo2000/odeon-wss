@@ -7,7 +7,8 @@ import java.util.*;
 @Component
 public class DVProductTransformer {
     public List<DVProductDTO> transform(List<DVProductFlatDTO> rs) {
-        final Map<Long, DVProductDTO> productDTOMap = new HashMap<>();
+        // LinkedHashMap because of a need to retain original order for correct sorting
+        final Map<Long, DVProductDTO> productDTOMap = new LinkedHashMap<>();
         final Map<Long, DVOriginDTO> originDTOMap = new HashMap<>();
 
         for (DVProductFlatDTO row : rs) {
@@ -35,7 +36,7 @@ public class DVProductTransformer {
                 return newDTO;
             });
 
-            if (row.getDvCategoryId() != null) {
+            if ((row.getDvCategoryId() != null) || (row.getDvCategoryName() != null)) {
                 DVCategoryDTOImpl newDvCategoryDTO = new DVCategoryDTOImpl();
                 newDvCategoryDTO.setId(row.getDvCategoryId());
                 newDvCategoryDTO.setName(row.getDvCategoryName());
