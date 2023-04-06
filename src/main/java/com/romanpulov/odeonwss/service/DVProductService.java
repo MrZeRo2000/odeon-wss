@@ -5,10 +5,13 @@ import com.romanpulov.odeonwss.dto.DVProductFlatDTO;
 import com.romanpulov.odeonwss.dto.DVProductTransformer;
 import com.romanpulov.odeonwss.dto.IdTitleDTO;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.DVCategory;
 import com.romanpulov.odeonwss.entity.DVProduct;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.DVProductMapper;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
+import com.romanpulov.odeonwss.repository.DVCategoryRepository;
+import com.romanpulov.odeonwss.repository.DVOriginRepository;
 import com.romanpulov.odeonwss.repository.DVProductRepository;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +28,8 @@ public class DVProductService
 
     public DVProductService(
             ArtifactTypeRepository artifactTypeRepository,
+            DVOriginRepository dvOriginRepository,
+            DVCategoryRepository dvCategoryRepository,
             DVProductRepository repository,
             DVProductMapper mapper,
             DVProductTransformer transformer) {
@@ -32,6 +37,25 @@ public class DVProductService
         this.artifactTypeRepository = artifactTypeRepository;
         this.dvProductRepository = repository;
         this.transformer = transformer;
+
+        this.setOnBeforeSaveEntityHandler(entity -> {
+            Long artifactTypeId = entity.getArtifactType().getId();
+            if (artifactTypeId != null && !artifactTypeRepository.existsById(artifactTypeId)) {
+                throw new CommonEntityNotFoundException("ArtifactType", artifactTypeId);
+            }
+
+            Long dvOriginId = entity.getDvOrigin().getId();
+            if (dvOriginId != null && !dvOriginRepository.existsById(dvOriginId)) {
+                throw new CommonEntityNotFoundException("DVOrigin", dvOriginId);
+            }
+
+            for (DVCategory dvCategory: entity.getDvCategories()) {
+                Long dvCategoryId = dvCategory.getId();
+                if (dvCategoryId != null && !dvCategoryRepository.existsById(dvCategoryId)) {
+                    throw new CommonEntityNotFoundException("DVCategory", dvCategoryId);
+                }
+            }
+        });
     }
 
     @Override

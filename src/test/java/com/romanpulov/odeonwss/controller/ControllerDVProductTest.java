@@ -1,13 +1,19 @@
 package com.romanpulov.odeonwss.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.romanpulov.odeonwss.builder.dtobuilder.DVOriginDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.DVProductDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVCategoryBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVProductBuilder;
+import com.romanpulov.odeonwss.dto.DVOriginDTO;
+import com.romanpulov.odeonwss.dto.DVProductDTOImpl;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.DVCategoryRepository;
 import com.romanpulov.odeonwss.repository.DVOriginRepository;
 import com.romanpulov.odeonwss.repository.DVProductRepository;
+import com.romanpulov.odeonwss.service.DVOriginService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -18,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,6 +33,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,6 +44,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ControllerDVProductTest {
     final static Logger logger = LoggerFactory.getLogger(ControllerDVProductTest.class);
+
+    final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private MockMvc mockMvc;
@@ -49,6 +61,9 @@ public class ControllerDVProductTest {
 
     @Autowired
     private DVProductRepository dvProductRepository;
+
+    @Autowired
+    private DVOriginService dvOriginService;
 
     @Test
     @Sql({"/schema.sql", "/data.sql"})
@@ -208,6 +223,55 @@ public class ControllerDVProductTest {
                 .andExpect(jsonPath("$", Matchers.hasSize(0)))
                 ;
         logger.debug("Get result:" + result.andReturn().getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(10)
+    void testInsertProductWithWrongArtifactTypeShouldFail() throws Exception {
+        DVOriginDTO dvOriginDTO = dvOriginService.getById(1L);
+
+        DVProductDTOImpl productDTO = new DVProductDTOBuilder()
+                .withDvOrigin(dvOriginDTO)
+                .withArtifactTypeId(987L)
+                .withTitle("Wrong title")
+                .build();
+
+        String json = mapper.writeValueAsString(productDTO);
+        logger.debug("insert json:" + json);
+
+        var result = mockMvc.perform(post("/api/dvproduct")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", Matchers.containsString("not found")));
+        logger.debug("Post result:" + result.andReturn().getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(11)
+    void testInsertProductWithWrongOriginShouldFail() throws Exception {
+        DVOriginDTO dvOriginDTO = new DVOriginDTOBuilder()
+                .withId(388L)
+                .withName("a name")
+                .build();
+
+        DVProductDTOImpl productDTO = new DVProductDTOBuilder()
+                .withDvOrigin(dvOriginDTO)
+                .withArtifactTypeId(203L)
+                .withTitle("Wrong title with wrong origin")
+                .build();
+
+        String json = mapper.writeValueAsString(productDTO);
+        logger.debug("insert json:" + json);
+
+        var result = mockMvc.perform(post("/api/dvproduct")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", Matchers.containsString("not found")));
+        logger.debug("Post result:" + result.andReturn().getResponse().getContentAsString());
     }
 
 }
