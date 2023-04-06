@@ -274,4 +274,44 @@ public class ControllerDVProductTest {
         logger.debug("Post result:" + result.andReturn().getResponse().getContentAsString());
     }
 
+    @Test
+    @Order(12)
+    void testInsertProductWithoutCategoriesShouldBeOk() throws Exception {
+        DVOriginDTO dvOriginDTO = dvOriginService.getById(1L);
+
+        DVProductDTOImpl productDTO = new DVProductDTOBuilder()
+                .withDvOrigin(dvOriginDTO)
+                .withArtifactTypeId(202L)
+                .withTitle("Without Categories")
+                .withOriginalTitle("Without Categories original")
+                .withYear(2012L)
+                .withFrontInfo("Front without categories")
+                .withDescription("Description without categories")
+                .withNotes("Notes without categories")
+                .build();
+
+        String json = mapper.writeValueAsString(productDTO);
+        logger.debug("insert json:" + json);
+
+        var result = mockMvc.perform(post("/api/dvproduct")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.aMapWithSize(10)))
+                .andExpect(jsonPath("$.id", Matchers.equalTo(4)))
+                .andExpect(jsonPath("$.dvOrigin.id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$.dvOrigin.name", Matchers.equalTo("Product Origin")))
+                .andExpect(jsonPath("$.title", Matchers.equalTo("Without Categories")))
+                .andExpect(jsonPath("$.originalTitle", Matchers.equalTo("Without Categories original")))
+                .andExpect(jsonPath("$.year", Matchers.equalTo(2012)))
+                .andExpect(jsonPath("$.frontInfo", Matchers.equalTo("Front without categories")))
+                .andExpect(jsonPath("$.description", Matchers.equalTo("Description without categories")))
+                .andExpect(jsonPath("$.notes", Matchers.equalTo("Notes without categories")))
+                .andExpect(jsonPath("$.dvCategories").isArray())
+                .andExpect(jsonPath("$.dvCategories", Matchers.hasSize(0)))
+        ;
+        logger.debug("Post result:" + result.andReturn().getResponse().getContentAsString());
+    }
+
 }
