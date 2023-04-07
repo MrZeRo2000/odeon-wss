@@ -1,12 +1,14 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.romanpulov.odeonwss.builder.dtobuilder.DVCategoryDTOBuilder;
 import com.romanpulov.odeonwss.builder.dtobuilder.DVOriginDTOBuilder;
 import com.romanpulov.odeonwss.builder.dtobuilder.DVProductDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVCategoryBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVProductBuilder;
 import com.romanpulov.odeonwss.dto.DVOriginDTO;
+import com.romanpulov.odeonwss.dto.DVProductDTO;
 import com.romanpulov.odeonwss.dto.DVProductDTOImpl;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
@@ -14,6 +16,7 @@ import com.romanpulov.odeonwss.repository.DVCategoryRepository;
 import com.romanpulov.odeonwss.repository.DVOriginRepository;
 import com.romanpulov.odeonwss.repository.DVProductRepository;
 import com.romanpulov.odeonwss.service.DVOriginService;
+import com.romanpulov.odeonwss.service.DVProductService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -32,6 +35,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -64,6 +68,9 @@ public class ControllerDVProductTest {
 
     @Autowired
     private DVOriginService dvOriginService;
+
+    @Autowired
+    private DVProductService dvProductService;
 
     @Test
     @Sql({"/schema.sql", "/data.sql"})
@@ -312,6 +319,107 @@ public class ControllerDVProductTest {
                 .andExpect(jsonPath("$.dvCategories", Matchers.hasSize(0)))
         ;
         logger.debug("Post result:" + result.andReturn().getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(13)
+    void testInsertProductWithCategoriesShouldBeOk() throws Exception {
+        DVOriginDTO dvOriginDTO = dvOriginService.getById(1L);
+
+        DVProductDTOImpl productDTO = new DVProductDTOBuilder()
+                .withDvOrigin(dvOriginDTO)
+                .withArtifactTypeId(202L)
+                .withTitle("With Categories")
+                .withOriginalTitle("With Categories original")
+                .withYear(2007L)
+                .withFrontInfo("Front with categories")
+                .withDescription("Description with categories")
+                .withNotes("Notes with categories")
+                .withDvCategories(List.of(
+                        new DVCategoryDTOBuilder().withId(1L).build(),
+                        new DVCategoryDTOBuilder().withId(2L).build()
+                ))
+                .build();
+
+        String json = mapper.writeValueAsString(productDTO);
+        logger.debug("insert json:" + json);
+
+        var result = mockMvc.perform(post("/api/dvproduct")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.aMapWithSize(10)))
+                .andExpect(jsonPath("$.id", Matchers.equalTo(5)))
+                .andExpect(jsonPath("$.dvOrigin.id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$.dvOrigin.name", Matchers.equalTo("Product Origin")))
+                .andExpect(jsonPath("$.title", Matchers.equalTo("With Categories")))
+                .andExpect(jsonPath("$.originalTitle", Matchers.equalTo("With Categories original")))
+                .andExpect(jsonPath("$.year", Matchers.equalTo(2007)))
+                .andExpect(jsonPath("$.frontInfo", Matchers.equalTo("Front with categories")))
+                .andExpect(jsonPath("$.description", Matchers.equalTo("Description with categories")))
+                .andExpect(jsonPath("$.notes", Matchers.equalTo("Notes with categories")))
+                .andExpect(jsonPath("$.dvCategories").isArray())
+                .andExpect(jsonPath("$.dvCategories", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$.dvCategories[0].id", Matchers.equalTo(2)))
+                .andExpect(jsonPath("$.dvCategories[0].name", Matchers.equalTo("Another category")))
+                .andExpect(jsonPath("$.dvCategories[1].id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$.dvCategories[1].name", Matchers.equalTo("Some category")))
+        ;
+        logger.debug("Post result:" + result.andReturn().getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(14)
+    void testUpdateProductRemoveCategoriesShouldBeOk() throws Exception {
+        DVProductDTO productDTO = dvProductService.getById(5L);
+        productDTO.getDvCategories().clear();
+
+        String json = mapper.writeValueAsString(productDTO);
+        logger.debug("insert json:" + json);
+
+        var result = mockMvc.perform(put("/api/dvproduct")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.aMapWithSize(10)))
+                .andExpect(jsonPath("$.id", Matchers.equalTo(5)))
+                .andExpect(jsonPath("$.dvOrigin.id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$.dvOrigin.name", Matchers.equalTo("Product Origin")))
+                .andExpect(jsonPath("$.title", Matchers.equalTo("With Categories")))
+                .andExpect(jsonPath("$.originalTitle", Matchers.equalTo("With Categories original")))
+                .andExpect(jsonPath("$.year", Matchers.equalTo(2007)))
+                .andExpect(jsonPath("$.frontInfo", Matchers.equalTo("Front with categories")))
+                .andExpect(jsonPath("$.description", Matchers.equalTo("Description with categories")))
+                .andExpect(jsonPath("$.notes", Matchers.equalTo("Notes with categories")))
+                .andExpect(jsonPath("$.dvCategories").isArray())
+                .andExpect(jsonPath("$.dvCategories", Matchers.hasSize(0)))
+        ;
+        logger.debug("Put result:" + result.andReturn().getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(15)
+    void testDeleteProductWithCategories() throws Exception {
+        DVProductDTO productDTO = dvProductService.getById(2L);
+        assertThat(productDTO.getId()).isEqualTo(2);
+
+        mockMvc.perform(get("/api/dvproduct/2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        var result = mockMvc.perform(delete("/api/dvproduct/2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        logger.debug("Delete result:" + result.andReturn().getResponse().getContentAsString());
+
+        mockMvc.perform(get("/api/dvproduct/2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
 }

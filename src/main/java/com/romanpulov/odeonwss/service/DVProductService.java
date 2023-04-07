@@ -51,7 +51,9 @@ public class DVProductService
 
             for (DVCategory dvCategory: entity.getDvCategories()) {
                 Long dvCategoryId = dvCategory.getId();
-                if (dvCategoryId != null && !dvCategoryRepository.existsById(dvCategoryId)) {
+                if (dvCategoryId == null) {
+                    throw new CommonEntityNotFoundException("DVCategory", 0L);
+                } else if (!dvCategoryRepository.existsById(dvCategoryId)) {
                     throw new CommonEntityNotFoundException("DVCategory", dvCategoryId);
                 }
             }
