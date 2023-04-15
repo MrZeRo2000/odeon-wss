@@ -43,14 +43,23 @@ public class ServiceDVProductTest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     void testPrepareDataShouldBeOk() throws Exception {
-        DVOriginDTO dvOriginDTO = new DVOriginDTOBuilder()
+        DVOriginDTO dvOriginDTO1 = new DVOriginDTOBuilder()
                 .withName("Initial origin")
                 .build();
-        dvOriginDTO = dvOriginService.insert(dvOriginDTO);
-        log.info("Inserted dvOriginDTO:" + dvOriginDTO);
+        dvOriginDTO1 = dvOriginService.insert(dvOriginDTO1);
+        log.info("Inserted dvOriginDTO1:" + dvOriginDTO1);
 
-        assertThat(dvOriginDTO.getId()).isEqualTo(1L);
-        assertThat(dvOriginDTO.getName()).isEqualTo("Initial origin");
+        assertThat(dvOriginDTO1.getId()).isEqualTo(1L);
+        assertThat(dvOriginDTO1.getName()).isEqualTo("Initial origin");
+
+        DVOriginDTO dvOriginDTO2 = new DVOriginDTOBuilder()
+                .withName("Another origin")
+                .build();
+        dvOriginDTO2 = dvOriginService.insert(dvOriginDTO2);
+        log.info("Inserted dvOriginDTO2:" + dvOriginDTO2);
+
+        assertThat(dvOriginDTO2.getId()).isEqualTo(2L);
+        assertThat(dvOriginDTO2.getName()).isEqualTo("Another origin");
 
         DVCategoryDTO dvCategoryDTO1 = new DVCategoryDTOBuilder()
                 .withName("First category")
@@ -190,5 +199,45 @@ public class ServiceDVProductTest {
         log.info("Updated dvProductDTO:" + savedDvProductDTO);
 
         assertThat(savedDvProductDTO.getDvCategories().size()).isEqualTo(0);
+    }
+
+    @Test
+    @Order(8)
+    void testGetTableDifferentOriginsShouldBeOk() throws Exception {
+        DVOriginDTO dvOriginDTO = dvOriginService.getById(2L);
+
+        DVProductDTO dvProductDTO = new DVProductDTOBuilder()
+                .withArtifactTypeId(artifactTypeRepository.getWithDVMovies().getId())
+                .withDvOrigin(dvOriginDTO)
+                .withTitle("Another title")
+                .withOriginalTitle("Another original title")
+                .withYear(2014L)
+                .withFrontInfo("Front another")
+                .withDescription("Another description")
+                .withNotes("Another notes")
+                .build();
+        dvProductDTO = service.insert(dvProductDTO);
+        log.info("Inserted dvProductDTO:" + dvProductDTO);
+
+        var table = service.getTable(artifactTypeRepository.getWithDVMovies().getId());
+        assertThat(table.size()).isEqualTo(3);
+        assertThat(table.get(0).getDvOrigin().getId()).isNull();
+        assertThat(table.get(0).getDvOrigin().getName()).isEqualTo("Another origin");
+        assertThat(table.get(0).getTitle()).isEqualTo("Another title");
+        assertThat(table.get(0).getOriginalTitle()).isEqualTo("Another original title");
+        assertThat(table.get(0).getYear()).isEqualTo(2014L);
+        assertThat(table.get(0).getFrontInfo()).isEqualTo("Front another");
+        assertThat(table.get(0).getDescription()).isNull();
+        assertThat(table.get(0).getNotes()).isNull();
+
+        assertThat(table.get(1).getDvOrigin().getName()).isEqualTo("Initial origin");
+        assertThat(table.get(2).getDvOrigin().getName()).isEqualTo("Initial origin");
+
+        assertThat(table.get(0).getDvCategories().size()).isEqualTo(0);
+        assertThat(table.get(1).getDvCategories().size()).isEqualTo(0);
+        assertThat(table.get(2).getDvCategories().size()).isEqualTo(2);
+        assertThat(table.get(2).getDvCategories().get(0).getId()).isNull();
+        assertThat(table.get(2).getDvCategories().get(0).getName()).isEqualTo("Another category");
+        assertThat(table.get(2).getDvCategories().get(1).getName()).isEqualTo("First category");
     }
 }
