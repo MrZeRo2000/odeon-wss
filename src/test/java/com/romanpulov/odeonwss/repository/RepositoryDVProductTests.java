@@ -1,26 +1,21 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVCategoryBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVProductBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.dto.DVProductDTO;
 import com.romanpulov.odeonwss.dto.DVProductFlatDTO;
-import com.romanpulov.odeonwss.entity.DVCategory;
-import com.romanpulov.odeonwss.entity.DVOrigin;
-import com.romanpulov.odeonwss.entity.DVProduct;
+import com.romanpulov.odeonwss.entity.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.transaction.Transactional;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -30,12 +25,17 @@ public class RepositoryDVProductTests {
     private ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
+    private ArtifactRepository artifactRepository;
+
+    @Autowired
     private DVProductRepository dvProductRepository;
 
     @Autowired
     private DVOriginRepository dvOriginRepository;
     @Autowired
     private DVCategoryRepository dVCategoryRepository;
+    @Autowired
+    private TrackRepository trackRepository;
 
     @Test
     @Order(1)
@@ -209,5 +209,45 @@ public class RepositoryDVProductTests {
 
         assertThat(dto2.getDvCategoryId()).isEqualTo(3L);
         assertThat(dto2.getDvCategoryName()).isEqualTo("Cat 3");
+    }
+
+    @Test
+    @Order(9)
+    void testDeleteWithoutTracksShouldBeOk() {
+        assertThat(dvProductRepository.findAll().size()).isEqualTo(3);
+        assertThat(dvProductRepository.findDTOById(1L).orElseThrow()).isNotNull();
+
+        dvProductRepository.deleteById(1L);
+
+        assertThatThrownBy(() -> dvProductRepository.findDTOById(1L).orElseThrow()).isInstanceOf(NoSuchElementException.class);
+        assertThat(dvProductRepository.findAll().size()).isEqualTo(2);
+    }
+
+    @Test
+    @Order(10)
+    void testDeleteWithTracksShouldFail() {
+        Artifact artifact = new EntityArtifactBuilder()
+                .withArtifactType(artifactTypeRepository.getWithDVMovies())
+                .withTitle("Title 1")
+                .build();
+        artifactRepository.save(artifact);
+        assertThat(artifact.getId()).isGreaterThan(0);
+
+        DVProduct dvProduct = dvProductRepository.findById(2L).orElseThrow();
+
+        Track track = new EntityTrackBuilder()
+                .withArtifact(artifact)
+                .withTitle("Track title")
+                .withDiskNum(1L)
+                .withNum(8L)
+                .withDuration(123456L)
+                .withMigrationId(4321L)
+                .build();
+        track.getDvProducts().add(dvProduct);
+
+        trackRepository.save(track);
+        assertThat(track.getId()).isGreaterThan(0);
+
+        assertThatThrownBy(() -> dvProductRepository.delete(dvProduct)).isInstanceOf(JpaSystemException.class);
     }
 }

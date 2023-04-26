@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.entity;
 
 import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -131,6 +132,13 @@ public class DVProduct extends AbstractBaseMigratedEntity {
 
     public void setTracks(Set<Track> tracks) {
         this.tracks = tracks;
+    }
+
+    @PreRemove
+    private void removeDvProduct() {
+        if (tracks != null && !tracks.isEmpty()) {
+            throw new HibernateException("Unable to delete " + this + " because it has tracks");
+        }
     }
 
     public DVProduct() {
