@@ -190,6 +190,44 @@ public class ControllerDVProductTest {
     }
 
     @Test
+    @Order(2)
+    void testGetDescriptionExistingOk() throws Exception {
+        var result = mockMvc.perform(get("/api/dvproduct/description/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.aMapWithSize(1)))
+                .andExpect(jsonPath("$.text", Matchers.equalTo("Green description")))
+                ;
+        logger.debug("Get result:" + result.andReturn().getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(2)
+    void testGetDescriptionNonExistingShouldFail() throws Exception {
+        mockMvc.perform(get("/api/dvproduct/description/100"))
+                .andExpect(status().isNotFound())
+                ;
+    }
+
+    @Test
+    @Order(2)
+    void testGetNotesExistingOk() throws Exception {
+        var result = mockMvc.perform(get("/api/dvproduct/notes/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.aMapWithSize(1)))
+                .andExpect(jsonPath("$.text", Matchers.equalTo("Green notes")))
+                ;
+        logger.debug("Get result:" + result.andReturn().getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(2)
+    void testGetNotesNonExistingShouldFail() throws Exception {
+        mockMvc.perform(get("/api/dvproduct/notes/83"))
+                .andExpect(status().isNotFound())
+                ;
+    }
+
+    @Test
     @Order(3)
     void testGetTableAnimationWithCategories() throws Exception {
         var result = mockMvc.perform(get("/api/dvproduct/dvproducts/table")

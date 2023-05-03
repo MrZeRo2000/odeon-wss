@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.dto.DVProductDTO;
 import com.romanpulov.odeonwss.dto.IdTitleDTO;
+import com.romanpulov.odeonwss.dto.TextDTO;
 import com.romanpulov.odeonwss.entity.DVProduct;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.repository.DVProductRepository;
@@ -32,5 +33,17 @@ public class DVProductController
     ResponseEntity<List<DVProductDTO>> getTable(@RequestParam Long artifactTypeId)
             throws CommonEntityNotFoundException {
         return ResponseEntity.ok(service.getTable(artifactTypeId));
+    }
+
+    @GetMapping("/description/{id}")
+    ResponseEntity<TextDTO> getDescription(@PathVariable Long id)
+            throws CommonEntityNotFoundException {
+        return ResponseEntity.ok(service.getDescription(id));
+    }
+
+    @GetMapping("/notes/{id}")
+    ResponseEntity<TextDTO> getNotes(@PathVariable Long id)
+            throws CommonEntityNotFoundException {
+        return ResponseEntity.ok(service.getNotes(id));
     }
 }

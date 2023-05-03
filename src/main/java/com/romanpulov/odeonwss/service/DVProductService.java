@@ -1,9 +1,6 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.dto.DVProductDTO;
-import com.romanpulov.odeonwss.dto.DVProductFlatDTO;
-import com.romanpulov.odeonwss.dto.DVProductTransformer;
-import com.romanpulov.odeonwss.dto.IdTitleDTO;
+import com.romanpulov.odeonwss.dto.*;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.DVCategory;
 import com.romanpulov.odeonwss.entity.DVProduct;
@@ -82,5 +79,17 @@ public class DVProductService
         } else {
             throw new CommonEntityNotFoundException("ArtifactType", artifactTypeId);
         }
+    }
+
+    public TextDTO getDescription(Long id) throws CommonEntityNotFoundException {
+        return dvProductRepository
+                .findDescriptionById(id)
+                .orElseThrow(() -> new CommonEntityNotFoundException("DVProduct", id));
+    }
+
+    public TextDTO getNotes(Long id) throws CommonEntityNotFoundException {
+        return dvProductRepository
+                .findNotesById(id)
+                .orElseThrow(() -> new CommonEntityNotFoundException("DVProduct", id));
     }
 }
