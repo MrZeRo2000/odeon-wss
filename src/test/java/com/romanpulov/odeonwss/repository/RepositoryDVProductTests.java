@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.repository;
 import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.dto.DVProductDTO;
 import com.romanpulov.odeonwss.dto.DVProductFlatDTO;
+import com.romanpulov.odeonwss.dto.TextDTO;
 import com.romanpulov.odeonwss.entity.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -209,6 +210,21 @@ public class RepositoryDVProductTests {
 
         assertThat(dto2.getDvCategoryId()).isEqualTo(3L);
         assertThat(dto2.getDvCategoryName()).isEqualTo("Cat 3");
+    }
+
+    @Test
+    @Order(8)
+    void testFindDescriptionNotesById() {
+        TextDTO description = dvProductRepository.findDescriptionById(2L).orElseThrow();
+        assertThat(description.getText()).isEqualTo("Best ever");
+
+        TextDTO notes = dvProductRepository.findNotesById(2L).orElseThrow();
+        assertThat(notes.getText()).isEqualTo("Good as always");
+
+        assertThatThrownBy(() -> dvProductRepository.findDescriptionById(22L).orElseThrow())
+                .isInstanceOf(NoSuchElementException.class);
+        assertThatThrownBy(() -> dvProductRepository.findNotesById(77L).orElseThrow())
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test

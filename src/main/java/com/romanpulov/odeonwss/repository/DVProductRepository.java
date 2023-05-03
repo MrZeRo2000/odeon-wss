@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.dto.DVProductDTO;
 import com.romanpulov.odeonwss.dto.DVProductFlatDTO;
+import com.romanpulov.odeonwss.dto.TextDTO;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.DVProduct;
 import com.romanpulov.odeonwss.dto.IdTitleDTO;
@@ -55,4 +56,10 @@ public interface DVProductRepository
             "WHERE dvp.artifactType.id=:artifactTypeId " +
             "ORDER BY dvp.title, dvc.name")
     List<DVProductFlatDTO> findAllFlatDTOByArtifactTypeId(Long artifactTypeId);
+
+    @Query("SELECT dvp.description as text FROM DVProduct dvp WHERE dvp.id=:id")
+    Optional<TextDTO> findDescriptionById(Long id);
+
+    @Query("SELECT dvp.notes as text FROM DVProduct dvp WHERE dvp.id=:id")
+    Optional<TextDTO> findNotesById(Long id);
 }
