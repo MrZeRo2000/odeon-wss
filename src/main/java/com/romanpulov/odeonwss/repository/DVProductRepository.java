@@ -48,6 +48,8 @@ public interface DVProductRepository
             "dvp.originalTitle AS originalTitle, " +
             "dvp.year AS year, " +
             "dvp.frontInfo AS frontInfo, " +
+            "CASE WHEN dvp.description IS NOT NULL THEN true ELSE false END AS hasDescription, " +
+            "CASE WHEN dvp.notes IS NOT NULL THEN true ELSE false END AS hasNotes, " +
             "dvc.name AS dvCategoryName " +
             "FROM DVProduct dvp " +
             "LEFT JOIN DVProductDVCategory dvp_dvc ON dvp.id = dvp_dvc.dvProductId " +

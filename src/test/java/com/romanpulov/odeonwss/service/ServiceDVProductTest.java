@@ -228,7 +228,9 @@ public class ServiceDVProductTest {
         assertThat(table.get(0).getYear()).isEqualTo(2014L);
         assertThat(table.get(0).getFrontInfo()).isEqualTo("Front another");
         assertThat(table.get(0).getDescription()).isNull();
+        assertThat(table.get(0).getHasDescription()).isTrue();
         assertThat(table.get(0).getNotes()).isNull();
+        assertThat(table.get(0).getHasNotes()).isTrue();
 
         assertThat(table.get(1).getDvOrigin().getName()).isEqualTo("Initial origin");
         assertThat(table.get(2).getDvOrigin().getName()).isEqualTo("Initial origin");

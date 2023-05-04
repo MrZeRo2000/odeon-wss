@@ -15,6 +15,8 @@ public interface DVProductDTO extends AbstractEntityDTO {
     Long getYear();
     String getFrontInfo();
     String getDescription();
+    Boolean getHasDescription();
     String getNotes();
+    Boolean getHasNotes();
     List<DVCategoryDTO> getDvCategories();
 }

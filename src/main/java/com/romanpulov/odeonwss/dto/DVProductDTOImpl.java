@@ -13,9 +13,12 @@ public class DVProductDTOImpl implements DVProductDTO {
     private Long year;
     private String frontInfo;
     private String description;
+    private Boolean hasDescription;
     private String notes;
+    private Boolean hasNotes;
     private List<DVCategoryDTO> dvCategories = new ArrayList<>();
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -24,6 +27,7 @@ public class DVProductDTOImpl implements DVProductDTO {
         this.id = id;
     }
 
+    @Override
     public Long getArtifactTypeId() {
         return artifactTypeId;
     }
@@ -32,6 +36,7 @@ public class DVProductDTOImpl implements DVProductDTO {
         this.artifactTypeId = artifactTypeId;
     }
 
+    @Override
     public DVOriginDTO getDvOrigin() {
         return dvOrigin;
     }
@@ -40,6 +45,7 @@ public class DVProductDTOImpl implements DVProductDTO {
         this.dvOrigin = dvOrigin;
     }
 
+    @Override
     public String getTitle() {
         return title;
     }
@@ -48,6 +54,7 @@ public class DVProductDTOImpl implements DVProductDTO {
         this.title = title;
     }
 
+    @Override
     public String getOriginalTitle() {
         return originalTitle;
     }
@@ -56,6 +63,7 @@ public class DVProductDTOImpl implements DVProductDTO {
         this.originalTitle = originalTitle;
     }
 
+    @Override
     public Long getYear() {
         return year;
     }
@@ -64,6 +72,7 @@ public class DVProductDTOImpl implements DVProductDTO {
         this.year = year;
     }
 
+    @Override
     public String getFrontInfo() {
         return frontInfo;
     }
@@ -72,6 +81,7 @@ public class DVProductDTOImpl implements DVProductDTO {
         this.frontInfo = frontInfo;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
@@ -80,6 +90,16 @@ public class DVProductDTOImpl implements DVProductDTO {
         this.description = description;
     }
 
+    @Override
+    public Boolean getHasDescription() {
+        return hasDescription;
+    }
+
+    public void setHasDescription(Boolean hasDescription) {
+        this.hasDescription = hasDescription;
+    }
+
+    @Override
     public String getNotes() {
         return notes;
     }
@@ -88,6 +108,16 @@ public class DVProductDTOImpl implements DVProductDTO {
         this.notes = notes;
     }
 
+    @Override
+    public Boolean getHasNotes() {
+        return hasNotes;
+    }
+
+    public void setHasNotes(Boolean hasNotes) {
+        this.hasNotes = hasNotes;
+    }
+
+    @Override
     public List<DVCategoryDTO> getDvCategories() {
         return dvCategories;
     }
