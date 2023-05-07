@@ -9,6 +9,8 @@ CREATE TABLE artists (
     arts_id INTEGER PRIMARY KEY AUTOINCREMENT,
     arts_type_code TEXT NOT NULL,
     arts_name TEXT NOT NULL,
+    arts_ins_datm INTEGER NOT NULL,
+    arts_upd_datm INTEGER NOT NULL,
     arts_migration_id INTEGER NULL
 );
 
@@ -21,7 +23,9 @@ CREATE TABLE artifact_types (
     attp_id INTEGER PRIMARY KEY AUTOINCREMENT,
     attp_name TEXT NOT NULL,
     attp_media_file_formats TEXT NULL,
-    attp_parent_id INTEGER NULL
+    attp_parent_id INTEGER NULL,
+    attp_ins_datm INTEGER NOT NULL,
+    attp_upd_datm INTEGER NOT NULL
 );
 
 CREATE UNIQUE INDEX idx_artifact_attp_parent_id_attp_name ON artifact_types (attp_parent_id, attp_name)
@@ -31,7 +35,9 @@ DROP TABLE IF EXISTS dv_types;
 
 CREATE TABLE dv_types (
     dvtp_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    dvtp_name TEXT NOT NULL
+    dvtp_name TEXT NOT NULL,
+    dvtp_ins_datm INTEGER NOT NULL,
+    dvtp_upd_datm INTEGER NOT NULL
 );
 
 CREATE UNIQUE INDEX idx_dv_types_dvtp_name ON dv_types(dvtp_name);
@@ -47,7 +53,8 @@ CREATE TABLE artifacts (
     artf_year INTEGER NULL,
     artf_duration INTEGER NULL,
     artf_size INTEGER NULL,
-    artf_ins_date INTEGER NULL,
+    artf_ins_datm INTEGER NOT NULL,
+    artf_upd_datm INTEGER NOT NULL,
     artf_migration_id INTEGER NULL
 );
 
@@ -69,6 +76,8 @@ CREATE TABLE tracks (
     trck_duration INTEGER NULL,
     trck_disk_num INTEGER NULL,
     trck_num INTEGER NULL,
+    trck_ins_datm INTEGER NOT NULL,
+    trck_upd_datm INTEGER NOT NULL,
     trck_migration_id INTEGER NULL
 );
 
@@ -86,6 +95,8 @@ CREATE TABLE media_files (
     mdfl_size INTEGER NOT NULL,
     mdfl_bitrate INTEGER NULL,
     mdfl_duration INTEGER NULL,
+    mdfl_ins_datm INTEGER NOT NULL,
+    mdfl_upd_datm INTEGER NOT NULL,
     mdfl_migration_id INTEGER NULL
 );
 
@@ -106,6 +117,8 @@ CREATE TABLE artist_categories (
     arts_id INTEGER NOT NULL,
     atct_type_code TEXT NOT NULL,
     atct_name TEXT NOT NULL,
+    atct_ins_datm INTEGER NOT NULL,
+    atct_upd_datm INTEGER NOT NULL,
     atct_migration_id INTEGER NULL
 );
 
@@ -116,7 +129,9 @@ DROP TABLE IF EXISTS artist_details;
 CREATE TABLE artist_details (
     atdt_id INTEGER PRIMARY KEY AUTOINCREMENT,
     arts_id INTEGER NOT NULL,
-    atdt_biography TEXT NOT NULL
+    atdt_biography TEXT NOT NULL,
+    atdt_ins_datm INTEGER NOT NULL,
+    atdt_upd_datm INTEGER NOT NULL
 );
 
 CREATE UNIQUE INDEX idx_artist_details_arts_id ON artist_details(arts_id);
@@ -127,7 +142,9 @@ CREATE TABLE artist_lyrics (
     atlr_id INTEGER PRIMARY KEY AUTOINCREMENT,
     arts_id INTEGER NOT NULL,
     atlr_title TEXT NOT NULL,
-    atlr_text TEXT NOT NULL
+    atlr_text TEXT NOT NULL,
+    atlr_ins_datm INTEGER NOT NULL,
+    atlr_upd_datm INTEGER NOT NULL
 );
 
 CREATE UNIQUE INDEX idx_artist_lyrics_arts_id_atlr_title ON artist_lyrics(arts_id, atlr_title);
@@ -137,6 +154,8 @@ DROP TABLE IF EXISTS dv_origins;
 CREATE TABLE dv_origins (
     dvor_id INTEGER PRIMARY KEY AUTOINCREMENT,
     dvor_name TEXT NOT NULL,
+    dvor_ins_datm INTEGER NOT NULL,
+    dvor_upd_datm INTEGER NOT NULL,
     dvor_migration_id INTEGER NULL
 );
 
@@ -147,6 +166,8 @@ DROP TABLE IF EXISTS dv_categories;
 CREATE TABLE dv_categories (
     dvct_id INTEGER PRIMARY KEY AUTOINCREMENT,
     dvct_name TEXT NOT NULL,
+    dvct_ins_datm INTEGER NULL,
+    dvct_upd_datm INTEGER NULL,
     dvct_migration_id INTEGER NULL
 );
 
@@ -164,6 +185,8 @@ CREATE TABLE dv_products(
     dvpd_front_info TEXT,
     dvpd_description TEXT,
     dvpd_notes TEXT,
+    dvpd_ins_datm INTEGER NOT NULL,
+    dvpd_upd_datm INTEGER NOT NULL,
     dvpd_migration_id INTEGER NULL
 );
 
