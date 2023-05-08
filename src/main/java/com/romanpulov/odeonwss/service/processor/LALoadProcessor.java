@@ -2,8 +2,8 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -94,7 +93,6 @@ public class LALoadProcessor extends AbstractArtistProcessor {
 
             artifact.setDuration(summary.duration);
             artifact.setSize(summary.size);
-            artifact.setInsertDate(LocalDate.now());
             artifactRepository.save(artifact);
 
             counter += summary.count;

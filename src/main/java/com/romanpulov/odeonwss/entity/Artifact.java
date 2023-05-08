@@ -1,18 +1,18 @@
 package com.romanpulov.odeonwss.entity;
 
-import com.romanpulov.odeonwss.entity.converter.DateConverter;
 import org.hibernate.Hibernate;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
 @Table(name = "artifacts")
 @AttributeOverride(name = "id", column = @Column(name = "artf_id"))
+@AttributeOverride(name = "insertDateTime", column = @Column(name = "artf_ins_datm"))
+@AttributeOverride(name = "updateDateTime", column = @Column(name = "artf_upd_datm"))
 @AttributeOverride(name = "migrationId", column = @Column(name = "artf_migration_id"))
 public class Artifact extends AbstractBaseMigratedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
@@ -105,20 +105,6 @@ public class Artifact extends AbstractBaseMigratedEntity {
         this.size = size;
     }
 
-    @Column(name = "artf_ins_date")
-    @Convert(converter = DateConverter.class)
-    @Nullable
-    private LocalDate insertDate;
-
-    @Nullable
-    public LocalDate getInsertDate() {
-        return insertDate;
-    }
-
-    public void setInsertDate(@Nullable LocalDate insertDate) {
-        this.insertDate = insertDate;
-    }
-
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "artifact", fetch = FetchType.LAZY)
     private List<Track> tracks;
 
@@ -156,7 +142,7 @@ public class Artifact extends AbstractBaseMigratedEntity {
                 ", year=" + year +
                 ", duration=" + duration +
                 ", size=" + size +
-                ", insertDate=" + insertDate +
+                ", insertDateTime=" + getInsertDateTime() +
                 ", tracks=" + (Hibernate.isInitialized(tracks) ? tracks : "not initialized") +
                 ", mediaFiles=" + (Hibernate.isInitialized(mediaFiles) ? mediaFiles : "not initialized") +
                 '}';

@@ -20,4 +20,13 @@ public class UnitDateTimeConverterTest {
         assertThat(dt).isEqualTo(convertedDt);
     }
 
+    @Test
+    void test2000() {
+        LocalDateTime dt = LocalDateTime.of(2000, 1, 1, 0, 0, 0);
+        assertThat(dtc.convertToDatabaseColumn(dt)).isEqualTo(946684800L);
+
+        LocalDateTime convertedDt = dtc.convertToEntityAttribute(946684800L);
+        assertThat(convertedDt).isEqualTo(dt);
+    }
+
 }

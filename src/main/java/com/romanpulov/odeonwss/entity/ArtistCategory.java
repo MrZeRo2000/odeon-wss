@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "artist_categories")
 @AttributeOverride(name = "id", column = @Column(name = "atct_id"))
+@AttributeOverride(name = "insertDateTime", column = @Column(name = "atct_ins_datm"))
+@AttributeOverride(name = "updateDateTime", column = @Column(name = "atct_upd_datm"))
 @AttributeOverride(name = "migrationId", column = @Column(name = "atct_migration_id"))
 public class ArtistCategory extends AbstractBaseMigratedEntity {
     @ManyToOne

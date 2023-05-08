@@ -43,7 +43,7 @@ public class ArtifactService implements EditableObjectService<ArtifactEditDTO> {
         Optional<Artifact> existingArtifact = artifactRepository.findById(aed.getId());
         if (existingArtifact.isPresent()) {
             Artifact artifact = artifactMapper.fromDTO(aed);
-            artifact.setInsertDate(existingArtifact.get().getInsertDate());
+            artifact.setInsertDateTime(existingArtifact.get().getInsertDateTime());
             artifactRepository.save(artifact);
             return getById(artifact.getId());
         } else {

@@ -3,7 +3,7 @@ package com.romanpulov.odeonwss.entity;
 import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
-public abstract class AbstractBaseMigratedEntity extends AbstractBaseEntity {
+public abstract class AbstractBaseMigratedEntity extends AbstractBaseModifiableEntity {
     private Long migrationId;
 
     public Long getMigrationId() {

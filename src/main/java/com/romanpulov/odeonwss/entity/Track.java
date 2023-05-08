@@ -10,6 +10,8 @@ import java.util.Set;
 @Entity
 @Table(name = "tracks")
 @AttributeOverride(name = "id", column = @Column(name = "trck_id"))
+@AttributeOverride(name = "insertDateTime", column = @Column(name = "trck_ins_datm"))
+@AttributeOverride(name = "updateDateTime", column = @Column(name = "trck_upd_datm"))
 @AttributeOverride(name = "migrationId", column = @Column(name = "trck_migration_id"))
 public class Track extends AbstractBaseMigratedEntity {
     @ManyToOne(fetch = FetchType.LAZY)

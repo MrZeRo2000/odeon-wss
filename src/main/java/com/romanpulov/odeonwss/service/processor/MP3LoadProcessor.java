@@ -2,8 +2,8 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
@@ -18,7 +18,6 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -129,7 +128,6 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
 
                 artifact.setDuration(summary.duration);
                 artifact.setSize(summary.size);
-                artifact.setInsertDate(LocalDate.now());
                 artifactRepository.save(artifact);
             }
         }

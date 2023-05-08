@@ -6,8 +6,6 @@ import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-
 @Component
 public class ArtifactMapper {
     public ArtifactEditDTO toDTO(Artifact a) {
@@ -47,10 +45,6 @@ public class ArtifactMapper {
         artifact.setYear(aed.getYear());
         artifact.setDuration(aed.getDuration());
         artifact.setSize(aed.getSize());
-
-        if (aed.getId() == null) {
-            artifact.setInsertDate(LocalDate.now());
-        }
 
         return artifact;
     }

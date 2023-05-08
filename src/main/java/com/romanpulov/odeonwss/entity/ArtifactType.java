@@ -9,7 +9,9 @@ import java.util.Objects;
 @Entity
 @Table(name = "artifact_types")
 @AttributeOverride(name = "id", column = @Column(name = "attp_id"))
-public class ArtifactType extends AbstractBaseEntity {
+@AttributeOverride(name = "insertDateTime", column = @Column(name = "attp_ins_datm"))
+@AttributeOverride(name = "updateDateTime", column = @Column(name = "attp_upd_datm"))
+public class ArtifactType extends AbstractBaseModifiableEntity {
     @Column(name = "attp_name")
     @NotNull
     private String name;

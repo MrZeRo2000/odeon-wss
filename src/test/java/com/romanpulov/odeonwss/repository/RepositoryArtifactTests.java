@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.transaction.Transactional;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
@@ -75,7 +75,7 @@ public class RepositoryArtifactTests {
                 .withTitle("Title 1")
                 .withYear(2000L)
                 .withDuration(54334L)
-                .withInsertDate(LocalDate.now().minusDays(1))
+                .withInsertDate(LocalDateTime.now().minusDays(1))
                 .withMigrationId(321L)
                 .build();
 
@@ -136,7 +136,7 @@ public class RepositoryArtifactTests {
 
     @Test
     @Order(5)
-    void testArtifactsByType() throws Exception{
+    void testArtifactsByType() {
         Assertions.assertEquals(1, artifactRepository.getArtifactsByArtistType(ArtistType.ARTIST).size());
         Assertions.assertEquals(0, artifactRepository.getArtifactsByArtistType(ArtistType.CLASSICS).size());
         Assertions.assertEquals("Title 1", artifactRepository.getArtifactsByArtistType(ArtistType.ARTIST).get(0).getTitle());
@@ -144,7 +144,7 @@ public class RepositoryArtifactTests {
 
     @Test
     @Order(6)
-    void testArtifactWithoutYear() throws Exception {
+    void testArtifactWithoutYear() {
         Artist artist = artistRepository.getAllByType(ArtistType.ARTIST).get(0);
 
         Artifact artifact = new EntityArtifactBuilder()
@@ -152,7 +152,7 @@ public class RepositoryArtifactTests {
                 .withArtist(artist)
                 .withTitle("Title No Year")
                 .withDuration(77743L)
-                .withInsertDate(LocalDate.now().minusDays(2))
+                .withInsertDate(LocalDateTime.now().minusDays(2))
                 .withMigrationId(732L)
                 .build();
 
@@ -179,7 +179,7 @@ public class RepositoryArtifactTests {
                 .withArtifactType(artifactTypeRepository.getWithDVMovies())
                 .withTitle("Title No Artist")
                 .withDuration(77743L)
-                .withInsertDate(LocalDate.now().minusDays(5))
+                .withInsertDate(LocalDateTime.now().minusDays(5))
                 .withMigrationId(732L)
                 .build();
 

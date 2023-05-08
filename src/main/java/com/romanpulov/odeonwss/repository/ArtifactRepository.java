@@ -52,7 +52,7 @@ public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifa
                 "a.year," +
                 "a.duration," +
                 "a.size," +
-                "a.insertDate" +
+                "a.insertDateTime" +
                 ") " +
                 "FROM Artifact as a " +
                 "INNER JOIN ArtifactType as at ON a.artifactType = at " +

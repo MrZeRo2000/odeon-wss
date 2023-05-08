@@ -12,6 +12,8 @@ import java.util.Set;
 @Entity
 @Table(name = "dv_products")
 @AttributeOverride(name = "id", column = @Column(name = "dvpd_id"))
+@AttributeOverride(name = "insertDateTime", column = @Column(name = "dvpd_ins_datm"))
+@AttributeOverride(name = "updateDateTime", column = @Column(name = "dvpd_upd_datm"))
 @AttributeOverride(name = "migrationId", column = @Column(name = "dvpd_migration_id"))
 public class DVProduct extends AbstractBaseMigratedEntity {
     @ManyToOne(fetch = FetchType.LAZY)

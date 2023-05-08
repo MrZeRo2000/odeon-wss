@@ -39,8 +39,6 @@ public class DbManagerService {
         }
     }
 
-    private static final String DB_STORAGE_PATH = "%s/" + PROJECT_NAME + "/db/%s";
-
     private static final Logger log = Logger.getLogger(DbManagerService.class.getSimpleName());
 
     public enum DbType {
@@ -57,7 +55,7 @@ public class DbManagerService {
 
         public final String fileName;
 
-        private DbType(String fileName) {
+        DbType(String fileName) {
             this.fileName = fileName;
         }
     }

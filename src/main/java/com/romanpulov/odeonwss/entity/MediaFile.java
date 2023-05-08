@@ -11,6 +11,8 @@ import java.util.Set;
 @Entity
 @Table(name = "media_files")
 @AttributeOverride(name = "id", column = @Column(name = "mdfl_id"))
+@AttributeOverride(name = "insertDateTime", column = @Column(name = "mdfl_ins_datm"))
+@AttributeOverride(name = "updateDateTime", column = @Column(name = "mdfl_upd_datm"))
 @AttributeOverride(name = "migrationId", column = @Column(name = "mdfl_migration_id"))
 public class MediaFile extends AbstractBaseMigratedEntity {
     @ManyToOne(fetch = FetchType.LAZY)

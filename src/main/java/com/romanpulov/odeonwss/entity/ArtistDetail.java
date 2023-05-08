@@ -8,7 +8,9 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "artist_details")
 @AttributeOverride(name = "id", column = @Column(name = "atdt_id"))
-public class ArtistDetail extends AbstractBaseEntity {
+@AttributeOverride(name = "insertDateTime", column = @Column(name = "atdt_ins_datm"))
+@AttributeOverride(name = "updateDateTime", column = @Column(name = "atdt_upd_datm"))
+public class ArtistDetail extends AbstractBaseModifiableEntity {
     @ManyToOne
     @JoinColumn(name = "arts_id", referencedColumnName = "arts_id")
     @NotNull

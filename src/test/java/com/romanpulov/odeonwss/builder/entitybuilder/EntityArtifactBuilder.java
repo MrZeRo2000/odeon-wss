@@ -5,7 +5,7 @@ import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class EntityArtifactBuilder extends AbstractClassBuilder<Artifact> {
 
@@ -48,8 +48,8 @@ public class EntityArtifactBuilder extends AbstractClassBuilder<Artifact> {
         return this;
     }
 
-    public EntityArtifactBuilder withInsertDate(LocalDate insertDate) {
-        this.instance.setInsertDate(insertDate);
+    public EntityArtifactBuilder withInsertDate(LocalDateTime insertDateTime) {
+        this.instance.setInsertDateTime(insertDateTime);
         return this;
     }
 

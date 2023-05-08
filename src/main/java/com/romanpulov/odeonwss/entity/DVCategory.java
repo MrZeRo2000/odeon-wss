@@ -9,6 +9,8 @@ import java.util.Set;
 @Entity
 @Table(name = "dv_categories")
 @AttributeOverride(name = "id", column = @Column(name = "dvct_id"))
+@AttributeOverride(name = "insertDateTime", column = @Column(name = "dvct_ins_datm"))
+@AttributeOverride(name = "updateDateTime", column = @Column(name = "dvct_upd_datm"))
 @AttributeOverride(name = "migrationId", column = @Column(name = "dvct_migration_id"))
 public class DVCategory extends AbstractBaseMigratedEntity {
     @Column(name = "dvct_name")

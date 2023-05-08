@@ -12,7 +12,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.transaction.Transactional;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -74,7 +74,7 @@ public class RepositoryTrackTests {
                 .withTitle("Title 1")
                 .withYear(1982L)
                 .withDuration(73555L)
-                .withInsertDate(LocalDate.now().minusDays(1))
+                .withInsertDate(LocalDateTime.now().minusDays(1))
                 .build();
         Artifact savedArtifact = artifactRepository.save(artifact);
         Assertions.assertNotNull(savedArtifact.getId());
@@ -88,7 +88,7 @@ public class RepositoryTrackTests {
                         .withTitle("Title 2")
                         .withYear(1983L)
                         .withDuration(73556L)
-                        .withInsertDate(LocalDate.now().minusDays(5))
+                        .withInsertDate(LocalDateTime.now().minusDays(5))
                         .build()
         );
 

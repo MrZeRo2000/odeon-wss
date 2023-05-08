@@ -11,6 +11,8 @@ import java.util.Objects;
 @Entity
 @Table(name = "artists")
 @AttributeOverride(name = "id", column = @Column(name = "arts_id"))
+@AttributeOverride(name = "insertDateTime", column = @Column(name = "arts_ins_datm"))
+@AttributeOverride(name = "updateDateTime", column = @Column(name = "arts_upd_datm"))
 @AttributeOverride(name = "migrationId", column = @Column(name = "arts_migration_id"))
 public class Artist extends AbstractBaseMigratedEntity {
     @Column(name = "arts_type_code")

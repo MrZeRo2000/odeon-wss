@@ -2,7 +2,7 @@ package com.romanpulov.odeonwss.dto;
 
 import com.romanpulov.odeonwss.entity.ArtistType;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class ArtifactTableDTO {
     private Long id;
@@ -23,7 +23,7 @@ public class ArtifactTableDTO {
 
     private Long size;
 
-    private LocalDate insertDate;
+    private LocalDateTime insertDateTime;
 
     public Long getId() {
         return id;
@@ -97,15 +97,15 @@ public class ArtifactTableDTO {
         this.size = size;
     }
 
-    public LocalDate getInsertDate() {
-        return insertDate;
+    public LocalDateTime getInsertDateTime() {
+        return insertDateTime;
     }
 
-    public void setInsertDate(LocalDate insertDate) {
-        this.insertDate = insertDate;
+    public void setInsertDateTime(LocalDateTime insertDateTime) {
+        this.insertDateTime = insertDateTime;
     }
 
-    public ArtifactTableDTO(Long id, String artifactTypeName, ArtistType artistType, String artistName, String performerArtistName, String title, Long year, Long duration, Long size, LocalDate insertDate) {
+    public ArtifactTableDTO(Long id, String artifactTypeName, ArtistType artistType, String artistName, String performerArtistName, String title, Long year, Long duration, Long size, LocalDateTime insertDateTime) {
         this.id = id;
         this.artifactTypeName = artifactTypeName;
         this.artistTypeCode = artistType == null ? null : artistType.getCode();
@@ -115,7 +115,7 @@ public class ArtifactTableDTO {
         this.year = year;
         this.duration = duration;
         this.size = size;
-        this.insertDate = insertDate;
+        this.insertDateTime = insertDateTime;
     }
 
     public ArtifactTableDTO() {
@@ -133,7 +133,7 @@ public class ArtifactTableDTO {
                 ", year=" + year +
                 ", duration=" + duration +
                 ", size=" + size +
-                ", insertDate=" + insertDate +
+                ", insertDateTime=" + insertDateTime +
                 '}';
     }
 }

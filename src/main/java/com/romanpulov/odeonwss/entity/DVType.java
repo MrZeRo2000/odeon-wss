@@ -7,7 +7,9 @@ import java.util.Objects;
 @Entity
 @Table(name = "dv_types")
 @AttributeOverride(name = "id", column = @Column(name = "dvtp_id"))
-public class DVType extends AbstractBaseEntity {
+@AttributeOverride(name = "insertDateTime", column = @Column(name = "dvtp_ins_datm"))
+@AttributeOverride(name = "updateDateTime", column = @Column(name = "dvtp_upd_datm"))
+public class DVType extends AbstractBaseModifiableEntity {
     @Column(name = "dvtp_name")
     @NotNull
     private String name;
