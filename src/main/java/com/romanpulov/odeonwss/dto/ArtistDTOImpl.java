@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.dto;
 
+import com.romanpulov.odeonwss.entity.ArtistType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -7,7 +9,7 @@ import java.util.Objects;
 public class ArtistDTOImpl implements ArtistDTO {
     private Long id;
     private String artistName;
-    private String artistType;
+    private ArtistType artistType;
     private String genre;
     private List<String> styles = new ArrayList<>();
     private Long detailId;
@@ -32,11 +34,11 @@ public class ArtistDTOImpl implements ArtistDTO {
     }
 
     @Override
-    public String getArtistType() {
+    public ArtistType getArtistType() {
         return artistType;
     }
 
-    public void setArtistType(String artistType) {
+    public void setArtistType(ArtistType artistType) {
         this.artistType = artistType;
     }
 

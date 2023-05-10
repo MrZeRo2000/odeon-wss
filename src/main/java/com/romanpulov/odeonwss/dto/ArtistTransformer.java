@@ -15,7 +15,7 @@ public class ArtistTransformer {
                 ArtistDTOImpl newDTO = new ArtistDTOImpl();
                 newDTO.setId(id);
                 newDTO.setArtistName(row.getArtistName());
-                newDTO.setArtistType(row.getArtistType().getCode());
+                newDTO.setArtistType(row.getArtistType());
                 newDTO.setDetailId(row.getDetailId());
 
                 artistDTOMap.put(id, newDTO);
