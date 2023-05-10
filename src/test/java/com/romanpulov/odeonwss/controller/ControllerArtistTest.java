@@ -163,6 +163,7 @@ public class ControllerArtistTest {
                 .andExpect(jsonPath("$[4].styles", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$[4].styles[0]", Matchers.equalTo("Grunge")))
                 .andExpect(jsonPath("$[4].styles[1]", Matchers.equalTo("Heavy Metal")))
+                .andExpect(jsonPath("$[4].detailId", Matchers.equalTo(1)))
                 //
                 .andReturn();
         logger.debug("Get result with categories: " + result.getResponse().getContentAsString());
