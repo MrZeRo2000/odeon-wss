@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistCategoryBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistDetailBuilder;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
@@ -13,6 +15,8 @@ import org.springframework.test.context.jdbc.Sql;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -32,6 +36,9 @@ public class RepositoryArtistTests {
 
     @Autowired
     ArtifactRepository artifactRepository;
+
+    @Autowired
+    ArtistDetailRepository artistDetailRepository;
 
     @Test
     @Order(1)
@@ -107,6 +114,65 @@ public class RepositoryArtistTests {
         Assertions.assertEquals("zzz", artists.get(2).getName());
         Assertions.assertEquals("nnn", artists.get(1).getName());
         Assertions.assertEquals("aaa", artists.get(0).getName());
+    }
+
+    @Test
+    @Order(5)
+    void testAllFlatDTO() {
+        var a1 = new EntityArtistBuilder()
+                .withType(ArtistType.ARTIST)
+                .withName("category Artist")
+                .build();
+        artistRepository.save(a1);
+
+
+        var g1 = new EntityArtistCategoryBuilder()
+                .withType(ArtistCategoryType.GENRE)
+                .withName("G1")
+                .withArtist(a1)
+                .build();
+        artistCategoryRepository.save(g1);
+
+        var s1 = new EntityArtistCategoryBuilder()
+                .withType(ArtistCategoryType.STYLE)
+                .withName("S2")
+                .withArtist(a1)
+                .build();
+        artistCategoryRepository.save(s1);
+
+        var s2 = new EntityArtistCategoryBuilder()
+                .withType(ArtistCategoryType.STYLE)
+                .withName("S1")
+                .withArtist(a1)
+                .build();
+        artistCategoryRepository.save(s2);
+
+        var ad1 = new EntityArtistDetailBuilder()
+                .withArtist(a1)
+                .withBiography("Bio")
+                .build();
+        artistDetailRepository.save(ad1);
+
+        var flatDTOs = artistRepository.findAllFlatDTO();
+        assertThat(flatDTOs.get(0).getArtistName()).isEqualTo("aaa");
+
+        assertThat(flatDTOs.get(1).getArtistName()).isEqualTo("category Artist");
+        assertThat(flatDTOs.get(1).getArtistType().getCode()).isEqualTo("A");
+        assertThat(flatDTOs.get(1).getCategoryType().getCode()).isEqualTo("G");
+        assertThat(flatDTOs.get(1).getCategoryName()).isEqualTo("G1");
+        assertThat(flatDTOs.get(1).getDetailId()).isEqualTo(1L);
+
+        assertThat(flatDTOs.get(2).getArtistName()).isEqualTo("category Artist");
+        assertThat(flatDTOs.get(2).getArtistType().getCode()).isEqualTo("A");
+        assertThat(flatDTOs.get(2).getCategoryType().getCode()).isEqualTo("S");
+        assertThat(flatDTOs.get(2).getCategoryName()).isEqualTo("S1");
+        assertThat(flatDTOs.get(2).getDetailId()).isEqualTo(1L);
+
+        assertThat(flatDTOs.get(3).getArtistName()).isEqualTo("category Artist");
+        assertThat(flatDTOs.get(3).getArtistType().getCode()).isEqualTo("A");
+        assertThat(flatDTOs.get(3).getCategoryType().getCode()).isEqualTo("S");
+        assertThat(flatDTOs.get(3).getCategoryName()).isEqualTo("S2");
+        assertThat(flatDTOs.get(3).getDetailId()).isEqualTo(1L);
     }
 
 }

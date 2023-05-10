@@ -2,6 +2,8 @@ package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
 import com.romanpulov.odeonwss.dto.ArtistCategoryDetailDTO;
+import com.romanpulov.odeonwss.dto.ArtistDTO;
+import com.romanpulov.odeonwss.dto.ArtistTransformer;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
 import com.romanpulov.odeonwss.entity.ArtistDetail;
@@ -38,19 +40,23 @@ public class ArtistService implements EditableObjectService<ArtistCategoriesDeta
 
     private final ArtistMapper artistMapper;
 
+    private final ArtistTransformer artistTransformer;
+
     public ArtistService(
             ArtistCategoryRepository artistCategoryRepository,
             ArtistCategoryMapper artistCategoryMapper,
             ArtistDetailRepository artistDetailRepository,
             ArtistDetailMapper artistDetailMapper,
             ArtistRepository artistRepository,
-            ArtistMapper artistMapper) {
+            ArtistMapper artistMapper,
+            ArtistTransformer artistTransformer) {
         this.artistCategoryRepository = artistCategoryRepository;
         this.artistCategoryMapper = artistCategoryMapper;
         this.artistDetailRepository = artistDetailRepository;
         this.artistDetailMapper = artistDetailMapper;
         this.artistRepository = artistRepository;
         this.artistMapper = artistMapper;
+        this.artistTransformer = artistTransformer;
     }
 
     @Override
@@ -154,5 +160,9 @@ public class ArtistService implements EditableObjectService<ArtistCategoriesDeta
         } else {
             throw new CommonEntityNotFoundException("Artist", id);
         }
+    }
+
+    public List<ArtistDTO> getTable() {
+        return artistTransformer.transform(artistRepository.findAllFlatDTO());
     }
 }
