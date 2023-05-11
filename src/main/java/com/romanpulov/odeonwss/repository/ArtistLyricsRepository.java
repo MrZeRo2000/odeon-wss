@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Transactional(readOnly = true)
 public interface ArtistLyricsRepository extends CrudRepository<ArtistLyrics, Long> {
@@ -51,4 +52,7 @@ public interface ArtistLyricsRepository extends CrudRepository<ArtistLyrics, Lon
     List<ArtistLyrics> findAllByArtistOrderByTitle(Artist artist);
 
     Optional<ArtistLyrics> findFirstByArtistAndTitle(Artist artist, String title);
+
+    @Query("SELECT DISTINCT(al.artist.id) FROM ArtistLyrics al")
+    Set<Long> findDistinctArtistId();
 }

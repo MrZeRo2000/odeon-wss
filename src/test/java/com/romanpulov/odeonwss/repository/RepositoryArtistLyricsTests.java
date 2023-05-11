@@ -14,6 +14,9 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
+import java.util.Set;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -27,7 +30,7 @@ public class RepositoryArtistLyricsTests {
     @Test
     @Order(1)
     @Sql(value = {"/schema.sql", "/data.sql"})
-    void testCRUD() throws Exception {
+    void testCRUD() {
         Artist artist1 = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 1").build());
         Artist artist2 = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 2").build());
 
@@ -38,9 +41,8 @@ public class RepositoryArtistLyricsTests {
         artistLyricsRepository.save(new EntityArtistLyricsBuilder().withArtist(artist2).withTitle("Title 23").withText("Text 23").build());
         artistLyricsRepository.save(new EntityArtistLyricsBuilder().withArtist(artist2).withTitle("Title 24").withText("Text 24").build());
 
-        Assertions.assertThrows(JpaSystemException.class, () -> {
-                artistLyricsRepository.save(new EntityArtistLyricsBuilder().withArtist(artist2).withTitle("Title 24").withText("Text 24").build());
-        });
+        Assertions.assertThrows(JpaSystemException.class,
+                () -> artistLyricsRepository.save(new EntityArtistLyricsBuilder().withArtist(artist2).withTitle("Title 24").withText("Text 24").build()));
 
         List<ArtistLyrics> artistLyricsList1 = artistLyricsRepository.findAllByArtistOrderByTitle(artist1);
         Assertions.assertEquals(2, artistLyricsList1.size());
@@ -81,5 +83,12 @@ public class RepositoryArtistLyricsTests {
     void testFindLyrics() {
         Assertions.assertEquals("Text 12", artistLyricsRepository.findArtistLyricsById(1L).orElseThrow().getText());
         Assertions.assertEquals("Text 24", artistLyricsRepository.findArtistLyricsById(5L).orElseThrow().getText());
+    }
+
+    @Test
+    @Order(4)
+    void testFindDistinctArtist() {
+        var a = artistLyricsRepository.findDistinctArtistId();
+        assertThat(a).isEqualTo(Set.of(1L, 2L));
     }
 }

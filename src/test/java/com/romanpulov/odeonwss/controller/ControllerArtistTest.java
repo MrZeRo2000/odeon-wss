@@ -2,11 +2,13 @@ package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistCategoryBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistDetailBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistLyricsBuilder;
 import com.romanpulov.odeonwss.entity.ArtistCategoryType;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.repository.ArtistCategoryRepository;
 import com.romanpulov.odeonwss.repository.ArtistDetailRepository;
+import com.romanpulov.odeonwss.repository.ArtistLyricsRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
@@ -42,6 +44,9 @@ public class ControllerArtistTest {
 
     @Autowired
     private ArtistDetailRepository artistDetailRepository;
+
+    @Autowired
+    private ArtistLyricsRepository artistLyricsRepository;
 
     @Test
     @Sql({"/schema.sql", "/data.sql"})
@@ -150,12 +155,19 @@ public class ControllerArtistTest {
                 .build();
         artistDetailRepository.save(ad1);
 
+        var al1 = new EntityArtistLyricsBuilder()
+                .withArtist(a1)
+                .withTitle("t1")
+                .withText("Txt 1")
+                .build();
+        artistLyricsRepository.save(al1);
+
         var result = mockMvc.perform(get("/api/artist/artists/table"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(5)))
                 //
-                .andExpect(jsonPath("$[4]", Matchers.aMapWithSize(6)))
+                .andExpect(jsonPath("$[4]", Matchers.aMapWithSize(7)))
                 .andExpect(jsonPath("$[4].id", Matchers.equalTo(5)))
                 .andExpect(jsonPath("$[4].artistName", Matchers.equalTo("with Categories")))
                 .andExpect(jsonPath("$[4].artistType", Matchers.equalTo("A")))
@@ -164,6 +176,7 @@ public class ControllerArtistTest {
                 .andExpect(jsonPath("$[4].styles[0]", Matchers.equalTo("Grunge")))
                 .andExpect(jsonPath("$[4].styles[1]", Matchers.equalTo("Heavy Metal")))
                 .andExpect(jsonPath("$[4].detailId", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[4].hasLyrics", Matchers.equalTo(true)))
                 //
                 .andReturn();
         logger.debug("Get result with categories: " + result.getResponse().getContentAsString());

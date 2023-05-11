@@ -1,10 +1,7 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistCategoryBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistDetailBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.entity.*;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.dto.IdNameDTO;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +36,9 @@ public class RepositoryArtistTests {
 
     @Autowired
     ArtistDetailRepository artistDetailRepository;
+
+    @Autowired
+    ArtistLyricsRepository artistLyricsRepository;
 
     @Test
     @Order(1)
@@ -153,26 +153,36 @@ public class RepositoryArtistTests {
                 .build();
         artistDetailRepository.save(ad1);
 
+        var al1 = new EntityArtistLyricsBuilder()
+                .withArtist(a1)
+                .withTitle("Lyrics a1")
+                .withText("A nice text")
+                .build();
+        artistLyricsRepository.save(al1);
+
         var flatDTOs = artistRepository.findAllFlatDTO();
         assertThat(flatDTOs.get(0).getArtistName()).isEqualTo("aaa");
 
         assertThat(flatDTOs.get(1).getArtistName()).isEqualTo("category Artist");
-        assertThat(flatDTOs.get(1).getArtistType().getCode()).isEqualTo("A");
-        assertThat(flatDTOs.get(1).getCategoryType().getCode()).isEqualTo("G");
+        assertThat(flatDTOs.get(1).getArtistType()).isEqualTo("A");
+        assertThat(flatDTOs.get(1).getCategoryType()).isEqualTo("G");
         assertThat(flatDTOs.get(1).getCategoryName()).isEqualTo("G1");
         assertThat(flatDTOs.get(1).getDetailId()).isEqualTo(1L);
+        assertThat(flatDTOs.get(1).getHasLyrics()).isEqualTo(1L);
 
         assertThat(flatDTOs.get(2).getArtistName()).isEqualTo("category Artist");
-        assertThat(flatDTOs.get(2).getArtistType().getCode()).isEqualTo("A");
-        assertThat(flatDTOs.get(2).getCategoryType().getCode()).isEqualTo("S");
+        assertThat(flatDTOs.get(2).getArtistType()).isEqualTo("A");
+        assertThat(flatDTOs.get(2).getCategoryType()).isEqualTo("S");
         assertThat(flatDTOs.get(2).getCategoryName()).isEqualTo("S1");
         assertThat(flatDTOs.get(2).getDetailId()).isEqualTo(1L);
+        assertThat(flatDTOs.get(2).getHasLyrics()).isEqualTo(1L);
 
         assertThat(flatDTOs.get(3).getArtistName()).isEqualTo("category Artist");
-        assertThat(flatDTOs.get(3).getArtistType().getCode()).isEqualTo("A");
-        assertThat(flatDTOs.get(3).getCategoryType().getCode()).isEqualTo("S");
+        assertThat(flatDTOs.get(3).getArtistType()).isEqualTo("A");
+        assertThat(flatDTOs.get(3).getCategoryType()).isEqualTo("S");
         assertThat(flatDTOs.get(3).getCategoryName()).isEqualTo("S2");
         assertThat(flatDTOs.get(3).getDetailId()).isEqualTo(1L);
+        assertThat(flatDTOs.get(3).getHasLyrics()).isEqualTo(1L);
     }
 
 }

@@ -25,16 +25,18 @@ public interface ArtistRepository extends PagingAndSortingRepository<Artist, Lon
 
     Optional<Artist> findFirstByMigrationId(Long migrationId);
 
-    @Query("SELECT " +
-            "ar.id AS id, " +
-            "ar.name AS artistName, " +
-            "ar.type AS artistType, " +
-            "ac.type AS categoryType, " +
-            "ac.name AS categoryName, " +
-            "ad.id AS detailId " +
-            "FROM Artist AS ar " +
-            "LEFT OUTER JOIN ArtistCategory AS ac ON ac.artist = ar " +
-            "LEFT OUTER JOIN ArtistDetail AS ad ON ad.artist = ar " +
-            "ORDER BY ar.name, ac.type, ac.name")
+    @Query(value = "SELECT " +
+            "ar.arts_id AS id, " +
+            "ar.arts_name AS artistName, " +
+            "ar.arts_type_code AS artistType, " +
+            "ac.atct_type_code AS categoryType, " +
+            "ac.atct_name AS categoryName, " +
+            "ad.atdt_id AS detailId, " +
+            "CASE WHEN EXISTS(SELECT 1 FROM artist_lyrics al WHERE ar.arts_id = al.arts_id) THEN 1 END AS hasLyrics " +
+            "FROM main.artists AS ar " +
+            "LEFT OUTER JOIN main.artist_categories AS ac ON ac.arts_id = ar.arts_id " +
+            "LEFT OUTER JOIN main.artist_details AS ad ON ad.arts_id = ar.arts_id " +
+            "ORDER BY ar.arts_name, ac.atct_type_code, ac.atct_name",
+            nativeQuery = true)
     List<ArtistFlatDTO> findAllFlatDTO();
 }
