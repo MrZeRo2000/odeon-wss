@@ -18,7 +18,7 @@ public class ArtistTransformer {
                 newDTO.setArtistName(row.getArtistName());
                 newDTO.setArtistType(row.getArtistType());
                 newDTO.setDetailId(row.getDetailId());
-                newDTO.setHasLyrics(row.getHasLyrics() != null && row.getHasLyrics().equals(1L) ? true : null);
+                newDTO.setHasLyrics(TransformRules.booleanFromLong(row.getHasLyrics()));
 
                 artistDTOMap.put(id, newDTO);
                 return newDTO;

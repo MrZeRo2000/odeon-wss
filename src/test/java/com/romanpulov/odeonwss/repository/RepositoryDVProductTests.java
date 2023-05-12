@@ -266,4 +266,45 @@ public class RepositoryDVProductTests {
 
         assertThatThrownBy(() -> dvProductRepository.delete(dvProduct)).isInstanceOf(JpaSystemException.class);
     }
+
+    @Test
+    @Order(11)
+    void testFindAllFlatDTO() {
+        var dtoMovies = dvProductRepository.findAllFlatDTOByArtifactTypeId(artifactTypeRepository.getWithDVMovies().getId());
+        assertThat(dtoMovies.size()).isEqualTo(2);
+
+        assertThat(dtoMovies.get(0).getDvOriginId()).isNull();
+        assertThat(dtoMovies.get(0).getDvOriginName()).isEqualTo("Origin 1");
+        assertThat(dtoMovies.get(0).getTitle()).isEqualTo("Product with categories");
+        assertThat(dtoMovies.get(0).getOriginalTitle()).isEqualTo("Original product with categories");
+        assertThat(dtoMovies.get(0).getYear()).isEqualTo(2003L);
+        assertThat(dtoMovies.get(0).getFrontInfo()).isEqualTo("Adriano Celentano");
+        assertThat(dtoMovies.get(0).getHasDescription()).isEqualTo(1L);
+        assertThat(dtoMovies.get(0).getDescription()).isNull();
+        assertThat(dtoMovies.get(0).getHasNotes()).isEqualTo(1L);
+        assertThat(dtoMovies.get(0).getNotes()).isNull();
+        assertThat(dtoMovies.get(0).getDvCategoryId()).isNull();
+        assertThat(dtoMovies.get(0).getDvCategoryName()).isEqualTo("Cat 2");
+        assertThat(dtoMovies.get(0).getHasTracks()).isEqualTo(1L);
+
+        assertThat(dtoMovies.get(1).getDvOriginId()).isNull();
+        assertThat(dtoMovies.get(1).getDvOriginName()).isEqualTo("Origin 1");
+        assertThat(dtoMovies.get(1).getTitle()).isEqualTo("Product with categories");
+        assertThat(dtoMovies.get(1).getOriginalTitle()).isEqualTo("Original product with categories");
+        assertThat(dtoMovies.get(1).getYear()).isEqualTo(2003L);
+        assertThat(dtoMovies.get(1).getFrontInfo()).isEqualTo("Adriano Celentano");
+        assertThat(dtoMovies.get(1).getHasDescription()).isEqualTo(1L);
+        assertThat(dtoMovies.get(1).getDescription()).isNull();
+        assertThat(dtoMovies.get(1).getHasNotes()).isEqualTo(1L);
+        assertThat(dtoMovies.get(1).getNotes()).isNull();
+        assertThat(dtoMovies.get(1).getDvCategoryId()).isNull();
+        assertThat(dtoMovies.get(1).getDvCategoryName()).isEqualTo("Cat 3");
+        assertThat(dtoMovies.get(1).getHasTracks()).isEqualTo(1L);
+
+        var dtoAnimations = dvProductRepository.findAllFlatDTOByArtifactTypeId(artifactTypeRepository.getWithDVAnimation().getId());
+        assertThat(dtoAnimations.size()).isEqualTo(1);
+        assertThat(dtoAnimations.get(0).getHasTracks()).isNull();
+    }
+
+
 }

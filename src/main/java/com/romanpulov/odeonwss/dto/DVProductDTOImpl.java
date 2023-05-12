@@ -17,6 +17,7 @@ public class DVProductDTOImpl implements DVProductDTO {
     private String notes;
     private Boolean hasNotes;
     private List<DVCategoryDTO> dvCategories = new ArrayList<>();
+    private Boolean hasTracks;
 
     @Override
     public Long getId() {
@@ -126,6 +127,15 @@ public class DVProductDTOImpl implements DVProductDTO {
         this.dvCategories = dvCategories;
     }
 
+    @Override
+    public Boolean getHasTracks() {
+        return hasTracks;
+    }
+
+    public void setHasTracks(Boolean hasTracks) {
+        this.hasTracks = hasTracks;
+    }
+
     public DVProductDTOImpl() {
     }
 
@@ -155,6 +165,7 @@ public class DVProductDTOImpl implements DVProductDTO {
                 ", description='" + description + '\'' +
                 ", notes='" + notes + '\'' +
                 ", dvCategories=" + dvCategories +
+                ", hasTracks=" + hasTracks +
                 '}';
     }
 }

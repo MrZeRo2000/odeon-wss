@@ -19,4 +19,5 @@ public interface DVProductDTO extends AbstractEntityDTO {
     String getNotes();
     Boolean getHasNotes();
     List<DVCategoryDTO> getDvCategories();
+    Boolean getHasTracks();
 }

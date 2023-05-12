@@ -41,22 +41,23 @@ public interface DVProductRepository
     List<DVProductFlatDTO> findFlatDTOById(Long id);
 
 
-    @Query("SELECT " +
-            "dvp.id AS id, " +
-            "dvo.name AS dvOriginName, " +
-            "dvp.title AS title, " +
-            "dvp.originalTitle AS originalTitle, " +
-            "dvp.year AS year, " +
-            "dvp.frontInfo AS frontInfo, " +
-            "CASE WHEN dvp.description IS NOT NULL THEN true ELSE false END AS hasDescription, " +
-            "CASE WHEN dvp.notes IS NOT NULL THEN true ELSE false END AS hasNotes, " +
-            "dvc.name AS dvCategoryName " +
-            "FROM DVProduct dvp " +
-            "LEFT JOIN DVProductDVCategory dvp_dvc ON dvp.id = dvp_dvc.dvProductId " +
-            "LEFT JOIN DVCategory dvc ON dvp_dvc.dvCategoryId = dvc.id " +
-            "LEFT JOIN DVOrigin dvo ON dvp.dvOrigin = dvo " +
-            "WHERE dvp.artifactType.id=:artifactTypeId " +
-            "ORDER BY dvp.title, dvc.name")
+    @Query(value = "SELECT " +
+            "dvp.dvpd_id AS id, " +
+            "dvo.dvor_name AS dvOriginName, " +
+            "dvp.dvpd_title AS title, " +
+            "dvp.dvpd_orig_title AS originalTitle, " +
+            "dvp.dvpd_year AS year, " +
+            "dvp.dvpd_front_info AS frontInfo, " +
+            "CASE WHEN dvp.dvpd_description IS NOT NULL THEN 1 END AS hasDescription, " +
+            "CASE WHEN dvp.dvpd_notes IS NOT NULL THEN 1 END AS hasNotes, " +
+            "dvc.dvct_name AS dvCategoryName, " +
+            "CASE WHEN EXISTS(SELECT 1 FROM tracks_dv_products t WHERE t.dvpd_id = dvp.dvpd_id) THEN 1 END AS hasTracks " +
+            "FROM main.dv_products dvp " +
+            "LEFT JOIN main.dv_products_dv_categories dvp_dvc ON dvp.dvpd_id = dvp_dvc.dvpd_id " +
+            "LEFT JOIN main.dv_categories dvc ON dvp_dvc.dvct_id = dvc.dvct_id " +
+            "LEFT JOIN main.dv_origins dvo ON dvp.dvor_id = dvo.dvor_id " +
+            "WHERE dvp.attp_id=:artifactTypeId " +
+            "ORDER BY dvp.dvpd_title, dvc.dvct_name", nativeQuery = true)
     List<DVProductFlatDTO> findAllFlatDTOByArtifactTypeId(Long artifactTypeId);
 
     @Query("SELECT dvp.description as text FROM DVProduct dvp WHERE dvp.id=:id")

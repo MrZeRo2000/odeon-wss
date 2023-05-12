@@ -30,9 +30,10 @@ public class DVProductTransformer {
                 newDTO.setYear(row.getYear());
                 newDTO.setFrontInfo(row.getFrontInfo());
                 newDTO.setDescription(row.getDescription());
-                newDTO.setHasDescription(row.getHasDescription());
+                newDTO.setHasDescription(TransformRules.booleanFromLong(row.getHasDescription()));
                 newDTO.setNotes(row.getNotes());
-                newDTO.setHasNotes(row.getHasNotes());
+                newDTO.setHasNotes(TransformRules.booleanFromLong(row.getHasNotes()));
+                newDTO.setHasTracks(TransformRules.booleanFromLong(row.getHasTracks()));
 
                 productDTOMap.put(newDTO.getId(), newDTO);
                 return newDTO;

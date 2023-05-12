@@ -3,10 +3,17 @@ package com.romanpulov.odeonwss.service;
 import com.romanpulov.odeonwss.builder.dtobuilder.DVCategoryDTOBuilder;
 import com.romanpulov.odeonwss.builder.dtobuilder.DVOriginDTOBuilder;
 import com.romanpulov.odeonwss.builder.dtobuilder.DVProductDTOBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityTrackBuilder;
 import com.romanpulov.odeonwss.dto.DVCategoryDTO;
 import com.romanpulov.odeonwss.dto.DVOriginDTO;
 import com.romanpulov.odeonwss.dto.DVProductDTO;
+import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.entity.Track;
+import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
+import com.romanpulov.odeonwss.repository.DVProductRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -38,6 +45,15 @@ public class ServiceDVProductTest {
 
     @Autowired
     private DVProductService service;
+
+    @Autowired
+    private DVProductRepository dvProductRepository;
+
+    @Autowired
+    private ArtifactRepository artifactRepository;
+
+    @Autowired
+    private TrackRepository trackRepository;
 
     @Test
     @Order(1)
@@ -219,6 +235,26 @@ public class ServiceDVProductTest {
         dvProductDTO = service.insert(dvProductDTO);
         log.info("Inserted dvProductDTO:" + dvProductDTO);
 
+        Artifact artifact = new EntityArtifactBuilder()
+                .withArtifactType(artifactTypeRepository.getWithDVMovies())
+                .withTitle("Title 1")
+                .build();
+        artifactRepository.save(artifact);
+        assertThat(artifact.getId()).isGreaterThan(0);
+
+        Track track = new EntityTrackBuilder()
+                .withArtifact(artifact)
+                .withTitle("Track title")
+                .withDiskNum(1L)
+                .withNum(8L)
+                .withDuration(123456L)
+                .withMigrationId(4321L)
+                .build();
+        track.getDvProducts().add(dvProductRepository.findById(dvProductDTO.getId()).orElseThrow());
+
+        trackRepository.save(track);
+        assertThat(track.getId()).isGreaterThan(0);
+
         var table = service.getTable(artifactTypeRepository.getWithDVMovies().getId());
         assertThat(table.size()).isEqualTo(3);
         assertThat(table.get(0).getDvOrigin().getId()).isNull();
@@ -231,9 +267,13 @@ public class ServiceDVProductTest {
         assertThat(table.get(0).getHasDescription()).isTrue();
         assertThat(table.get(0).getNotes()).isNull();
         assertThat(table.get(0).getHasNotes()).isTrue();
+        assertThat(table.get(0).getHasTracks()).isTrue();
 
         assertThat(table.get(1).getDvOrigin().getName()).isEqualTo("Initial origin");
         assertThat(table.get(2).getDvOrigin().getName()).isEqualTo("Initial origin");
+
+        assertThat(table.get(1).getHasTracks()).isNull();
+        assertThat(table.get(2).getHasTracks()).isNull();
 
         assertThat(table.get(0).getDvCategories().size()).isEqualTo(0);
         assertThat(table.get(1).getDvCategories().size()).isEqualTo(0);

@@ -13,9 +13,10 @@ public interface DVProductFlatDTO {
     Long getYear();
     String getFrontInfo();
     String getDescription();
-    Boolean getHasDescription();
+    Long getHasDescription();
     String getNotes();
-    Boolean getHasNotes();
+    Long getHasNotes();
     Long getDvCategoryId();
     String getDvCategoryName();
+    Long getHasTracks();
 }

@@ -4,17 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.odeonwss.builder.dtobuilder.DVCategoryDTOBuilder;
 import com.romanpulov.odeonwss.builder.dtobuilder.DVOriginDTOBuilder;
 import com.romanpulov.odeonwss.builder.dtobuilder.DVProductDTOBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVCategoryBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVProductBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.dto.DVOriginDTO;
 import com.romanpulov.odeonwss.dto.DVProductDTO;
 import com.romanpulov.odeonwss.dto.DVProductDTOImpl;
+import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.DVOrigin;
-import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
-import com.romanpulov.odeonwss.repository.DVCategoryRepository;
-import com.romanpulov.odeonwss.repository.DVOriginRepository;
-import com.romanpulov.odeonwss.repository.DVProductRepository;
+import com.romanpulov.odeonwss.entity.DVProduct;
+import com.romanpulov.odeonwss.entity.Track;
+import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.DVOriginService;
 import com.romanpulov.odeonwss.service.DVProductService;
 import org.hamcrest.Matchers;
@@ -56,6 +54,12 @@ public class ControllerDVProductTest {
 
     @Autowired
     private ArtifactTypeRepository artifactTypeRepository;
+
+    @Autowired
+    private ArtifactRepository artifactRepository;
+
+    @Autowired
+    private TrackRepository trackRepository;
 
     @Autowired
     private DVOriginRepository dvOriginRepository;
@@ -123,6 +127,30 @@ public class ControllerDVProductTest {
                 .withOrigin(origin)
                 .withTitle("Brown")
                 .build());
+
+
+        Artifact artifact = new EntityArtifactBuilder()
+                .withArtifactType(artifactTypeRepository.getWithDVMovies())
+                .withTitle("Title 1")
+                .build();
+        artifactRepository.save(artifact);
+        assertThat(artifact.getId()).isGreaterThan(0);
+
+        DVProduct dvProduct = dvProductRepository.findById(3L).orElseThrow();
+
+        Track track = new EntityTrackBuilder()
+                .withArtifact(artifact)
+                .withTitle("Track title")
+                .withDiskNum(1L)
+                .withNum(8L)
+                .withDuration(123456L)
+                .withMigrationId(4321L)
+                .build();
+        track.getDvProducts().add(dvProduct);
+
+        trackRepository.save(track);
+        assertThat(track.getId()).isGreaterThan(0);
+
         logger.debug("Data generated");
     }
 
@@ -237,22 +265,19 @@ public class ControllerDVProductTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(2)))
-                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(6)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(5)))
                 .andExpect(jsonPath("$[0].id", Matchers.equalTo(3)))
                 .andExpect(jsonPath("$[0].dvOrigin", Matchers.aMapWithSize(1)))
                 .andExpect(jsonPath("$[0].dvOrigin.name", Matchers.equalTo("Product Origin")))
                 .andExpect(jsonPath("$[0].title", Matchers.equalTo("Brown")))
-                .andExpect(jsonPath("$[0].hasDescription", Matchers.equalTo(false)))
-                .andExpect(jsonPath("$[0].hasNotes", Matchers.equalTo(false)))
                 .andExpect(jsonPath("$[0].dvCategories").isArray())
                 .andExpect(jsonPath("$[0].dvCategories", Matchers.hasSize(0)))
-                .andExpect(jsonPath("$[1]", Matchers.aMapWithSize(6)))
+                .andExpect(jsonPath("$[0].hasTracks", Matchers.equalTo(true)))
+                .andExpect(jsonPath("$[1]", Matchers.aMapWithSize(4)))
                 .andExpect(jsonPath("$[1].id", Matchers.equalTo(2)))
                 .andExpect(jsonPath("$[1].dvOrigin", Matchers.aMapWithSize(1)))
                 .andExpect(jsonPath("$[1].dvOrigin.name", Matchers.equalTo("Product Origin")))
                 .andExpect(jsonPath("$[1].title", Matchers.equalTo("White")))
-                .andExpect(jsonPath("$[1].hasDescription", Matchers.equalTo(false)))
-                .andExpect(jsonPath("$[1].hasNotes", Matchers.equalTo(false)))
                 .andExpect(jsonPath("$[1].dvCategories").isArray())
                 .andExpect(jsonPath("$[1].dvCategories", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$[1].dvCategories[0]", Matchers.aMapWithSize(1)))
