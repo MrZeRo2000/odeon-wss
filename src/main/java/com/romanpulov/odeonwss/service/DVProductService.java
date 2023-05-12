@@ -63,7 +63,7 @@ public class DVProductService
         if (dtoList.size() == 0) {
             throw new CommonEntityNotFoundException(this.entityName, id);
         } else {
-            return transformer.transform(dtoList).get(0);
+            return transformer.transform(dtoList, false).get(0);
         }
     }
 
@@ -75,7 +75,7 @@ public class DVProductService
 
     public List<DVProductDTO> getTable(Long artifactTypeId) throws CommonEntityNotFoundException {
         if (artifactTypeRepository.existsById(artifactTypeId)) {
-            return transformer.transform(dvProductRepository.findAllFlatDTOByArtifactTypeId(artifactTypeId));
+            return transformer.transform(dvProductRepository.findAllFlatDTOByArtifactTypeId(artifactTypeId), true);
         } else {
             throw new CommonEntityNotFoundException("ArtifactType", artifactTypeId);
         }

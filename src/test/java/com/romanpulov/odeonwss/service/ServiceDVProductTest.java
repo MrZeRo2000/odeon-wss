@@ -272,8 +272,8 @@ public class ServiceDVProductTest {
         assertThat(table.get(1).getDvOrigin().getName()).isEqualTo("Initial origin");
         assertThat(table.get(2).getDvOrigin().getName()).isEqualTo("Initial origin");
 
-        assertThat(table.get(1).getHasTracks()).isNull();
-        assertThat(table.get(2).getHasTracks()).isNull();
+        assertThat(table.get(1).getHasTracks()).isFalse();
+        assertThat(table.get(2).getHasTracks()).isFalse();
 
         assertThat(table.get(0).getDvCategories().size()).isEqualTo(0);
         assertThat(table.get(1).getDvCategories().size()).isEqualTo(0);

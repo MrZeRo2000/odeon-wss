@@ -90,29 +90,33 @@ public class ControllerArtistTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(4)))
                 //
-                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(4)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(5)))
                 .andExpect(jsonPath("$[0].id", Matchers.equalTo(4)))
                 .andExpect(jsonPath("$[0].artistName", Matchers.equalTo("Classics001")))
                 .andExpect(jsonPath("$[0].artistType", Matchers.equalTo("C")))
                 .andExpect(jsonPath("$[0].styles", Matchers.hasSize(0)))
+                .andExpect(jsonPath("$[0].hasLyrics", Matchers.equalTo(false)))
                 //
-                .andExpect(jsonPath("$[1]", Matchers.aMapWithSize(4)))
+                .andExpect(jsonPath("$[1]", Matchers.aMapWithSize(5)))
                 .andExpect(jsonPath("$[1].id", Matchers.equalTo(1)))
                 .andExpect(jsonPath("$[1].artistName", Matchers.equalTo("Name23")))
                 .andExpect(jsonPath("$[1].artistType", Matchers.equalTo("A")))
                 .andExpect(jsonPath("$[1].styles", Matchers.hasSize(0)))
+                .andExpect(jsonPath("$[1].hasLyrics", Matchers.equalTo(false)))
                 //
-                .andExpect(jsonPath("$[2]", Matchers.aMapWithSize(4)))
+                .andExpect(jsonPath("$[2]", Matchers.aMapWithSize(5)))
                 .andExpect(jsonPath("$[2].id", Matchers.equalTo(3)))
                 .andExpect(jsonPath("$[2].artistName", Matchers.equalTo("Name55")))
                 .andExpect(jsonPath("$[2].artistType", Matchers.equalTo("A")))
                 .andExpect(jsonPath("$[2].styles", Matchers.hasSize(0)))
+                .andExpect(jsonPath("$[2].hasLyrics", Matchers.equalTo(false)))
                 //
-                .andExpect(jsonPath("$[3]", Matchers.aMapWithSize(4)))
+                .andExpect(jsonPath("$[3]", Matchers.aMapWithSize(5)))
                 .andExpect(jsonPath("$[3].id", Matchers.equalTo(2)))
                 .andExpect(jsonPath("$[3].artistName", Matchers.equalTo("Name76")))
                 .andExpect(jsonPath("$[3].artistType", Matchers.equalTo("A")))
                 .andExpect(jsonPath("$[3].styles", Matchers.hasSize(0)))
+                .andExpect(jsonPath("$[3].hasLyrics", Matchers.equalTo(false)))
                 //
                 .andReturn();
         logger.debug("Get result: " + result.getResponse().getContentAsString());

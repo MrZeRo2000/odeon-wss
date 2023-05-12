@@ -6,7 +6,7 @@ import java.util.*;
 
 @Component
 public class DVProductTransformer {
-    public List<DVProductDTO> transform(List<DVProductFlatDTO> rs) {
+    public List<DVProductDTO> transform(List<DVProductFlatDTO> rs, boolean withHasFlags) {
         // LinkedHashMap because of a need to retain original order for correct sorting
         final Map<Long, DVProductDTO> productDTOMap = new LinkedHashMap<>();
         final Map<String, DVOriginDTO> originDTOMap = new HashMap<>();
@@ -30,10 +30,12 @@ public class DVProductTransformer {
                 newDTO.setYear(row.getYear());
                 newDTO.setFrontInfo(row.getFrontInfo());
                 newDTO.setDescription(row.getDescription());
-                newDTO.setHasDescription(TransformRules.booleanFromLong(row.getHasDescription()));
                 newDTO.setNotes(row.getNotes());
-                newDTO.setHasNotes(TransformRules.booleanFromLong(row.getHasNotes()));
-                newDTO.setHasTracks(TransformRules.booleanFromLong(row.getHasTracks()));
+                if (withHasFlags) {
+                    newDTO.setHasDescription(TransformRules.booleanFromLong(row.getHasDescription()));
+                    newDTO.setHasNotes(TransformRules.booleanFromLong(row.getHasNotes()));
+                    newDTO.setHasTracks(TransformRules.booleanFromLong(row.getHasTracks()));
+                }
 
                 productDTOMap.put(newDTO.getId(), newDTO);
                 return newDTO;

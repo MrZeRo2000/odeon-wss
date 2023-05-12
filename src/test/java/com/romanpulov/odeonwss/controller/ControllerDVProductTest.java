@@ -204,7 +204,7 @@ public class ControllerDVProductTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(1)))
-                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(8)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(9)))
                 .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
                 .andExpect(jsonPath("$[0].dvOrigin", Matchers.aMapWithSize(1)))
                 .andExpect(jsonPath("$[0].dvOrigin.name", Matchers.equalTo("Product Origin")))
@@ -215,6 +215,7 @@ public class ControllerDVProductTest {
                 .andExpect(jsonPath("$[0].hasNotes", Matchers.equalTo(true)))
                 .andExpect(jsonPath("$[0].dvCategories").isArray())
                 .andExpect(jsonPath("$[0].dvCategories", Matchers.hasSize(0)))
+                .andExpect(jsonPath("$[0].hasTracks", Matchers.equalTo(false)))
                 ;
         logger.debug("Get result:" + result.andReturn().getResponse().getContentAsString());
     }
@@ -265,15 +266,19 @@ public class ControllerDVProductTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(2)))
-                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(5)))
+
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(7)))
                 .andExpect(jsonPath("$[0].id", Matchers.equalTo(3)))
                 .andExpect(jsonPath("$[0].dvOrigin", Matchers.aMapWithSize(1)))
                 .andExpect(jsonPath("$[0].dvOrigin.name", Matchers.equalTo("Product Origin")))
                 .andExpect(jsonPath("$[0].title", Matchers.equalTo("Brown")))
                 .andExpect(jsonPath("$[0].dvCategories").isArray())
                 .andExpect(jsonPath("$[0].dvCategories", Matchers.hasSize(0)))
+                .andExpect(jsonPath("$[0].hasDescription", Matchers.equalTo(false)))
+                .andExpect(jsonPath("$[0].hasNotes", Matchers.equalTo(false)))
                 .andExpect(jsonPath("$[0].hasTracks", Matchers.equalTo(true)))
-                .andExpect(jsonPath("$[1]", Matchers.aMapWithSize(4)))
+
+                .andExpect(jsonPath("$[1]", Matchers.aMapWithSize(7)))
                 .andExpect(jsonPath("$[1].id", Matchers.equalTo(2)))
                 .andExpect(jsonPath("$[1].dvOrigin", Matchers.aMapWithSize(1)))
                 .andExpect(jsonPath("$[1].dvOrigin.name", Matchers.equalTo("Product Origin")))
@@ -284,7 +289,9 @@ public class ControllerDVProductTest {
                 .andExpect(jsonPath("$[1].dvCategories[0].name", Matchers.equalTo("Another category")))
                 .andExpect(jsonPath("$[1].dvCategories[1]", Matchers.aMapWithSize(1)))
                 .andExpect(jsonPath("$[1].dvCategories[1].name", Matchers.equalTo("Third category")))
-
+                .andExpect(jsonPath("$[1].hasDescription", Matchers.equalTo(false)))
+                .andExpect(jsonPath("$[1].hasNotes", Matchers.equalTo(false)))
+                .andExpect(jsonPath("$[1].hasTracks", Matchers.equalTo(false)))
                 ;
         logger.debug("Get result:" + result.andReturn().getResponse().getContentAsString());
     }
@@ -376,6 +383,7 @@ public class ControllerDVProductTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.aMapWithSize(10)))
                 .andExpect(jsonPath("$.id", Matchers.equalTo(4)))
+                .andExpect(jsonPath("$.artifactTypeId", Matchers.equalTo(202)))
                 .andExpect(jsonPath("$.dvOrigin.id", Matchers.equalTo(1)))
                 .andExpect(jsonPath("$.dvOrigin.name", Matchers.equalTo("Product Origin")))
                 .andExpect(jsonPath("$.title", Matchers.equalTo("Without Categories")))
