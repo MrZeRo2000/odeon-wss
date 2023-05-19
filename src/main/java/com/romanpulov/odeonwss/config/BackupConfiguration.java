@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.config;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 
 @Component
 public class BackupConfiguration {
@@ -13,7 +14,7 @@ public class BackupConfiguration {
 
     public String getDbFileName() {
         String[] splitDBUrl = dbUrl.split(":");
-        return splitDBUrl[2];
+        return String.join(":", Arrays.copyOfRange(splitDBUrl, 2, splitDBUrl.length));
     }
 
     public String getBackupPath() {
