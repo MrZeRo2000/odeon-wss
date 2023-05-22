@@ -33,7 +33,7 @@ bootWar {
 }
 
 group = 'com.romanpulov'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 sourceCompatibility = '11'
 
 repositories {
@@ -83,6 +83,14 @@ tasks.register('deployInt', Copy) {
 	into tomcat_webapps
 	include file_name_build
 	rename file_name_build, file_name_int
+}
+
+tasks.register('deployProd', Copy) {
+	dependsOn(bootWar)
+	from "build/libs"
+	into tomcat_webapps
+	include file_name_build
+	rename file_name_build, file_name_prod
 }
 
 tasks.register("testFull") {
