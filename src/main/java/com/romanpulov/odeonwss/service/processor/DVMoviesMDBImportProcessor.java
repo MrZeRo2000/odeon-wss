@@ -205,7 +205,6 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
         for (Row row: table) {
             long id = row.getInt(DVDET_ID_COLUMN_NAME);
             long productId = row.getInt(VPRODUCT_ID_COLUMN_NAME);
-            log.info(String.format("Loading %s DVDetId=%d, VProductId=%d", PRODUCT_DVDET_TABLE_NAME, id, productId));
 
             Track track = null;
             if (this.contentTracks.containsKey(id)) {

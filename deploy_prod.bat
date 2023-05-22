@@ -1,1 +1,1 @@
-gradlew deployProd
+gradlew clean deployProd
