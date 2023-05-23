@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <Context>
-	<Parameter name="db-url" value="jdbc:sqlite:R:/Odeon/db/odeon.db"/>
+	<Parameter name="db-url" value="jdbc:sqlite:R:/OneDrive/Odeon/db/odeon.db"/>
 	<Parameter name="mp3-path" value="J:/ARCHIVE/MP3 Music/"/>
 	<Parameter name="la-path" value="J:/ARCHIVE/Lossless/"/>
 	<Parameter name="ffprobe-path" value="D:/prj/ffmpeg/"/>
@@ -8,4 +8,5 @@
 	<Parameter name="dv-music-path" value="L:/Music/"/>
 	<Parameter name="dv-movies-path" value="L:/Movies/"/>
 	<Parameter name="mdb-path" value="D:/prj/Cat2000/"/>
+	<Parameter name="spring.profiles.active" value="debug"/>
 </Context>
