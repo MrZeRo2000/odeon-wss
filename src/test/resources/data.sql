@@ -3,7 +3,7 @@ VALUES (100, 'Music', null, 946684800, 946684800);
 INSERT INTO artifact_types (attp_id, attp_name, attp_media_file_formats, attp_parent_id, attp_ins_datm, attp_upd_datm)
 VALUES (101, 'MP3', 'MP3', 100, 946684800, 946684800);
 INSERT INTO artifact_types (attp_id, attp_name, attp_media_file_formats, attp_parent_id, attp_ins_datm, attp_upd_datm)
-VALUES (102, 'LA', 'APE|FLAC|WV', 100, 946684800, 946684800);
+VALUES (102, 'LA', 'APE|FLAC|WV|M4A', 100, 946684800, 946684800);
 
 INSERT INTO artifact_types (attp_id, attp_name, attp_parent_id, attp_ins_datm, attp_upd_datm)
 VALUES (200, 'Video', null, 946684800, 946684800);

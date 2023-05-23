@@ -27,7 +27,14 @@ public class ServiceProcessLoadLATest {
     private static final Logger log = Logger.getLogger(ServiceProcessLoadLATest.class.getSimpleName());
     private static final ProcessorType PROCESSOR_TYPE = ProcessorType.LA_LOADER;
     private static final String[] ARTIST_LIST = {
-            "Evanescence", "Pink Floyd", "Therapy", "Tori Amos", "Abigail Williams", "Agua De Annique", "Christina Aguilera"
+            "Evanescence",
+            "Pink Floyd",
+            "Therapy",
+            "Tori Amos",
+            "Abigail Williams",
+            "Agua De Annique",
+            "Christina Aguilera",
+            "The Sisters Of Mercy"
     };
 
     @Autowired
@@ -58,7 +65,7 @@ public class ServiceProcessLoadLATest {
         processService.executeProcessor(PROCESSOR_TYPE, null);
         processDetail = processService.getProcessInfo().getProcessDetails();
 
-        Assertions.assertEquals(10, processDetail.size());
+        Assertions.assertEquals(11, processDetail.size());
         Assertions.assertEquals(ProcessingStatus.WARNING, processService.getProcessInfo().getProcessingStatus());
 
         List<ProcessDetail> expectedProcessDetails = Stream.of(ARTIST_LIST)
@@ -71,7 +78,7 @@ public class ServiceProcessLoadLATest {
                 .collect(Collectors.toList());
 
         // check processing progress
-        for (int i = 1; i < 8; i++) {
+        for (int i = 1; i < 9; i++) {
             ProcessingAction pa = processDetail.get(i).getProcessingAction();
             Assertions.assertNotNull(pa);
             Assertions.assertEquals(ProcessingActionType.ADD_ARTIST, pa.getActionType());
@@ -82,7 +89,8 @@ public class ServiceProcessLoadLATest {
                             pa.getValue().contains("Tori Amos") ||
                             pa.getValue().contains("Abigail Williams") ||
                             pa.getValue().contains("Agua De Annique") ||
-                            pa.getValue().contains("Christina Aguilera")
+                            pa.getValue().contains("Christina Aguilera") ||
+                            pa.getValue().contains("The Sisters Of Mercy")
             );
             assertThat(processDetail.get(i)).isIn(expectedProcessDetails);
         }
@@ -172,7 +180,7 @@ public class ServiceProcessLoadLATest {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artists loaded"),
                         ProcessingStatus.INFO,
-                        7,
+                        8,
                         null)
         );
 
@@ -180,7 +188,7 @@ public class ServiceProcessLoadLATest {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifacts loaded"),
                         ProcessingStatus.INFO,
-                        9,
+                        10,
                         null)
         );
 
@@ -188,7 +196,7 @@ public class ServiceProcessLoadLATest {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Tracks loaded"),
                         ProcessingStatus.INFO,
-                        116,
+                        117,
                         null)
         );
 
@@ -209,6 +217,7 @@ public class ServiceProcessLoadLATest {
         testOneMediaFilePerAllTracks("Therapy", "Nurse", 10, 1, 267984588);
         testOneMediaFilePerAllTracks("Therapy", "Infernal Love", 11, 1, 330812393);
         testOneMediaFilePerAllTracks("Tori Amos", "Y Kant Tori Read", 10, 1, 286331932);
+        testOneMediaFilePerOneTrack("The Sisters Of Mercy", "Anaconda 7 Inch Single", 1, 89624046L);
     }
 
 }

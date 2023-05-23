@@ -113,7 +113,7 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                             .filter(f -> NamesParser.validateFileNameMediaFormat(f, this.artifactType.getMediaFileFormats()))
                             .collect(Collectors.toList());
                     if (trackFileNames.size() == 0) {
-                        errorHandler(ProcessorMessages.ERROR_TRACK_FILES_NOT_FOUND_FOR_ARTIFACT, artifactPath.getFileName().toString());
+                        errorHandler(ProcessorMessages.ERROR_TRACK_FILES_NOT_FOUND_FOR_ARTIFACT, artifactPath.toString());
                     } else {
                         trackFileNames.forEach(trackFileName -> result.add(new MediaFileValidationDTO(
                                 artistPath.getFileName().toString(),

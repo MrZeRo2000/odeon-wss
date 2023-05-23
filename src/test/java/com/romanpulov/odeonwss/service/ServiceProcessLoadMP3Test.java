@@ -47,7 +47,7 @@ public class ServiceProcessLoadMP3Test {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     void testOk() {
-        Arrays.asList("Aerosmith", "Kosheen").forEach(s ->
+        Arrays.asList("Aerosmith", "Kosheen", "Various Artists").forEach(s ->
                 artistRepository.save(
                         new EntityArtistBuilder()
                                 .withType(ArtistType.ARTIST)
@@ -72,7 +72,7 @@ public class ServiceProcessLoadMP3Test {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artists loaded"),
                         ProcessingStatus.INFO,
-                        2,
+                        3,
                         null)
         );
 
@@ -81,7 +81,7 @@ public class ServiceProcessLoadMP3Test {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifacts loaded"),
                         ProcessingStatus.INFO,
-                        3,
+                        4,
                         null)
         );
 
@@ -89,7 +89,7 @@ public class ServiceProcessLoadMP3Test {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Tracks loaded"),
                         ProcessingStatus.INFO,
-                        40,
+                        42,
                         null)
         );
 
@@ -102,7 +102,8 @@ public class ServiceProcessLoadMP3Test {
         );
 
         Artist aerosmithArtist = artistRepository.findFirstByName("Aerosmith").orElseThrow();
-        Artist kosheenArtist = artistRepository.findFirstByName("Kosheen").orElseThrow();
+        artistRepository.findFirstByName("Kosheen").orElseThrow();
+        artistRepository.findFirstByName("Various Artists").orElseThrow();
 
         Artifact honkinArtifact = artifactRepository.getArtifactsByArtist(aerosmithArtist).get(0);
         Assertions.assertEquals(trackRepository.findAllByArtifact(honkinArtifact).size(), mediaFileRepository.findAllByArtifact(honkinArtifact).size());
@@ -131,7 +132,12 @@ public class ServiceProcessLoadMP3Test {
                         ProcessDetailInfo.fromMessage("Artist Kosheen not found"),
                         ProcessingStatus.WARNING,
                         null,
-                        new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Kosheen"))
+                        new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Kosheen")),
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artist Various Artists not found"),
+                        ProcessingStatus.WARNING,
+                        null,
+                        new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Various Artists"))
         );
 
         assertThat(pi.getProcessDetails().get(2)).isIn(
@@ -144,10 +150,33 @@ public class ServiceProcessLoadMP3Test {
                         ProcessDetailInfo.fromMessage("Artist Kosheen not found"),
                         ProcessingStatus.WARNING,
                         null,
-                        new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Kosheen"))
+                        new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Kosheen")),
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artist Various Artists not found"),
+                        ProcessingStatus.WARNING,
+                        null,
+                        new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Various Artists"))
         );
 
-        assertThat(pi.getProcessDetails().get(3)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(3)).isIn(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artist Aerosmith not found"),
+                        ProcessingStatus.WARNING,
+                        null,
+                        new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Aerosmith")),
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artist Kosheen not found"),
+                        ProcessingStatus.WARNING,
+                        null,
+                        new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Kosheen")),
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artist Various Artists not found"),
+                        ProcessingStatus.WARNING,
+                        null,
+                        new ProcessingAction(ProcessingActionType.ADD_ARTIST, "Various Artists"))
+        );
+
+        assertThat(pi.getProcessDetails().get(4)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artists loaded"),
                         ProcessingStatus.INFO,
@@ -155,7 +184,7 @@ public class ServiceProcessLoadMP3Test {
                         null)
         );
 
-        assertThat(pi.getProcessDetails().get(4)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(5)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.WARNING,
@@ -309,7 +338,7 @@ public class ServiceProcessLoadMP3Test {
 
         service.executeProcessor(PROCESSOR_TYPE, null);
         processDetail = service.getProcessInfo().getProcessDetails();
-        Assertions.assertEquals(5, processDetail.size());
+        Assertions.assertEquals(6, processDetail.size());
         Assertions.assertEquals(ProcessingStatus.WARNING, service.getProcessInfo().getProcessingStatus());
 
         // find first action
@@ -318,7 +347,7 @@ public class ServiceProcessLoadMP3Test {
 
         // resolve first action
         service.getProcessInfo().resolveAction(processingAction);
-        Assertions.assertEquals(4, processDetail.size());
+        Assertions.assertEquals(5, processDetail.size());
         Assertions.assertEquals(ProcessingStatus.WARNING,
                 service.getProcessInfo().getProcessDetails().get(service.getProcessInfo().getProcessDetails().size() - 1).getStatus());
 
@@ -328,7 +357,7 @@ public class ServiceProcessLoadMP3Test {
 
         // resolve second action
         service.getProcessInfo().resolveAction(processingAction);
-        Assertions.assertEquals(3, processDetail.size());
+        Assertions.assertEquals(4, processDetail.size());
     }
 
 }

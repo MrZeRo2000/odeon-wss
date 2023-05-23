@@ -31,7 +31,8 @@ public class ServiceProcessValidateLATest {
                     "Tori Amos",
                     "Abigail Williams",
                     "Agua De Annique",
-                    "Christina Aguilera");
+                    "Christina Aguilera",
+                    "The Sisters Of Mercy");
 
     @Autowired
     ArtifactTypeRepository artifactTypeRepository;

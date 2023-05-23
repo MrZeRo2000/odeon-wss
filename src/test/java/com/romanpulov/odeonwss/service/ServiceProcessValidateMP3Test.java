@@ -122,7 +122,7 @@ public class ServiceProcessValidateMP3Test {
     @Sql({"/schema.sql", "/data.sql", "/main_artists.sql"})
     void testLoad() {
         this.prepareInternal();
-        assertThat(artistRepository.getAllByType(ArtistType.ARTIST).size()).isEqualTo(2);
+        assertThat(artistRepository.getAllByType(ArtistType.ARTIST).size()).isEqualTo(3);
     }
 
     @Test
@@ -214,7 +214,7 @@ public class ServiceProcessValidateMP3Test {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artists not in files or have no artifacts and tracks",
-                                List.of("Kosheen")),
+                                List.of("Kosheen", "Various Artists")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -234,7 +234,7 @@ public class ServiceProcessValidateMP3Test {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artists not in files or have no artifacts and tracks",
-                                List.of("Kosheen")),
+                                List.of("Kosheen", "Various Artists")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -263,7 +263,7 @@ public class ServiceProcessValidateMP3Test {
 
     @Test
     @Order(7)
-    void testMissingFileArtifact() throws Exception {
+    void testMissingFileArtifact() {
         service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/validation_mp3_missing_artifact/");
         ProcessInfo pi = service.getProcessInfo();
         List<ProcessDetail> processDetails = pi.getProcessDetails();
