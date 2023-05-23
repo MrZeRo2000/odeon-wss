@@ -63,7 +63,7 @@ public class PathReader {
         if (!result) {
             processor.errorHandler(
                     ProcessorMessages.ERROR_EXPECTED_DIRECTORY,
-                    folders.stream().findFirst().orElseThrow().toString());
+                    folders.stream().reduce((first, second) -> second).orElseThrow().toString());
         }
         return result;
     }
