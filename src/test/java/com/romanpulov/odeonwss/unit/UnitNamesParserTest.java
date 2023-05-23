@@ -77,6 +77,14 @@ public class UnitNamesParserTest {
         Assertions.assertNotNull(nt);
         Assertions.assertEquals(22, nt.getNumber());
         Assertions.assertEquals("Title. Can have dots", nt.getTitle());
+
+        nt = NamesParser.parseMusicTrack("001 - This is the painkiller.mp3");
+        assert nt != null;
+        assertThat(nt.getNumber()).isEqualTo(1);
+        assertThat(nt.getTitle()).isEqualTo("This is the painkiller");
+
+        assertThat(NamesParser.parseMusicTrack("01-First day.mp3")).isNull();
+        assertThat(NamesParser.parseMusicTrack("0101-Too much.mp3")).isNull();
     }
 
     @Test

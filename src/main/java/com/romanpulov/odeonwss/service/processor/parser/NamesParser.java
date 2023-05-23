@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class NamesParser {
     private static final Pattern REGEXP_PATTERN_MUSIC_ARTIFACT = Pattern.compile("^((?:19|20)[0-9]{2})\\s(\\S.*)");
-    private static final Pattern REGEXP_PATTERN_MUSIC_TRACK = Pattern.compile("^([0-9][0-9])\\s-\\s(\\S.*)(?:\\.\\S{2,4})$");
+    private static final Pattern REGEXP_PATTERN_MUSIC_TRACK = Pattern.compile("^([0-9]{2,3})\\s-\\s(\\S.*)(?:\\.\\S{2,4})$");
     private static final Pattern REGEXP_PATTERN_FOLDER_NAME_DISK_NUM = Pattern.compile("^(?:CD)(\\d+)$");
     private static final Pattern REGEXP_PATTERN_FILE_NAME_DISK_NUM = Pattern.compile("(?:CD)(\\d+)\\.");
     private static final String FORMAT_MUSIC_ARTIFACT = "%d %s";
