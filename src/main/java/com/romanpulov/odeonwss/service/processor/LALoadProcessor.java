@@ -87,6 +87,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
         for (Pair<Path, Artifact> pathArtifactPair: pathArtifacts) {
             Path path = pathArtifactPair.getFirst();
             Artifact artifact = pathArtifactPair.getSecond();
+            logger.debug(String.format("processTracks path=%s", path));
 
             TracksSummary summary = processTracksPathWithDiskNum(path, artifact,0);
             logger.info("Artifact:" + pathArtifactPair.getSecond().getTitle() + ", track summary: " + summary);
@@ -184,7 +185,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
     ) throws ProcessorException {
         TracksSummary summary = new TracksSummary();
 
-        logger.debug("Processing Cue");
+        logger.debug(String.format("Processing Cue:%s", path));
 
         Set<String> cueFileNames = cueTracks.stream().map(CueParser.CueTrack::getFileName).collect(Collectors.toSet());
 

@@ -70,6 +70,8 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
         List<Pair<Path, Pair<Artifact, NamesParser.NumberTitle>>> flatPathArtifacts = new ArrayList<>();
         List<Path> flatPathTracks = new ArrayList<>();
         for (Pair<Path, Artifact> pathArtifactPair: pathArtifacts) {
+            logger.debug(String.format("processTracks path=%s", pathArtifactPair.getFirst()));
+
             List<Path> trackFiles = new ArrayList<>();
             if (!PathReader.readPathFilesOnly(this, pathArtifactPair.getFirst(), trackFiles)) {
                 return counter.get();
@@ -77,6 +79,8 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
 
             for (Path p: trackFiles) {
                 String trackFileName = p.getFileName().toString();
+                logger.debug(String.format("processTracks trackFileName=%s", trackFileName));
+
                 if (!NamesParser.validateFileNameMediaFormat(trackFileName, getArtifactType().getMediaFileFormats())) {
                     errorHandler(ProcessorMessages.ERROR_WRONG_FILE_TYPE, p.toAbsolutePath());
                     return counter.get();

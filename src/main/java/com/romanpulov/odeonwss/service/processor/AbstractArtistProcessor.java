@@ -61,6 +61,7 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
 
         for (Path p: artistFiles) {
             String artistName = p.getFileName().toString();
+            logger.debug(String.format("processArtists artistName=%s", artistName));
 
             Optional<Artist> artist = artistRepository.findFirstByTypeAndName(ArtistType.ARTIST, artistName);
             if (artist.isEmpty()) {
@@ -80,6 +81,8 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
         // load artifact folders to flat list
         List<Pair<Path, Pair<Artist, NamesParser.YearTitle>>> flatPathArtists = new ArrayList<>();
         for (Pair<Path, Artist> pathArtistPair: pathArtists) {
+            logger.debug(String.format("processArtifacts path=%s", pathArtistPair.getFirst()));
+
             List<Path> artifactFiles = new ArrayList<>();
             if (!PathReader.readPathFoldersOnly(this, pathArtistPair.getFirst(), artifactFiles)) {
                 return result;
@@ -87,6 +90,8 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
 
             for (Path p: artifactFiles) {
                 String artifactName = p.getFileName().toString();
+                logger.debug(String.format("processArtifacts artifactName=%s", artifactName));
+
                 NamesParser.YearTitle yt = NamesParser.parseMusicArtifactTitle(artifactName);
                 if (yt == null) {
                     errorHandlerItem(
