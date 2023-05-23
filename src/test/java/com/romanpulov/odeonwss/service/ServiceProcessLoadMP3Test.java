@@ -302,7 +302,8 @@ public class ServiceProcessLoadMP3Test {
         );
 
         String trackNameMessage = processDetail.get(3).getInfo().getMessage();
-        assertThat(trackNameMessage).startsWith("Error parsing music track name: 04-Baby, Please Don't Go.mp3");
+        assertThat(trackNameMessage).startsWith("Error parsing music track name");
+        assertThat(trackNameMessage).contains("04-Baby, Please Don't Go.mp3");
         assertThat(trackNameMessage).contains("Aerosmith");
         assertThat(trackNameMessage).contains("2004 Honkin'On Bobo");
 

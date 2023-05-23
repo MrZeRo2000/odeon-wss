@@ -96,8 +96,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
                         if (nt == null) {
                             errorHandler(
                                     ProcessorMessages.ERROR_PARSING_MUSIC_TRACK_NAME,
-                                    trackPath.toAbsolutePath().getFileName().toString(),
-                                    trackPath.toAbsolutePath().getParent().toString()
+                                    trackPath.toAbsolutePath().toString()
 
                             );
                             result.add(
