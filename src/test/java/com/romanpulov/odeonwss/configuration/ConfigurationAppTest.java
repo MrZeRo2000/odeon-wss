@@ -22,6 +22,6 @@ public class ConfigurationAppTest {
 
     @Test
     void testVersion() {
-        Assertions.assertEquals("0.0.1-SNAPSHOT", appConfiguration.getVersion());
+        Assertions.assertEquals("0.0.1", appConfiguration.getVersion());
     }
 }

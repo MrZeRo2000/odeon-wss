@@ -22,7 +22,7 @@ public class ControllerAppTest {
     void testVersion() throws Exception {
         mockMvc.perform(get("/api/app/info").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.version", Matchers.is("0.0.1-SNAPSHOT")));
+                .andExpect(jsonPath("$.version", Matchers.is("0.0.1")));
 
     }
 }

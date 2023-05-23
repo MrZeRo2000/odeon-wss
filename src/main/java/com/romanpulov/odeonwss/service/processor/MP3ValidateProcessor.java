@@ -94,7 +94,12 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
                     } else {
                         NamesParser.NumberTitle nt = NamesParser.parseMusicTrack(trackFileName);
                         if (nt == null) {
-                            errorHandler(ProcessorMessages.ERROR_PARSING_TRACK_NAME, trackPath.toAbsolutePath().getFileName());
+                            errorHandler(
+                                    ProcessorMessages.ERROR_PARSING_MUSIC_TRACK_NAME,
+                                    trackPath.toAbsolutePath().getFileName().toString(),
+                                    trackPath.toAbsolutePath().getParent().toString()
+
+                            );
                             result.add(
                                     new MediaFileValidationDTOBuilder()
                                             .withArtistName(artistPath.getFileName().toString())

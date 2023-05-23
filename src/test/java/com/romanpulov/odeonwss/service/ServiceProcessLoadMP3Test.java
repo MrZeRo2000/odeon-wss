@@ -111,7 +111,7 @@ public class ServiceProcessLoadMP3Test {
     @Test
     @Order(2)
     @Sql({"/schema.sql", "/data.sql"})
-    void testNoArtistExistsShouldFail() throws Exception {
+    void testNoArtistExistsShouldFail() {
         List<ProcessDetail> processDetail;
 
         // warnings - no artists exist
@@ -175,7 +175,7 @@ public class ServiceProcessLoadMP3Test {
     @Test
     @Order(3)
     @Sql({"/schema.sql", "/data.sql"})
-    void testNoPathExistsShouldFail() throws Exception {
+    void testNoPathExistsShouldFail() {
         List<ProcessDetail> processDetail;
 
         // error - path not exist
@@ -188,7 +188,7 @@ public class ServiceProcessLoadMP3Test {
 
     @Test
     @Order(4)
-    void testDirectoryWithFiles() throws Exception {
+    void testDirectoryWithFiles() {
         service.executeProcessor(PROCESSOR_TYPE, "");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
         Assertions.assertTrue(service.getProcessInfo().getProcessDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("directory, found:")));
@@ -196,7 +196,7 @@ public class ServiceProcessLoadMP3Test {
 
     @Test
     @Order(5)
-    void testWrongArtifactTitle() throws Exception {
+    void testWrongArtifactTitle() {
         Artist artist = new Artist();
         artist.setType(ArtistType.ARTIST);
         artist.setName("Aerosmith");
@@ -248,6 +248,46 @@ public class ServiceProcessLoadMP3Test {
 
     @Test
     @Order(6)
+    void testWrongCompositionTitle() {
+        service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/wrong_composition_title/");
+        ProcessInfo pi = service.getProcessInfo();
+        List<ProcessDetail> processDetail = pi.getProcessDetails();
+
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(processDetail.get(1)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artists loaded"),
+                        ProcessingStatus.INFO,
+                        1,
+                        null)
+        );
+
+
+        assertThat(processDetail.get(2)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artifacts loaded"),
+                        ProcessingStatus.INFO,
+                        1,
+                        null)
+        );
+
+        String trackNameMessage = processDetail.get(3).getInfo().getMessage();
+        assertThat(trackNameMessage).startsWith("Error parsing music track name: 04-Baby, Please Don't Go.mp3");
+        assertThat(trackNameMessage).contains("Aerosmith");
+        assertThat(trackNameMessage).contains("2004 Honkin'On Bobo");
+
+        assertThat(pi.getProcessDetails().get(5)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Task status"),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(7)
     @Sql({"/schema.sql", "/data.sql"})
     void testOneArtistNotExists() {
         artistRepository.save(
@@ -262,7 +302,7 @@ public class ServiceProcessLoadMP3Test {
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     @Sql({"/schema.sql", "/data.sql"})
     void testNoArtistResolving() {
         List<ProcessDetail> processDetail;
