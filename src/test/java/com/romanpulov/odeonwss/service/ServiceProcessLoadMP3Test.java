@@ -4,6 +4,7 @@ import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.repository.TrackRepository;
@@ -111,6 +112,27 @@ public class ServiceProcessLoadMP3Test {
 
     @Test
     @Order(2)
+    void testLoadMissingTracksOk() {
+        Artist artist = artistRepository.findFirstByName("Aerosmith").orElseThrow();
+        Artifact artifact = artifactRepository.getArtifactsByArtist(artist).get(0);
+        List<Track> tracks = trackRepository.findAllByArtifact(artifact);
+        assertThat(tracks.size()).isEqualTo(12);
+
+        //delete tracks
+        trackRepository.deleteAll(tracks);
+        tracks = trackRepository.findAllByArtifact(artifact);
+        assertThat(tracks.size()).isEqualTo(0);
+
+        Assertions.assertDoesNotThrow(() -> service.executeProcessor(PROCESSOR_TYPE));
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+
+        tracks = trackRepository.findAllByArtifact(artifact);
+        assertThat(tracks.size()).isEqualTo(12);
+    }
+
+    @Test
+    @Order(3)
     @Sql({"/schema.sql", "/data.sql"})
     void testNoArtistExistsShouldFail() {
         List<ProcessDetail> processDetail;
@@ -202,7 +224,7 @@ public class ServiceProcessLoadMP3Test {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     @Sql({"/schema.sql", "/data.sql"})
     void testNoPathExistsShouldFail() {
         List<ProcessDetail> processDetail;
@@ -216,7 +238,7 @@ public class ServiceProcessLoadMP3Test {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void testDirectoryWithFiles() {
         service.executeProcessor(PROCESSOR_TYPE, "");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
@@ -224,7 +246,7 @@ public class ServiceProcessLoadMP3Test {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     void testWrongArtifactTitle() {
         Artist artist = new Artist();
         artist.setType(ArtistType.ARTIST);
@@ -276,7 +298,7 @@ public class ServiceProcessLoadMP3Test {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     void testWrongCompositionTitle() {
         service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/wrong_composition_title/");
         ProcessInfo pi = service.getProcessInfo();
@@ -317,7 +339,7 @@ public class ServiceProcessLoadMP3Test {
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     @Sql({"/schema.sql", "/data.sql"})
     void testOneArtistNotExists() {
         artistRepository.save(
@@ -332,7 +354,7 @@ public class ServiceProcessLoadMP3Test {
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     @Sql({"/schema.sql", "/data.sql"})
     void testNoArtistResolving() {
         List<ProcessDetail> processDetail;
@@ -360,5 +382,4 @@ public class ServiceProcessLoadMP3Test {
         service.getProcessInfo().resolveAction(processingAction);
         Assertions.assertEquals(4, processDetail.size());
     }
-
 }

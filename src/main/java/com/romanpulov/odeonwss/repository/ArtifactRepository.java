@@ -22,7 +22,7 @@ public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifa
     @Query("SELECT a FROM Artifact a LEFT JOIN FETCH a.tracks WHERE a.artifactType = :artifactType")
     List<Artifact> getAllByArtifactTypeWithTracks(ArtifactType artifactType);
 
-    @Query("SELECT a FROM Artifact a LEFT JOIN FETCH a.tracks WHERE a.artifactType = :artifactType AND a.tracks.size = 0")
+    @Query("SELECT a FROM Artifact a LEFT JOIN FETCH a.tracks LEFT JOIN FETCH a.artist WHERE a.artifactType = :artifactType AND a.tracks.size = 0")
     List<Artifact> getAllByArtifactTypeWithoutTracks(ArtifactType artifactType);
 
     @Query("SELECT a FROM Artifact a LEFT JOIN FETCH a.tracks WHERE a.id = :id")

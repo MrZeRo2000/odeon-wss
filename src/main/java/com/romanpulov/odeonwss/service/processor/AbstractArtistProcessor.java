@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +44,10 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
             List<Pair<Path, Artifact>> pathArtifacts = processArtifacts(pathArtists);
             infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED, pathArtifacts.size());
 
-            if (pathArtifacts.size() > 0) {
-                infoHandler(ProcessorMessages.INFO_TRACKS_LOADED, processTracks(pathArtifacts));
+            List<Pair<Path, Artifact>> processPathArtifacts = getProcessPathArtifacts(path);
+
+            if (processPathArtifacts.size() > 0) {
+                infoHandler(ProcessorMessages.INFO_TRACKS_LOADED, processTracks(processPathArtifacts));
             }
         }
     }
@@ -124,6 +127,30 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
             if (existingArtifact.isEmpty()) {
                 artifactRepository.save(artifact);
                 result.add(Pair.of(pathArtistPair.getFirst(), artifact));
+            }
+        }
+
+        return result;
+    }
+
+    public List<Pair<Path, Artifact>> getProcessPathArtifacts(Path rootPath) {
+        List<Pair<Path, Artifact>> result = new ArrayList<>();
+
+        List<Artifact> artifacts = artifactRepository.getAllByArtifactTypeWithoutTracks(this.getArtifactType());
+        for (Artifact artifact: artifacts) {
+            logger.debug("Got artifact without tracks:" + artifact);
+            Artist artist = artifact.getArtist();
+            Long year = artifact.getYear();
+            if ((artist != null) && (year != null)) {
+                Path path = Path.of(
+                        rootPath.toString(),
+                        artist.getName(),
+                        NamesParser.formatMusicArtifact(year, artifact.getTitle()));
+                if (Files.exists(path)) {
+                    result.add(Pair.of(path, artifact));
+                } else {
+                    logger.debug("Expected path does not exist:" + path);
+                }
             }
         }
 

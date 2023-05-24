@@ -117,6 +117,15 @@ public class TrackService implements EditableObjectService<TrackEditDTO>{
     @Transactional
     public void insertTrackWithMedia(Track track, MediaFile mediaFile) {
         if (mediaFile.getId() == null) {
+            //get id from existing
+            Optional<MediaFile> existingMediaFile = mediaFileRepository.findFirstByArtifactAndName(
+                    mediaFile.getArtifact(), mediaFile.getName());
+            if (existingMediaFile.isPresent()) {
+                mediaFile.setId(existingMediaFile.get().getId());
+                mediaFile.setInsertDateTime(existingMediaFile.get().getInsertDateTime());
+            }
+
+            //save
             mediaFileRepository.save(mediaFile);
         } else {
             mediaFile = mediaFileRepository.findById(mediaFile.getId()).orElseThrow();
