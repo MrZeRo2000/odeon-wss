@@ -243,4 +243,24 @@ public class RepositoryArtifactTests {
         //media files deleted
         Assertions.assertEquals(0, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
     }
+
+    @Test
+    @Order(11)
+    void testArtifactsWithoutTracks() {
+        var withoutTracks = artifactRepository.getAllByArtifactTypeWithoutTracks(artifactTypeRepository.getWithDVMovies());
+        assertThat(withoutTracks.size()).isEqualTo(1);
+
+        var track = new EntityTrackBuilder()
+                .withArtifact(withoutTracks.get(0))
+                .withTitle("Track title")
+                .withDiskNum(1L)
+                .withNum(1L)
+                .withDuration(123458L)
+                .build();
+
+        trackRepository.save(track);
+
+        var withTracks = artifactRepository.getAllByArtifactTypeWithoutTracks(artifactTypeRepository.getWithDVMovies());
+        assertThat(withTracks.size()).isEqualTo(0);
+    }
 }
