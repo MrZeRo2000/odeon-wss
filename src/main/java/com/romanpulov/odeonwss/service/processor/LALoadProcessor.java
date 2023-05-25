@@ -8,6 +8,7 @@ import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
+import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.TrackService;
 import com.romanpulov.odeonwss.service.processor.parser.CueParser;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
@@ -65,11 +66,12 @@ public class LALoadProcessor extends AbstractArtistProcessor {
             ArtifactTypeRepository artifactTypeRepository,
             ArtistRepository artistRepository,
             ArtifactRepository artifactRepository,
+            MediaFileRepository mediaFileRepository,
             TrackService trackService,
             MediaFileMapper mediaFileMapper,
             MediaParser mediaParser
     ) {
-        super(artistRepository, artifactRepository);
+        super(artistRepository, artifactRepository, mediaFileRepository);
         this.artifactTypeRepository = artifactTypeRepository;
         this.trackService = trackService;
         this.mediaFileMapper = mediaFileMapper;

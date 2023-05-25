@@ -6,6 +6,7 @@ import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
+import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +27,15 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
 
     protected final ArtifactRepository artifactRepository;
 
-    public AbstractArtistProcessor(ArtistRepository artistRepository, ArtifactRepository artifactRepository) {
+    protected final MediaFileRepository mediaFileRepository;
+
+    public AbstractArtistProcessor(
+            ArtistRepository artistRepository,
+            ArtifactRepository artifactRepository,
+            MediaFileRepository mediaFileRepository) {
         this.artistRepository = artistRepository;
         this.artifactRepository = artifactRepository;
+        this.mediaFileRepository = mediaFileRepository;
     }
 
     protected abstract ArtifactType getArtifactType();
@@ -44,7 +51,7 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
             List<Pair<Path, Artifact>> pathArtifacts = processArtifacts(pathArtists);
             infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED, pathArtifacts.size());
 
-            List<Pair<Path, Artifact>> processPathArtifacts = getProcessPathArtifacts(path);
+            List<Pair<Path, Artifact>> processPathArtifacts = preparePathArtifacts(path);
 
             if (processPathArtifacts.size() > 0) {
                 infoHandler(ProcessorMessages.INFO_TRACKS_LOADED, processTracks(processPathArtifacts));
@@ -133,12 +140,17 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
         return result;
     }
 
-    public List<Pair<Path, Artifact>> getProcessPathArtifacts(Path rootPath) {
+    public List<Pair<Path, Artifact>> preparePathArtifacts(Path rootPath) {
         List<Pair<Path, Artifact>> result = new ArrayList<>();
 
         List<Artifact> artifacts = artifactRepository.getAllByArtifactTypeWithoutTracks(this.getArtifactType());
         for (Artifact artifact: artifacts) {
             logger.debug("Got artifact without tracks:" + artifact);
+
+            //remove media files
+            mediaFileRepository.deleteAllByArtifact(artifact);
+            logger.debug("Deleted media files by artifact");
+
             Artist artist = artifact.getArtist();
             Long year = artifact.getYear();
             if ((artist != null) && (year != null)) {
