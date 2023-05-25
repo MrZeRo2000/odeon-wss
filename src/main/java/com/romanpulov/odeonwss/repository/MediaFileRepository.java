@@ -23,6 +23,7 @@ public interface MediaFileRepository extends CrudRepository<MediaFile, Long> {
 
     List<MediaFile> findAllByArtifact(Artifact artifact);
 
+    @Transactional
     void deleteAllByArtifact(Artifact artifact);
 
     List<IdNameDTO> findByArtifactOrderByName(Artifact artifact);

@@ -117,11 +117,15 @@ public class ServiceProcessLoadMP3Test {
         Artifact artifact = artifactRepository.getArtifactsByArtist(artist).get(0);
         List<Track> tracks = trackRepository.findAllByArtifact(artifact);
         assertThat(tracks.size()).isEqualTo(12);
+        assertThat(mediaFileRepository.findAllByArtifact(artifact).size()).isEqualTo(12);
+
+        mediaFileRepository.findFirstByArtifact(artifact).orElseThrow().setName("a different name");
 
         //delete tracks
         trackRepository.deleteAll(tracks);
         tracks = trackRepository.findAllByArtifact(artifact);
         assertThat(tracks.size()).isEqualTo(0);
+        assertThat(mediaFileRepository.findAllByArtifact(artifact).size()).isEqualTo(12);
 
         Assertions.assertDoesNotThrow(() -> service.executeProcessor(PROCESSOR_TYPE));
         ProcessInfo pi = service.getProcessInfo();
@@ -129,6 +133,7 @@ public class ServiceProcessLoadMP3Test {
 
         tracks = trackRepository.findAllByArtifact(artifact);
         assertThat(tracks.size()).isEqualTo(12);
+        assertThat(mediaFileRepository.findAllByArtifact(artifact).size()).isEqualTo(12);
     }
 
     @Test
