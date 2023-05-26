@@ -193,6 +193,19 @@ public class CueParser {
             return new ArrayList<>();
         }
 
+        //try to get from file name
+        result.stream().filter(t -> Objects.isNull(t.title) || t.num == 0).forEach(t -> {
+            NamesParser.NumberTitle nt = NamesParser.parseMusicTrack(t.fileName);
+            if (nt != null) {
+                if (t.num == 0) {
+                    t.num = (int)nt.getNumber();
+                }
+                if (t.title == null) {
+                    t.title = nt.getTitle();
+                }
+            }
+        });
+
         return result;
     }
 }

@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Path;
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 public class UnitCueParserTest {
 
     @Test
@@ -45,5 +47,23 @@ public class UnitCueParserTest {
         Assertions.assertEquals(new CueParser.CueTrack("07 An Echo In Our Legends.flac", 7, "An Echo In Our Legends", 0), tracks.get(6));
         Assertions.assertEquals(new CueParser.CueTrack("08 Malediction.flac", 8, "Malediction", 0), tracks.get(7));
 
+    }
+
+    @Test
+    void testCUEWithoutNames() {
+        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of("../odeon-test-data/files/Celestial Completion.cue"));
+
+        assertThat(tracks.size()).isEqualTo(11);
+        assertThat(tracks.get(0)).isEqualTo(new CueParser.CueTrack("01 - The Resonant Frequency of Flesh.flac", 1, "The Resonant Frequency of Flesh", 0));
+        assertThat(tracks.get(1)).isEqualTo(new CueParser.CueTrack("02 - The Magnetic Sky.ape", 2, "The Magnetic Sky", 0));
+        assertThat(tracks.get(2)).isEqualTo(new CueParser.CueTrack("03 - Internal Illumination.m4a", 3, "Internal Illumination", 0));
+        assertThat(tracks.get(3)).isEqualTo(new CueParser.CueTrack("04 - Path of the Beam.flac", 4, "Path of the Beam", 0));
+        assertThat(tracks.get(4)).isEqualTo(new CueParser.CueTrack("05 - Music of the Spheres- Requiem Aeternam I.flac", 5, "Music of the Spheres- Requiem Aeternam I", 0));
+        assertThat(tracks.get(5)).isEqualTo(new CueParser.CueTrack("06 - Elemental Wrath- Requiem Aeternam II.flac", 6, "Elemental Wrath- Requiem Aeternam II", 0));
+        assertThat(tracks.get(6)).isEqualTo(new CueParser.CueTrack("07 - Xenosynthesis- Requiem Aeternam III.flac", 7, "Xenosynthesis- Requiem Aeternam III", 0));
+        assertThat(tracks.get(7)).isEqualTo(new CueParser.CueTrack("08 - Invisible Creature.flac", 8, "Invisible Creature", 0));
+        assertThat(tracks.get(8)).isEqualTo(new CueParser.CueTrack("09 - Cardiac Rebellion.flac", 9, "Cardiac Rebellion", 0));
+        assertThat(tracks.get(9)).isEqualTo(new CueParser.CueTrack("10 - Reflect,Refract.flac", 10, "Reflect,Refract", 0));
+        assertThat(tracks.get(10)).isEqualTo(new CueParser.CueTrack("11 - Breathing Light.flac", 11, "Breathing Light", 0));
     }
 }
