@@ -5,81 +5,34 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
-public class FFMPEGMediaFileParser implements MediaFileParserInterface {
+public class FFMPEGMediaFileParser extends AbstractCLIMediaFileParser {
     private final static String FFPROBE_FILE_NAME = "ffprobe.exe";
 
-    private final String executableFileName;
-
-    public String getExecutableFileName() {
-        return executableFileName;
-    }
-
     public FFMPEGMediaFileParser(String ffprobePath) {
-        this.executableFileName = ffprobePath + FFPROBE_FILE_NAME;
+        super(ffprobePath, FFPROBE_FILE_NAME);
     }
 
     @Override
-    public MediaFileInfo parseMediaFile(Path file) throws MediaFileInfoException {
-        try {
-            Process process = new ProcessBuilder()
-                    .command(
-                            this.executableFileName,
-                            "-print_format",
-                            "json",
-                            "-show_format",
-                            "-show_streams",
-                            "-v",
-                            "quiet",
-                            file.toAbsolutePath().toString()
-                    )
-                    .start();
-
-            String inputStreamText = new BufferedReader(
-                    new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))
-                    .lines()
-                    .collect(Collectors.joining());
-
-            String errorStreamText = new BufferedReader(
-                    new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8))
-                    .lines()
-                    .collect(Collectors.joining());
-
-            if (errorStreamText.isEmpty()) {
-                MediaContentInfo mediaContentInfo = parseOutput(inputStreamText);
-                return new MediaFileInfo(
-                        file.getFileName().toString(),
-                        getPrimaryMediaTypeFromStreams(mediaContentInfo.getMediaStreams()),
-                        mediaContentInfo
-                );
-            } else {
-                throw new MediaFileInfoException(file.getFileName().toString(), "Error during file processing:" + errorStreamText);
-            }
-        } catch (IOException e) {
-            throw new MediaFileInfoException(file.getFileName().toString(), "IO Error:" + e.getMessage());
-        } catch (MediaInfoParsingException e) {
-            throw new MediaFileInfoException(file.getFileName().toString(), e.getMessage());
-        }
+    protected List<String> getProcessCommands(Path file) {
+        return List.of(
+                this.executableFileName,
+                "-print_format",
+                "json",
+                "-show_format",
+                "-show_streams",
+                "-v",
+                "quiet",
+                file.toAbsolutePath().toString()
+        );
     }
 
-    private static MediaType getPrimaryMediaTypeFromStreams(List<MediaStreamInfo> mediaStreams) throws MediaInfoParsingException {
-        if (mediaStreams.size() > 0) {
-            return mediaStreams.get(0).getMediaType();
-        } else {
-            throw new MediaInfoParsingException("Error obtaining media primary type from streams");
-        }
-    }
-
-    private MediaContentInfo parseOutput(String text) throws MediaInfoParsingException {
+    @Override
+    protected MediaContentInfo parseOutput(String text) throws MediaInfoParsingException {
         try {
             JSONObject jsonObject = new JSONObject(text);
 
@@ -103,7 +56,7 @@ public class FFMPEGMediaFileParser implements MediaFileParserInterface {
         }
     }
 
-    private List<MediaStreamInfo> parseMediaStreams(JSONArray jsonStreamsArray) throws JSONException, MediaInfoParsingException {
+    private List<MediaStreamInfo> parseMediaStreams(JSONArray jsonStreamsArray) throws JSONException {
         List<MediaStreamInfo> result = new ArrayList<>();
 
         for (int i = 0; i < jsonStreamsArray.length(); i++) {
