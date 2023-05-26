@@ -111,16 +111,14 @@ public class FFMPEGMediaFileParser implements MediaFileParserInterface {
 
             String mediaTypeString = streamObject.getString("codec_type");
             MediaType mediaType = EnumUtils.getEnumFromString(MediaType.class, mediaTypeString);
-            if (mediaType == null) {
-                throw new MediaInfoParsingException("Unknown media type:" + mediaTypeString);
+            if (mediaType != null) {
+                // for flac there may be no bitrate
+                // https://trac.ffmpeg.org/ticket/4195
+                long duration = Math.round(streamObject.optDouble("duration", 0));
+                long bitRate = Math.round(streamObject.optInt("bit_rate", 0) / 1000.0);
+
+                result.add(new MediaStreamInfo(mediaType, duration, bitRate));
             }
-
-            // for flac there may be no bitrate
-            // https://trac.ffmpeg.org/ticket/4195
-            long duration = Math.round(streamObject.optDouble("duration", 0));
-            long bitRate = Math.round(streamObject.optInt("bit_rate", 0) / 1000.0);
-
-            result.add(new MediaStreamInfo(mediaType, duration, bitRate));
         }
 
         return result;

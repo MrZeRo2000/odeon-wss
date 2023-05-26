@@ -4,6 +4,8 @@ import com.romanpulov.odeonwss.service.processor.ProcessorException;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
 import com.romanpulov.odeonwss.utils.media.MediaFileParserInterface;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,8 @@ import static com.romanpulov.odeonwss.service.processor.parser.ParserMessages.*;
 @Component
 public class MediaParser {
 
+    private static final Logger logger = LoggerFactory.getLogger(MediaParser.class);
+
     private final MediaFileParserInterface mediaFileParser;
 
     public MediaParser(MediaFileParserInterface mediaFileParser) {
@@ -26,6 +30,7 @@ public class MediaParser {
     }
 
     public MediaFileInfo parseTrack(Path trackPath) throws MediaFileInfoException {
+        logger.debug("Parsing track: " + trackPath);
         return mediaFileParser.parseMediaFile(trackPath);
     }
 
@@ -36,6 +41,7 @@ public class MediaParser {
         for (Path path: trackPaths) {
             Callable<Pair<Path, MediaFileInfo>> callable = () -> {
                 MediaFileInfo mediafileInfo = mediaFileParser.parseMediaFile(path);
+                logger.debug("Parsed track: " + path);
                 return Pair.of(path, mediafileInfo);
             };
             callables.add(callable);

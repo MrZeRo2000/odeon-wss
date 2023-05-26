@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 public class UnitFFMPEGMediaFileParserTest {
     FFMPEGMediaFileParser fp = new FFMPEGMediaFileParser("../ffmpeg/");
 
@@ -76,5 +78,19 @@ public class UnitFFMPEGMediaFileParserTest {
         Assertions.assertEquals(TEST_LA_FILE_BITRATE, formatInfo.getBitRate());
         Assertions.assertEquals(TEST_LA_FILE_DURATION, formatInfo.getDuration());
         Assertions.assertEquals(TEST_LA_FILE_SIZE, formatInfo.getSize());
+    }
+
+    @Test
+    void testMP3MultipleStreams() {
+        AtomicReference<MediaFileInfo> atomicInfo = new AtomicReference<>();
+
+        Assertions.assertDoesNotThrow(
+                () -> atomicInfo.set(
+                        fp.parseMediaFile(Path.of("../odeon-test-data/files/07 - Пылает За Окном Звезда.mp3"))
+                )
+        );
+
+        MediaFileInfo info = atomicInfo.get();
+        assertThat(info.getPrimaryMediaType()).isEqualTo(MediaType.AUDIO);
     }
 }
