@@ -142,7 +142,10 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                     .collect(Collectors.toList());
 
             //validation for Cue
-            List<Path> cuePaths = directoryPaths.stream().filter(p -> p.toString().endsWith("cue")).collect(Collectors.toList());
+            List<Path> cuePaths = directoryPaths
+                    .stream()
+                    .filter(p -> p.toString().toLowerCase().endsWith("cue"))
+                    .collect(Collectors.toList());
             if (cuePaths.size() > 0) {
                 logger.debug("Cue files found, processing");
                 boolean cueProcessed = false;
