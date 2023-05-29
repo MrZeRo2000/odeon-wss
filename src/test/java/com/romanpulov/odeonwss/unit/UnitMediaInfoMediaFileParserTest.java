@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.romanpulov.odeonwss.unit.MediaTestData.*;
+import static com.romanpulov.odeonwss.unit.MediaTestData.TEST_MP3_ME_FILE_SIZE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class UnitMediaInfoMediaFileParserTest {
@@ -117,6 +118,30 @@ public class UnitMediaInfoMediaFileParserTest {
         Assertions.assertEquals(TEST_MP3_EXTRA_FILE_BITRATE, formatInfo.getBitRate());
         Assertions.assertEquals(TEST_MP3_EXTRA_FILE_DURATION, formatInfo.getDuration());
         Assertions.assertEquals(TEST_MP3_EXTRA_FILE_SIZE, formatInfo.getSize());
+    }
+
+    @Test
+    void testMP3MultipleExtra() {
+        AtomicReference<MediaFileInfo> atomicInfo = new AtomicReference<>();
+
+        Assertions.assertDoesNotThrow(
+                () -> atomicInfo.set(
+                        parser.parseMediaFile(Path.of(TEST_MP3_ME_FILE_NAME))
+                )
+        );
+
+        MediaFileInfo info = atomicInfo.get();
+        assertThat(info.getPrimaryMediaType()).isEqualTo(MediaType.AUDIO);
+
+        MediaContentInfo contentInfo = info.getMediaContentInfo();
+        Assertions.assertEquals(1, contentInfo.getMediaStreams().size());
+
+        MediaFormatInfo formatInfo = contentInfo.getMediaFormatInfo();
+
+        Assertions.assertEquals("MPEG Audio", formatInfo.getFormatName());
+        Assertions.assertEquals(TEST_MP3_ME_FILE_BITRATE, formatInfo.getBitRate());
+        Assertions.assertEquals(TEST_MP3_ME_FILE_DURATION, formatInfo.getDuration());
+        Assertions.assertEquals(TEST_MP3_ME_FILE_SIZE, formatInfo.getSize());
     }
 
 }

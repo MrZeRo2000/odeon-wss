@@ -31,10 +31,20 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
     @Override
     protected MediaContentInfo parseOutput(String text) throws MediaInfoParsingException {
         try {
-            JSONObject jsonObject = new JSONObject(cleanup(text));
+            JSONObject jsonObject = null;
+            try {
+                jsonObject = new JSONObject(text);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            if (jsonObject == null) {
+                jsonObject = new JSONObject(cleanup(text));
+            }
 
             JSONObject mediaObject = jsonObject.optJSONObject("media");
             if (mediaObject == null) {
+                jsonObject = new JSONObject(cleanup(text));
                 throw new MediaInfoParsingException("Media information not found:" + jsonObject);
             }
 

@@ -48,7 +48,8 @@ public class MediaParser {
         }
 
         List<Future<Pair<Path, MediaFileInfo>>> futures;
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        ExecutorService executorService = Executors.newFixedThreadPool(
+                Runtime.getRuntime().availableProcessors() + 1);
         try {
             futures = executorService.invokeAll(callables);
         } catch (InterruptedException e) {

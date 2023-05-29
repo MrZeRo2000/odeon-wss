@@ -20,4 +20,10 @@ public class MediaTestData {
     static final long TEST_MP3_EXTRA_FILE_DURATION = 252L;
     static final long TEST_MP3_EXTRA_FILE_SIZE = 10218853;
     static final long TEST_MP3_EXTRA_FILE_BITRATE = 320;
+
+    static final String TEST_MP3_ME_FILE_NAME = "../odeon-test-data/files/01 - Lost.mp3";
+    static final long TEST_MP3_ME_FILE_DURATION = 278L;
+    static final long TEST_MP3_ME_FILE_SIZE = 11456458;
+    static final long TEST_MP3_ME_FILE_BITRATE = 320;
+
 }
