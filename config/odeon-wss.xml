@@ -4,6 +4,7 @@
 	<Parameter name="mp3-path" value="J:/ARCHIVE/MP3 Music/"/>
 	<Parameter name="la-path" value="J:/ARCHIVE/Lossless/"/>
 	<Parameter name="ffprobe-path" value="D:/prj/ffmpeg/"/>
+	<Parameter name="mediainfo-path" value="D:/prj/MediaInfo/"/>
 	<Parameter name="classics-path" value="J:/ARCHIVE/classics/"/>
 	<Parameter name="dv-music-path" value="L:/Music/"/>
 	<Parameter name="dv-movies-path" value="L:/Movies/"/>

@@ -4,6 +4,7 @@
 	<Parameter name="mp3-path" value="C:/Users/r1525/prj/odeon-test-data/ok/MP3 Music/"/>
 	<Parameter name="la-path" value="C:/Users/r1525/prj/odeon-test-data/ok/Lossless/"/>
 	<Parameter name="ffprobe-path" value="C:/Users/r1525/prj/ffmpeg/"/>
+	<Parameter name="mediainfo-path" value="C:/Users/r1525/prj/MediaInfo/"/>
 	<Parameter name="classics-path" value="C:/Users/r1525/prj/odeon-test-data/classics/"/>
 	<Parameter name="dv-music-path" value="C:/Users/r1525/prj/odeon-test-data/dv_music/"/>
 	<Parameter name="dv-movies-path" value="C:/Users/r1525/prj/odeon-test-data/dv_movies/"/>
