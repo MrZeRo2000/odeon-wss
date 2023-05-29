@@ -3,29 +3,47 @@ package com.romanpulov.odeonwss.utils.media;
 import java.util.Objects;
 
 public class MediaFormatInfo {
-    private final String formatName;
+    private String formatName;
 
     public String getFormatName() {
         return formatName;
     }
 
-    private final long duration;
+    public void setFormatName(String formatName) {
+        this.formatName = formatName;
+    }
+
+    private long duration;
 
     public long getDuration() {
         return duration;
     }
 
-    private final long size;
+    public void setDuration(long duration) {
+        this.duration = duration;
+    }
+
+    private long size;
 
     public long getSize() {
         return size;
     }
 
-    private final long bitRate;
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    private long bitRate;
 
     public long getBitRate() {
         return bitRate;
     }
+
+    public void setBitRate(long bitRate) {
+        this.bitRate = bitRate;
+    }
+
+    public MediaFormatInfo () {}
 
     public MediaFormatInfo(String formatName, long duration, long size, long bitRate) {
         this.formatName = formatName;

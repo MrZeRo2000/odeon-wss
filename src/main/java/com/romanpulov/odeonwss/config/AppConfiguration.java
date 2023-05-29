@@ -16,7 +16,8 @@ public class AppConfiguration {
         PT_DV_MUSIC,
         PT_DV_MOVIES,
         PT_MDB,
-        PT_FFPROBE
+        PT_FFPROBE,
+        PT_MEDIAINFO
     }
 
     private static final Map<PathType, String> PATH_PARAMETER_MAP = Map.of(
@@ -26,7 +27,8 @@ public class AppConfiguration {
             PathType.PT_DV_MUSIC, "dv-music-path",
             PathType.PT_DV_MOVIES, "dv-movies-path",
             PathType.PT_MDB, "mdb-path",
-            PathType.PT_FFPROBE, "ffprobe-path"
+            PathType.PT_FFPROBE, "ffprobe-path",
+            PathType.PT_MEDIAINFO, "mediainfo-path"
     );
 
     private final Map<PathType, String> pathMap = new HashMap<>();

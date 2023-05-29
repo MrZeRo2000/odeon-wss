@@ -77,7 +77,7 @@ public class FFMPEGMediaFileParser extends AbstractCLIMediaFileParser {
         return result;
     }
 
-    private MediaFormatInfo parseMediaFormat(JSONObject jsonFormatObject)  throws JSONException {
+    private MediaFormatInfo parseMediaFormat(JSONObject jsonFormatObject) throws JSONException {
         String formatName = jsonFormatObject.getString("format_name");
         long duration = Math.round(jsonFormatObject.getDouble("duration"));
         long size = jsonFormatObject.getLong("size");

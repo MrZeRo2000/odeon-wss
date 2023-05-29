@@ -7,12 +7,11 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.romanpulov.odeonwss.unit.MediaTestData.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import static com.romanpulov.odeonwss.unit.MediaTestData.*;
-
-public class UnitFFMPEGMediaFileParserTest {
-    FFMPEGMediaFileParser parser = new FFMPEGMediaFileParser("../ffmpeg/");
+public class UnitMediaInfoMediaFileParserTest {
+    MediaInfoMediaFileParser parser = new MediaInfoMediaFileParser("../MediaInfo");
 
     @Test
     void testNonMediaFile() {
@@ -42,7 +41,7 @@ public class UnitFFMPEGMediaFileParserTest {
         Assertions.assertEquals(TEST_MP3_FILE_DURATION, streamInfo.getDuration());
 
         MediaFormatInfo formatInfo = contentInfo.getMediaFormatInfo();
-        Assertions.assertEquals("mp3", formatInfo.getFormatName());
+        Assertions.assertEquals("MPEG Audio", formatInfo.getFormatName());
         Assertions.assertEquals(TEST_MP3_FILE_BITRATE, formatInfo.getBitRate());
         Assertions.assertEquals(TEST_MP3_FILE_DURATION, formatInfo.getDuration());
         Assertions.assertEquals(TEST_MP3_FILE_SIZE, formatInfo.getSize());
@@ -66,7 +65,7 @@ public class UnitFFMPEGMediaFileParserTest {
         Assertions.assertEquals(1, contentInfo.getMediaStreams().size());
 
         MediaFormatInfo formatInfo = contentInfo.getMediaFormatInfo();
-        Assertions.assertEquals("flac", formatInfo.getFormatName());
+        Assertions.assertEquals("FLAC", formatInfo.getFormatName());
         Assertions.assertEquals(TEST_LA_FILE_BITRATE, formatInfo.getBitRate());
         Assertions.assertEquals(TEST_LA_FILE_DURATION, formatInfo.getDuration());
         Assertions.assertEquals(TEST_LA_FILE_SIZE, formatInfo.getSize());
@@ -84,5 +83,15 @@ public class UnitFFMPEGMediaFileParserTest {
 
         MediaFileInfo info = atomicInfo.get();
         assertThat(info.getPrimaryMediaType()).isEqualTo(MediaType.AUDIO);
+
+        MediaContentInfo contentInfo = info.getMediaContentInfo();
+        Assertions.assertEquals(1, contentInfo.getMediaStreams().size());
+
+        MediaFormatInfo formatInfo = contentInfo.getMediaFormatInfo();
+
+        Assertions.assertEquals("MPEG Audio", formatInfo.getFormatName());
+        Assertions.assertEquals(TEST_MP3_MS_FILE_BITRATE, formatInfo.getBitRate());
+        Assertions.assertEquals(TEST_MP3_MS_FILE_DURATION, formatInfo.getDuration());
+        Assertions.assertEquals(TEST_MP3_MS_FILE_SIZE, formatInfo.getSize());
     }
 }
