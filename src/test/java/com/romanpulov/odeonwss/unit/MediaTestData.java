@@ -15,4 +15,9 @@ public class MediaTestData {
     static final long TEST_MP3_MS_FILE_DURATION = 178L;
     static final long TEST_MP3_MS_FILE_SIZE = 7236266;
     static final long TEST_MP3_MS_FILE_BITRATE = 320;
+
+    static final String TEST_MP3_EXTRA_FILE_NAME = "../odeon-test-data/files/01 - Monarchy Of Roses.mp3";
+    static final long TEST_MP3_EXTRA_FILE_DURATION = 252L;
+    static final long TEST_MP3_EXTRA_FILE_SIZE = 10218853;
+    static final long TEST_MP3_EXTRA_FILE_BITRATE = 320;
 }

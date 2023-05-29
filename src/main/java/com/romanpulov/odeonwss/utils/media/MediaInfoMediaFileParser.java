@@ -24,10 +24,14 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
         );
     }
 
+    private String cleanup(String text) {
+        return text.replaceAll(",\\n?\"extra\":\\s*\\{[^\\}]+\\}", "");
+    }
+
     @Override
     protected MediaContentInfo parseOutput(String text) throws MediaInfoParsingException {
         try {
-            JSONObject jsonObject = new JSONObject(text);
+            JSONObject jsonObject = new JSONObject(cleanup(text));
 
             JSONObject mediaObject = jsonObject.optJSONObject("media");
             if (mediaObject == null) {
