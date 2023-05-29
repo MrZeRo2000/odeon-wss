@@ -4,8 +4,11 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class DVProductDVCategoryId implements Serializable {
-    private final Long dvProductId;
-    private final Long dvCategoryId;
+    private Long dvProductId;
+    private Long dvCategoryId;
+
+    public DVProductDVCategoryId() {
+    }
 
     public DVProductDVCategoryId(Long dvProductId, Long dvCategoryId) {
         this.dvProductId = dvProductId;
