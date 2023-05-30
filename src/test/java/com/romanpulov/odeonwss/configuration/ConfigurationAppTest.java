@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.configuration;
 
 import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.config.ProjectConfigurationProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,9 @@ public class ConfigurationAppTest {
     @Autowired
     AppConfiguration appConfiguration;
 
+    @Autowired
+    ProjectConfigurationProperties projectConfigurationProperties;
+
     @Test
     void test() {
         Assertions.assertEquals(
@@ -22,6 +26,6 @@ public class ConfigurationAppTest {
 
     @Test
     void testVersion() {
-        Assertions.assertEquals("0.0.2", appConfiguration.getVersion());
+        Assertions.assertEquals(projectConfigurationProperties.getVersion(), appConfiguration.getVersion());
     }
 }

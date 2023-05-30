@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.controller;
 
+import com.romanpulov.odeonwss.config.ProjectConfigurationProperties;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,14 @@ public class ControllerAppTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    ProjectConfigurationProperties projectConfigurationProperties;
+
     @Test
     void testVersion() throws Exception {
         mockMvc.perform(get("/api/app/info").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.version", Matchers.is("0.0.2")));
+                .andExpect(jsonPath("$.version", Matchers.is(projectConfigurationProperties.getVersion())));
 
     }
 }
