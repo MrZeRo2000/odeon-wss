@@ -19,9 +19,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -79,6 +77,7 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
                 return counter.get();
             }
 
+            Set<Long> trackNumberSet = new HashSet<>(trackFiles.size());
             for (Path p: trackFiles) {
                 String trackFileName = p.getFileName().toString();
                 logger.debug(String.format("processTracks trackFileName=%s", trackFileName));
@@ -92,6 +91,14 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
                 if (nt == null) {
                     errorHandler(
                             ProcessorMessages.ERROR_PARSING_MUSIC_TRACK_NAME,
+                            p.toAbsolutePath().toString()
+                    );
+                    return counter.get();
+                }
+
+                if (!trackNumberSet.add(nt.getNumber())) {
+                    errorHandler(
+                            ProcessorMessages.ERROR_DUPLICATE_MUSIC_TRACK_NUMBER,
                             p.toAbsolutePath().toString()
                     );
                     return counter.get();

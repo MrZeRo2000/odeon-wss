@@ -158,7 +158,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
 
                     if (new HashSet<>(directoryFileNames).containsAll(cueFiles)) {
                         logger.debug("Contains all for " + cuePath.toString());
-                        summary.add(processCueFile(path, artifact, directoryPaths, cuePath, cueTracks, cueFiles, diskNum));
+                        summary.add(processCueFile(path, artifact, directoryPaths, cuePath, cueTracks, diskNum));
                         cueProcessed = true;
                     }
                 }
@@ -185,7 +185,6 @@ public class LALoadProcessor extends AbstractArtistProcessor {
             List<Path> directoryPaths,
             Path cuePath,
             List<CueParser.CueTrack> cueTracks,
-            List<String> cueFiles,
             int diskNum
     ) throws ProcessorException {
         TracksSummary summary = new TracksSummary();
@@ -210,9 +209,18 @@ public class LALoadProcessor extends AbstractArtistProcessor {
 
         logger.debug("Track paths: " + trackPaths);
 
+        Set<Integer> trackNumberSet = new HashSet<>(cueTracks.size());
         int firstSection = 0;
         for (int i = 0; i < cueTracks.size(); i++) {
             CueParser.CueTrack cueTrack = cueTracks.get(i);
+
+            // check track number uniqueness
+            if (!trackNumberSet.add(cueTrack.getNum())) {
+                throw new ProcessorException(ProcessorMessages.ERROR_DUPLICATE_MUSIC_TRACK_NUMBER,
+                        cuePath.toAbsolutePath().toString()
+                );
+            }
+
             boolean lastTrack = i == cueTracks.size() - 1;
             CueParser.CueTrack nextCueTrack = lastTrack ? null : cueTracks.get(i + 1);
 
@@ -329,13 +337,18 @@ public class LALoadProcessor extends AbstractArtistProcessor {
         return summary;
     }
 
-    private Map<String, NamesParser.NumberTitle> parseTrackFileNames(List<Path> trackPaths) {
+    private Map<String, NamesParser.NumberTitle> parseTrackFileNames(List<Path> trackPaths) throws ProcessorException {
         Map<String, NamesParser.NumberTitle> result = new HashMap<>();
 
+        Set<Long> trackNumberSet = new HashSet<>(trackPaths.size());
         for (Path path: trackPaths) {
             String trackFileName = path.getFileName().toString();
             NamesParser.NumberTitle nt = NamesParser.parseMusicTrack(trackFileName);
             if (nt != null) {
+                if (!trackNumberSet.add(nt.getNumber())) {
+                    throw new ProcessorException(ProcessorMessages.ERROR_DUPLICATE_MUSIC_TRACK_NUMBER,
+                            path.toAbsolutePath().toString());
+                }
                 result.put(trackFileName, nt);
             }
         }

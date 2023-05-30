@@ -345,6 +345,55 @@ public class ServiceProcessLoadMP3Test {
 
     @Test
     @Order(8)
+    void testWrongDuplicateTrack() {
+        service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/wrong_duplicate_track/");
+        ProcessInfo pi = service.getProcessInfo();
+        List<ProcessDetail> processDetail = pi.getProcessDetails();
+
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(processDetail.get(1)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artists loaded"),
+                        ProcessingStatus.INFO,
+                        1,
+                        null)
+        );
+
+
+        assertThat(processDetail.get(2)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artifacts loaded"),
+                        ProcessingStatus.INFO,
+                        1,
+                        null)
+        );
+
+        String trackNameMessage = processDetail.get(3).getInfo().getMessage();
+        assertThat(trackNameMessage).startsWith("Duplicate track number for");
+        assertThat(trackNameMessage).containsAnyOf("02 - Eyesight To The Blind.mp3", "02 - Shame, Shame, Shame.mp3");
+        assertThat(trackNameMessage).contains("Aerosmith");
+        assertThat(trackNameMessage).contains("2004 Honkin'On Bobo");
+
+        assertThat(processDetail.get(4)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Tracks loaded"),
+                        ProcessingStatus.INFO,
+                        0,
+                        null)
+        );
+
+        assertThat(pi.getProcessDetails().get(5)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Task status"),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(9)
     @Sql({"/schema.sql", "/data.sql"})
     void testOneArtistNotExists() {
         artistRepository.save(
@@ -359,7 +408,7 @@ public class ServiceProcessLoadMP3Test {
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     @Sql({"/schema.sql", "/data.sql"})
     void testNoArtistResolving() {
         List<ProcessDetail> processDetail;

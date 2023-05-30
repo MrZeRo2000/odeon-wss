@@ -11,6 +11,7 @@ public class ProcessorMessages {
     static final String ERROR_ARTIST_NOT_FOUND = "Artist %s not found";
     static final String ERROR_PARSING_ARTIFACT_NAME = "Error parsing artifact name";
     static final String ERROR_PARSING_MUSIC_TRACK_NAME = "Error parsing music track name: %s";
+    static final String ERROR_DUPLICATE_MUSIC_TRACK_NUMBER = "Duplicate track number for: %s";
     static final String ERROR_PARSING_FILE = "Error parsing file: %s";
     static final String ERROR_PROCESSING_FILES = "Error processing files: %s";
     static final String ERROR_WRONG_FILE_TYPE = "Wrong file type: %s";
