@@ -142,7 +142,7 @@ public class CueParser {
         } catch (UncheckedIOException e) {
             e.printStackTrace();
             throw new UncheckedIOException(
-                    "Error reading file:" + file.toAbsolutePath() + ": " + e.getMessage(),
+                    "Error reading file:" + file.toAbsolutePath() + ": possibly UTF-8 decoding failure: " + e.getMessage(),
                     e.getCause());
         }
 
