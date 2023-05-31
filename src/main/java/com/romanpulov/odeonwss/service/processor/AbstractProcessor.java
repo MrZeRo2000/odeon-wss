@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.service.processor.model.ProcessingActionType;
 import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
+import com.romanpulov.odeonwss.service.processor.model.ProcessingEvent;
 
 import java.util.List;
 
@@ -58,5 +59,13 @@ public abstract class AbstractProcessor {
 
     protected void warningHandlerWithAddArtistAction(String warningMessage, String artistName) {
         progressHandler.handleProgress(ProcessDetail.fromWarningMessageWithAction(warningMessage, ProcessingActionType.ADD_ARTIST, artistName));
+    }
+
+    protected void processingEventHandler(String eventText) {
+        progressHandler.handleProcessingEvent(ProcessingEvent.fromEventText(eventText));
+    }
+
+    protected void processingEventHandler(String eventText, Object ...args) {
+        progressHandler.handleProcessingEvent(ProcessingEvent.fromEventText(String.format(eventText, args)));
     }
 }

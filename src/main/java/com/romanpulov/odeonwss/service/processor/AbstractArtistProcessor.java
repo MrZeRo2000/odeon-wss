@@ -71,6 +71,7 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
 
         for (Path p: artistFiles) {
             String artistName = p.getFileName().toString();
+            processingEventHandler(ProcessorMessages.PROCESSING_ARTIST, artistName);
             logger.debug(String.format("processArtists artistName=%s", artistName));
 
             Optional<Artist> artist = artistRepository.findFirstByTypeAndName(ArtistType.ARTIST, artistName);
@@ -100,6 +101,7 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
 
             for (Path p: artifactFiles) {
                 String artifactName = p.getFileName().toString();
+                processingEventHandler(ProcessorMessages.PROCESSING_ARTIFACT, p.getFileName().toString());
                 logger.debug(String.format("processArtifacts artifactName=%s", artifactName));
 
                 NamesParser.YearTitle yt = NamesParser.parseMusicArtifactTitle(artifactName);
@@ -132,6 +134,7 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
             );
 
             if (existingArtifact.isEmpty()) {
+                processingEventHandler(ProcessorMessages.PROCESSING_SAVING_ARTIFACT, pathArtistPair.getFirst().toString());
                 artifactRepository.save(artifact);
                 result.add(Pair.of(pathArtistPair.getFirst(), artifact));
             }
@@ -148,6 +151,7 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
             logger.debug("Got artifact without tracks:" + artifact);
 
             //remove media files
+            processingEventHandler(ProcessorMessages.PROCESSING_PREPARING_ARTIFACT, artifact.getTitle());
             mediaFileRepository.deleteAllByArtifact(artifact);
             logger.debug("Deleted media files by artifact");
 

@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.service.processor;
 
 public class ProcessorMessages {
     public static final String INFO_STARTED = "Started %s";
+    public static final String PROCESSING_COMPLETED = "Completed";
 
     static final String ERROR_ROOT_FOLDER_NOT_FOUND = "Root folder not found";
     static final String ERROR_PATH_NOT_FOUND = "Path not found: %s";
@@ -67,4 +68,12 @@ public class ProcessorMessages {
 
     static final String INFO_CATEGORIES_IMPORTED = "Categories imported";
     static final String INFO_PRODUCTS_IMPORTED = "Products imported";
+
+    static final String PROCESSING_ARTIST = "Processing artist: %s";
+    static final String PROCESSING_ARTIFACT = "Processing artifact: %s";
+    static final String PROCESSING_SAVING_ARTIFACT = "Saving artifact: %s";
+    static final String PROCESSING_PREPARING_ARTIFACT = "Preparing artifact: %s";
+    static final String PROCESSING_TRACK = "Processing track: %s";
+    static final String PROCESSING_MEDIA_FILE = "Processing media file: %s";
+    static final String PROCESSING_PARSING_MEDIA_FILE = "Parsing media file: %s";
 }

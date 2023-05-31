@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.service.processor.model;
 
+import com.romanpulov.odeonwss.service.processor.ProcessorMessages;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +45,20 @@ public class ProcessInfo {
         return processDetails;
     }
 
+    private ProcessingEvent processingEvent;
+
+    public ProcessingEvent getProcessingEvent() {
+        return processingEvent;
+    }
+
+    public void setProcessingEvent(ProcessingEvent processingEvent) {
+        this.processingEvent = processingEvent;
+    }
+
+    public void clearProcessingEvent() {
+        this.processingEvent = null;
+    }
+
     public void resolveAction(ProcessingAction processingAction) {
         processDetails.stream()
                 .filter(d -> processingAction.equals(d.getProcessingAction()))
@@ -51,6 +67,8 @@ public class ProcessInfo {
     }
 
     public void finalizeProcess() {
+        processingEvent = ProcessingEvent.fromEventText(ProcessorMessages.PROCESSING_COMPLETED);
+
         // set final status
         ProcessDetail finalProcessDetail = ProcessDetail.createFinalProgressDetail(getProcessDetails());
         addProcessDetails(finalProcessDetail);
@@ -111,6 +129,7 @@ public class ProcessInfo {
                 ", processingStatus=" + processingStatus +
                 ", lastUpdated=" + lastUpdated +
                 ", progressDetails=" + processDetails.stream().map(Object::toString).collect(Collectors.joining("-", "{", "}")) +
+                ", processingEvent=" + processingEvent +
                 '}';
     }
 }
