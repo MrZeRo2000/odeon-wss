@@ -2,14 +2,19 @@ package com.romanpulov.odeonwss.unit;
 
 import com.romanpulov.odeonwss.service.processor.parser.CueParser;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class UnitCueParserTest {
+    Logger logger = Logger.getLogger(getClass().getSimpleName());
 
     @Test
     void testOneFileManyTracks() {
@@ -65,5 +70,11 @@ public class UnitCueParserTest {
         assertThat(tracks.get(8)).isEqualTo(new CueParser.CueTrack("09 - Cardiac Rebellion.flac", 9, "Cardiac Rebellion", 0));
         assertThat(tracks.get(9)).isEqualTo(new CueParser.CueTrack("10 - Reflect,Refract.flac", 10, "Reflect,Refract", 0));
         assertThat(tracks.get(10)).isEqualTo(new CueParser.CueTrack("11 - Breathing Light.flac", 11, "Breathing Light", 0));
+    }
+
+    @Test
+    @Disabled
+    void testCUEWithUnicode() {
+        assertThatThrownBy(() -> CueParser.parseFile(Path.of("../odeon-test-data/files/Happier Than Ever.cue"))).isInstanceOf(UncheckedIOException.class);
     }
 }

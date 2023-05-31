@@ -1,6 +1,8 @@
 package com.romanpulov.odeonwss.service.processor.parser;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -8,7 +10,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class CueParser {
     private static final Pattern REGEXP_PATTERN_FILE = Pattern.compile("FILE\\s+\"(.*)\"");
@@ -131,66 +132,73 @@ public class CueParser {
     public static List<CueTrack> parseFile(Path file) {
         List<CueTrack> result = new ArrayList<>();
 
+        //read lines
+        List<String> lines;
+        try (BufferedReader reader = Files.newBufferedReader(file)) {
+            lines = reader.lines().collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new UncheckedIOException("Error reading file:" + file.toAbsolutePath() + ": " + e.getMessage(), e);
+        } catch (UncheckedIOException e) {
+            e.printStackTrace();
+            throw new UncheckedIOException(
+                    "Error reading file:" + file.toAbsolutePath() + ": " + e.getMessage(),
+                    e.getCause());
+        }
+
+        //process lines
         StateData state;
 
         CueTrack prevTrack;
         CueTrack track = null;
 
-        try (Stream<String> streamLines = Files.lines(file))  {
-            List<String> lines = streamLines.collect(Collectors.toList());
+        for (String s: lines) {
+            state = parseLine(s);
+            if (state == null) {
+                continue;
+            } else if (state.state == CUE_STATE.ST_FILE) {
+                //save current track if exists
+                if (track != null) {
+                    result.add(track);
+                }
 
-            for (String s: lines) {
-                state = parseLine(s);
-                if (state == null) {
-                    continue;
-                } else if (state.state == CUE_STATE.ST_FILE) {
-                    //save current track if exists
-                    if (track != null) {
+                //we expect that there will be a track
+                track = new CueTrack();
+                track.fileName = state.matcher.group(1);
+            } else if (state.state == CUE_STATE.ST_TRACK) {
+                int trackNum = Integer.parseInt(state.matcher.group(1));
+
+                if (track != null) {
+                    //save previous track if available
+                    if (track.title != null) {
                         result.add(track);
-                    }
+                        prevTrack = track;
 
-                    //we expect that there will be a track
-                    track = new CueTrack();
-                    track.fileName = state.matcher.group(1);
-                } else if (state.state == CUE_STATE.ST_TRACK) {
-                    int trackNum = Integer.parseInt(state.matcher.group(1));
+                        //create new track
+                        track = new CueTrack();
 
-                    if (track != null) {
-                        //save previous track if available
-                        if (track.title != null) {
-                            result.add(track);
-                            prevTrack = track;
-
-                            //create new track
-                            track = new CueTrack();
-
-                            if (track.fileName == null) {
-                                //transfer previous file name if available
-                                track.fileName = prevTrack.fileName;
-                            }
+                        if (track.fileName == null) {
+                            //transfer previous file name if available
+                            track.fileName = prevTrack.fileName;
                         }
-                        track.num = trackNum;
                     }
+                    track.num = trackNum;
+                }
 
-                } else if (state.state == CUE_STATE.ST_TRACK_INDEX) {
-                    if ((track != null) && (track.num > 0)) {
-                        track.section = Integer.parseInt(state.matcher.group(1)) * 60 + Integer.parseInt(state.matcher.group(2));
-                    }
-                } else if (state.state == CUE_STATE.ST_TRACK_TITLE) {
-                    if ((track != null) && (track.num > 0)) {
-                        track.title = state.matcher.group(1);
-                    }
+            } else if (state.state == CUE_STATE.ST_TRACK_INDEX) {
+                if ((track != null) && (track.num > 0)) {
+                    track.section = Integer.parseInt(state.matcher.group(1)) * 60 + Integer.parseInt(state.matcher.group(2));
+                }
+            } else if (state.state == CUE_STATE.ST_TRACK_TITLE) {
+                if ((track != null) && (track.num > 0)) {
+                    track.title = state.matcher.group(1);
                 }
             }
+        }
 
-            // save last track
-            if (track != null) {
-                result.add(track);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ArrayList<>();
+        // save last track
+        if (track != null) {
+            result.add(track);
         }
 
         //try to get from file name
