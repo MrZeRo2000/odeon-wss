@@ -67,12 +67,14 @@ public class ProcessInfo {
     }
 
     public void finalizeProcess() {
-        processingEvent = ProcessingEvent.fromEventText(ProcessorMessages.PROCESSING_COMPLETED);
-
         // set final status
         ProcessDetail finalProcessDetail = ProcessDetail.createFinalProgressDetail(getProcessDetails());
         addProcessDetails(finalProcessDetail);
         setProcessingStatus(finalProcessDetail.getStatus());
+
+        if (processingStatus.equals(ProcessingStatus.SUCCESS)) {
+            processingEvent = ProcessingEvent.fromEventText(ProcessorMessages.PROCESSING_COMPLETED);
+        }
 
         // truncate long items
         getProcessDetails().forEach(processDetail -> {
