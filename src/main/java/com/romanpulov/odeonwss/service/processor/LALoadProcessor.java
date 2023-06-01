@@ -282,6 +282,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
             }
         }
 
+        processingEventHandler(ProcessorMessages.PROCESSING_SAVING_TRACKS_WITH_MEDIA, path.toAbsolutePath());
         trackService.insertTracksWithMedia(tracks, mediaFiles.values());
         return summary;
     }

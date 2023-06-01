@@ -71,6 +71,7 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
         List<Path> flatPathTracks = new ArrayList<>();
         for (Pair<Path, Artifact> pathArtifactPair: pathArtifacts) {
             logger.debug(String.format("processTracks path=%s", pathArtifactPair.getFirst()));
+            processingEventHandler(ProcessorMessages.PROCESSING_TRACKS, pathArtifactPair.getFirst());
 
             List<Path> trackFiles = new ArrayList<>();
             if (!PathReader.readPathFilesOnly(this, pathArtifactPair.getFirst(), trackFiles)) {
@@ -80,6 +81,7 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
             Set<Long> trackNumberSet = new HashSet<>(trackFiles.size());
             for (Path p: trackFiles) {
                 String trackFileName = p.getFileName().toString();
+                processingEventHandler(ProcessorMessages.PROCESSING_TRACK, p.toAbsolutePath());
                 logger.debug(String.format("processTracks trackFileName=%s", trackFileName));
 
                 if (!NamesParser.validateFileNameMediaFormat(trackFileName, getArtifactType().getMediaFileFormats())) {
@@ -138,6 +140,7 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
                     track.setNum(flatPathArtifact.getSecond().getSecond().getNumber());
                     track.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
 
+                    processingEventHandler(ProcessorMessages.PROCESSING_SAVING_TRACK_WITH_MEDIA, flatPathArtifact.getFirst().toAbsolutePath());
                     trackService.insertTrackWithMedia(track, mediaFile);
                     counter.getAndIncrement();
 

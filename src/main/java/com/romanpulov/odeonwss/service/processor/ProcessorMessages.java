@@ -77,7 +77,8 @@ public class ProcessorMessages {
     static final String PROCESSING_TRACK = "Processing track: %s";
     static final String PROCESSING_PARSING_CUE = "Parsing cue: %s";
     static final String PROCESSING_CUE = "Processing cue: %s";
-    static final String PROCESSING_MEDIA_FILE = "Processing media file: %s";
     static final String PROCESSING_PARSING_MEDIA_FILE = "Parsing media file: %s";
     static final String PROCESSING_PARSED_MEDIA_FILE = "Parsed media file: %s";
+    static final String PROCESSING_SAVING_TRACKS_WITH_MEDIA = "Saving tracks with media: %s";
+    static final String PROCESSING_SAVING_TRACK_WITH_MEDIA = "Saving track with media: %s";
 }
