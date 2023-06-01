@@ -109,7 +109,11 @@ public class MP3LoadProcessor extends AbstractArtistProcessor {
             }
         }
 
-        Map<Path, MediaFileInfo> parsedTrackMediaInfo = mediaParser.parseTracks(flatPathTracks);
+        Map<Path, MediaFileInfo> parsedTrackMediaInfo = mediaParser.parseTracks(
+                flatPathTracks,
+                (parsing -> synchronizedProcessingEventHandler(ProcessorMessages.PROCESSING_PARSING_MEDIA_FILE, parsing)),
+                (parsed -> synchronizedProcessingEventHandler(ProcessorMessages.PROCESSING_PARSED_MEDIA_FILE, parsed))
+        );
 
         Map<Artifact, List<Pair<Path, Pair<Artifact, NamesParser.NumberTitle>>>> pathArtifactsMap =
                 flatPathArtifacts

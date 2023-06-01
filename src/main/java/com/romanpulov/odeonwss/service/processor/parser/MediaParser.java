@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 
 import static com.romanpulov.odeonwss.service.processor.parser.ParserMessages.*;
 
@@ -34,14 +35,22 @@ public class MediaParser {
         return mediaFileParser.parseMediaFile(trackPath);
     }
 
-    public Map<Path, MediaFileInfo> parseTracks(List<Path> trackPaths)
-            throws ProcessorException {
+    public Map<Path, MediaFileInfo> parseTracks(
+            List<Path> trackPaths,
+            Consumer<String> parsingFileCallback,
+            Consumer<String> parsedFileCallback) throws ProcessorException {
         List<Callable<Pair<Path, MediaFileInfo>>> callables = new ArrayList<>();
 
         for (Path path: trackPaths) {
             Callable<Pair<Path, MediaFileInfo>> callable = () -> {
+                logger.debug("Parsing track: " + path);
+                parsingFileCallback.accept(path.toString());
+
                 MediaFileInfo mediafileInfo = mediaFileParser.parseMediaFile(path);
+
+                parsedFileCallback.accept(path.toString());
                 logger.debug("Parsed track: " + path);
+
                 return Pair.of(path, mediafileInfo);
             };
             callables.add(callable);

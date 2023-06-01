@@ -68,4 +68,9 @@ public abstract class AbstractProcessor {
     protected void processingEventHandler(String eventText, Object ...args) {
         progressHandler.handleProcessingEvent(ProcessingEvent.fromEventText(String.format(eventText, args)));
     }
+
+    protected synchronized void synchronizedProcessingEventHandler(String eventText, Object ...args) {
+        progressHandler.handleProcessingEvent(ProcessingEvent.fromEventText(String.format(eventText, args)));
+    }
+
 }

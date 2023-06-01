@@ -89,6 +89,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
         for (Pair<Path, Artifact> pathArtifactPair: pathArtifacts) {
             Path path = pathArtifactPair.getFirst();
             Artifact artifact = pathArtifactPair.getSecond();
+            processingEventHandler(ProcessorMessages.PROCESSING_TRACKS, path.toAbsolutePath().toString());
             logger.debug(String.format("processTracks path=%s", path));
 
             TracksSummary summary = processTracksPathWithDiskNum(path, artifact,0);
@@ -150,6 +151,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                 logger.debug("Cue files found, processing");
                 boolean cueProcessed = false;
                 for (Path cuePath : cuePaths) {
+                    processingEventHandler(ProcessorMessages.PROCESSING_PARSING_CUE, cuePath.toAbsolutePath());
                     List<CueParser.CueTrack> cueTracks = CueParser.parseFile(cuePath);
                     List<String> cueFiles = cueTracks
                             .stream()
@@ -157,7 +159,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                             .distinct().collect(Collectors.toList());
 
                     if (new HashSet<>(directoryFileNames).containsAll(cueFiles)) {
-                        logger.debug("Contains all for " + cuePath.toString());
+                        logger.debug("Contains all for " + cuePath);
                         summary.add(processCueFile(path, artifact, directoryPaths, cuePath, cueTracks, diskNum));
                         cueProcessed = true;
                     }
@@ -188,7 +190,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
             int diskNum
     ) throws ProcessorException {
         TracksSummary summary = new TracksSummary();
-
+        processingEventHandler(ProcessorMessages.PROCESSING_CUE, path.toAbsolutePath());
         logger.debug(String.format("Processing Cue:%s", path));
 
         Set<String> cueFileNames = cueTracks.stream().map(CueParser.CueTrack::getFileName).collect(Collectors.toSet());
@@ -199,7 +201,10 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                 .filter(p -> cueFileNames.contains(p.getFileName().toString()))
                 .collect(Collectors.toList());
 
-        Map<String, MediaFileInfo> parsedTrackMediaInfo = mediaParser.parseTracks(trackPaths)
+        Map<String, MediaFileInfo> parsedTrackMediaInfo = mediaParser.parseTracks(
+                trackPaths,
+                (parsing -> synchronizedProcessingEventHandler(ProcessorMessages.PROCESSING_PARSING_MEDIA_FILE, parsing)),
+                (parsed -> synchronizedProcessingEventHandler(ProcessorMessages.PROCESSING_PARSED_MEDIA_FILE, parsed)))
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(e -> e.getKey().getFileName().toString(), Map.Entry::getValue));
@@ -288,6 +293,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
             int diskNum
     ) throws ProcessorException {
         TracksSummary summary = new TracksSummary();
+        processingEventHandler(ProcessorMessages.PROCESSING_TRACKS, path.toAbsolutePath());
 
         Map<String, NamesParser.NumberTitle> parsedTrackFileNames = parseTrackFileNames(directoryPaths);
         if (parsedTrackFileNames.size() > 0) {
@@ -298,7 +304,10 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                     .stream()
                     .filter(p -> parsedTrackFileNames.containsKey(p.getFileName().toString()))
                     .collect(Collectors.toList());
-            Map<String, MediaFileInfo> parsedTrackMediaInfo = mediaParser.parseTracks(directoryTracksPaths)
+            Map<String, MediaFileInfo> parsedTrackMediaInfo = mediaParser.parseTracks(
+                    directoryTracksPaths,
+                    (parsing -> synchronizedProcessingEventHandler(ProcessorMessages.PROCESSING_PARSING_MEDIA_FILE, parsing)),
+                    (parsed -> synchronizedProcessingEventHandler(ProcessorMessages.PROCESSING_PARSED_MEDIA_FILE, parsed)))
                     .entrySet()
                     .stream()
                     .collect(Collectors.toMap(e -> e.getKey().getFileName().toString(), Map.Entry::getValue));
