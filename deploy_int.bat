@@ -1,1 +1,1 @@
-gradlew deployInt
+gradlew clean deployInt
