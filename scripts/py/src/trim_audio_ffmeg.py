@@ -42,6 +42,7 @@ if __name__ == "__main__":
         output_file = f"{sp[0]}.tr{sp[1]}"
 
         if os.path.exists(output_file):
+            logger.debug(f"Removing existing file: {output_file}")
             os.remove(output_file)
 
         command_line = " ".join([
@@ -51,7 +52,10 @@ if __name__ == "__main__":
             f"-t {random.randint(5, 20)} "
             f"\"{output_file}\""
         ])
-        logger.debug(command_line)
+
+        logger.debug(f"Executing: {command_line}")
+        subprocess.run(command_line, check=True)
+        logger.debug(f"Executed")
 
         if os.path.exists(output_file):
             os.remove(processed_file)

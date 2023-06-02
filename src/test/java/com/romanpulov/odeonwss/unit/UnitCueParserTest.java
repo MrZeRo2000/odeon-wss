@@ -18,23 +18,32 @@ public class UnitCueParserTest {
 
     @Test
     void testOneFileManyTracks() {
+        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of("../odeon-test-data/ok/Lossless/Tori Amos/1988 Y Kant Tori Read/Tori Amos - Y Kant Tori Read.wv.cue"));
+
+        Assertions.assertEquals(10, tracks.size());
+
+        Assertions.assertEquals(new CueParser.CueTrack("Tori Amos - Y Kant Tori Read.wv", 10, "Etienne Trilogy (The Highlands - Etienne - Skyeboat Song)", 61), tracks.get(9));
+    }
+
+    @Test
+    void testOneFileManyTracksMinutes() {
         List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of("../odeon-test-data/ok/Lossless/Agua De Annique/2007 Air/air.flac.cue"));
 
         Assertions.assertEquals(13, tracks.size());
 
         Assertions.assertEquals(new CueParser.CueTrack("air.flac", 1, "Beautiful One", 0), tracks.get(0));
-        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 2, "Witnesses", 283), tracks.get(1));
-        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 3, "Yalin", 539), tracks.get(2));
-        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 4, "Day After Yesterday", 743), tracks.get(3));
-        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 5, "My Girl", 965), tracks.get(4));
-        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 6, "Take Care of Me", 1219), tracks.get(5));
-        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 7, "Ice Water", 1382), tracks.get(6));
-        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 8, "You Are Nice", 1632), tracks.get(7));
-        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 9, "Trail of Grief", 1828), tracks.get(8));
-        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 10, "Come Wander with Me", 2102), tracks.get(9));
-        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 11, "Sunken Soldiers Ball", 2314), tracks.get(10));
-        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 12, "Lost and Found", 2621), tracks.get(11));
-        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 13, "Asleep", 2937), tracks.get(12));
+        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 2, "Witnesses", 1), tracks.get(1));
+        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 3, "Yalin", 2), tracks.get(2));
+        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 4, "Day After Yesterday", 3), tracks.get(3));
+        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 5, "My Girl", 4), tracks.get(4));
+        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 6, "Take Care of Me", 5), tracks.get(5));
+        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 7, "Ice Water", 6), tracks.get(6));
+        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 8, "You Are Nice", 7), tracks.get(7));
+        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 9, "Trail of Grief", 8), tracks.get(8));
+        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 10, "Come Wander with Me", 9), tracks.get(9));
+        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 11, "Sunken Soldiers Ball", 10), tracks.get(10));
+        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 12, "Lost and Found", 11), tracks.get(11));
+        Assertions.assertEquals(new CueParser.CueTrack("air.flac", 13, "Asleep", 15), tracks.get(12));
     }
 
     @Test

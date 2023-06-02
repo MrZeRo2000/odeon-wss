@@ -67,7 +67,7 @@ public class UnitFFMPEGMediaFileParserTest {
 
         MediaFormatInfo formatInfo = contentInfo.getMediaFormatInfo();
         Assertions.assertEquals("flac", formatInfo.getFormatName());
-        Assertions.assertEquals(TEST_LA_FILE_BITRATE, formatInfo.getBitRate());
+        Assertions.assertEquals(TEST_LA_FILE_BITRATE_FFMPEG, formatInfo.getBitRate());
         Assertions.assertEquals(TEST_LA_FILE_DURATION, formatInfo.getDuration());
         Assertions.assertEquals(TEST_LA_FILE_SIZE, formatInfo.getSize());
     }

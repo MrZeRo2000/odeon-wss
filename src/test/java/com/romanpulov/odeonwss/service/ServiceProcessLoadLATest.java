@@ -148,7 +148,9 @@ public class ServiceProcessLoadLATest {
         List<Track> tracks = trackRepository.findAllByArtifact(artifacts.get(0));
         Assertions.assertEquals(trackCount, tracks.size());
 
-        testSizeDuration(artifacts.get(0), tracks, mediaFiles, size);
+        if (size > 0) {
+            testSizeDuration(artifacts.get(0), tracks, mediaFiles, size);
+        }
     }
 
 
@@ -208,16 +210,15 @@ public class ServiceProcessLoadLATest {
                         null)
         );
 
-        testOneMediaFilePerOneTrack("Abigail Williams", "In The Absence Of Light", 8, 400492832L);
-        testOneMediaFilePerAllTracks("Agua De Annique", "Air", 13, 1, 317793966);
-        testOneMediaFilePerOneTrack("Christina Aguilera", "Back To Basics", 22, 322883508 + 214576534);
-        testOneMediaFilePerAllTracks("Evanescence", "Origin", 11, 1, 324579670);
-        testOneMediaFilePerOneTrack("Evanescence", "Evanescence", 16, 466334102);
-        testOneMediaFilePerAllTracks("Pink Floyd", "Delicate Sound Of Thunder", 15, 2, 294597930 + 338702030);
-        testOneMediaFilePerAllTracks("Therapy", "Nurse", 10, 1, 267984588);
-        testOneMediaFilePerAllTracks("Therapy", "Infernal Love", 11, 1, 330812393);
-        testOneMediaFilePerAllTracks("Tori Amos", "Y Kant Tori Read", 10, 1, 286331932);
-        testOneMediaFilePerOneTrack("The Sisters Of Mercy", "Anaconda 7 Inch Single", 1, 89624046L);
+        testOneMediaFilePerOneTrack("Abigail Williams", "In The Absence Of Light", 8, 14016145L);
+        testOneMediaFilePerAllTracks("Agua De Annique", "Air", 13, 1, 1854548);
+        testOneMediaFilePerOneTrack("Christina Aguilera", "Back To Basics", 22, 22135346 + 13557777);
+        testOneMediaFilePerAllTracks("Evanescence", "Origin", 11, 1, 1620441);
+        testOneMediaFilePerOneTrack("Evanescence", "Evanescence", 16, 20995495);
+        testOneMediaFilePerAllTracks("Pink Floyd", "Delicate Sound Of Thunder", 15, 2, 935874 + 935874);
+        testOneMediaFilePerOneTrack("The Sisters Of Mercy", "Anaconda 7 Inch Single", 1, 1745574);
+        testOneMediaFilePerAllTracks("Therapy", "Nurse", 10, 1, 2462664);
+        testOneMediaFilePerAllTracks("Therapy", "Infernal Love", 11, 1, 2462664);
+        testOneMediaFilePerAllTracks("Tori Amos", "Y Kant Tori Read", 10, 1, 13577349);
     }
-
 }
