@@ -81,4 +81,12 @@ public class ProcessorMessages {
     static final String PROCESSING_PARSED_MEDIA_FILE = "Parsed media file: %s";
     static final String PROCESSING_SAVING_TRACKS_WITH_MEDIA = "Saving tracks with media: %s";
     static final String PROCESSING_SAVING_TRACK_WITH_MEDIA = "Saving track with media: %s";
+
+    static final String VALIDATING_LOADING_FROM_PATH = "Loading validation information from path: %s";
+    static final String VALIDATING_LOADING_FROM_DB = "Loading validation information from database";
+    static final String VALIDATING_ARTISTS = "Validating artists";
+    static final String VALIDATING_ARTIFACTS = "Validating artifacts";
+    static final String VALIDATING_TRACKS = "Validating tracks";
+    static final String VALIDATING_MEDIA_FILES = "Validating media files";
+    static final String VALIDATING_ARTIFACT_MEDIA_FILES = "Validating artifact media files";
 }

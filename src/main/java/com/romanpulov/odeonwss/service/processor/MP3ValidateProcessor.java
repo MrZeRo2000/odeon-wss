@@ -38,28 +38,35 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
 
         Path path = validateAndGetPath();
 
+        processingEventHandler(ProcessorMessages.VALIDATING_LOADING_FROM_PATH, path.toAbsolutePath());
         List<MediaFileValidationDTO> pathValidation =
                 PathValidationLoader.loadFromPathArtistArtifacts(this, path, this);
+
+        processingEventHandler(ProcessorMessages.VALIDATING_LOADING_FROM_DB);
         List<MediaFileValidationDTO> dbValidation = mediaFileRepository
                 .getTrackMediaFileValidationMusic(ArtistType.ARTIST, artifactType);
 
+        processingEventHandler(ProcessorMessages.VALIDATING_ARTISTS);
         if (PathValidator.validateArtistNamesArtifactsTracks(this, pathValidation, dbValidation)) {
             infoHandler(ProcessorMessages.INFO_ARTISTS_VALIDATED);
 
+            processingEventHandler(ProcessorMessages.VALIDATING_ARTIFACTS);
             if (PathValidator.validateArtifactsMusic(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
+                processingEventHandler(ProcessorMessages.VALIDATING_TRACKS);
                 if (PathValidator.validateTracksMusic(this, pathValidation, dbValidation)) {
                     infoHandler(ProcessorMessages.INFO_TRACKS_VALIDATED);
                 }
 
+                processingEventHandler(ProcessorMessages.VALIDATING_MEDIA_FILES);
                 if (PathValidator.validateMediaFilesMusic(this, pathValidation, dbValidation)) {
                     infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
                 }
 
+                processingEventHandler(ProcessorMessages.VALIDATING_ARTIFACT_MEDIA_FILES);
                 List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
                         .getArtifactMediaFileValidationMusic(artifactType);
-
                 if (PathValidator.validateArtifactMediaFilesMusic(this, pathValidation, dbArtifactValidation)) {
                     infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
                 }
