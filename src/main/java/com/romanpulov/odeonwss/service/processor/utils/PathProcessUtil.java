@@ -1,8 +1,11 @@
-package com.romanpulov.odeonwss.service.processor;
+package com.romanpulov.odeonwss.service.processor.utils;
 
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.service.processor.AbstractProcessor;
+import com.romanpulov.odeonwss.service.processor.PathReader;
+import com.romanpulov.odeonwss.service.processor.ProcessorException;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class PathProcessUtil {
@@ -17,9 +21,11 @@ public class PathProcessUtil {
             AbstractProcessor processor,
             Path path,
             ArtifactRepository artifactRepository,
-            ArtifactType artifactType) throws ProcessorException {
+            ArtifactType artifactType,
+            Consumer<String> processingErrorExpectedDirectoryCallback) throws ProcessorException {
         if (!Files.isDirectory(path)) {
-            processor.errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, path.getFileName());
+            processingErrorExpectedDirectoryCallback.accept(path.toString());
+            //processor.errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, path.getFileName());
             return 0;
         }
 

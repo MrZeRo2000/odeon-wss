@@ -9,8 +9,9 @@ import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
-import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
-import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
+import com.romanpulov.odeonwss.service.processor.utils.MediaFilesProcessUtil;
+import com.romanpulov.odeonwss.service.processor.utils.PathProcessUtil;
+import com.romanpulov.odeonwss.service.processor.vo.SizeDuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.ERROR_PARSING_FILE;
 
@@ -59,7 +59,12 @@ public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
         this.artifactType = Optional.ofNullable(this.artifactType).orElse(artifactTypeRepository.getWithDVMusic());
 
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED,
-                PathProcessUtil.processArtifactsPath(this, path, artifactRepository, artifactType));
+                PathProcessUtil.processArtifactsPath(
+                        this,
+                        path,
+                        artifactRepository,
+                        artifactType,
+                        s -> errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, s)));
         infoHandler(ProcessorMessages.INFO_MEDIA_FILES_LOADED, processMediaFiles(path));
     }
 
@@ -80,39 +85,20 @@ public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
                 return counter.get();
             }
 
-            Set<MediaFile> mediaFiles = new HashSet<>();
-            for (Path mediaFilePath: mediaFilesPaths) {
-                String fileName = mediaFilePath.getFileName().toString();
-                MediaFile mediaFile = null;
+            Set<MediaFile> mediaFiles = MediaFilesProcessUtil.loadFromMediaFilesPaths(
+                    mediaFilesPaths,
+                    a,
+                    mediaParser,
+                    mediaFileRepository,
+                    mediaFileMapper,
+                    counter,
+                    p -> errorHandler(ERROR_PARSING_FILE, p));
 
-                if (mediaFileRepository.findFirstByArtifactAndName(a, fileName).isEmpty()) {
-                    try {
-                        MediaFileInfo mediaFileInfo = mediaParser.parseTrack(mediaFilePath);
-
-                        mediaFile = mediaFileMapper.fromMediaFileInfo(mediaFileInfo);
-                        mediaFile.setArtifact(a);
-                        mediaFile.setName(fileName);
-
-                        mediaFileRepository.save(mediaFile);
-                        counter.getAndIncrement();
-
-                    } catch (MediaFileInfoException e) {
-                        errorHandler(ERROR_PARSING_FILE, mediaFilePath.toAbsolutePath().toString());
-                    }
-                } else {
-                    mediaFile = mediaFileRepository.findFirstByArtifactAndName(a, fileName).get();
-                }
-                if (mediaFile != null) {
-                    mediaFiles.add(mediaFile);
-                }
-            }
-
-            long totalSize = mediaFiles.stream().collect(Collectors.summarizingLong(MediaFile::getSize)).getSum();
-            long totalDuration = mediaFiles.stream().collect(Collectors.summarizingLong(MediaFile::getDuration)).getSum();
+            SizeDuration sizeDuration = MediaFilesProcessUtil.getMediaFilesSizeDuration(mediaFiles);
 
             if (ValueValidator.isEmpty(a.getSize()) || ValueValidator.isEmpty(a.getDuration())) {
-                a.setSize(totalSize);
-                a.setDuration(totalDuration);
+                a.setSize(sizeDuration.getSize());
+                a.setDuration(sizeDuration.getDuration());
 
                 artifactRepository.save(a);
             }

@@ -7,6 +7,7 @@ import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
+import com.romanpulov.odeonwss.service.processor.vo.SizeDuration;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

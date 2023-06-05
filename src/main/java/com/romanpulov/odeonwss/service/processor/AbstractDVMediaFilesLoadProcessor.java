@@ -9,6 +9,7 @@ import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
+import com.romanpulov.odeonwss.service.processor.vo.SizeDuration;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
 
@@ -55,18 +56,6 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
         infoHandler(INFO_MEDIA_FILES_LOADED, processArtifactsPath(path));
     }
 
-    static class SizeDuration {
-        long size;
-        long duration;
-        public SizeDuration(long size, long duration) {
-            this.size = size;
-            this.duration = duration;
-        }
-
-        public SizeDuration() {
-        }
-
-    }
     public int processArtifactsPath(Path path) {
         AtomicInteger counter = new AtomicInteger(0);
 
@@ -88,8 +77,8 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
                     emptyMediaFile.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
 
                     SizeDuration sd = artifactSizeDurationMap.getOrDefault(emptyMediaFile.getArtifact(), new SizeDuration());
-                    sd.size = sd.size + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize();
-                    sd.duration = sd.duration + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration();
+                    sd.setSize(sd.getSize() + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
+                    sd.setDuration(sd.getDuration() + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
                     artifactSizeDurationMap.put(emptyMediaFile.getArtifact(), sd);
 
                     mediaFileRepository.save(emptyMediaFile);
@@ -114,8 +103,8 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
         for (Artifact artifact: artifactSizeDurationMap.keySet()) {
             SizeDuration sd = artifactSizeDurationMap.get(artifact);
 
-            artifact.setSize(sd.size);
-            artifact.setDuration(sd.duration);
+            artifact.setSize(sd.getSize());
+            artifact.setDuration(sd.getDuration());
 
             artifactRepository.save(artifact);
         }
