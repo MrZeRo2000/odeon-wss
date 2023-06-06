@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.ERROR_PARSING_FILE;
 
 @Component
 public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
@@ -74,6 +74,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
                         path,
                         artifactRepository,
                         artifactType,
+                        s -> processingEventHandler(ProcessorMessages.PROCESSING_ARTIFACT, s),
                         s -> errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, s)));
         infoHandler(ProcessorMessages.INFO_TRACKS_LOADED, processTracks());
         infoHandler(ProcessorMessages.INFO_MEDIA_FILES_LOADED, processMediaFiles(path));
@@ -125,7 +126,8 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
                     mediaFileRepository,
                     mediaFileMapper,
                     counter,
-                    p -> errorHandler(ERROR_PARSING_FILE, p));
+                    p -> processingEventHandler(ProcessorMessages.PROCESSING_PARSING_MEDIA_FILE, p),
+                    p -> errorHandler(ProcessorMessages.ERROR_PARSING_FILE, p));
 
             if (a.getTracks().size() == 1) {
                 Track track = trackRepository

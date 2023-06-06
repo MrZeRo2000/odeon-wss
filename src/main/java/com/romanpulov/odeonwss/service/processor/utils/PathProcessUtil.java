@@ -22,10 +22,10 @@ public class PathProcessUtil {
             Path path,
             ArtifactRepository artifactRepository,
             ArtifactType artifactType,
+            Consumer<String> processingArtifactCallback,
             Consumer<String> processingErrorExpectedDirectoryCallback) throws ProcessorException {
         if (!Files.isDirectory(path)) {
             processingErrorExpectedDirectoryCallback.accept(path.toString());
-            //processor.errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, path.getFileName());
             return 0;
         }
 
@@ -45,6 +45,8 @@ public class PathProcessUtil {
                 .map(f -> f.getFileName().toString())
                 .forEach(artifactName -> {
                     if (!artifacts.containsKey(artifactName)) {
+                        processingArtifactCallback.accept(artifactName);
+
                         Artifact artifact = new Artifact();
                         artifact.setArtifactType(artifactType);
                         artifact.setTitle(artifactName);

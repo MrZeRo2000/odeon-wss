@@ -25,6 +25,7 @@ public class MediaFilesProcessUtil {
             MediaFileRepository mediaFileRepository,
             MediaFileMapper mediaFileMapper,
             AtomicInteger counter,
+            Consumer<String> parsingFileCallback,
             Consumer<String> parsingErrorCallback
     ) {
         Set<MediaFile> mediaFiles = new HashSet<>();
@@ -34,6 +35,7 @@ public class MediaFilesProcessUtil {
 
             if (mediaFileRepository.findFirstByArtifactAndName(artifact, fileName).isEmpty()) {
                 try {
+                    parsingFileCallback.accept(mediaFilePath.toString());
                     MediaFileInfo mediaFileInfo = mediaParser.parseTrack(mediaFilePath);
 
                     mediaFile = mediaFileMapper.fromMediaFileInfo(mediaFileInfo);
