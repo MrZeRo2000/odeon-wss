@@ -13,6 +13,8 @@ public class MDBConst {
     public static final String CAT_TABLE_NAME = "Cat";
     public static final String PRODUCT_TABLE_NAME = "VProduct";
     public static final String PRODUCT_CAT_TABLE_NAME = "VProductCat";
+    public static final String MP3CDCONT_TABLE_NAME = "MP3CDCont";
+    public static final String LACONT_TABLE_NAME = "LACont";
 
     public static final String ARTISTLIST_ID_COLUMN_NAME = "ArtistListID";
     public static final String TITLE_COLUMN_NAME = "Title";
@@ -37,4 +39,5 @@ public class MDBConst {
     public static final String ORIG_TITLE_COLUMN_NAME = "OrigTitle";
     public static final String FRONT_INFO_COLUMN_NAME = "FrontInfo";
     public static final String MC_PATH_ID_COLUMN_NAME = "MCPathID";
+    public static final String INS_DATE_COLUMN_NAME = "InsDate";
 }

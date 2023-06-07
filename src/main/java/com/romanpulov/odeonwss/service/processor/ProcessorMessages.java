@@ -60,6 +60,7 @@ public class ProcessorMessages {
     static final String INFO_ARTISTS_CLEANSED = "Artists cleansed";
 
     static final String INFO_ARTIFACTS_LOADED = "Artifacts loaded";
+    static final String INFO_ARTIFACTS_UPDATED = "Artifacts updated";
 
     static final String INFO_ARTIFACTS_IMPORTED = "Artifacts imported";
     static final String INFO_TRACKS_IMPORTED = "Tracks imported";

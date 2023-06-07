@@ -36,7 +36,10 @@ public class ProcessorFactory {
             LAValidateProcessor laValidateProcessor,
             DVMoviesLoadProcessor dvMoviesLoadProcessor,
             DVMoviesValidateProcessor dvMoviesValidateProcessor,
-            DVMusicLoadProcessor dvMusicLoadProcessor)
+            DVMusicLoadProcessor dvMusicLoadProcessor,
+            MP3UpdateAttributesMDBImportProcessor mp3UpdateAttributesMDBImportProcessor,
+            LAUpdateAttributesMDBImportProcessor laUpdateAttributesMDBImportProcessor
+    )
     {
         this.appConfiguration = appConfiguration;
 
@@ -56,6 +59,8 @@ public class ProcessorFactory {
         addProcessorMap(ProcessorType.DV_MOVIES_LOADER, dvMoviesLoadProcessor, AppConfiguration.PathType.PT_DV_MOVIES);
         addProcessorMap(ProcessorType.DV_MOVIES_VALIDATOR, dvMoviesValidateProcessor, AppConfiguration.PathType.PT_DV_MOVIES);
         addProcessorMap(ProcessorType.DV_MUSIC_LOADER, dvMusicLoadProcessor, AppConfiguration.PathType.PT_DV_MUSIC);
+        addProcessorMap(ProcessorType.MP3_UPDATE_ATTRIBUTES_IMPORTER, mp3UpdateAttributesMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
+        addProcessorMap(ProcessorType.LA_UPDATE_ATTRIBUTES_IMPORTER, laUpdateAttributesMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
     }
 
     public AbstractProcessor fromProcessorType(ProcessorType processorType, ProgressHandler handler) {

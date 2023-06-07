@@ -44,6 +44,13 @@ public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifa
             Long year
     );
 
+    Optional<Artifact> findFirstByArtifactTypeAndArtistNameAndTitleAndYear(
+            ArtifactType artifactType,
+            String artistName,
+            String title,
+            Long year
+    );
+
     @Query(
         "SELECT new com.romanpulov.odeonwss.dto.ArtifactTableDTO(" +
                 "a.id," +

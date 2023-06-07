@@ -17,6 +17,8 @@ public enum ProcessorType {
     DV_MOVIES_LOADER("Movies Loader"),
     DV_MOVIES_VALIDATOR("Movies Validator"),
     DV_MUSIC_LOADER("Video music Loader"),
+    MP3_UPDATE_ATTRIBUTES_IMPORTER("MP3 update attributes importer"),
+    LA_UPDATE_ATTRIBUTES_IMPORTER("LA update attributes importer"),
     ;
 
     public final String label;

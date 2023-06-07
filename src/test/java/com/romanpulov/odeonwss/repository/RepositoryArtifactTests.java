@@ -96,6 +96,13 @@ public class RepositoryArtifactTests {
 
         Assertions.assertEquals(1, artifactRepository.getArtifactsByArtist(artist).size());
 
+        var foundArtifact = artifactRepository.findFirstByArtifactTypeAndArtistNameAndTitleAndYear(
+                artifactTypeRepository.getWithMP3(),
+                "Name1",
+                "Title 1",
+                2000L
+        );
+        assertThat(foundArtifact.isPresent()).isTrue();
     }
 
     @Test
