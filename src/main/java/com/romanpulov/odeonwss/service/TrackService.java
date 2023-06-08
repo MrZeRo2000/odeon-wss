@@ -1,17 +1,18 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.dto.TrackDTO;
 import com.romanpulov.odeonwss.dto.TrackEditDTO;
-import com.romanpulov.odeonwss.dto.TrackTableDTO;
+import com.romanpulov.odeonwss.dto.TrackTransformer;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.DVProduct;
-import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.TrackMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.DVProductRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -32,6 +33,8 @@ public class TrackService implements EditableObjectService<TrackEditDTO>{
 
     private final TrackMapper trackMapper;
 
+    private final TrackTransformer transformer;
+
     private final MediaFileRepository mediaFileRepository;
 
     private final DVProductRepository dvProductRepository;
@@ -40,19 +43,21 @@ public class TrackService implements EditableObjectService<TrackEditDTO>{
             ArtifactRepository artifactRepository,
             TrackRepository trackRepository,
             TrackMapper trackMapper,
+            TrackTransformer transformer,
             MediaFileRepository mediaFileRepository,
             DVProductRepository dvProductRepository) {
         this.artifactRepository = artifactRepository;
         this.trackRepository = trackRepository;
         this.trackMapper = trackMapper;
+        this.transformer = transformer;
         this.mediaFileRepository = mediaFileRepository;
         this.dvProductRepository = dvProductRepository;
     }
 
-    public List<TrackTableDTO>getTable(Long artifactId) throws CommonEntityNotFoundException {
+    public List<TrackDTO>getTable(Long artifactId) throws CommonEntityNotFoundException {
         Optional<Artifact> existingArtifact = artifactRepository.findById(artifactId);
         if (existingArtifact.isPresent()) {
-            return trackRepository.getTrackTableByArtifact(existingArtifact.get());
+            return transformer.transform(trackRepository.findAllFlatDTOByArtifact(existingArtifact.get()));
         } else {
             throw new CommonEntityNotFoundException("Artifact", artifactId);
         }

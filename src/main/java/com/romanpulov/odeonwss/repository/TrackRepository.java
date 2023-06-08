@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.dto.TrackFlatDTO;
 import com.romanpulov.odeonwss.dto.TrackTableDTO;
 import com.romanpulov.odeonwss.dto.TrackValidationDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
@@ -46,6 +47,56 @@ public interface TrackRepository extends CrudRepository<Track, Long> {
     )
     List<TrackValidationDTO> getTrackValidationMusic(ArtifactType artifactType);
 
+    @Query("SELECT " +
+            "c.id AS id, " +
+            "c.diskNum AS diskNum, " +
+            "c.num AS num, " +
+            "ar.id AS artistId, " +
+            "ar.name AS artistName, " +
+            "par.id AS performerArtistId, " +
+            "par.name AS performerArtistName, " +
+            "dvt.id AS dvTypeId, " +
+            "dvt.name AS dvTypeName, " +
+            "c.title AS title, " +
+            "c.duration AS duration, " +
+            "m.size AS size, " +
+            "m.bitrate AS bitrate, " +
+            "m.name AS fileName " +
+            "FROM Track c " +
+            "LEFT OUTER JOIN TrackMediaFile cm ON cm.trackId = c.id " +
+            "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
+            "LEFT OUTER JOIN Artist ar ON ar = c.artist " +
+            "LEFT OUTER JOIN Artist par ON par = c.performerArtist " +
+            "LEFT OUTER JOIN DVType dvt ON dvt = c.dvType " +
+            "WHERE c.artifact = :artifact " +
+            "ORDER BY c.diskNum, c.num, ar.name, c.title")
+    List<TrackTableDTO> getTrackTableByArtifact(Artifact artifact);
+
+    @Query("SELECT " +
+            "c.id AS id, " +
+            "c.diskNum AS diskNum, " +
+            "c.num AS num, " +
+            "ar.id AS artistId, " +
+            "ar.name AS artistName, " +
+            "par.id AS performerArtistId, " +
+            "par.name AS performerArtistName, " +
+            "dvt.id AS dvTypeId, " +
+            "dvt.name AS dvTypeName, " +
+            "c.title AS title, " +
+            "c.duration AS duration, " +
+            "m.size AS size, " +
+            "m.bitrate AS bitRate, " +
+            "m.name AS fileName " +
+            "FROM Track c " +
+            "LEFT OUTER JOIN TrackMediaFile cm ON cm.trackId = c.id " +
+            "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
+            "LEFT OUTER JOIN Artist ar ON ar = c.artist " +
+            "LEFT OUTER JOIN Artist par ON par = c.performerArtist " +
+            "LEFT OUTER JOIN DVType dvt ON dvt = c.dvType " +
+            "WHERE c.artifact = :artifact " +
+            "ORDER BY c.diskNum, c.num, ar.name, c.title")
+    List<TrackFlatDTO> findAllFlatDTOByArtifact(Artifact artifact);
+
     @Query("SELECT new com.romanpulov.odeonwss.dto.TrackTableDTO(" +
             "c.id, " +
             "c.diskNum, " +
@@ -71,32 +122,6 @@ public interface TrackRepository extends CrudRepository<Track, Long> {
             "WHERE c.artifact.id = :id " +
             "ORDER BY c.diskNum, c.num, ar.name, c.title")
     List<TrackTableDTO> getTrackTableByArtifactId(Long id);
-
-    @Query("SELECT new com.romanpulov.odeonwss.dto.TrackTableDTO(" +
-            "c.id, " +
-            "c.diskNum, " +
-            "c.num, " +
-            "ar.id, " +
-            "ar.name, " +
-            "par.id, " +
-            "par.name, " +
-            "dvt.id, " +
-            "dvt.name, " +
-            "c.title, " +
-            "c.duration, " +
-            "m.size, " +
-            "m.bitrate, " +
-            "m.name " +
-            ") " +
-            "FROM Track c " +
-            "LEFT OUTER JOIN TrackMediaFile cm ON cm.trackId = c.id " +
-            "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
-            "LEFT OUTER JOIN Artist ar ON ar = c.artist " +
-            "LEFT OUTER JOIN Artist par ON par = c.performerArtist " +
-            "LEFT OUTER JOIN DVType dvt ON dvt = c.dvType " +
-            "WHERE c.artifact = :artifact " +
-            "ORDER BY c.diskNum, c.num, ar.name, c.title")
-    List<TrackTableDTO> getTrackTableByArtifact(Artifact artifact);
 
     Optional<Track> findTrackByArtifactAndTitle(Artifact artifact, String title);
 }

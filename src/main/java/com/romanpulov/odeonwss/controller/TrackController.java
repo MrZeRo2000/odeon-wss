@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.controller;
 
+import com.romanpulov.odeonwss.dto.TrackDTO;
 import com.romanpulov.odeonwss.dto.TrackEditDTO;
-import com.romanpulov.odeonwss.dto.TrackTableDTO;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.service.TrackService;
 import org.springframework.http.MediaType;
@@ -22,7 +22,7 @@ public class TrackController {
     }
 
     @GetMapping("/table/{artifactId}")
-    ResponseEntity<List<TrackTableDTO>> getTable(@PathVariable Long artifactId) throws CommonEntityNotFoundException {
+    ResponseEntity<List<TrackDTO>> getTable(@PathVariable Long artifactId) throws CommonEntityNotFoundException {
         return ResponseEntity.ok(trackService.getTable(artifactId));
     }
 
