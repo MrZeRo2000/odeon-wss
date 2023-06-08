@@ -14,11 +14,13 @@ import org.springframework.test.context.jdbc.Sql;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -162,10 +164,15 @@ public class RepositoryTrackTests {
     @Test
     @Order(3)
     void testTrackTableDTO() {
-        List<TrackTableDTO> tracks = trackRepository.getTrackTableByArtifactId(1L);
-        Assertions.assertEquals(2, tracks.size());
-        Assertions.assertEquals(0, trackRepository.getTrackTableByArtifactId(2L).size());
-        Assertions.assertEquals(0, trackRepository.getTrackTableByArtifactId(3L).size());
+        Artifact artifact1 = artifactRepository.findById(1L).orElseThrow();
+        var flatTracks1 = trackRepository.findAllFlatDTOByArtifact(artifact1);
+        assertThat(flatTracks1.size()).isEqualTo(2);
+
+        Artifact artifact2 = artifactRepository.findById(2L).orElseThrow();
+        var flatTracks2 = trackRepository.findAllFlatDTOByArtifact(artifact2);
+        assertThat(flatTracks2.size()).isEqualTo(0);
+
+        assertThatThrownBy(() -> artifactRepository.findById(3L).orElseThrow()).isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
