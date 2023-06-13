@@ -1,13 +1,10 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.config.DatabaseConfiguration;
-import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.DVOrigin;
+import com.romanpulov.odeonwss.entity.DVProduct;
 import com.romanpulov.odeonwss.entity.Track;
-import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
-import com.romanpulov.odeonwss.repository.MediaFileRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
+import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.ValueValidator;
 import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
 import com.romanpulov.odeonwss.service.processor.model.ProcessDetailInfo;
@@ -18,18 +15,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.DisabledIf;
 
 import javax.sql.DataSource;
+import java.util.Arrays;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
-import static com.romanpulov.odeonwss.db.DbManagerService.DbType.DB_PRODUCTS;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@DisabledIf(value = "${full.tests.disabled}", loadContext = true)
 public class ServiceProcessLoadMoviesDVTest {
+    private final static String[] DV_PRODUCT_NAMES = {
+            "Крепкий орешек",
+            "Лицензия на убийство",
+            "Обыкновенное чудо"
+    };
+
     private static final Logger log = Logger.getLogger(ServiceProcessLoadMoviesDVTest.class.getSimpleName());
 
     private static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MOVIES_LOADER;
@@ -37,9 +40,6 @@ public class ServiceProcessLoadMoviesDVTest {
 
     @Autowired
     ProcessService processService;
-
-    @Autowired
-    private DatabaseConfiguration databaseConfiguration;
 
     @Autowired
     private ArtifactTypeRepository artifactTypeRepository;
@@ -54,20 +54,37 @@ public class ServiceProcessLoadMoviesDVTest {
     private MediaFileRepository mediaFileRepository;
 
     @Autowired
+    private DVOriginRepository dvOriginRepository;
+
+    @Autowired
+    private DVProductRepository dvProductRepository;
+
+    @Autowired
     DataSource dataSource;
 
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(value = false)
-    void testPrepare() throws Exception {
+    void testPrepare() {
         this.artifactType = artifactTypeRepository.getWithDVMovies();
 
-        DbManagerService.loadOrPrepare(databaseConfiguration, DB_PRODUCTS, () -> {
-            processService.executeProcessor(ProcessorType.DV_PRODUCT_IMPORTER);
-            Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
-            log.info("Products Importer Processing info: " + processService.getProcessInfo());
-        });
+        var dvProductList = Arrays.stream(DV_PRODUCT_NAMES).map(s -> {
+            DVProduct dvProduct = new DVProduct();
+            dvProduct.setArtifactType(artifactType);
+            dvProduct.setDvOrigin(dvOriginRepository.findById(1L).orElseGet(() -> {
+                DVOrigin dvOrigin = new DVOrigin();
+                dvOrigin.setName("New Origin");
+                dvOriginRepository.save(dvOrigin);
+
+                return dvOrigin;
+            }));
+            dvProduct.setTitle(s);
+
+            return dvProduct;
+        }).collect(Collectors.toList());
+
+        dvProductRepository.saveAll(dvProductList);
     }
 
     @Test
@@ -158,7 +175,7 @@ public class ServiceProcessLoadMoviesDVTest {
 
     @Test
     @Order(5)
-    @Rollback(value = true)
+    @Rollback(value = false)
     void testSizeDuration() {
         artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
                 .forEach(artifact -> {
@@ -168,8 +185,42 @@ public class ServiceProcessLoadMoviesDVTest {
                     Assertions.assertEquals(artifact.getDuration(), artifact.getTracks().get(0).getDuration());
                 });
         trackRepository.getTracksByArtifactType(artifactType)
-                .forEach(track -> {
-                    Assertions.assertFalse(ValueValidator.isEmpty(track.getDuration()));
-                });
+                .forEach(track ->
+                    Assertions.assertFalse(ValueValidator.isEmpty(track.getDuration()))
+                );
+    }
+
+    @Test
+    @Order(10)
+    @Sql({"/schema.sql", "/data.sql"})
+    @Rollback(value = false)
+    void testLoadWithoutOneProduct() {
+        var dvProductList = Arrays.stream(DV_PRODUCT_NAMES).filter(s -> !s.equals(DV_PRODUCT_NAMES[0])).map(s -> {
+            DVProduct dvProduct = new DVProduct();
+            dvProduct.setArtifactType(artifactType);
+            dvProduct.setDvOrigin(dvOriginRepository.findById(1L).orElseGet(() -> {
+                DVOrigin dvOrigin = new DVOrigin();
+                dvOrigin.setName("New Origin");
+                dvOriginRepository.save(dvOrigin);
+
+                return dvOrigin;
+            }));
+            dvProduct.setTitle(s);
+
+            return dvProduct;
+        }).collect(Collectors.toList());
+
+        dvProductRepository.saveAll(dvProductList);
+
+        processService.executeProcessor(PROCESSOR_TYPE);
+        Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
+
+        var resultTracks = trackRepository.getTracksByArtifactType(artifactType);
+        assertThat(resultTracks.size()).isEqualTo(3);
+
+        int tracksWithProducts = resultTracks.stream().map(track ->
+            trackRepository.findByIdWithProducts(track.getId()).orElseThrow().getDvProducts().size()
+        ).mapToInt(Integer::intValue).sum();
+        assertThat(tracksWithProducts).isEqualTo(2);
     }
 }
