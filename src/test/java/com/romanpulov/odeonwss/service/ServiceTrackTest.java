@@ -163,6 +163,30 @@ public class ServiceTrackTest {
 
     @Test
     @Order(2)
+    @Rollback(value = false)
+    void testGetTable() throws Exception {
+        var table = trackService.getTable(1L);
+        assertThat(table.size()).isEqualTo(2);
+        assertThat(table.get(0).getTitle()).isEqualTo("Comp 1-1");
+        assertThat(table.get(1).getTitle()).isEqualTo("Comp 1-2");
+    }
+
+    @Test
+    @Order(2)
+    @Rollback(value = false)
+    void testGetTableByArtifactTypeId() {
+        var table = trackService.getTableByArtifactTypeId(artifactTypeRepository.getWithMP3().getId());
+        assertThat(table.size()).isEqualTo(2);
+        assertThat(table.get(0).getTitle()).isEqualTo("Comp 1-1");
+        assertThat(table.get(0).getDvProduct()).isNull();
+
+        assertThat(table.get(1).getTitle()).isEqualTo("Comp 1-2");
+        assertThat(table.get(1).getDvProduct().getId()).isEqualTo(1);
+        assertThat(table.get(1).getDvProduct().getTitle()).isEqualTo("Title 1");
+    }
+
+    @Test
+    @Order(7)
     @Transactional
     @Rollback(value = false)
     void testRemoveMediaFile() throws Exception {
@@ -179,7 +203,7 @@ public class ServiceTrackTest {
 
 
     @Test
-    @Order(3)
+    @Order(8)
     @Transactional
     @Rollback(value = false)
     void testInsertMediaFile() throws Exception {
@@ -204,7 +228,7 @@ public class ServiceTrackTest {
     }
 
     @Test
-    @Order(5)
+    @Order(9)
     void testAssignProduct() throws Exception {
         TrackEditDTO dto = trackService.getById(2L);
         assertThat(dto.getDvProductId()).isEqualTo(1L);
@@ -222,7 +246,7 @@ public class ServiceTrackTest {
 
 
     @Test
-    @Order(6)
+    @Order(10)
     void testDelete() throws Exception {
         Assertions.assertThrows(CommonEntityNotFoundException.class, () -> trackService.deleteById(5L));
 

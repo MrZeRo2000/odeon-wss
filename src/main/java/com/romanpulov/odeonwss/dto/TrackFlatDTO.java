@@ -19,4 +19,6 @@ public interface TrackFlatDTO {
     Long getSize();
     Long getBitRate();
     String getFileName();
+    Long getDvProductId();
+    String getDvProductTitle();
 }

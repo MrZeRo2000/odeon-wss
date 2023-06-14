@@ -1,9 +1,11 @@
 package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
+import com.romanpulov.odeonwss.dto.TrackDTO;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.service.TrackService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -22,11 +24,15 @@ public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {
 
     private final MediaFileRepository mediaFileRepository;
 
+    private final TrackService trackService;
+
     public DVMoviesValidateProcessor(
             ArtifactTypeRepository artifactTypeRepository,
-            MediaFileRepository mediaFileRepository) {
+            MediaFileRepository mediaFileRepository,
+            TrackService trackService) {
         this.artifactTypeRepository = artifactTypeRepository;
         this.mediaFileRepository = mediaFileRepository;
+        this.trackService = trackService;
     }
 
     @Override
@@ -57,6 +63,16 @@ public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {
 
             if (PathValidator.validateArtifactMediaFiles(this, pathValidation, dbArtifactValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
+            }
+
+            List<TrackDTO> tracks = trackService.getTableByArtifactTypeId(this.artifactType.getId());
+            if (ValueValidator.validateEmptyValue(
+                    this,
+                    tracks,
+                    ProcessorMessages.ERROR_TRACKS_WITHOUT_PRODUCT,
+                    TrackDTO::getDvProduct,
+                    TrackDTO::getTitle)) {
+                infoHandler(ProcessorMessages.INFO_PRODUCTS_FOR_TRACKS_VALIDATED);
             }
         }
     }

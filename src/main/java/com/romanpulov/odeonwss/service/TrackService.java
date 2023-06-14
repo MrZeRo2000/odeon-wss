@@ -63,6 +63,10 @@ public class TrackService implements EditableObjectService<TrackEditDTO>{
         }
     }
 
+    public List<TrackDTO> getTableByArtifactTypeId(Long artifactTypeId) {
+        return transformer.transform(trackRepository.findAllFlatDTOByArtifactTypeId(artifactTypeId));
+    }
+
     @Override
     @Transactional
     public TrackEditDTO getById(Long id) throws CommonEntityNotFoundException {

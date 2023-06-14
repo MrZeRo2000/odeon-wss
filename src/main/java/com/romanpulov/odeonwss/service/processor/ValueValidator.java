@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.service.processor;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class ValueValidator {
@@ -42,5 +43,23 @@ public class ValueValidator {
         }
 
         return result;
+    }
+
+    public static <T> boolean validateEmptyValue(
+            AbstractProcessor processor,
+            Collection<T> list,
+            String errorMessage,
+            Function<T, Object> valueMapper,
+            Function<T, String> errorMessageMapper
+            ) {
+        List<T> emptyList = list.stream().filter(v -> Objects.isNull(valueMapper.apply(v))).collect(Collectors.toList());
+        if (emptyList.size() > 0) {
+            processor.errorHandler(errorMessage, sortedCollection(
+                    emptyList.stream().map(errorMessageMapper).collect(Collectors.toList())
+            ));
+            return false;
+        }
+
+        return true;
     }
 }

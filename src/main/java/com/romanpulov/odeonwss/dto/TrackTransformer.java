@@ -50,6 +50,14 @@ public class TrackTransformer {
                     }));
                 }
 
+                if ((row.getDvProductId() != null) && (row.getDvProductTitle() != null)) {
+                    DVProductDTOImpl dvProductDTO = new DVProductDTOImpl();
+                    dvProductDTO.setId(row.getDvProductId());
+                    dvProductDTO.setTitle(row.getDvProductTitle());
+                    
+                    newDTO.setDvProduct(dvProductDTO);
+                }
+
                 newDTO.setTitle(row.getTitle());
                 newDTO.setDuration(row.getDuration());
                 newDTO.setDiskNum(row.getDiskNum());

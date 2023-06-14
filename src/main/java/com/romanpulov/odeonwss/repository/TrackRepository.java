@@ -1,7 +1,6 @@
 package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.dto.TrackFlatDTO;
-import com.romanpulov.odeonwss.dto.TrackTableDTO;
 import com.romanpulov.odeonwss.dto.TrackValidationDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
@@ -71,6 +70,24 @@ public interface TrackRepository extends CrudRepository<Track, Long> {
             "WHERE c.artifact = :artifact " +
             "ORDER BY c.diskNum, c.num, ar.name, c.title")
     List<TrackFlatDTO> findAllFlatDTOByArtifact(Artifact artifact);
+
+    @Query("SELECT " +
+            "c.id AS id, " +
+            "c.num AS num, " +
+            "dvt.id AS dvTypeId, " +
+            "dvt.name AS dvTypeName, " +
+            "c.title AS title, " +
+            "c.duration AS duration, " +
+            "dvp.id AS dvProductId, " +
+            "dvp.title AS dvProductTitle " +
+            "FROM Track c " +
+            "INNER JOIN Artifact a ON c.artifact = a " +
+            "LEFT OUTER JOIN DVType dvt ON dvt = c.dvType " +
+            "LEFT OUTER JOIN TrackDVProduct tp ON tp.trackId = c.id " +
+            "LEFT OUTER JOIN DVProduct dvp ON tp.dvProductId = dvp.id " +
+            "WHERE a.artifactType.id = :artifactTypeId " +
+            "ORDER BY a.title, c.num, c.title")
+    List<TrackFlatDTO> findAllFlatDTOByArtifactTypeId(Long artifactTypeId);
 
     Optional<Track> findTrackByArtifactAndTitle(Artifact artifact, String title);
 }

@@ -1,47 +1,40 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.config.DatabaseConfiguration;
-import com.romanpulov.odeonwss.db.DbManagerService;
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.MediaFile;
-import com.romanpulov.odeonwss.entity.Track;
-import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
-import com.romanpulov.odeonwss.repository.MediaFileRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
+import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.DisabledIf;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@DisabledIf(value = "${full.tests.disabled}", loadContext = true)
 public class ServiceProcessValidateDVMoviesTest {
+    private final static String[] DV_PRODUCT_NAMES = {
+            "Крепкий орешек",
+            "Лицензия на убийство",
+            "Обыкновенное чудо"
+    };
+
     private static final Logger log = Logger.getLogger(ServiceProcessValidateDVMoviesTest.class.getSimpleName());
     private static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MOVIES_VALIDATOR;
-
-    private ArtifactType artifactType;
 
     @Autowired
     ProcessService service;
 
     @Autowired
     private ArtifactTypeRepository artifactTypeRepository;
-
-    @Autowired
-    private DatabaseConfiguration databaseConfiguration;;
 
     @Autowired
     private ArtifactRepository artifactRepository;
@@ -52,12 +45,41 @@ public class ServiceProcessValidateDVMoviesTest {
     @Autowired
     private MediaFileRepository mediaFileRepository;
 
+    @Autowired
+    private DVOriginRepository dvOriginRepository;
+
+    @Autowired
+    private DVProductRepository dvProductRepository;
+
+    private ArtifactType artifactType;
+
+    @BeforeEach
+    void beforeEach() {
+        this.artifactType = artifactTypeRepository.getWithDVMovies();
+    }
+
     private void internalPrepare() {
-        DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_LOADED_MOVIES, () -> {
-            service.executeProcessor(ProcessorType.DV_MOVIES_LOADER);
-            Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
-            log.info("Movies Importer Processing info: " + service.getProcessInfo());
-        });
+        // prepare products
+        var dvProductList = Arrays.stream(DV_PRODUCT_NAMES).map(s -> {
+            DVProduct dvProduct = new DVProduct();
+            dvProduct.setArtifactType(artifactType);
+            dvProduct.setDvOrigin(dvOriginRepository.findById(1L).orElseGet(() -> {
+                DVOrigin dvOrigin = new DVOrigin();
+                dvOrigin.setName("New Origin");
+                dvOriginRepository.save(dvOrigin);
+
+                return dvOrigin;
+            }));
+            dvProduct.setTitle(s);
+
+            return dvProduct;
+        }).collect(Collectors.toList());
+
+        dvProductRepository.saveAll(dvProductList);
+
+        service.executeProcessor(ProcessorType.DV_MOVIES_LOADER);
+        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+        log.info("Movies Importer Processing info: " + service.getProcessInfo());
     }
 
     @Test
@@ -65,7 +87,6 @@ public class ServiceProcessValidateDVMoviesTest {
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
     void testPrepare() {
-        this.artifactType = artifactTypeRepository.getWithDVMovies();
         internalPrepare();
     }
 
@@ -106,6 +127,14 @@ public class ServiceProcessValidateDVMoviesTest {
         );
 
         assertThat(pi.getProcessDetails().get(4)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Products for tracks validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(pi.getProcessDetails().get(5)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
@@ -326,6 +355,38 @@ public class ServiceProcessValidateDVMoviesTest {
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifact media files not in database",
                                 List.of(mediaFile.getName())),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+
+    @Test
+    @Order(10)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testMissingProductForTrackShouldFail() {
+        this.internalPrepare();
+
+        //remove a product
+        var track_to_remove = trackRepository.getTracksByArtifactType(artifactType)
+                .stream()
+                .filter(t -> t.getTitle().equals(DV_PRODUCT_NAMES[0]))
+                .findFirst().orElseThrow();
+
+        track_to_remove.setDvProducts(Set.of());
+        trackRepository.save(track_to_remove);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(4)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Tracks without product",
+                                List.of(DV_PRODUCT_NAMES[0])),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
