@@ -88,6 +88,31 @@ public class UnitNamesParserTest {
     }
 
     @Test
+    void testVideoTrackParser() {
+        NamesParser.NumberTitle nt;
+        nt = NamesParser.parseVideoTrack("02 Title.avi");
+        Assertions.assertNotNull(nt);
+        Assertions.assertEquals(2, nt.getNumber());
+        Assertions.assertEquals("Title", nt.getTitle());
+
+        Assertions.assertNull(NamesParser.parseVideoTrack("02  Title"));
+        Assertions.assertNull(NamesParser.parseVideoTrack("t2 Title"));
+
+        nt = NamesParser.parseVideoTrack("22 Title. Can have dots.MKV");
+        Assertions.assertNotNull(nt);
+        Assertions.assertEquals(22, nt.getNumber());
+        Assertions.assertEquals("Title. Can have dots", nt.getTitle());
+
+        nt = NamesParser.parseVideoTrack("001 This is the painkiller.MKV");
+        assert nt != null;
+        assertThat(nt.getNumber()).isEqualTo(1);
+        assertThat(nt.getTitle()).isEqualTo("This is the painkiller");
+
+        assertThat(NamesParser.parseVideoTrack("01-First day.mp3")).isNull();
+        assertThat(NamesParser.parseVideoTrack("0101-Too much.mp3")).isNull();
+    }
+
+    @Test
     void testPattern() {
         Pattern pattern = Pattern.compile("((?:19|20)[0-9]{2})\\s(\\S.*)");
         Matcher matcher = pattern.matcher("1980 Title");

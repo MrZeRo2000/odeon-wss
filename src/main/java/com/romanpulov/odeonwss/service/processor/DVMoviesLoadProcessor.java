@@ -13,11 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Component
 public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
@@ -78,52 +76,97 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
                         artifactType,
                         s -> processingEventHandler(ProcessorMessages.PROCESSING_ARTIFACT, s),
                         s -> errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, s)));
-        infoHandler(ProcessorMessages.INFO_TRACKS_LOADED, processTracks());
-        infoHandler(ProcessorMessages.INFO_MEDIA_FILES_LOADED, processMediaFiles(path));
+
+        List<Artifact> artifacts = this.artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
+                .stream()
+                .filter(a -> a.getTracks().size() == 0)
+                .collect(Collectors.toList());
+        Map<Artifact, Collection<Path>> artifactPaths = loadArtifactPaths(path, artifactType, artifacts);
+
+        Set<Artifact> multipleTrackArtifacts = getMultipleTrackArtifacts(artifactPaths);
+
+        Map<Artifact, Collection<Path>> singleTracksArtifactPaths = artifactPaths.entrySet()
+                .stream()
+                .filter(a -> !multipleTrackArtifacts.contains(a.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        Map<Artifact, Collection<Path>> multipleTracksArtifactPaths = artifactPaths.entrySet()
+                .stream()
+                .filter(a -> multipleTrackArtifacts.contains(a.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+
+        infoHandler(ProcessorMessages.INFO_TRACKS_LOADED, processTracks(singleTracksArtifactPaths.keySet()));
+        infoHandler(ProcessorMessages.INFO_MEDIA_FILES_LOADED, processMediaFiles(singleTracksArtifactPaths));
     }
 
-    private int processTracks() {
+    private Map<Artifact, Collection<Path>> loadArtifactPaths(
+            Path path,
+            ArtifactType artifactType,
+            Collection<Artifact> artifacts) throws ProcessorException {
+        Map<Artifact, Collection<Path>> result = new HashMap<>();
+
+        for (Artifact artifact: artifacts) {
+            List<Path> paths = new ArrayList<>();
+            if (!PathReader.readPathPredicateFilesOnly(
+                    this,
+                    Path.of(path.toAbsolutePath().toString(), artifact.getTitle()),
+                    p -> NamesParser.validateFileNameMediaFormat(
+                            p.getFileName().toString(),
+                            artifactType.getMediaFileFormats()),
+                    paths)) {
+                return result;
+            }
+
+            if (!paths.isEmpty()) {
+                result.put(artifact, paths);
+            }
+        }
+
+        return result;
+    }
+
+    private Set<Artifact> getMultipleTrackArtifacts(Map<Artifact, Collection<Path>> artifactPaths) {
+        return artifactPaths
+                .entrySet()
+                .stream()
+                .filter(e -> e.getValue()
+                        .stream()
+                        .allMatch(p -> NamesParser.validateVideoTrack(p.getFileName().toString())))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+    }
+
+    private int processTracks(Collection<Artifact> artifacts) {
         AtomicInteger counter = new AtomicInteger(0);
         DVType dvType = dvTypeRepository.getById(7L);
 
-        this.artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
-                .stream()
-                .filter(a -> a.getTracks().size() == 0)
-                .forEach(artifact -> {
-                    Track track = new Track();
-                    track.setArtifact(artifact);
-                    track.setDvType(dvType);
-                    track.setTitle(artifact.getTitle());
-                    track.setNum(1L);
-                    track.setDuration(artifact.getDuration());
-                    dVProductRepository.findFirstByArtifactTypeAndTitle(artifactType, track.getTitle())
-                            .ifPresent(p -> track.setDvProducts(Set.of(p)));
+        for (Artifact artifact: artifacts) {
+            Track track = new Track();
+            track.setArtifact(artifact);
+            track.setDvType(dvType);
+            track.setTitle(artifact.getTitle());
+            track.setNum(1L);
+            track.setDuration(artifact.getDuration());
+            dVProductRepository.findFirstByArtifactTypeAndTitle(artifactType, track.getTitle())
+                    .ifPresent(p -> track.setDvProducts(Set.of(p)));
 
-                    trackRepository.save(track);
+            trackRepository.save(track);
 
-                    artifact.getTracks().add(track);
-                    artifactRepository.save(artifact);
+            artifact.getTracks().add(track);
+            artifactRepository.save(artifact);
 
-                    counter.getAndIncrement();
-                });
+            counter.getAndIncrement();
+        }
 
         return counter.get();
     }
 
-    private int processMediaFiles(Path path) throws ProcessorException {
+    private int processMediaFiles(Map<Artifact, Collection<Path>> artifactPaths) {
         AtomicInteger counter = new AtomicInteger(0);
 
-        for (Artifact a: artifactRepository.getAllByArtifactTypeWithTracks(artifactType)) {
-            Path mediaFilesRootPath = Paths.get(path.toAbsolutePath().toString(), a.getTitle());
-
-            List<Path> mediaFilesPaths = new ArrayList<>();
-            if (!PathReader.readPathPredicateFilesOnly(
-                    this,
-                    mediaFilesRootPath,
-                    p -> NamesParser.validateFileNameMediaFormat(p.getFileName().toString(), artifactType.getMediaFileFormats()),
-                    mediaFilesPaths)) {
-                return counter.get();
-            }
+        for (Artifact a: artifactPaths.keySet()) {
+            Collection<Path> mediaFilesPaths = artifactPaths.get(a);
 
             Set<MediaFile> mediaFiles = MediaFilesProcessUtil.loadFromMediaFilesPaths(
                     mediaFilesPaths,
