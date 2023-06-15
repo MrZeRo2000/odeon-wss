@@ -171,7 +171,7 @@ public class ServiceProcessValidateDVMoviesTest {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifacts not in files",
-                                List.of("Крепкий орешек", "Лицензия на убийство", "Обыкновенное чудо")),
+                                List.of("Коломбо", "Крепкий орешек", "Лицензия на убийство", "Обыкновенное чудо")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
