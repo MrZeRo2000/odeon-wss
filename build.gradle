@@ -51,13 +51,13 @@ dependencies {
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
 	//sqlite
-	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
+	implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
 
 	//ms access
 	implementation 'com.healthmarketscience.jackcess:jackcess:4.0.1'
 
 	//json
-	implementation 'org.json:json:20220320'
+	implementation 'org.json:json:20230227'
 
 	//custom configuration
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
