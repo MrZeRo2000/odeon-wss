@@ -110,6 +110,13 @@ public class UnitNamesParserTest {
 
         assertThat(NamesParser.parseVideoTrack("01-First day.mp3")).isNull();
         assertThat(NamesParser.parseVideoTrack("0101-Too much.mp3")).isNull();
+
+        nt = NamesParser.parseVideoTrack("001 With 3 digits.MKV");
+        assertThat(nt).isNotNull();
+        assert nt != null;
+        assertThat(nt.getNumber()).isEqualTo(1L);
+        assertThat(nt.getTitle()).isEqualTo("With 3 digits");
+
     }
 
     @Test
