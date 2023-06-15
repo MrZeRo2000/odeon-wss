@@ -24,7 +24,9 @@ public class ServiceProcessValidateDVMoviesTest {
     private final static String[] DV_PRODUCT_NAMES = {
             "Крепкий орешек",
             "Лицензия на убийство",
-            "Обыкновенное чудо"
+            "Обыкновенное чудо",
+            "Рецепт убийства",
+            "Убийство по книге"
     };
 
     private static final Logger log = Logger.getLogger(ServiceProcessValidateDVMoviesTest.class.getSimpleName());

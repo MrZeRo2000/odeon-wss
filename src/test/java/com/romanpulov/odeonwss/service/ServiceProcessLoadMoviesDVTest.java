@@ -126,6 +126,8 @@ public class ServiceProcessLoadMoviesDVTest {
         trackRepository.getTracksByArtifactType(artifactType).forEach(c -> {
             Track productsTrack = trackRepository.findByIdWithProducts(c.getId()).orElseThrow();
             Assertions.assertEquals(1, productsTrack.getDvProducts().size());
+            //every track has a media file
+            assertThat(trackRepository.findByIdWithMediaFiles(c.getId()).orElseThrow().getMediaFiles().size()).isGreaterThan(0);
         });
     }
 
