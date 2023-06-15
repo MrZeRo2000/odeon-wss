@@ -4,6 +4,7 @@ import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
+import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import com.romanpulov.odeonwss.service.processor.utils.MediaFilesProcessUtil;
 import com.romanpulov.odeonwss.service.processor.utils.PathProcessUtil;
 import com.romanpulov.odeonwss.service.processor.vo.SizeDuration;
@@ -20,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
+    @SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory.getLogger(DVMoviesLoadProcessor.class);
 
     private ArtifactType artifactType;
@@ -115,7 +117,11 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
             Path mediaFilesRootPath = Paths.get(path.toAbsolutePath().toString(), a.getTitle());
 
             List<Path> mediaFilesPaths = new ArrayList<>();
-            if (!PathReader.readPathFilesOnly(this, mediaFilesRootPath, mediaFilesPaths)) {
+            if (!PathReader.readPathPredicateFilesOnly(
+                    this,
+                    mediaFilesRootPath,
+                    p -> NamesParser.validateFileNameMediaFormat(p.getFileName().toString(), artifactType.getMediaFileFormats()),
+                    mediaFilesPaths)) {
                 return counter.get();
             }
 
