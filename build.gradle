@@ -33,7 +33,7 @@ bootWar {
 }
 
 group = 'com.romanpulov'
-version = '0.3.1'
+version = '0.3.2'
 sourceCompatibility = '11'
 
 repositories {
