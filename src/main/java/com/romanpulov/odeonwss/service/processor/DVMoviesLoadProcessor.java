@@ -24,6 +24,8 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
 
     private ArtifactType artifactType;
 
+    private DVType dvType;
+
     private final ArtifactTypeRepository artifactTypeRepository;
 
     private final ArtifactRepository artifactRepository;
@@ -48,8 +50,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
             MediaFileMapper mediaFileMapper,
             DVTypeRepository dvTypeRepository,
             DVProductRepository dVProductRepository,
-            MediaParser mediaParser)
-    {
+            MediaParser mediaParser) {
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.trackRepository = trackRepository;
@@ -65,7 +66,11 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
         Path path = validateAndGetPath();
 
         if (this.artifactType == null) {
-             this.artifactType = artifactTypeRepository.getWithDVMovies();
+            this.artifactType = artifactTypeRepository.getWithDVMovies();
+        }
+
+        if (this.dvType == null) {
+            this.dvType = dvTypeRepository.getById(7L);
         }
 
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED,
@@ -95,9 +100,12 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
                 .filter(a -> multipleTrackArtifacts.contains(a.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
+        int trackRows = processTracks(singleTracksArtifactPaths.keySet());
+        int mediaFileRows = processMediaFiles(singleTracksArtifactPaths);
+        int tracksMediaFilesRows = processTracksAndMediaFiles(multipleTracksArtifactPaths);
 
-        infoHandler(ProcessorMessages.INFO_TRACKS_LOADED, processTracks(singleTracksArtifactPaths.keySet()));
-        infoHandler(ProcessorMessages.INFO_MEDIA_FILES_LOADED, processMediaFiles(singleTracksArtifactPaths));
+        infoHandler(ProcessorMessages.INFO_TRACKS_LOADED, trackRows + tracksMediaFilesRows);
+        infoHandler(ProcessorMessages.INFO_MEDIA_FILES_LOADED, mediaFileRows + tracksMediaFilesRows);
     }
 
     private Map<Artifact, Collection<Path>> loadArtifactPaths(
@@ -106,7 +114,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
             Collection<Artifact> artifacts) throws ProcessorException {
         Map<Artifact, Collection<Path>> result = new HashMap<>();
 
-        for (Artifact artifact: artifacts) {
+        for (Artifact artifact : artifacts) {
             List<Path> paths = new ArrayList<>();
             if (!PathReader.readPathPredicateFilesOnly(
                     this,
@@ -139,9 +147,8 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
 
     private int processTracks(Collection<Artifact> artifacts) {
         AtomicInteger counter = new AtomicInteger(0);
-        DVType dvType = dvTypeRepository.getById(7L);
 
-        for (Artifact artifact: artifacts) {
+        for (Artifact artifact : artifacts) {
             Track track = new Track();
             track.setArtifact(artifact);
             track.setDvType(dvType);
@@ -165,7 +172,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
     private int processMediaFiles(Map<Artifact, Collection<Path>> artifactPaths) {
         AtomicInteger counter = new AtomicInteger(0);
 
-        for (Artifact a: artifactPaths.keySet()) {
+        for (Artifact a : artifactPaths.keySet()) {
             Collection<Path> mediaFilesPaths = artifactPaths.get(a);
 
             Set<MediaFile> mediaFiles = MediaFilesProcessUtil.loadFromMediaFilesPaths(
@@ -192,7 +199,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
 
             if (
                     ValueValidator.isEmpty(a.getSize()) ||
-                    ValueValidator.isEmpty(a.getDuration())) {
+                            ValueValidator.isEmpty(a.getDuration())) {
                 a.setSize(sizeDuration.getSize());
                 a.setDuration(sizeDuration.getDuration());
 
@@ -201,11 +208,60 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
 
             if (
                     (a.getTracks().size() == 1) &&
-                    ValueValidator.isEmpty(a.getTracks().get(0).getDuration())) {
+                            ValueValidator.isEmpty(a.getTracks().get(0).getDuration())) {
                 a.getTracks().get(0).setDuration(sizeDuration.getDuration());
 
                 trackRepository.save(a.getTracks().get(0));
             }
+        }
+
+        return counter.get();
+    }
+
+    private int processTracksAndMediaFiles(Map<Artifact, Collection<Path>> artifactPaths)
+    throws ProcessorException {
+        AtomicInteger counter = new AtomicInteger(0);
+
+        for (Artifact a : artifactPaths.keySet()) {
+            Set<MediaFile> mediaFiles = MediaFilesProcessUtil.loadFromMediaFilesPaths(
+                    artifactPaths.get(a),
+                    a,
+                    mediaParser,
+                    mediaFileRepository,
+                    mediaFileMapper,
+                    counter,
+                    p -> processingEventHandler(ProcessorMessages.PROCESSING_PARSING_MEDIA_FILE, p),
+                    p -> errorHandler(ProcessorMessages.ERROR_PARSING_FILE, p));
+
+            SizeDuration sizeDuration = SizeDuration.empty();
+            for (MediaFile mediaFile: mediaFiles) {
+                NamesParser.NumberTitle nt = NamesParser.parseVideoTrack(mediaFile.getName());
+                if (nt == null) {
+                    throw new ProcessorException("Error parsing video track name: " + mediaFile.getName());
+                }
+
+                // calc size duration
+                sizeDuration.addSize(mediaFile.getSize());
+                sizeDuration.addDuration(mediaFile.getDuration());
+
+                // create track
+                Track track = new Track();
+                track.setArtifact(a);
+                track.setDvType(dvType);
+                track.setTitle(nt.getTitle());
+                track.setNum(nt.getNumber());
+                track.setDuration(mediaFile.getDuration());
+                dVProductRepository.findFirstByArtifactTypeAndTitle(artifactType, track.getTitle())
+                        .ifPresent(p -> track.setDvProducts(Set.of(p)));
+
+                trackRepository.save(track);
+
+                a.getTracks().add(track);
+            }
+
+            a.setSize(sizeDuration.getSize());
+            a.setDuration(sizeDuration.getDuration());
+            artifactRepository.save(a);
         }
 
         return counter.get();

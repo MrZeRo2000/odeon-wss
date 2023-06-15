@@ -30,7 +30,9 @@ public class ServiceProcessLoadMoviesDVTest {
     private final static String[] DV_PRODUCT_NAMES = {
             "Крепкий орешек",
             "Лицензия на убийство",
-            "Обыкновенное чудо"
+            "Обыкновенное чудо",
+            "Рецепт убийства",
+            "Убийство по книге"
     };
 
     private static final Logger log = Logger.getLogger(ServiceProcessLoadMoviesDVTest.class.getSimpleName());
@@ -109,15 +111,15 @@ public class ServiceProcessLoadMoviesDVTest {
 
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
         Assertions.assertEquals(
-                new ProcessDetail(ProcessDetailInfo.fromMessage("Artifacts loaded"), ProcessingStatus.INFO, 3, null),
+                new ProcessDetail(ProcessDetailInfo.fromMessage("Artifacts loaded"), ProcessingStatus.INFO, 4, null),
                 processService.getProcessInfo().getProcessDetails().get(1)
         );
         Assertions.assertEquals(
-                new ProcessDetail(ProcessDetailInfo.fromMessage("Tracks loaded"), ProcessingStatus.INFO, 3, null),
+                new ProcessDetail(ProcessDetailInfo.fromMessage("Tracks loaded"), ProcessingStatus.INFO, 5, null),
                 processService.getProcessInfo().getProcessDetails().get(2)
         );
         Assertions.assertEquals(
-                new ProcessDetail(ProcessDetailInfo.fromMessage("Media files loaded"), ProcessingStatus.INFO, 4, null),
+                new ProcessDetail(ProcessDetailInfo.fromMessage("Media files loaded"), ProcessingStatus.INFO, 6, null),
                 processService.getProcessInfo().getProcessDetails().get(3)
         );
 
@@ -136,7 +138,7 @@ public class ServiceProcessLoadMoviesDVTest {
 
         int oldTracks = trackRepository.getTracksByArtifactType(artifactType).size();
         Assertions.assertTrue(oldTracks > 0);
-        Assertions.assertEquals(oldArtifacts, oldTracks);
+        assertThat(oldArtifacts).isLessThanOrEqualTo(oldTracks);
 
         int oldMediaFiles = mediaFileRepository.getMediaFilesByArtifactType(artifactType).size();
         Assertions.assertTrue(oldMediaFiles > 0);
@@ -182,12 +184,36 @@ public class ServiceProcessLoadMoviesDVTest {
                     Assertions.assertFalse(ValueValidator.isEmpty(artifact.getSize()));
                     Assertions.assertFalse(ValueValidator.isEmpty(artifact.getDuration()));
 
-                    Assertions.assertEquals(artifact.getDuration(), artifact.getTracks().get(0).getDuration());
+                    assertThat(artifact.getDuration()).isEqualTo(
+                            artifact.getTracks()
+                                    .stream()
+                                    .map(Track::getDuration)
+                                    .reduce(0L, (a, b) -> b != null ? Long.sum(a, b) : 0)
+                                    .longValue()
+                    );
                 });
         trackRepository.getTracksByArtifactType(artifactType)
                 .forEach(track ->
                     Assertions.assertFalse(ValueValidator.isEmpty(track.getDuration()))
                 );
+    }
+
+    @Test
+    @Order(5)
+    @Rollback(value = false)
+    void testTrackNumber() {
+        var artifact = artifactRepository
+                .getAllByArtifactTypeWithTracks(artifactType)
+                .stream()
+                .filter(a -> a.getTitle().equals("Коломбо"))
+                .findFirst()
+                .orElseThrow();
+
+        var track = trackRepository.findTrackByArtifactAndTitle(artifact, "Убийство по книге").orElseThrow();
+        assertThat(track.getNum()).isEqualTo(2L);
+
+        track = trackRepository.findTrackByArtifactAndTitle(artifact, "Рецепт убийства").orElseThrow();
+        assertThat(track.getNum()).isEqualTo(1L);
     }
 
     @Test
@@ -216,11 +242,11 @@ public class ServiceProcessLoadMoviesDVTest {
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
 
         var resultTracks = trackRepository.getTracksByArtifactType(artifactType);
-        assertThat(resultTracks.size()).isEqualTo(3);
+        assertThat(resultTracks.size()).isEqualTo(5);
 
         int tracksWithProducts = resultTracks.stream().map(track ->
             trackRepository.findByIdWithProducts(track.getId()).orElseThrow().getDvProducts().size()
         ).mapToInt(Integer::intValue).sum();
-        assertThat(tracksWithProducts).isEqualTo(2);
+        assertThat(tracksWithProducts).isEqualTo(4);
     }
 }
