@@ -6,7 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
 public interface DVCategoryRepository
@@ -19,5 +21,9 @@ public interface DVCategoryRepository
 
     @Query("SELECT dvc.id AS id, dvc.name AS name FROM DVCategory dvc ORDER BY dvc.name")
     List<DVCategoryDTO> findAllDTO();
+
+    default Map<String, DVCategory> findAllNameMap() {
+        return this.findAll().stream().collect(Collectors.toMap(DVCategory::getName, v -> v));
+    }
 
 }

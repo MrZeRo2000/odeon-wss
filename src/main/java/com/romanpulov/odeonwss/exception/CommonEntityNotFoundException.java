@@ -9,4 +9,7 @@ public class CommonEntityNotFoundException extends DataNotFoundException {
         super(String.format("Entity %s with id=%d not found", entityName, id));
     }
 
+    public CommonEntityNotFoundException(String entityName, String s) {
+        super(String.format("Entity %s with identified by %s not found", entityName, s));
+    }
 }
