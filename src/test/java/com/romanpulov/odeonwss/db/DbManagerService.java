@@ -101,7 +101,7 @@ public class DbManagerService {
                 preparable.prepare();
                 dbManagerService.saveDb(dbType);
             } else {
-                log.info("Successfully loaded " + dbType);
+                log.info("Successfully loaded " + dbType + " with " + databaseConfiguration.getDbUrl());
             }
         } catch (IOException e) {
             log.warning("Unable to load db " + dbType + ":" + e.getMessage() + ", running prepare");
