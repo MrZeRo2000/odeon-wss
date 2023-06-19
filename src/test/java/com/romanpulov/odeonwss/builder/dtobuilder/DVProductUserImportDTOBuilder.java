@@ -12,28 +12,28 @@ public class DVProductUserImportDTOBuilder extends AbstractClassBuilder<DVProduc
         super(DVProductUserImportDTO.class);
     }
 
-    public DVProductUserImportDTO withArtifactTypeId(long artifactTypeId) {
+    public DVProductUserImportDTOBuilder withArtifactTypeId(long artifactTypeId) {
         this.instance.setArtifactTypeId(artifactTypeId);
-        return instance;
+        return this;
     }
 
-    public DVProductUserImportDTO withDvOriginId(long dvOriginId) {
+    public DVProductUserImportDTOBuilder withDvOriginId(long dvOriginId) {
         this.instance.setDvOriginId(dvOriginId);
-        return instance;
+        return this;
     }
 
-    public DVProductUserImportDTO withDvProductDetails(List<DVProductUserImportDetailDTO> dvProductDetails) {
+    public DVProductUserImportDTOBuilder withDvProductDetails(List<DVProductUserImportDetailDTO> dvProductDetails) {
         this.instance.setDvProductDetails(dvProductDetails);
-        return instance;
+        return this;
     }
 
-    public DVProductUserImportDTO withFrontInfo(String frontInfo) {
+    public DVProductUserImportDTOBuilder withFrontInfo(String frontInfo) {
         this.instance.setFrontInfo(frontInfo);
-        return instance;
+        return this;
     }
 
-    public DVProductUserImportDTO withDvCategories(List<DVCategoryDTO> dvCategories) {
+    public DVProductUserImportDTOBuilder withDvCategories(List<DVCategoryDTO> dvCategories) {
         this.instance.setDvCategories(dvCategories);
-        return instance;
+        return this;
     }
 }

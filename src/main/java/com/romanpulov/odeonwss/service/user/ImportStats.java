@@ -1,39 +1,25 @@
 package com.romanpulov.odeonwss.service.user;
 
-public class ImportStats {
-    private int rowsInserted;
-    private int rowsUpdated;
+import java.util.ArrayList;
+import java.util.List;
 
-    public int getRowsInserted() {
+public class ImportStats {
+    private final List<String> rowsInserted = new ArrayList<>();
+    private final List<String> rowsUpdated = new ArrayList<>();
+
+    public List<String> getRowsInserted() {
         return rowsInserted;
     }
 
-    public void setRowsInserted(int rowsInserted) {
-        this.rowsInserted = rowsInserted;
-    }
-
-    public int getRowsUpdated() {
+    public List<String> getRowsUpdated() {
         return rowsUpdated;
     }
-
-    public void setRowsUpdated(int rowsUpdated) {
-        this.rowsUpdated = rowsUpdated;
+    public void addRowInserted(String row) {
+        this.rowsInserted.add(row);
     }
 
-    public void incrementRowsInserted() {
-        addRowsInserted(1);
-    }
-
-    public void addRowsInserted(int rows) {
-        this.rowsInserted += rows;
-    }
-
-    public void incrementRowsUpdated() {
-        addRowsUpdated(1);
-    }
-
-    public void addRowsUpdated(int rows) {
-        this.rowsUpdated += rows;
+    public void addRowUpdated(String row) {
+        this.rowsUpdated.add(row);
     }
 
     @Override

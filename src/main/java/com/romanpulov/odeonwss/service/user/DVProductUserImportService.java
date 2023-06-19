@@ -99,8 +99,8 @@ public class DVProductUserImportService {
                 throw new EmptyParameterException("Title");
             }
             dvProductRepository.findFirstByArtifactTypeAndTitle(artifactType, det.getTitle()).ifPresentOrElse(
-                    p -> result.incrementRowsUpdated(),
-                    result::incrementRowsInserted
+                    p -> result.addRowUpdated(det.getTitle()),
+                    () -> result.addRowInserted(det.getTitle())
             );
         }
 
@@ -135,9 +135,9 @@ public class DVProductUserImportService {
             dvProduct.setDvCategories(dvCategories);
 
             if (dvProduct.getId() == null) {
-                result.incrementRowsInserted();
+                result.addRowInserted(det.getTitle());
             } else {
-                result.incrementRowsUpdated();
+                result.addRowUpdated(det.getTitle());
             }
         }
 
