@@ -132,7 +132,7 @@ public class ServiceUserImportDVProductTest {
         assertThat(ar.getRowsUpdated().size()).isEqualTo(1);
         assertThat(ar.getRowsUpdated().get(0)).isEqualTo("Cruel Summer");
 
-        var er = service.processImportDVProducts(data);
+        var er = service.executeImportDVProducts(data);
         assertThat(er.getRowsInserted().size()).isEqualTo(1);
         assertThat(er.getRowsInserted().get(0)).isEqualTo("New Title");
 

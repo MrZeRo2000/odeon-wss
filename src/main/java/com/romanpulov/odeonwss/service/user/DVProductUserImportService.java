@@ -107,7 +107,7 @@ public class DVProductUserImportService {
         return result;
     }
 
-    public ImportStats processImportDVProducts(DVProductUserImportDTO data)
+    public ImportStats executeImportDVProducts(DVProductUserImportDTO data)
             throws CommonEntityNotFoundException, EmptyParameterException {
         ImportStats result = ImportStats.empty();
 
