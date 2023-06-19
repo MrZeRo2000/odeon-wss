@@ -139,6 +139,8 @@ public class DVProductUserImportService {
             } else {
                 result.addRowUpdated(det.getTitle());
             }
+
+            dvProductRepository.save(dvProduct);
         }
 
         return result;

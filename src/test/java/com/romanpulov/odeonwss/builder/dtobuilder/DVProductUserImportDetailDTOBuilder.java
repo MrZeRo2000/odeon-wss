@@ -8,18 +8,18 @@ public class DVProductUserImportDetailDTOBuilder extends AbstractClassBuilder<DV
         super(DVProductUserImportDetailDTO.class);
     }
 
-    public DVProductUserImportDetailDTO withTitle(String title) {
+    public DVProductUserImportDetailDTOBuilder withTitle(String title) {
         this.instance.setTitle(title);
-        return instance;
+        return this;
     }
 
-    public DVProductUserImportDetailDTO withOriginalTitle(String originalTitle) {
+    public DVProductUserImportDetailDTOBuilder withOriginalTitle(String originalTitle) {
         this.instance.setOriginalTitle(originalTitle);
-        return instance;
+        return this;
     }
 
-    public DVProductUserImportDetailDTO withYear(long year) {
+    public DVProductUserImportDetailDTOBuilder withYear(long year) {
         this.instance.setYear(year);
-        return instance;
+        return this;
     }
 }
