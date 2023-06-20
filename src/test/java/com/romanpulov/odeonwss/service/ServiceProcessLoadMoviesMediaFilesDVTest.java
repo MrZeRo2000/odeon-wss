@@ -14,11 +14,10 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.DisabledIf;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -26,6 +25,7 @@ import java.util.stream.Collectors;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisabledIf(value = "${full.tests.disabled}", loadContext = true)
+@ActiveProfiles(value = "test-01")
 public class ServiceProcessLoadMoviesMediaFilesDVTest {
     private static final Logger log = Logger.getLogger(ServiceProcessLoadMoviesMediaFilesDVTest.class.getSimpleName());
 
@@ -38,20 +38,17 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
     @Autowired
     MediaFileRepository mediaFileRepository;
 
-    @PersistenceContext
-    EntityManager em;
-
     @Autowired
     private ArtifactRepository artifactRepository;
 
     @Autowired
-    private DatabaseConfiguration databaseConfiguration;;
+    private DatabaseConfiguration databaseConfiguration;
 
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
-    void testPrepare() throws Exception {
+    void testPrepare() {
         DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_IMPORTED_MOVIES, () -> {
             service.executeProcessor(ProcessorType.DV_MOVIES_IMPORTER);
             Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());

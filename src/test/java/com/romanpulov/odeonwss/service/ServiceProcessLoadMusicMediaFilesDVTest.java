@@ -13,6 +13,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.DisabledIf;
 
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisabledIf(value = "${full.tests.disabled}", loadContext = true)
+@ActiveProfiles(value = "test-03")
 public class ServiceProcessLoadMusicMediaFilesDVTest {
     private static final Logger log = Logger.getLogger(ServiceProcessLoadMusicMediaFilesDVTest.class.getSimpleName());
 
@@ -39,7 +41,7 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
     MediaFileRepository mediaFileRepository;
 
     @Autowired
-    DatabaseConfiguration databaseConfiguration;;
+    DatabaseConfiguration databaseConfiguration;
 
     @Test
     @Order(1)

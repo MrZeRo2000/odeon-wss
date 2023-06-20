@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisabledIf(value = "${full.tests.disabled}", loadContext = true)
+@ActiveProfiles(value = "test-05")
 public class ServiceProcessValidateDVMusicTest {
     private static final Logger log = Logger.getLogger(ServiceProcessValidateDVMusicTest.class.getSimpleName());
     private static final Set<String> EXISTING_ARTIFACT_TITLES = Set.of(
@@ -79,14 +80,13 @@ public class ServiceProcessValidateDVMusicTest {
 
     private void internalPrepareExisting() {
         internalPrepareImported();
-        DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA_EXISTING, () -> {
-            artifactRepository.getAllByArtifactType(artifactType)
-                    .forEach(artifact -> {
-                        if (!EXISTING_ARTIFACT_TITLES.contains(artifact.getTitle())) {
-                            artifactRepository.delete(artifact);
-                        }
-                    });
-        });
+        DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA_EXISTING, () ->
+                artifactRepository.getAllByArtifactType(artifactType)
+                .forEach(artifact -> {
+                    if (!EXISTING_ARTIFACT_TITLES.contains(artifact.getTitle())) {
+                        artifactRepository.delete(artifact);
+                    }
+                }));
     }
 
     @Test

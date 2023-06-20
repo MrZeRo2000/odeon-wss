@@ -9,6 +9,7 @@ import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@ActiveProfiles(value = "test-07")
 public class ServiceProcessValidateMP3Test {
     public static final ProcessorType PROCESSOR_TYPE = ProcessorType.MP3_VALIDATOR;
     private ArtifactType artifactType;
@@ -47,7 +49,7 @@ public class ServiceProcessValidateMP3Test {
     List<String> artistNames;
 
     @Autowired
-    public ServiceProcessValidateMP3Test(ProcessService service, ArtifactTypeRepository artifactTypeRepository) {
+    public ServiceProcessValidateMP3Test(ProcessService service) {
         this.service = service;
     }
 
@@ -243,7 +245,7 @@ public class ServiceProcessValidateMP3Test {
 
     @Test
     @Order(6)
-    void testAdditionalFileArtist() throws Exception {
+    void testAdditionalFileArtist() {
         service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/validation_mp3_additional_artist/");
         ProcessInfo pi = service.getProcessInfo();
         List<ProcessDetail> processDetails = pi.getProcessDetails();
@@ -290,7 +292,7 @@ public class ServiceProcessValidateMP3Test {
 
     @Test
     @Order(8)
-    void testMissingFileTracks() throws Exception {
+    void testMissingFileTracks() {
         service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/validation_mp3_missing_tracks/");
         ProcessInfo pi = service.getProcessInfo();
         List<ProcessDetail> processDetails = pi.getProcessDetails();

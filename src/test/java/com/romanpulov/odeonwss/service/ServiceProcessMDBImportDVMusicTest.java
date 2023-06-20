@@ -12,6 +12,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.DisabledIf;
 
@@ -25,6 +26,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisabledIf(value = "${full.tests.disabled}", loadContext = true)
+@ActiveProfiles(value = "test-04")
 public class ServiceProcessMDBImportDVMusicTest {
     private static final Logger log = Logger.getLogger(ServiceProcessMDBImportClassicsTest.class.getSimpleName());
     private static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MUSIC_IMPORTER;
@@ -47,7 +49,7 @@ public class ServiceProcessMDBImportDVMusicTest {
     ProcessService service;
 
     @Autowired
-    DatabaseConfiguration databaseConfiguration;;
+    DatabaseConfiguration databaseConfiguration;
 
     @Test
     @Order(1)

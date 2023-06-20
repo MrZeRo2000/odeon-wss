@@ -10,6 +10,7 @@ import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.persistence.EntityManager;
@@ -22,6 +23,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@ActiveProfiles(value = "test-06")
 public class ServiceProcessValidateLATest {
     private static final List<String> TEST_ARTISTS =
             List.of(
@@ -56,7 +58,7 @@ public class ServiceProcessValidateLATest {
     private ArtifactRepository artifactRepository;
 
     @Autowired
-    private DatabaseConfiguration databaseConfiguration;;
+    private DatabaseConfiguration databaseConfiguration;
 
     private void prepareInternal() {
         DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_LOADED_LA, () -> {
@@ -122,7 +124,7 @@ public class ServiceProcessValidateLATest {
 
     @Test
     @Order(3)
-    void testOk() throws Exception {
+    void testOk() {
         service.executeProcessor(ProcessorType.LA_VALIDATOR);
         ProcessInfo pi = service.getProcessInfo();
         List<ProcessDetail> processDetails = pi.getProcessDetails();
@@ -173,7 +175,7 @@ public class ServiceProcessValidateLATest {
     }
 
     private String getErrorStringFromTrackId(long id) {
-        Track track = trackRepository.findByIdWithMediaFiles(1L).orElseThrow();
+        Track track = trackRepository.findByIdWithMediaFiles(id).orElseThrow();
         Artifact artifact = artifactRepository.findById(track.getArtifact().getId()).orElseThrow();
         assert artifact.getArtist() != null;
         Artist artist = artistRepository.findById(artifact.getArtist().getId()).orElseThrow();
@@ -185,7 +187,7 @@ public class ServiceProcessValidateLATest {
     @Test
     @Order(4)
     @Transactional
-    void testNoTrackMediaFileShouldFail() throws Exception {
+    void testNoTrackMediaFileShouldFail() {
         String errorString = getErrorStringFromTrackId(1L);
 
         em.createNativeQuery("delete from tracks_media_files WHERE trck_id = 1").executeUpdate();
@@ -214,7 +216,7 @@ public class ServiceProcessValidateLATest {
                         null,
                         null)
         );
-        assertThat(processDetails.get(id++)).isEqualTo(
+        assertThat(processDetails.get(id)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Media files not in database",
@@ -230,7 +232,7 @@ public class ServiceProcessValidateLATest {
     @Test
     @Order(5)
     @Transactional
-    void testNoTrackShouldFail() throws Exception {
+    void testNoTrackShouldFail() {
         String errorString = getErrorStringFromTrackId(1L);
 
         em.createNativeQuery("delete from tracks WHERE trck_id = 1").executeUpdate();
@@ -261,7 +263,7 @@ public class ServiceProcessValidateLATest {
                         null,
                         null)
         );
-        assertThat(processDetails.get(id++)).isEqualTo(
+        assertThat(processDetails.get(id)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Media files not in database",
@@ -274,7 +276,7 @@ public class ServiceProcessValidateLATest {
 
     @Test
     @Order(6)
-    void testOkAgain() throws Exception {
+    void testOkAgain() {
         service.executeProcessor(ProcessorType.LA_VALIDATOR);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
     }
