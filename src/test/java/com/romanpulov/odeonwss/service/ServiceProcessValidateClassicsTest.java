@@ -8,13 +8,11 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.DisabledIf;
 
 import java.util.logging.Logger;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@DisabledIf(value = "${full.tests.disabled}", loadContext = true)
 public class ServiceProcessValidateClassicsTest {
 
     private static final Logger log = Logger.getLogger(ServiceProcessValidateClassicsTest.class.getName());
@@ -46,7 +44,7 @@ public class ServiceProcessValidateClassicsTest {
 
     @Test
     @Order(3)
-    void testFail() throws Exception {
+    void testFail() {
         Artifact artifact = artifactRepository.findById(1L).orElseThrow();
         artifact.setTitle(artifact.getTitle() + "(changed)");
         artifactRepository.save(artifact);

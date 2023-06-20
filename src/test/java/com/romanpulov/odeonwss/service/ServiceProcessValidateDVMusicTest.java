@@ -12,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.DisabledIf;
 
 import java.util.List;
 import java.util.Set;
@@ -23,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@DisabledIf(value = "${full.tests.disabled}", loadContext = true)
 @ActiveProfiles(value = "test-05")
 public class ServiceProcessValidateDVMusicTest {
     private static final Logger log = Logger.getLogger(ServiceProcessValidateDVMusicTest.class.getSimpleName());

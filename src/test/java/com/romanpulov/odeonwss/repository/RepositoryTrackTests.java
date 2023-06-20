@@ -1,7 +1,6 @@
 package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.*;
-import com.romanpulov.odeonwss.dto.TrackTableDTO;
 import com.romanpulov.odeonwss.dto.TrackValidationDTO;
 import com.romanpulov.odeonwss.entity.*;
 import org.junit.jupiter.api.*;
@@ -16,8 +15,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -284,36 +281,5 @@ public class RepositoryTrackTests {
         assertThat(deletedTrack.getDvProducts().size()).isEqualTo(0);
 
 
-    }
-
-    @Test
-    @Order(100)
-    @Disabled("Not actual after DB structure change, to delete")
-    void testCascade() {
-        Iterable<Track> tracks = trackRepository.findAll();
-        List<Track> trackList = StreamSupport.stream(tracks.spliterator(), false).collect(Collectors.toList());
-        Assertions.assertEquals(2, trackList.size());
-
-        MediaFile mediaFile = new EntityMediaFileBuilder()
-                .withArtifact(artifactRepository.findById(1L).orElseThrow())
-                .withFormat("mp3")
-                .withName("File Name")
-                .withDuration(123456L)
-                .withBitrate(123L)
-                .withSize(77777L)
-                .build();
-
-        //insert media file
-        mediaFileRepository.save(mediaFile);
-        Assertions.assertEquals(1, mediaFileRepository.findAllByArtifact(artifactRepository.findById(1L).orElseThrow()).size());
-        Assertions.assertEquals(1, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
-
-        //delete track
-        trackRepository.delete(trackList.get(0));
-        trackList = StreamSupport.stream(trackRepository.findAll().spliterator(), false).collect(Collectors.toList());
-        Assertions.assertEquals(1, trackList.size());
-
-        //media file deleted
-        Assertions.assertEquals(0, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
     }
 }

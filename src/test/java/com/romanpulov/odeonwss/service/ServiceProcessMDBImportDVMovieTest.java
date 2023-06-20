@@ -5,14 +5,13 @@ import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.DisabledIf;
 
 import java.util.List;
 
@@ -21,7 +20,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@DisabledIf(value = "${full.tests.disabled}", loadContext = true)
 public class ServiceProcessMDBImportDVMovieTest {
 
     public static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MOVIES_IMPORTER;
@@ -142,7 +140,6 @@ public class ServiceProcessMDBImportDVMovieTest {
         assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
 
         ProcessInfo pi = executeProcessor();
-        List<ProcessDetail> processDetails = pi.getProcessDetails();
 
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
     }
