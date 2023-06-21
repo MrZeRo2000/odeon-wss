@@ -12,6 +12,7 @@ import os
 import random
 import string
 from logger import get_logger
+from file_utils import validate_file_name_and_path, get_file_lines
 
 
 class FileGenerator:
@@ -19,24 +20,6 @@ class FileGenerator:
         self.file_names = file_names
         self.folder_name = folder_name
         self.logger = logger
-
-    def validate_params(self):
-        if not os.path.exists(self.file_names):
-            raise ValueError(f"File name does not exist: {self.file_names}")
-        if not os.path.isfile(self.file_names):
-            raise ValueError(f"{self.file_names} is not a file")
-        if not os.path.exists(self.folder_name):
-            raise ValueError(f"Folder does not exist: {self.folder_name}")
-        if not os.path.isdir(self.folder_name):
-            raise ValueError(f"{self.folder_name} is not a folder")
-
-    def get_file_names(self) -> list[str]:
-        result = []
-        with open(self.file_names) as f:
-            for line in f:
-                result.append(line.rstrip())
-
-        return sorted(result)
 
     def generate_files(self, file_names: list[str]):
         for file_name in file_names:
@@ -47,11 +30,11 @@ class FileGenerator:
 
     def execute(self):
         self.logger.info("Validating params")
-        self.validate_params()
+        validate_file_name_and_path(self.file_names, self.folder_name)
         self.logger.info("Params validated")
 
         self.logger.info("Reading file names")
-        files = self.get_file_names()
+        files = get_file_lines(self.file_names)
         self.logger.info(f"File names obtained: {str(files)}")
 
         self.logger.info("Generating files")
