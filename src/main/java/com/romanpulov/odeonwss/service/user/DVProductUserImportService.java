@@ -130,6 +130,7 @@ public class DVProductUserImportService {
                        return newDvProduct;
                     });
             dvProduct.setDvOrigin(dvOrigin);
+            dvProduct.setFrontInfo(data.getFrontInfo());
             dvProduct.setOriginalTitle(det.getOriginalTitle());
             dvProduct.setYear(det.getYear());
             dvProduct.setDvCategories(dvCategories);

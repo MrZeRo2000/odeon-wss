@@ -114,14 +114,23 @@ public class ServiceUserImportDVProductTest {
         var data = (new DVProductUserImportDTOBuilder())
                 .withArtifactTypeId(getArtifactType().getId())
                 .withDvOriginId(dvOriginRepository.findById(1L).orElseThrow().getId())
+                .withFrontInfo("Olivia Holt")
                 .withDvCategories(
                         List.of(
                                 (new DVCategoryDTOBuilder()).withName("Cat 01").build()
                         )
                 )
                 .withDvProductDetails(List.of(
-                        (new DVProductUserImportDetailDTOBuilder().withTitle("New Title").withOriginalTitle("New Original Title").withYear(1999L).build()),
-                        (new DVProductUserImportDetailDTOBuilder().withTitle("Cruel Summer").withOriginalTitle("Cruel Summer").withYear(2003L).build())
+                        (new DVProductUserImportDetailDTOBuilder()
+                                .withTitle("New Title")
+                                .withOriginalTitle("New Original Title")
+                                .withYear(1999L)
+                                .build()),
+                        (new DVProductUserImportDetailDTOBuilder()
+                                .withTitle("Cruel Summer")
+                                .withOriginalTitle("Cruel Summer")
+                                .withYear(2003L)
+                                .build())
                 ))
                 .build();
 
@@ -144,6 +153,7 @@ public class ServiceUserImportDVProductTest {
         // "The Idol", "Cruel Summer", "New Title"
 
         assertThat(products.get(0).getTitle()).isEqualTo("Cruel Summer");
+        assertThat(products.get(0).getFrontInfo()).isEqualTo("Olivia Holt");
         assertThat(products.get(0).getYear()).isEqualTo(2003L);
         assertThat(
                 products.get(0)
@@ -154,10 +164,12 @@ public class ServiceUserImportDVProductTest {
 
         assertThat(products.get(1).getTitle()).isEqualTo("New Title");
         assertThat(products.get(1).getOriginalTitle()).isEqualTo("New Original Title");
+        assertThat(products.get(1).getFrontInfo()).isEqualTo("Olivia Holt");
         assertThat(products.get(1).getYear()).isEqualTo(1999L);
         assertThat(products.get(1).getDvCategories().size()).isEqualTo(1);
 
         assertThat(products.get(2).getTitle()).isEqualTo("The Idol");
         assertThat(products.get(2).getDvCategories().size()).isEqualTo(0);
+        assertThat(products.get(2).getFrontInfo()).isNull();
     }
 }
