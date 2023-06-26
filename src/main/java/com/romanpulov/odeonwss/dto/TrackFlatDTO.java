@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public interface TrackFlatDTO {
     Long getId();
     Long getArtifactId();
+    String getArtifactTitle();
     Long getArtistId();
     String getArtistName();
     Long getPerformerArtistId();

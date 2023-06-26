@@ -13,6 +13,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -153,6 +154,7 @@ public class ServiceTrackTest {
                         .withDiskNum(1L)
                         .withNum(5L)
                         .withDuration(12L)
+                        .withDvTypeId(7L)
                         .withMediaFileIds(Stream.of(mediaFile12).map(MediaFile::getId).collect(Collectors.toSet()))
                         .withDvProductId(product.getId())
                         .build()
@@ -173,7 +175,6 @@ public class ServiceTrackTest {
 
     @Test
     @Order(2)
-    @Rollback(value = false)
     void testGetTableByArtifactTypeId() {
         var table = trackService.getTableByArtifactTypeId(artifactTypeRepository.getWithMP3().getId());
         assertThat(table.size()).isEqualTo(2);
@@ -183,6 +184,23 @@ public class ServiceTrackTest {
         assertThat(table.get(1).getTitle()).isEqualTo("Comp 1-2");
         assertThat(table.get(1).getDvProduct().getId()).isEqualTo(1);
         assertThat(table.get(1).getDvProduct().getTitle()).isEqualTo("Title 1");
+    }
+
+    @Test
+    @Order(2)
+    void testGetTableByProductId() {
+        assertThat(trackService.getTableByProductId(2L).size()).isEqualTo(0);
+
+        var table = trackService.getTableByProductId(1L);
+        assertThat(table.size()).isEqualTo(1);
+        var row = table.get(0);
+        assertThat(row.getArtifactId()).isEqualTo(1L);
+        assertThat(row.getArtifactTitle()).isEqualTo("Title 1");
+        assertThat(row.getNum()).isEqualTo(5L);
+        assertThat(row.getDuration()).isEqualTo(12L);
+        assertThat(row.getTitle()).isEqualTo("Comp 1-2");
+        assertThat(row.getDvType().getId()).isEqualTo(7L);
+        assertThat(row.getFileNames()).isEqualTo(List.of("Comp 1-2.mp3"));
     }
 
     @Test

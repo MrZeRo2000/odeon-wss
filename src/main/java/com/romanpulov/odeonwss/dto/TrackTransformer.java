@@ -16,6 +16,7 @@ public class TrackTransformer {
                 TrackDTOImpl newDTO = new TrackDTOImpl();
                 newDTO.setId(row.getId());
                 newDTO.setArtifactId(row.getArtifactId());
+                newDTO.setArtifactTitle(row.getArtifactTitle());
 
                 if (row.getArtistId() != null) {
                     newDTO.setArtist(Optional.ofNullable(artistDTOMap.get(row.getArtistId())).orElseGet(() -> {

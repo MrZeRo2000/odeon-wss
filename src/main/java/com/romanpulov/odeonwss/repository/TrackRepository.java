@@ -68,7 +68,7 @@ public interface TrackRepository extends CrudRepository<Track, Long> {
             "LEFT OUTER JOIN Artist par ON par = c.performerArtist " +
             "LEFT OUTER JOIN DVType dvt ON dvt = c.dvType " +
             "WHERE c.artifact = :artifact " +
-            "ORDER BY c.diskNum, c.num, ar.name, c.title")
+            "ORDER BY c.diskNum, c.num, ar.name, c.title, m.name")
     List<TrackFlatDTO> findAllFlatDTOByArtifact(Artifact artifact);
 
     @Query("SELECT " +
@@ -88,6 +88,29 @@ public interface TrackRepository extends CrudRepository<Track, Long> {
             "WHERE a.artifactType.id = :artifactTypeId " +
             "ORDER BY a.title, c.num, c.title")
     List<TrackFlatDTO> findAllFlatDTOByArtifactTypeId(Long artifactTypeId);
+
+    @Query("SELECT " +
+            "c.id AS id, " +
+            "c.num AS num, " +
+            "a.id AS artifactId, " +
+            "a.title AS artifactTitle, " +
+            "dvt.id AS dvTypeId, " +
+            "dvt.name AS dvTypeName, " +
+            "c.title AS title, " +
+            "c.duration AS duration, " +
+            "dvp.id AS dvProductId, " +
+            "dvp.title AS dvProductTitle, " +
+            "m.name AS fileName " +
+            "FROM Track c " +
+            "INNER JOIN Artifact a ON c.artifact = a " +
+            "INNER JOIN TrackDVProduct tp ON tp.trackId = c.id " +
+            "INNER JOIN DVProduct dvp ON tp.dvProductId = dvp.id " +
+            "LEFT OUTER JOIN TrackMediaFile cm ON cm.trackId = c.id " +
+            "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
+            "LEFT OUTER JOIN DVType dvt ON dvt = c.dvType " +
+            "WHERE dvp.id = :dvProductId " +
+            "ORDER BY a.title, c.num, c.title, m.name")
+    List<TrackFlatDTO> findAllFlatDTOByDvProductId(Long dvProductId);
 
     Optional<Track> findTrackByArtifactAndTitle(Artifact artifact, String title);
 }
