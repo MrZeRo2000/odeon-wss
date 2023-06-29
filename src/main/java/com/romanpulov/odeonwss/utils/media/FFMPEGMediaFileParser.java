@@ -70,7 +70,7 @@ public class FFMPEGMediaFileParser extends AbstractCLIMediaFileParser {
                 long duration = Math.round(streamObject.optDouble("duration", 0));
                 long bitRate = Math.round(streamObject.optInt("bit_rate", 0) / 1000.0);
 
-                result.add(new MediaStreamInfo(mediaType, duration, bitRate));
+                result.add(MediaStreamInfo.createUnordered(mediaType, duration, bitRate));
             }
         }
 

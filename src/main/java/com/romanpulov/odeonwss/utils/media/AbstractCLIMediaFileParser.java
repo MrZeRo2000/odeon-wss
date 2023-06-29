@@ -10,7 +10,8 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractCLIMediaFileParser implements MediaFileParserInterface {
 
-    private static MediaType getPrimaryMediaTypeFromStreams(List<MediaStreamInfo> mediaStreams) throws MediaInfoParsingException {
+    private static MediaType getPrimaryMediaTypeFromStreams(List<MediaStreamInfo> mediaStreams)
+            throws MediaInfoParsingException {
         if (mediaStreams.size() > 0) {
             return mediaStreams.get(0).getMediaType();
         } else {

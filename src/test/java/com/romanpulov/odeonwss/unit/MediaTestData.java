@@ -27,4 +27,10 @@ public class MediaTestData {
     static final long TEST_MP3_ME_FILE_SIZE = 11456458;
     static final long TEST_MP3_ME_FILE_BITRATE = 320;
 
+    static final String TEST_VOB_FILE_NAME = "../odeon-test-data/files/sample_960x400_ocean_with_audio.vob";
+    static final long TEST_VOB_FILE_DURATION = 47L;
+    static final long TEST_VOB_FILE_SIZE = 8615936L;
+    static final long TEST_VOB_WIDTH = 960L;
+    static final long TEST_VOB_HEIGHT = 400L;
+
 }

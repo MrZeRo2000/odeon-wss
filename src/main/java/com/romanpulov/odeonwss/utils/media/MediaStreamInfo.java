@@ -9,6 +9,12 @@ public class MediaStreamInfo {
         return mediaType;
     }
 
+    private final long order;
+
+    public long getOrder() {
+        return order;
+    }
+
     private final long duration;
 
     public long getDuration() {
@@ -21,10 +27,19 @@ public class MediaStreamInfo {
         return bitRate;
     }
 
-    public MediaStreamInfo(MediaType mediaType, long duration, long bitRate) {
+    private MediaStreamInfo(MediaType mediaType, long order, long duration, long bitRate) {
         this.mediaType = mediaType;
+        this.order = order;
         this.duration = duration;
         this.bitRate = bitRate;
+    }
+
+    public static MediaStreamInfo createOrdered(MediaType mediaType, long order, long duration, long bitRate) {
+        return new MediaStreamInfo(mediaType, order, duration, bitRate);
+    }
+
+    public static MediaStreamInfo createUnordered(MediaType mediaType, long duration, long bitRate) {
+        return new MediaStreamInfo(mediaType, 0, duration, bitRate);
     }
 
     @Override

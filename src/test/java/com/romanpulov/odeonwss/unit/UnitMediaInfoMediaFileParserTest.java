@@ -6,12 +6,15 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 
 import static com.romanpulov.odeonwss.unit.MediaTestData.*;
 import static com.romanpulov.odeonwss.unit.MediaTestData.TEST_MP3_ME_FILE_SIZE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class UnitMediaInfoMediaFileParserTest {
+    private static final Logger logger = Logger.getLogger(UnitMediaInfoMediaFileParserTest.class.getSimpleName());
+
     MediaInfoMediaFileParser parser = new MediaInfoMediaFileParser("../MediaInfo");
 
     @Test
@@ -142,6 +145,28 @@ public class UnitMediaInfoMediaFileParserTest {
         Assertions.assertEquals(TEST_MP3_ME_FILE_BITRATE, formatInfo.getBitRate());
         Assertions.assertEquals(TEST_MP3_ME_FILE_DURATION, formatInfo.getDuration());
         Assertions.assertEquals(TEST_MP3_ME_FILE_SIZE, formatInfo.getSize());
+    }
+
+    @Test
+    void testVOB() {
+        AtomicReference<MediaFileInfo> atomicInfo = new AtomicReference<>();
+
+        Assertions.assertDoesNotThrow(
+                () -> atomicInfo.set(
+                        parser.parseMediaFile(Path.of(TEST_VOB_FILE_NAME))
+                )
+        );
+
+        MediaFileInfo info = atomicInfo.get();
+        logger.info("Got media info:" + info);
+        assertThat(info.getPrimaryMediaType()).isEqualTo(MediaType.VIDEO);
+
+        MediaContentInfo contentInfo = info.getMediaContentInfo();
+        Assertions.assertEquals(2, contentInfo.getMediaStreams().size());
+
+        MediaFormatInfo formatInfo = contentInfo.getMediaFormatInfo();
+        assertThat(formatInfo.getDuration()).isEqualTo(TEST_VOB_FILE_DURATION);
+        assertThat(formatInfo.getSize()).isEqualTo(TEST_VOB_FILE_SIZE);
     }
 
 }

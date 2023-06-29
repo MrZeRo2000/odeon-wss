@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
     private final static String MEDIA_INFO_FILE_NAME = "MediaInfo.exe";
@@ -77,8 +78,9 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
             } else {
                 MediaType mediaType = EnumUtils.getEnumFromString(MediaType.class, trackType.toUpperCase());
                 if (mediaType != null) {
-                    MediaStreamInfo mediaStream = new MediaStreamInfo(
+                    MediaStreamInfo mediaStream = MediaStreamInfo.createOrdered(
                             mediaType,
+                            Long.parseLong((String) tracksMap.getOrDefault("StreamOrder", "0")),
                             Math.round(
                                     Double.parseDouble((String) tracksMap.getOrDefault("Duration", "0"))),
                             Math.round(
@@ -102,6 +104,12 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
                 mediaStreamInfo.getBitRate()
         );
 
-        return new MediaContentInfo(new ArrayList<>(mediaStreamMap.values()), resultMediaFormat);
+        List<MediaStreamInfo> mediaStreams = mediaStreamMap
+                .values()
+                .stream()
+                .sorted(Comparator.comparing(MediaStreamInfo::getOrder))
+                .collect(Collectors.toList());
+
+        return new MediaContentInfo(mediaStreams, resultMediaFormat);
     }
 }
