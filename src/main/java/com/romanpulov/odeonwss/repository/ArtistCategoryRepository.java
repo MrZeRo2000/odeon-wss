@@ -5,14 +5,14 @@ import com.romanpulov.odeonwss.dto.ArtistCategoryDetailDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Transactional(readOnly = true)
-public interface ArtistCategoryRepository extends PagingAndSortingRepository<ArtistCategory, Long> {
+public interface ArtistCategoryRepository extends CrudRepository<ArtistCategory, Long> {
 
     List<ArtistCategory> getArtistCategoriesByArtistOrderByTypeAscNameAsc(Artist artist);
 

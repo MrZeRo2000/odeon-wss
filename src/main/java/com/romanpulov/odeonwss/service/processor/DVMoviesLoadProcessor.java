@@ -70,7 +70,7 @@ public class DVMoviesLoadProcessor extends AbstractFileSystemProcessor {
         }
 
         if (this.dvType == null) {
-            this.dvType = dvTypeRepository.getById(7L);
+            this.dvType = dvTypeRepository.getReferenceById(7L);
         }
 
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED,

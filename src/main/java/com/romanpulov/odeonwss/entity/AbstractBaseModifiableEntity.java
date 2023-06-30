@@ -2,10 +2,10 @@ package com.romanpulov.odeonwss.entity;
 
 import com.romanpulov.odeonwss.entity.converter.DateTimeConverter;
 
-import javax.persistence.Convert;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import jakarta.persistence.Convert;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import java.time.LocalDateTime;
 
 @MappedSuperclass

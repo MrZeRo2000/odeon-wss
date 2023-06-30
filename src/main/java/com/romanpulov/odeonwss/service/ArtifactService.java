@@ -7,7 +7,7 @@ import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Optional;
 
 @Service

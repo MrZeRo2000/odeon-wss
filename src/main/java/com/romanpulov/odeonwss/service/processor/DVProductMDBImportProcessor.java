@@ -12,7 +12,7 @@ import com.romanpulov.odeonwss.repository.DVOriginRepository;
 import com.romanpulov.odeonwss.repository.DVProductRepository;
 import org.springframework.stereotype.Component;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;

@@ -3,8 +3,8 @@ package com.romanpulov.odeonwss.entity;
 import com.romanpulov.odeonwss.entity.converter.ArtistCategoryTypeConverter;
 import org.springframework.lang.Nullable;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "artist_categories")

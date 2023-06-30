@@ -2,7 +2,7 @@ package com.romanpulov.odeonwss.config;
 
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.util.HashMap;
 import java.util.Map;
 

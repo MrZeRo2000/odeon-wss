@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 
 import java.util.List;
 import java.util.Map;

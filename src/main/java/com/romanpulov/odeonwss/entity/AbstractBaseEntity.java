@@ -1,6 +1,6 @@
 package com.romanpulov.odeonwss.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @MappedSuperclass
 public abstract class AbstractBaseEntity {

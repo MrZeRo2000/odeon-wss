@@ -3,8 +3,8 @@ package com.romanpulov.odeonwss.entity;
 import com.romanpulov.odeonwss.entity.converter.ArtistTypeConverter;
 import org.hibernate.HibernateException;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 

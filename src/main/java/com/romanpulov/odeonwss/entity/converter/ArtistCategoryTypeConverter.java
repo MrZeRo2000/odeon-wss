@@ -2,8 +2,8 @@ package com.romanpulov.odeonwss.entity.converter;
 
 import com.romanpulov.odeonwss.entity.ArtistCategoryType;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 @Converter
 public class ArtistCategoryTypeConverter implements AttributeConverter<ArtistCategoryType, String> {

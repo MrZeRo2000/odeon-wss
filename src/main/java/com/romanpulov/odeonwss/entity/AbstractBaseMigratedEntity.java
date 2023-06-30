@@ -1,6 +1,6 @@
 package com.romanpulov.odeonwss.entity;
 
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public abstract class AbstractBaseMigratedEntity extends AbstractBaseModifiableEntity {

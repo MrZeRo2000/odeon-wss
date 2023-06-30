@@ -5,8 +5,8 @@ import com.romanpulov.odeonwss.entity.converter.ProcessingStatusConverter;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import org.hibernate.Hibernate;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Objects;
 

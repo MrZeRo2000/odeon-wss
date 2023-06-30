@@ -1,18 +1,18 @@
 package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.dto.ArtistFlatDTO;
+import com.romanpulov.odeonwss.dto.IdNameDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.dto.IdNameDTO;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Transactional(readOnly = true)
-public interface ArtistRepository extends PagingAndSortingRepository<Artist, Long> {
+public interface ArtistRepository extends CrudRepository<Artist, Long> {
     List<Artist> getAllByType(ArtistType type);
 
     List<Artist> getAllByTypeOrderByName(ArtistType type);

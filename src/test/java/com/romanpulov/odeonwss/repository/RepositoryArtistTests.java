@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.jdbc.Sql;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.NoSuchElementException;
 

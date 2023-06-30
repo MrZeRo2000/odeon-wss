@@ -6,8 +6,8 @@ import com.romanpulov.odeonwss.entity.converter.ProcessorTypeConverter;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
