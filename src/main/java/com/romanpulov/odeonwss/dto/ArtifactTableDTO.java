@@ -6,23 +6,14 @@ import java.time.LocalDateTime;
 
 public class ArtifactTableDTO {
     private Long id;
-
     private String artifactTypeName;
-
     private String artistTypeCode;
-
     private String artistName;
-
     private String performerArtistName;
-
     private String title;
-
     private Long year;
-
     private Long duration;
-
     private Long size;
-
     private LocalDateTime insertDateTime;
 
     public Long getId() {
