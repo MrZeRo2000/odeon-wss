@@ -295,6 +295,8 @@ public class RepositoryArtifactTests {
                 .getArtifactsWithNoMonotonicallyIncreasingTrackNumbers(
                         artifactTypeRepository.getWithDVMovies().getId());
         assertThat(hasNumbers.size()).isEqualTo(1);
+        assertThat(hasNumbers.get(0).getId()).isNotNull();
+        assertThat(hasNumbers.get(0).getTitle()).isEqualTo("Title No Artist");
 
         assertThat(artifactRepository
                 .getArtifactsWithNoMonotonicallyIncreasingTrackNumbers(
