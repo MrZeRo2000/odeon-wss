@@ -29,11 +29,11 @@ public abstract class AbstractProcessor {
 
     abstract public void execute() throws ProcessorException;
 
-    protected void infoHandler(String infoMessage) {
+    public void infoHandler(String infoMessage) {
         progressHandler.handleProgress(ProcessDetail.fromInfoMessage(infoMessage));
     }
 
-    protected void infoHandler(String infoMessage, int rows) {
+    public void infoHandler(String infoMessage, int rows) {
         progressHandler.handleProgress(ProcessDetail.fromInfoMessage(infoMessage, rows));
     }
 
@@ -61,11 +61,11 @@ public abstract class AbstractProcessor {
         progressHandler.handleProgress(ProcessDetail.fromWarningMessageWithAction(warningMessage, ProcessingActionType.ADD_ARTIST, artistName));
     }
 
-    protected void processingEventHandler(String eventText) {
+    public void processingEventHandler(String eventText) {
         progressHandler.handleProcessingEvent(ProcessingEvent.fromEventText(eventText));
     }
 
-    protected void processingEventHandler(String eventText, Object ...args) {
+    public void processingEventHandler(String eventText, Object ...args) {
         progressHandler.handleProcessingEvent(ProcessingEvent.fromEventText(String.format(eventText, args)));
     }
 

@@ -7,6 +7,7 @@ import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
+import com.romanpulov.odeonwss.service.processor.utils.MediaFilesValidateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -57,17 +58,11 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
             if (PathValidator.validateArtifactsMusic(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
-                processingEventHandler(ProcessorMessages.VALIDATING_MEDIA_FILES);
-                if (PathValidator.validateMediaFilesMusic(this, pathValidation, dbValidation)) {
-                    infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
-                }
-
-                processingEventHandler(ProcessorMessages.VALIDATING_ARTIFACT_MEDIA_FILES);
-                List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
-                        .getArtifactMediaFileValidationMusic(artifactType);
-                if (PathValidator.validateArtifactMediaFilesMusic(this, pathValidation, dbArtifactValidation)) {
-                        infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
-                }
+                MediaFilesValidateUtil.validateMediaFilesAll(
+                        this,
+                        pathValidation,
+                        dbValidation,
+                        mediaFileRepository.getArtifactMediaFileValidationMusic(artifactType));
             }
         }
         logger.info("Completed LAValidateProcessor execution");
