@@ -270,4 +270,34 @@ public class RepositoryArtifactTests {
         var withTracks = artifactRepository.getAllByArtifactTypeWithoutTracks(artifactTypeRepository.getWithDVMovies());
         assertThat(withTracks.size()).isEqualTo(0);
     }
+
+    @Test
+    @Order(12)
+    void testArtifactsWithNoMonotonicallyIncreasingTrackNumbers() {
+        var noNumbers = artifactRepository
+                .getArtifactsWithNoMonotonicallyIncreasingTrackNumbers(
+                        artifactTypeRepository.getWithDVMovies().getId());
+        assertThat(noNumbers.size()).isEqualTo(0);
+
+        var artifact = trackRepository.getTracksByArtifactType(artifactTypeRepository.getWithDVMovies()).get(0).getArtifact();
+        assertThat(artifact).isNotNull();
+
+        var track = new EntityTrackBuilder()
+                .withArtifact(artifact)
+                .withTitle("Track title 2")
+                .withDiskNum(1L)
+                .withNum(3L)
+                .withDuration(555L)
+                .build();
+        trackRepository.save(track);
+
+        var hasNumbers = artifactRepository
+                .getArtifactsWithNoMonotonicallyIncreasingTrackNumbers(
+                        artifactTypeRepository.getWithDVMovies().getId());
+        assertThat(hasNumbers.size()).isEqualTo(1);
+
+        assertThat(artifactRepository
+                .getArtifactsWithNoMonotonicallyIncreasingTrackNumbers(
+                        artifactTypeRepository.getWithDVMusic().getId()).size()).isEqualTo(0);
+    }
 }

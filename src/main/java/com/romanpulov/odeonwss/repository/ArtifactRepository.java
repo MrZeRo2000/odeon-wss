@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.dto.ArtifactFlatDTO;
 import com.romanpulov.odeonwss.dto.ArtifactTableDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
@@ -80,6 +81,27 @@ public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifa
             "WHERE a.artist.type = :artistType"
     )
     List<IdTitleDTO> getArtifactsByArtistType(@Param("artistType") ArtistType artistType);
+
+    @Query(value ="""
+        SELECT DISTINCT
+          artf_id AS id,
+          arts_name AS artistName,
+          artf_title AS title
+        FROM (
+        SELECT
+            ar.arts_name,
+            t.artf_id,
+            a.artf_title,
+            t.trck_num,
+            ROW_NUMBER() OVER (PARTITION BY t.artf_id, t.trck_disk_num ORDER BY t.trck_num) AS trck_num_row
+        FROM tracks t
+        INNER JOIN artifacts a on t.artf_id = a.artf_id
+        LEFT OUTER JOIN artists ar ON a.arts_id = ar.arts_id
+        WHERE a.attp_id = :artifactTypeId
+        )
+        WHERE trck_num != trck_num_row
+    """,nativeQuery = true)
+    List<ArtifactFlatDTO> getArtifactsWithNoMonotonicallyIncreasingTrackNumbers(Long artifactTypeId);
 
     @Query(
             "SELECT a " +

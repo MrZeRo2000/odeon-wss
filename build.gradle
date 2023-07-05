@@ -73,7 +73,9 @@ dependencies {
 
 	//test
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation("org.springframework.boot:spring-boot-starter-test") {
+		exclude group: "com.vaadin.external.google", module:"android-json"
+	}
 }
 
 tasks.named('test') {
