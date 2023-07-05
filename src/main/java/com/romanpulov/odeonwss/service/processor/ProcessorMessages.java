@@ -44,6 +44,7 @@ public class ProcessorMessages {
     static final String ERROR_TRACKS_NOT_FOUND_FOR_ARTIFACT = "Tracks not found for artifact: %s";
     static final String ERROR_TRACK_FILES_NOT_FOUND_FOR_ARTIFACT = "Track files not found for artifact: %s";
     static final String INFO_TRACKS_VALIDATED = "Tracks validated";
+    public static final String INFO_MONOTONICALLY_INCREASING_TRACK_NUMBER_VALIDATED = "Monotonically increasing track numbers validated";
     static final String INFO_TRACKS_LOADED = "Tracks loaded";
 
     static final String ERROR_MEDIA_FILES_NOT_IN_DB = "Media files not in database";
@@ -52,7 +53,7 @@ public class ProcessorMessages {
     static final String ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_FILES = "Artifact media files not in files";
     static final String ERROR_MEDIA_FILES_EMPTY_SIZE = "Media files with empty size";
     static final String ERROR_TRACKS_WITHOUT_PRODUCT = "Tracks without product";
-
+    public static final String ERROR_NO_MONOTONICALLY_INCREASING_TRACK_NUMBERS = "Track numbers for artifact not increasing monotonically";
 
     public static final String INFO_MEDIA_FILES_VALIDATED = "Media files validated";
     public static final String INFO_ARTIFACT_MEDIA_FILES_VALIDATED = "Artifact media files validated";

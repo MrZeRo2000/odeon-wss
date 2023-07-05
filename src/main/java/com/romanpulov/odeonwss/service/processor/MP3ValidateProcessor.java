@@ -4,10 +4,12 @@ import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTOBuilder;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
+import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import com.romanpulov.odeonwss.service.processor.utils.MediaFilesValidateUtil;
+import com.romanpulov.odeonwss.service.processor.utils.TracksValidateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -23,13 +25,15 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
     public static final String MEDIA_FILE_FORMAT = "MP3";
 
     private final ArtifactTypeRepository artifactTypeRepository;
-
+    private final ArtifactRepository artifactRepository;
     private final MediaFileRepository mediaFileRepository;
 
     public MP3ValidateProcessor(
             ArtifactTypeRepository artifactTypeRepository,
+            ArtifactRepository artifactRepository,
             MediaFileRepository mediaFileRepository) {
         this.artifactTypeRepository = artifactTypeRepository;
+        this.artifactRepository = artifactRepository;
         this.mediaFileRepository = mediaFileRepository;
     }
 
@@ -65,6 +69,11 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
                         pathValidation,
                         dbValidation,
                         mediaFileRepository.getArtifactMediaFileValidationMusic(artifactType));
+
+                TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
+                        this,
+                        artifactRepository,
+                        artifactType);
             }
         }
     }

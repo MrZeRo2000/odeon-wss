@@ -62,4 +62,22 @@ public class ValueValidator {
 
         return true;
     }
+
+    public static <T> boolean validateNonEmptyCollection(
+            AbstractProcessor processor,
+            Collection<T> collection,
+            String errorMessage,
+            Function<T, String> errorMessageMapper
+    ) {
+        List<T> list = collection.stream().toList();
+        if (list.size() > 0) {
+            processor.errorHandler(errorMessage, sortedCollection(
+                    list.stream().map(errorMessageMapper).collect(Collectors.toList())
+            ));
+            return false;
+        }
+
+        return true;
+    }
+
 }

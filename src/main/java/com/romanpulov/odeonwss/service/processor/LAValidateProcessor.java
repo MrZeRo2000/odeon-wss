@@ -4,10 +4,12 @@ import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTOBuilder;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
+import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import com.romanpulov.odeonwss.service.processor.utils.MediaFilesValidateUtil;
+import com.romanpulov.odeonwss.service.processor.utils.TracksValidateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -25,13 +27,15 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
     private ArtifactType artifactType;
 
     private final ArtifactTypeRepository artifactTypeRepository;
-
+    private final ArtifactRepository artifactRepository;
     private final MediaFileRepository mediaFileRepository;
 
     public LAValidateProcessor(
             ArtifactTypeRepository artifactTypeRepository,
+            ArtifactRepository artifactRepository,
             MediaFileRepository mediaFileRepository) {
         this.artifactTypeRepository = artifactTypeRepository;
+        this.artifactRepository = artifactRepository;
         this.mediaFileRepository = mediaFileRepository;
     }
 
@@ -63,6 +67,11 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                         pathValidation,
                         dbValidation,
                         mediaFileRepository.getArtifactMediaFileValidationMusic(artifactType));
+
+                TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
+                        this,
+                        artifactRepository,
+                        artifactType);
             }
         }
         logger.info("Completed LAValidateProcessor execution");

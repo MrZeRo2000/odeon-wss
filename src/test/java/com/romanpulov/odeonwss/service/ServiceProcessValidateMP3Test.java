@@ -184,6 +184,14 @@ public class ServiceProcessValidateMP3Test {
                         null)
         );
 
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
         assertThat(processDetails.get(id)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
@@ -379,6 +387,13 @@ public class ServiceProcessValidateMP3Test {
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifact media files validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
