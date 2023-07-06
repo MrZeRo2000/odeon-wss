@@ -8,6 +8,7 @@ import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.service.processor.utils.TracksValidateUtil;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
@@ -66,6 +67,11 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
                 if (PathValidator.validateArtifactMediaFiles(this, pathValidation, dbArtifactValidation)) {
                     infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
                 }
+
+                TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
+                        this,
+                        artifactRepository,
+                        artifactType);
             }
         }
     }

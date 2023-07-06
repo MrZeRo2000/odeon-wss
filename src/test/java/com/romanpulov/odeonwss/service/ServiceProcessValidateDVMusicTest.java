@@ -182,6 +182,15 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProcessDetails().get(5)).isEqualTo(
                 new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+
+        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
+                new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
                         null,
