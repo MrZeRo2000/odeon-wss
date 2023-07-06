@@ -10,6 +10,7 @@ import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -161,6 +162,13 @@ public class ServiceProcessValidateLATest {
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifact media files validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -322,6 +330,13 @@ public class ServiceProcessValidateLATest {
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifact media files validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -585,6 +600,49 @@ public class ServiceProcessValidateLATest {
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifact media files not in database",
                                 List.of("Abigail Williams >> 2010 In The Absence Of Light >> 01 Hope The Great Betrayal.flac")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(20)
+    @Sql({"/schema.sql", "/data.sql"})
+    @Rollback(value = false)
+    void testNoMonotonicallyIncreasingTrackNumbersShouldFail() {
+        this.prepareInternal();
+        ArtifactType artifactType = artifactTypeRepository.getWithLA();
+
+        List<Track> tracks = trackRepository.getTracksByArtifactType(artifactType);
+
+        Track track7 = tracks
+                .stream()
+                .filter(t -> (t.getNum() != null) && (t.getNum() == 7L))
+                .findFirst()
+                .orElseThrow();
+
+        Track track8 = tracks
+                .stream()
+                .filter(t -> (t.getNum() != null) && (t.getNum() == 8L))
+                .findFirst()
+                .orElseThrow();
+
+        track7.setNum(8L);
+        track8.setNum(9L);
+
+        trackRepository.save(track8);
+        trackRepository.save(track7);
+
+        ProcessInfo pi = executeProcessor();
+        List<ProcessDetail> processDetails = pi.getProcessDetails();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(processDetails.get(5)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Track numbers for artifact not increasing monotonically",
+                                List.of("Abigail Williams >> 2010 In The Absence Of Light")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)

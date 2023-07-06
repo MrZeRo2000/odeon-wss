@@ -7,6 +7,7 @@ import com.romanpulov.odeonwss.service.processor.AbstractProcessor;
 import com.romanpulov.odeonwss.service.processor.PathValidator;
 import com.romanpulov.odeonwss.service.processor.ProcessorMessages;
 import com.romanpulov.odeonwss.service.processor.ValueValidator;
+import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 
 import java.util.List;
 
@@ -23,7 +24,13 @@ public class TracksValidateUtil {
                 ProcessorMessages.ERROR_NO_MONOTONICALLY_INCREASING_TRACK_NUMBERS,
                 dto -> dto.getArtistName() == null ?
                         dto.getTitle() :
-                        String.format(PathValidator.DELIMITER_FORMAT, dto.getArtistName(), dto.getTitle())
+                        String.format(
+                                PathValidator.DELIMITER_FORMAT,
+                                dto.getArtistName(),
+                                dto.getYear() == null ?
+                                        dto.getTitle() :
+                                        String.format(NamesParser.formatMusicArtifact(dto.getYear(), dto.getTitle()))
+                        )
                 )) {
             processor.infoHandler(ProcessorMessages.INFO_MONOTONICALLY_INCREASING_TRACK_NUMBER_VALIDATED);
         }

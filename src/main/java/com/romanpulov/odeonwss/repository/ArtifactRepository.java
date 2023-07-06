@@ -86,12 +86,14 @@ public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifa
         SELECT DISTINCT
           artf_id AS id,
           arts_name AS artistName,
-          artf_title AS title
+          artf_title AS title,
+          artf_year AS year
         FROM (
         SELECT
             ar.arts_name,
             t.artf_id,
             a.artf_title,
+            a.artf_year,
             t.trck_num,
             ROW_NUMBER() OVER (PARTITION BY t.artf_id, t.trck_disk_num ORDER BY t.trck_num) AS trck_num_row
         FROM tracks t
