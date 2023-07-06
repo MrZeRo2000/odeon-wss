@@ -138,6 +138,15 @@ public class ServiceProcessValidateDVMoviesTest {
 
         assertThat(pi.getProcessDetails().get(5)).isEqualTo(
                 new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+
+        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
+                new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
                         null,
@@ -393,5 +402,40 @@ public class ServiceProcessValidateDVMoviesTest {
                         null,
                         null)
         );
+    }
+
+
+    @Test
+    @Order(11)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testMonotonicallyIncreasingTrackNumbersShouldFail() {
+        this.internalPrepare();
+
+        var track1 = trackRepository
+                .getTracksByArtifactType(artifactType)
+                .stream()
+                .filter(t -> t.getTitle().equals("Рецепт убийства"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(track1.getNum()).isEqualTo(1L);
+
+        track1.setNum(3L);
+        trackRepository.save(track1);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(5)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Track numbers for artifact not increasing monotonically",
+                                List.of("Коломбо")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+
     }
 }

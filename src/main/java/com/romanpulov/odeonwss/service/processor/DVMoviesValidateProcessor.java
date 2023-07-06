@@ -3,9 +3,11 @@ package com.romanpulov.odeonwss.service.processor;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.dto.TrackDTO;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.TrackService;
+import com.romanpulov.odeonwss.service.processor.utils.TracksValidateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -21,16 +23,17 @@ public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {
     private ArtifactType artifactType;
 
     private final ArtifactTypeRepository artifactTypeRepository;
-
+    private final ArtifactRepository artifactRepository;
     private final MediaFileRepository mediaFileRepository;
-
     private final TrackService trackService;
 
     public DVMoviesValidateProcessor(
             ArtifactTypeRepository artifactTypeRepository,
+            ArtifactRepository artifactRepository,
             MediaFileRepository mediaFileRepository,
             TrackService trackService) {
         this.artifactTypeRepository = artifactTypeRepository;
+        this.artifactRepository = artifactRepository;
         this.mediaFileRepository = mediaFileRepository;
         this.trackService = trackService;
     }
@@ -74,6 +77,11 @@ public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {
                     TrackDTO::getTitle)) {
                 infoHandler(ProcessorMessages.INFO_PRODUCTS_FOR_TRACKS_VALIDATED);
             }
+
+            TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
+                    this,
+                    artifactRepository,
+                    artifactType);
         }
     }
 }
