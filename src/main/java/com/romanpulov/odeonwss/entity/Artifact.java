@@ -1,8 +1,7 @@
 package com.romanpulov.odeonwss.entity;
 
 import org.hibernate.Hibernate;
-import org.springframework.lang.Nullable;
-
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;

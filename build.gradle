@@ -50,9 +50,6 @@ dependencies {
 	//dialects to support SQLite
 	implementation 'org.hibernate.orm:hibernate-community-dialects'
 
-	//https://stackoverflow.com/questions/53326271/spring-nullable-annotation-generates-unknown-enum-constant-warning
-	implementation 'com.google.code.findbugs:jsr305:3.0.2'
-
 	//sqlite
 	implementation 'org.xerial:sqlite-jdbc:3.42.0.0'
 

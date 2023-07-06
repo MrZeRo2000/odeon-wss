@@ -1,7 +1,5 @@
 package com.romanpulov.odeonwss.entity;
 
-import org.springframework.lang.Nullable;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -20,7 +18,7 @@ public class ArtistDetail extends AbstractBaseModifiableEntity {
         return artist;
     }
 
-    public void setArtist(@Nullable Artist artist) {
+    public void setArtist(Artist artist) {
         this.artist = artist;
     }
 

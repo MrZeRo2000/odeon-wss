@@ -1,6 +1,6 @@
 package com.romanpulov.odeonwss.entity;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -29,7 +29,7 @@ public class Track extends AbstractBaseMigratedEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "arts_id", referencedColumnName = "arts_id")
-    @org.springframework.lang.Nullable
+    @Nullable
     private Artist artist;
 
     @Nullable
@@ -43,7 +43,7 @@ public class Track extends AbstractBaseMigratedEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "perf_arts_id", referencedColumnName = "arts_id")
-    @org.springframework.lang.Nullable
+    @Nullable
     private Artist performerArtist;
 
     @Nullable
@@ -51,7 +51,7 @@ public class Track extends AbstractBaseMigratedEntity {
         return performerArtist;
     }
 
-    public void setPerformerArtist(@org.springframework.lang.Nullable Artist performerArtist) {
+    public void setPerformerArtist(@Nullable Artist performerArtist) {
         this.performerArtist = performerArtist;
     }
 
