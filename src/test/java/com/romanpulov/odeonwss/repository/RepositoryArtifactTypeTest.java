@@ -30,13 +30,6 @@ public class RepositoryArtifactTypeTest {
     }
 
     @Test
-    void testByNameIn() {
-        assertThat(artifactTypeRepository.getAllByIdIsIn(List.of(101L, 102L)).size()).isEqualTo(2);
-        assertThat(artifactTypeRepository.getAllByIdIsIn(List.of(101L, 88L)).size()).isEqualTo(1);
-        assertThat(artifactTypeRepository.getAllByIdIsIn(List.of(777L)).size()).isEqualTo(0);
-    }
-
-    @Test
     void testCaching() {
         Cache cache = cacheManager.getCache("artifactTypeMP3");
         assert cache != null;

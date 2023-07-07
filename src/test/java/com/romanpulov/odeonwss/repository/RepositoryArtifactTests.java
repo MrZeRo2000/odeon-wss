@@ -120,23 +120,23 @@ public class RepositoryArtifactTests {
     @Test
     @Order(4)
     void testArtifactTable() {
-        List<ArtifactTableDTO> at = artifactRepository.getArtifactTableByArtistTypeAndArtifactTypes(
+        List<ArtifactTableDTO> at = artifactRepository.getArtifactTableByArtistTypeAndArtifactTypeIds(
                 ArtistType.ARTIST,
-                List.of(artifactTypeRepository.getWithMP3(), artifactTypeRepository.getWithLA())
+                List.of(artifactTypeRepository.getWithMP3().getId(), artifactTypeRepository.getWithLA().getId())
         );
         Assertions.assertEquals(1, at.size());
 
         Assertions.assertEquals(0,
-            artifactRepository.getArtifactTableByArtistTypeAndArtifactTypes(
+            artifactRepository.getArtifactTableByArtistTypeAndArtifactTypeIds(
                     ArtistType.ARTIST,
-                    List.of(artifactTypeRepository.getWithLA())
+                    List.of(artifactTypeRepository.getWithLA().getId())
             ).size()
         );
 
         Assertions.assertEquals(0,
-                artifactRepository.getArtifactTableByArtistTypeAndArtifactTypes(
+                artifactRepository.getArtifactTableByArtistTypeAndArtifactTypeIds(
                         ArtistType.CLASSICS,
-                        List.of(artifactTypeRepository.getWithMP3())
+                        List.of(artifactTypeRepository.getWithMP3().getId())
                 ).size()
         );
     }
@@ -180,7 +180,9 @@ public class RepositoryArtifactTests {
     @Order(7)
     void testArtifactWithoutArtist() {
         List<ArtifactTableDTO> prevArtifactTable = artifactRepository
-                .getArtifactTableByArtistTypeAndArtifactTypes(ArtistType.ARTIST, List.of(artifactTypeRepository.getWithDVMovies()));
+                .getArtifactTableByArtistTypeAndArtifactTypeIds(
+                        ArtistType.ARTIST,
+                        List.of(artifactTypeRepository.getWithDVMovies().getId()));
         assertThat(prevArtifactTable.size()).isEqualTo(0);
         Artifact artifact = new EntityArtifactBuilder()
                 .withArtifactType(artifactTypeRepository.getWithDVMovies())
@@ -193,9 +195,9 @@ public class RepositoryArtifactTests {
         artifactRepository.save(artifact);
 
         List<ArtifactTableDTO> artifactTable = artifactRepository
-                .getArtifactTableByArtistTypeAndArtifactTypes(
+                .getArtifactTableByArtistTypeAndArtifactTypeIds(
                         ArtistType.ARTIST,
-                        List.of(artifactTypeRepository.getWithDVMovies()));
+                        List.of(artifactTypeRepository.getWithDVMovies().getId()));
         assertThat(artifactTable.size()).isEqualTo(1);
 
         Artifact savedArtifact = artifactRepository.findById(artifact.getId()).orElseThrow();

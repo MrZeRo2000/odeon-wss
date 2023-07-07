@@ -70,10 +70,10 @@ public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifa
                 "LEFT OUTER JOIN Artist as ar ON a.artist = ar " +
                 "LEFT OUTER JOIN Artist as par ON a.performerArtist = par " +
                 "WHERE (at.parentId = 200 OR ar.type IS NULL OR ar.type=:artistType) " +
-                "AND a.artifactType IN (:artifactTypes) " +
+                "AND a.artifactType.id IN (:artifactTypeIds) " +
                 "ORDER BY ar.name, a.year, a.title"
     )
-    List<ArtifactTableDTO> getArtifactTableByArtistTypeAndArtifactTypes(@Param("artistType") ArtistType artistType, @Param("artifactTypes") List<ArtifactType> artifactTypes);
+    List<ArtifactTableDTO> getArtifactTableByArtistTypeAndArtifactTypeIds(ArtistType artistType, List<Long> artifactTypeIds);
 
     @Query(
             "SELECT a " +

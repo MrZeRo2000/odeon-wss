@@ -2,11 +2,9 @@ package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
 import com.romanpulov.odeonwss.dto.ArtifactTableDTO;
-import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.service.ArtifactService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,23 +19,19 @@ import java.util.stream.Collectors;
 public class ArtifactController {
 
     private final ArtifactRepository artifactRepository;
-
-    private final ArtifactTypeRepository artifactTypeRepository;
-
     private final ArtifactService artifactService;
 
 
-    public ArtifactController(ArtifactRepository artifactRepository, ArtifactTypeRepository artifactTypeRepository, ArtifactService artifactService) {
+    public ArtifactController(ArtifactRepository artifactRepository, ArtifactService artifactService) {
         this.artifactRepository = artifactRepository;
-        this.artifactTypeRepository = artifactTypeRepository;
         this.artifactService = artifactService;
     }
 
     @GetMapping("/table")
     ResponseEntity<List<ArtifactTableDTO>> getTable(@RequestParam String artistTypeCode, @RequestParam List<String> artifactTypeCodes) {
         ArtistType artistType = ArtistType.fromCode(artistTypeCode);
-        List<ArtifactType> artifactTypes = artifactTypeRepository.getAllByIdIsIn(artifactTypeCodes.stream().map(Long::valueOf).collect(Collectors.toList()));
-        return ResponseEntity.ok(artifactRepository.getArtifactTableByArtistTypeAndArtifactTypes(artistType, artifactTypes));
+        List<Long> artifactTypeIds = artifactTypeCodes.stream().map(Long::valueOf).collect(Collectors.toList());
+        return ResponseEntity.ok(artifactRepository.getArtifactTableByArtistTypeAndArtifactTypeIds(artistType, artifactTypeIds));
     }
 
     @GetMapping("/{id}")

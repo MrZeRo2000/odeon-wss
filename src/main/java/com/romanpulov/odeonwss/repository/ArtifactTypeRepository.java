@@ -5,13 +5,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Transactional(readOnly = true)
 public interface ArtifactTypeRepository extends CrudRepository<ArtifactType, Long> {
-    @Cacheable("artifactTypesIdsInList")
-    List<ArtifactType> getAllByIdIsIn(List<Long> ids);
-
     @Cacheable(value = "artifactTypeMP3", key = "'default'")
     default ArtifactType getWithMP3() {
         return findById(101L).orElseThrow();
