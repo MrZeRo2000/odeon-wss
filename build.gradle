@@ -5,28 +5,20 @@ plugins {
 	id 'war'
 }
 
+apply from: '../common/gradle/tomcat.config.gradle'
+
 ext {
 	file_name_build = 'odeon-wss-build.war'
 	file_name_prod = 'odeon-wss.war'
 	file_name_int = 'odeon-int-wss.war'
 }
 
-ext {
-	if (project.hasProperty("tomcat_home")) {
-		tomcat_webapps = tomcat_home + '/webapps'
-	} else if (project.file('../apache-tomcat-10.1.10/').exists()) {
-		tomcat_webapps = '../apache-tomcat-10.1.10/webapps'
-	} else {
-		tomcat_webapps = 'D:/prj/apache-tomcat-10.1.10/webapps'
-	}
-}
 
 tasks.named('processResources') {
 	filesMatching('project.properties') {
 		expand(project.properties)
 	}
 }
-
 
 bootWar {
 	archiveFileName = file_name_build
