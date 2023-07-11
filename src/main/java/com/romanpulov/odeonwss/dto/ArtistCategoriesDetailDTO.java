@@ -2,8 +2,8 @@ package com.romanpulov.odeonwss.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.romanpulov.odeonwss.dto.serializer.ArtistTypeDeserializer;
-import com.romanpulov.odeonwss.dto.serializer.ArtistTypeSerializer;
+import com.romanpulov.odeonwss.serializer.ArtistTypeDeserializer;
+import com.romanpulov.odeonwss.serializer.ArtistTypeSerializer;
 import com.romanpulov.odeonwss.entity.ArtistType;
 
 import java.util.ArrayList;

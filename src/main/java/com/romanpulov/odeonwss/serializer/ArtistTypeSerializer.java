@@ -1,4 +1,4 @@
-package com.romanpulov.odeonwss.dto.serializer;
+package com.romanpulov.odeonwss.serializer;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
