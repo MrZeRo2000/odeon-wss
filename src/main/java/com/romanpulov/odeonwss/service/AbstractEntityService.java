@@ -1,6 +1,6 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.dto.AbstractEntityDTO;
+import com.romanpulov.odeonwss.dto.BaseEntityDTO;
 import com.romanpulov.odeonwss.entity.AbstractBaseEntity;
 import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 public abstract class AbstractEntityService<
         E extends AbstractBaseEntity,
-        DTO extends AbstractEntityDTO,
+        DTO extends BaseEntityDTO,
         R extends EntityDTORepository<E, DTO>> {
 
     @FunctionalInterface

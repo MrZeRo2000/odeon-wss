@@ -5,6 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(as = DVCategoryDTOImpl.class)
-public interface DVCategoryDTO extends AbstractEntityDTO {
+public interface DVCategoryDTO extends BaseEntityDTO {
     String getName();
 }

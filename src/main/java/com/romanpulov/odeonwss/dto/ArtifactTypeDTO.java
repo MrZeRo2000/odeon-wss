@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonDeserialize(as = DVOriginDTOImpl.class)
-public interface DVOriginDTO extends BaseEntityDTO {
+@JsonDeserialize(as = ArtifactTypeDTOImpl.class)
+public interface ArtifactTypeDTO extends BaseEntityDTO {
     String getName();
 }

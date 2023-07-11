@@ -1,6 +1,6 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.romanpulov.odeonwss.dto.AbstractEntityDTO;
+import com.romanpulov.odeonwss.dto.BaseEntityDTO;
 import com.romanpulov.odeonwss.entity.AbstractBaseEntity;
 import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 public class AbstractEntityServiceRestController<
         E extends AbstractBaseEntity,
-        DTO extends AbstractEntityDTO,
+        DTO extends BaseEntityDTO,
         R extends EntityDTORepository<E, DTO>,
         S extends AbstractEntityService<E, DTO, R>> {
 

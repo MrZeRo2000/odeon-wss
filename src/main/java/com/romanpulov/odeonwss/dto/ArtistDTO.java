@@ -7,7 +7,7 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(as = ArtistDTOImpl.class)
-public interface ArtistDTO extends AbstractEntityDTO {
+public interface ArtistDTO extends BaseEntityDTO {
     String getArtistName();
     String getArtistType();
     String getGenre();

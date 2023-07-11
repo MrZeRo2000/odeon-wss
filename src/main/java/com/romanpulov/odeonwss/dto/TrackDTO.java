@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public interface TrackDTO extends AbstractEntityDTO {
+public interface TrackDTO extends BaseEntityDTO {
     Long getArtifactId();
     String getArtifactTitle();
     ArtistDTO getArtist();
