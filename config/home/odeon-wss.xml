@@ -9,5 +9,4 @@
 	<Parameter name="dv-music-path" value="L:/Music/"/>
 	<Parameter name="dv-movies-path" value="L:/Movies/"/>
 	<Parameter name="mdb-path" value="D:/prj/Cat2000/"/>
-	<Parameter name="spring.profiles.active" value="debug"/>
 </Context>

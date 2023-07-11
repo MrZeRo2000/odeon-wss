@@ -1,0 +1,9 @@
+
+To install for custom JAVA version:
+
+1. Execute below
+set JAVA_HOME=C:\WinApp\jdk-12.0.2
+set JRE_HOME=C:\WinApp\jdk-12.0.2
+
+2. Run service install
+3. Check which JAVA version is used via process explorer
