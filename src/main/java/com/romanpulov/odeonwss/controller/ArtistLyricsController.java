@@ -1,8 +1,9 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.romanpulov.odeonwss.dto.ArtistLyricsEditDTO;
-import com.romanpulov.odeonwss.dto.ArtistLyricsTableDTO;
+import com.romanpulov.odeonwss.dto.ArtistLyricsDTO;
+import com.romanpulov.odeonwss.entity.ArtistLyrics;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
+import com.romanpulov.odeonwss.repository.ArtistLyricsRepository;
 import com.romanpulov.odeonwss.service.ArtistLyricsService;
 import com.romanpulov.odeonwss.dto.TextDTO;
 import org.springframework.http.MediaType;
@@ -14,49 +15,26 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping(value = "/api/artist-lyrics", produces = MediaType.APPLICATION_JSON_VALUE)
-public class ArtistLyricsController {
-
-    private final ArtistLyricsService artistLyricsService;
+public class ArtistLyricsController
+        extends AbstractEntityServiceRestController<
+        ArtistLyrics, ArtistLyricsDTO, ArtistLyricsRepository, ArtistLyricsService> {
 
     public ArtistLyricsController(ArtistLyricsService artistLyricsService) {
-        this.artistLyricsService = artistLyricsService;
+        super(artistLyricsService);
     }
 
     @GetMapping("/table")
-    ResponseEntity<List<ArtistLyricsTableDTO>> getTable() {
-        return ResponseEntity.ok(artistLyricsService.getTable());
+    ResponseEntity<List<ArtistLyricsDTO>> getTable() {
+        return ResponseEntity.ok(service.getTable());
     }
 
     @GetMapping("/table/{id}")
-    ResponseEntity<List<ArtistLyricsTableDTO>> getTable(@PathVariable Long id) {
-        return ResponseEntity.ok(artistLyricsService.getTable(id));
+    ResponseEntity<List<ArtistLyricsDTO>> getTable(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getTable(id));
     }
 
     @GetMapping("/text/{id}")
     ResponseEntity<TextDTO> getText(@PathVariable Long id) throws CommonEntityNotFoundException {
-        return ResponseEntity.ok(artistLyricsService.getText(id));
-    }
-
-    @GetMapping("/{id}")
-    ResponseEntity<ArtistLyricsEditDTO> get(@PathVariable Long id) throws CommonEntityNotFoundException {
-        return ResponseEntity.ok(artistLyricsService.getById(id));
-    }
-
-    @PostMapping
-    ResponseEntity<ArtistLyricsEditDTO> post(@RequestBody ArtistLyricsEditDTO dto)
-            throws CommonEntityNotFoundException {
-        return ResponseEntity.ok(artistLyricsService.insert(dto));
-    }
-
-    @PutMapping
-    ResponseEntity<ArtistLyricsEditDTO> put(@RequestBody ArtistLyricsEditDTO dto)
-            throws CommonEntityNotFoundException {
-        return ResponseEntity.ok(artistLyricsService.update(dto));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) throws CommonEntityNotFoundException {
-        artistLyricsService.deleteById(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(service.getText(id));
     }
 }

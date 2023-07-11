@@ -1,22 +1,23 @@
 package com.romanpulov.odeonwss.dto;
 
-public class ArtistLyricsEditDTO {
+public class ArtistLyricsDTOImpl implements ArtistLyricsDTO {
     private Long id;
-
     private Long artistId;
-
+    private String artistName;
     private String title;
-
     private String text;
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }
 
+    @Override
     public Long getArtistId() {
         return artistId;
     }
@@ -25,6 +26,16 @@ public class ArtistLyricsEditDTO {
         this.artistId = artistId;
     }
 
+    @Override
+    public String getArtistName() {
+        return artistName;
+    }
+
+    public void setArtistName(String artistName) {
+        this.artistName = artistName;
+    }
+
+    @Override
     public String getTitle() {
         return title;
     }
@@ -33,6 +44,7 @@ public class ArtistLyricsEditDTO {
         this.title = title;
     }
 
+    @Override
     public String getText() {
         return text;
     }
@@ -41,21 +53,12 @@ public class ArtistLyricsEditDTO {
         this.text = text;
     }
 
-    public ArtistLyricsEditDTO(Long id, Long artistId, String title, String text) {
-        this.id = id;
-        this.artistId = artistId;
-        this.title = title;
-        this.text = text;
-    }
-
-    public ArtistLyricsEditDTO() {
-    }
-
     @Override
     public String toString() {
-        return "ArtistLyricsEditDTO{" +
+        return "ArtistLyricsDTOImpl{" +
                 "id=" + id +
                 ", artistId=" + artistId +
+                ", artistName='" + artistName + '\'' +
                 ", title='" + title + '\'' +
                 ", text='" + text + '\'' +
                 '}';

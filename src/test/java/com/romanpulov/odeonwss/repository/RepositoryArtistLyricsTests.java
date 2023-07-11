@@ -1,12 +1,10 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.dto.ArtistLyricsEditDTO;
-import com.romanpulov.odeonwss.dto.ArtistLyricsTableDTO;
-import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.ArtistLyrics;
-import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistLyricsBuilder;
+import com.romanpulov.odeonwss.dto.ArtistLyricsDTO;
+import com.romanpulov.odeonwss.entity.Artist;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,22 +42,31 @@ public class RepositoryArtistLyricsTests {
         Assertions.assertThrows(JpaSystemException.class,
                 () -> artistLyricsRepository.save(new EntityArtistLyricsBuilder().withArtist(artist2).withTitle("Title 24").withText("Text 24").build()));
 
-        List<ArtistLyrics> artistLyricsList1 = artistLyricsRepository.findAllByArtistOrderByTitle(artist1);
+        var artistLyricsList1 = artistLyricsRepository.findAllDTOByArtistId(artist1.getId());
         Assertions.assertEquals(2, artistLyricsList1.size());
         Assertions.assertEquals("Title 11", artistLyricsList1.get(0).getTitle());
         Assertions.assertEquals("Title 12", artistLyricsList1.get(1).getTitle());
-        Assertions.assertEquals("Text 12", artistLyricsList1.get(1).getText());
 
-        List<ArtistLyrics> artistLyricsList2 = artistLyricsRepository.findAllByArtistOrderByTitle(artist2);
+        var artistLyricsList2 = artistLyricsRepository.findAllDTOByArtistId(artist2.getId());
         Assertions.assertEquals(3, artistLyricsList2.size());
-        Assertions.assertEquals("Text 23", artistLyricsList2.get(0).getText());
-        Assertions.assertEquals("Text 27", artistLyricsList2.get(2).getText());
+        Assertions.assertEquals("Title 23", artistLyricsList2.get(0).getTitle());
+        Assertions.assertEquals("Title 27", artistLyricsList2.get(2).getTitle());
+    }
+
+    @Test
+    @Order(2)
+    void testFindById() {
+        var dto = artistLyricsRepository.findDTOById(4L).orElseThrow();
+        assertThat(dto.getId()).isEqualTo(4L);
+        assertThat(dto.getArtistId()).isEqualTo(2L);
+        assertThat(dto.getTitle()).isEqualTo("Title 23");
+        assertThat(dto.getText()).isEqualTo("Text 23");
     }
 
     @Test
     @Order(2)
     void testTableDTO() {
-        List<ArtistLyricsTableDTO> table = artistLyricsRepository.getArtistLyricsTableDTO();
+        List<ArtistLyricsDTO> table = artistLyricsRepository.findAllDTO();
 
         Assertions.assertEquals(5, table.size());
         Assertions.assertEquals("Name 1", table.get(0).getArtistName());
@@ -71,7 +78,7 @@ public class RepositoryArtistLyricsTests {
     @Test
     @Order(2)
     void testEditDTO() {
-        ArtistLyricsEditDTO editDTO = artistLyricsRepository.getArtistListEditById(1L).orElseThrow();
+        ArtistLyricsDTO editDTO = artistLyricsRepository.findDTOById(1L).orElseThrow();
         Assertions.assertEquals(1, editDTO.getId());
         Assertions.assertEquals(1, editDTO.getArtistId());
         Assertions.assertEquals("Title 12", editDTO.getTitle());

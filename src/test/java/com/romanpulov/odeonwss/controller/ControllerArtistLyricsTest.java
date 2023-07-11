@@ -1,10 +1,9 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.romanpulov.odeonwss.builder.dtobuilder.ArtistLyricsEditDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.ArtistLyricsDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.repository.ArtistLyricsRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.service.ArtistLyricsService;
 import org.hamcrest.Matchers;
@@ -35,9 +34,6 @@ public class ControllerArtistLyricsTest {
     private ArtistRepository artistRepository;
 
     @Autowired
-    private ArtistLyricsRepository artistLyricsRepository;
-
-    @Autowired
     private ArtistLyricsService artistLyricsService;
 
     @Test
@@ -59,7 +55,7 @@ public class ControllerArtistLyricsTest {
         );
 
         artistLyricsService.insert(
-                new ArtistLyricsEditDTOBuilder()
+                new ArtistLyricsDTOBuilder()
                         .withArtistId(artist1.getId())
                         .withTitle("Title 2")
                         .withText("Text 2")
@@ -67,7 +63,7 @@ public class ControllerArtistLyricsTest {
         );
 
         artistLyricsService.insert(
-                new ArtistLyricsEditDTOBuilder()
+                new ArtistLyricsDTOBuilder()
                         .withArtistId(artist1.getId())
                         .withTitle("Title 1")
                         .withText("Text 1")
@@ -75,7 +71,7 @@ public class ControllerArtistLyricsTest {
         );
 
         artistLyricsService.insert(
-                new ArtistLyricsEditDTOBuilder()
+                new ArtistLyricsDTOBuilder()
                         .withArtistId(artist2.getId())
                         .withTitle("Title 200")
                         .withText("Text 200")
