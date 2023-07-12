@@ -12,7 +12,5 @@ import java.util.Optional;
 public interface ArtistDetailRepository extends CrudRepository<ArtistDetail, Long> {
     Optional<ArtistDetail> findArtistDetailByArtist(Artist artist);
 
-    Optional<BiographyDTO> findArtistDetailByArtistId(Long id);
-
     Optional<BiographyDTO> findArtistDetailById(Long id);
 }
