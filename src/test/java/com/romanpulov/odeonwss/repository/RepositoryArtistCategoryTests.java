@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.dto.ArtistCategoryArtistDTO;
-import com.romanpulov.odeonwss.dto.ArtistCategoryTableDTO;
+import com.romanpulov.odeonwss.dto.ArtistDTOImpl;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
 import com.romanpulov.odeonwss.entity.ArtistCategoryType;
@@ -31,7 +31,7 @@ public class RepositoryArtistCategoryTests {
     @Test
     @Order(1)
     @Sql(value = {"/schema.sql", "/data.sql"})
-    void testCRUD() throws Exception {
+    void testCRUD() {
         Artist artist = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 1").build());
         ArtistCategory artistCategory = artistCategoryRepository.save(
                 new EntityArtistCategoryBuilder().withType(ArtistCategoryType.GENRE).withArtist(artist).withName("Rock").build()
@@ -54,7 +54,7 @@ public class RepositoryArtistCategoryTests {
 
     @Test
     @Order(2)
-    void testCascade() throws Exception {
+    void testCascade() {
         Artist artist = artistRepository.getAllByType(ArtistType.ARTIST).get(0);
 
         // delete with child element works
@@ -64,26 +64,26 @@ public class RepositoryArtistCategoryTests {
 
     @Test
     @Order(3)
-    void testWithCategories() throws Exception {
+    void testWithCategories() {
         Artist artist1 = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 3").build());
-        ArtistCategory artistCategory11 = artistCategoryRepository.save(
+        artistCategoryRepository.save(
                 new EntityArtistCategoryBuilder().withType(ArtistCategoryType.GENRE).withArtist(artist1).withName("Rock").build()
         );
-        ArtistCategory artistCategory12 = artistCategoryRepository.save(
+        artistCategoryRepository.save(
                 new EntityArtistCategoryBuilder().withType(ArtistCategoryType.STYLE).withArtist(artist1).withName("Pop").build()
         );
-        ArtistCategory artistCategory13 = artistCategoryRepository.save(
+        artistCategoryRepository.save(
                 new EntityArtistCategoryBuilder().withType(ArtistCategoryType.STYLE).withArtist(artist1).withName("Alternative Rock").build()
         );
 
         Artist artist2 = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 1").build());
-        ArtistCategory artistCategory21 = artistCategoryRepository.save(
+        artistCategoryRepository.save(
                 new EntityArtistCategoryBuilder().withType(ArtistCategoryType.GENRE).withArtist(artist2).withName("Pop").build()
         );
-        ArtistCategory artistCategory22 = artistCategoryRepository.save(
+        artistCategoryRepository.save(
                 new EntityArtistCategoryBuilder().withType(ArtistCategoryType.STYLE).withArtist(artist2).withName("Electronic").build()
         );
-        ArtistCategory artistCategory23 = artistCategoryRepository.save(
+        artistCategoryRepository.save(
                 new EntityArtistCategoryBuilder().withType(ArtistCategoryType.STYLE).withArtist(artist2).withName("Rap").build()
         );
 
@@ -97,10 +97,16 @@ public class RepositoryArtistCategoryTests {
         List<ArtistCategoryArtistDTO> acaDTOs = artistCategoryRepository.getAllWithArtistOrdered();
         Assertions.assertEquals(6, acaDTOs.size());
 
-        List<ArtistCategoryTableDTO> acalDTOs = new ArrayList<>();
+        List<ArtistDTOImpl> acalDTOs = new ArrayList<>();
         acaDTOs.forEach(acaDTO -> {
             if ((acalDTOs.size() == 0) || (!Objects.equals(acalDTOs.get(acalDTOs.size() - 1).getId(), acaDTO.getId()))) {
-                acalDTOs.add(new ArtistCategoryTableDTO(acaDTO.getId(), acaDTO.getArtistName(), acaDTO.getArtistType().getCode(), acaDTO.getDetailId()));
+                ArtistDTOImpl newArtistDTO = new ArtistDTOImpl();
+                newArtistDTO.setId(acaDTO.getId());
+                newArtistDTO.setArtistName(acaDTO.getArtistName());
+                newArtistDTO.setArtistType(acaDTO.getArtistType().getCode());
+                newArtistDTO.setDetailId(acaDTO.getDetailId());
+
+                acalDTOs.add(newArtistDTO);
             }
             if (acaDTO.getCategoryType().equals(ArtistCategoryType.GENRE)) {
                 acalDTOs.get(acalDTOs.size()-1).setGenre(acaDTO.getCategoryName());
