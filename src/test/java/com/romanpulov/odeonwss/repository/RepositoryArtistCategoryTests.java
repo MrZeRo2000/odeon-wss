@@ -7,6 +7,7 @@ import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
 import com.romanpulov.odeonwss.entity.ArtistCategoryType;
 import com.romanpulov.odeonwss.entity.ArtistType;
+import com.romanpulov.odeonwss.utils.EnumUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -102,12 +103,12 @@ public class RepositoryArtistCategoryTests {
                 ArtistDTOImpl newArtistDTO = new ArtistDTOImpl();
                 newArtistDTO.setId(acaDTO.getId());
                 newArtistDTO.setArtistName(acaDTO.getArtistName());
-                newArtistDTO.setArtistType(acaDTO.getArtistType());
+                newArtistDTO.setArtistType(EnumUtils.getEnumFromString(ArtistType.class, acaDTO.getArtistTypeCode()));
                 newArtistDTO.setDetailId(acaDTO.getDetailId());
 
                 acalDTOs.add(newArtistDTO);
             }
-            if (acaDTO.getCategoryType().equals("G")) {
+            if (acaDTO.getCategoryTypeCode().equals("G")) {
                 acalDTOs.get(acalDTOs.size()-1).setGenre(acaDTO.getCategoryName());
             } else {
                 acalDTOs.get(acalDTOs.size()-1).getStyles().add(acaDTO.getCategoryName());

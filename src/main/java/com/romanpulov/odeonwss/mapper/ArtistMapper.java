@@ -4,7 +4,6 @@ import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
 import com.romanpulov.odeonwss.dto.ArtistDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.utils.EnumUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,7 +19,7 @@ public class ArtistMapper implements EntityDTOMapper<Artist, ArtistDTO> {
         artist.setType(
                 dto.getArtistType() == null ?
                         ArtistType.ARTIST :
-                        EnumUtils.getEnumFromString(ArtistType.class, dto.getArtistType()));
+                        dto.getArtistType());
         artist.setName(dto.getArtistName());
 
         return artist;
@@ -30,7 +29,7 @@ public class ArtistMapper implements EntityDTOMapper<Artist, ArtistDTO> {
     public void update(Artist entity, ArtistDTO dto) {
         entity.setName(dto.getArtistName());
         if (dto.getArtistType() != null) {
-            entity.setType(EnumUtils.getEnumFromString(ArtistType.class, dto.getArtistType()));
+            entity.setType(dto.getArtistType());
         }
     }
 

@@ -43,8 +43,8 @@ public interface ArtistRepository extends EntityDTORepository<Artist, ArtistDTO>
     @Query(value = "SELECT " +
             "ar.arts_id AS id, " +
             "ar.arts_name AS artistName, " +
-            "ar.arts_type_code AS artistType, " +
-            "ac.atct_type_code AS categoryType, " +
+            "ar.arts_type_code AS artistTypeCode, " +
+            "ac.atct_type_code AS categoryTypeCode, " +
             "ac.atct_name AS categoryName, " +
             "ad.atdt_id AS detailId, " +
             "CASE WHEN EXISTS(SELECT 1 FROM artist_lyrics al WHERE ar.arts_id = al.arts_id) THEN 1 END AS hasLyrics " +

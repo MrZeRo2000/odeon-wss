@@ -34,7 +34,7 @@ public class ArtifactTransformer {
                         v -> {
                             ArtistDTOImpl newArtistDTO = new ArtistDTOImpl();
                             newArtistDTO.setId(row.getArtistId());
-                            newArtistDTO.setArtistType(row.getArtistTypeCode());
+                            newArtistDTO.setArtistType(row.getArtistType());
                             newArtistDTO.setArtistName(row.getArtistName());
 
                             return newArtistDTO;
@@ -48,7 +48,7 @@ public class ArtifactTransformer {
                         v -> {
                             ArtistDTOImpl newPerformerArtistDTO = new ArtistDTOImpl();
                             newPerformerArtistDTO.setId(row.getPerformerArtistId());
-                            newPerformerArtistDTO.setArtistType(row.getArtistTypeCode());
+                            newPerformerArtistDTO.setArtistType(row.getArtistType());
                             newPerformerArtistDTO.setArtistName(row.getPerformerArtistName());
 
                             return newPerformerArtistDTO;

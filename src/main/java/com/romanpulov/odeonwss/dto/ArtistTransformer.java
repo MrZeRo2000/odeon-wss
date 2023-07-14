@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.dto;
 
 import com.romanpulov.odeonwss.entity.ArtistCategoryType;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -16,18 +17,19 @@ public class ArtistTransformer {
                 ArtistDTOImpl newDTO = new ArtistDTOImpl();
                 newDTO.setId(id);
                 newDTO.setArtistName(row.getArtistName());
-                newDTO.setArtistType(row.getArtistType());
+                newDTO.setArtistType(ArtistType.fromCode(row.getArtistTypeCode()));
                 newDTO.setDetailId(row.getDetailId());
+                newDTO.setArtistBiography(row.getArtistBiography());
                 newDTO.setHasLyrics(TransformRules.booleanFromLong(row.getHasLyrics()));
 
                 artistDTOMap.put(id, newDTO);
                 return newDTO;
             });
 
-            if (row.getCategoryType() != null) {
-                if (row.getCategoryType().equals(ArtistCategoryType.GENRE.getCode())) {
+            if (row.getCategoryTypeCode() != null) {
+                if (row.getCategoryTypeCode().equals(ArtistCategoryType.GENRE.getCode())) {
                     dto.setGenre(row.getCategoryName());
-                } else if (row.getCategoryType().equals(ArtistCategoryType.STYLE.getCode())) {
+                } else if (row.getCategoryTypeCode().equals(ArtistCategoryType.STYLE.getCode())) {
                     dto.getStyles().add(row.getCategoryName());
                 }
             }

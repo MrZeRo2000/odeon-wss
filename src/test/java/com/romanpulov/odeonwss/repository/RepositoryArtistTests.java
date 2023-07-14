@@ -164,22 +164,22 @@ public class RepositoryArtistTests {
         assertThat(flatDTOs.get(0).getArtistName()).isEqualTo("aaa");
 
         assertThat(flatDTOs.get(1).getArtistName()).isEqualTo("category Artist");
-        assertThat(flatDTOs.get(1).getArtistType()).isEqualTo("A");
-        assertThat(flatDTOs.get(1).getCategoryType()).isEqualTo("G");
+        assertThat(flatDTOs.get(1).getArtistTypeCode()).isEqualTo("A");
+        assertThat(flatDTOs.get(1).getCategoryTypeCode()).isEqualTo("G");
         assertThat(flatDTOs.get(1).getCategoryName()).isEqualTo("G1");
         assertThat(flatDTOs.get(1).getDetailId()).isEqualTo(1L);
         assertThat(flatDTOs.get(1).getHasLyrics()).isEqualTo(1L);
 
         assertThat(flatDTOs.get(2).getArtistName()).isEqualTo("category Artist");
-        assertThat(flatDTOs.get(2).getArtistType()).isEqualTo("A");
-        assertThat(flatDTOs.get(2).getCategoryType()).isEqualTo("S");
+        assertThat(flatDTOs.get(2).getArtistTypeCode()).isEqualTo("A");
+        assertThat(flatDTOs.get(2).getCategoryTypeCode()).isEqualTo("S");
         assertThat(flatDTOs.get(2).getCategoryName()).isEqualTo("S1");
         assertThat(flatDTOs.get(2).getDetailId()).isEqualTo(1L);
         assertThat(flatDTOs.get(2).getHasLyrics()).isEqualTo(1L);
 
         assertThat(flatDTOs.get(3).getArtistName()).isEqualTo("category Artist");
-        assertThat(flatDTOs.get(3).getArtistType()).isEqualTo("A");
-        assertThat(flatDTOs.get(3).getCategoryType()).isEqualTo("S");
+        assertThat(flatDTOs.get(3).getArtistTypeCode()).isEqualTo("A");
+        assertThat(flatDTOs.get(3).getCategoryTypeCode()).isEqualTo("S");
         assertThat(flatDTOs.get(3).getCategoryName()).isEqualTo("S2");
         assertThat(flatDTOs.get(3).getDetailId()).isEqualTo(1L);
         assertThat(flatDTOs.get(3).getHasLyrics()).isEqualTo(1L);
