@@ -1,18 +1,18 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.dto.ArtistDTO;
 import com.romanpulov.odeonwss.dto.ArtistFlatDTO;
 import com.romanpulov.odeonwss.dto.IdNameDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Transactional(readOnly = true)
-public interface ArtistRepository extends CrudRepository<Artist, Long> {
+public interface ArtistRepository extends EntityDTORepository<Artist, ArtistDTO> {
     List<Artist> getAllByType(ArtistType type);
 
     List<Artist> getAllByTypeOrderByName(ArtistType type);
@@ -24,6 +24,21 @@ public interface ArtistRepository extends CrudRepository<Artist, Long> {
     Optional<Artist> findFirstByName(String name);
 
     Optional<Artist> findFirstByMigrationId(Long migrationId);
+
+    @Query(value = "SELECT " +
+            "ar.id AS id, " +
+            "ar.name AS artistName, " +
+            "ar.type AS artistType, " +
+            "ac.type AS categoryType, " +
+            "ac.name AS categoryName, " +
+            "ad.id AS detailId " +
+            "FROM Artist AS ar " +
+            "LEFT OUTER JOIN ArtistCategory AS ac ON ar.id = ac.artist.id " +
+            "LEFT OUTER JOIN ArtistDetail AS ad ON ar.id = ad.artist.id " +
+            "WHERE ar.id = :id " +
+            "ORDER BY ac.type, ac.name"
+    )
+    List<ArtistFlatDTO> findFlatDTOById(long id);
 
     @Query(value = "SELECT " +
             "ar.arts_id AS id, " +

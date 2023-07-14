@@ -1,13 +1,12 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.dto.ArtistCategoryArtistDTO;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistCategoryBuilder;
 import com.romanpulov.odeonwss.dto.ArtistDTOImpl;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
 import com.romanpulov.odeonwss.entity.ArtistCategoryType;
 import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistCategoryBuilder;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -94,7 +93,7 @@ public class RepositoryArtistCategoryTests {
         Assertions.assertEquals(6, artistCategories.size());
         Assertions.assertEquals("Name 1", artistCategories.get(0).getArtist().getName());
 
-        List<ArtistCategoryArtistDTO> acaDTOs = artistCategoryRepository.getAllWithArtistOrdered();
+        var acaDTOs = artistRepository.findAllFlatDTO();
         Assertions.assertEquals(6, acaDTOs.size());
 
         List<ArtistDTOImpl> acalDTOs = new ArrayList<>();
@@ -103,12 +102,12 @@ public class RepositoryArtistCategoryTests {
                 ArtistDTOImpl newArtistDTO = new ArtistDTOImpl();
                 newArtistDTO.setId(acaDTO.getId());
                 newArtistDTO.setArtistName(acaDTO.getArtistName());
-                newArtistDTO.setArtistType(acaDTO.getArtistType().getCode());
+                newArtistDTO.setArtistType(acaDTO.getArtistType());
                 newArtistDTO.setDetailId(acaDTO.getDetailId());
 
                 acalDTOs.add(newArtistDTO);
             }
-            if (acaDTO.getCategoryType().equals(ArtistCategoryType.GENRE)) {
+            if (acaDTO.getCategoryType().equals("G")) {
                 acalDTOs.get(acalDTOs.size()-1).setGenre(acaDTO.getCategoryName());
             } else {
                 acalDTOs.get(acalDTOs.size()-1).getStyles().add(acaDTO.getCategoryName());
@@ -121,10 +120,9 @@ public class RepositoryArtistCategoryTests {
         Assertions.assertEquals("Alternative Rock", acalDTOs.get(1).getStyles().get(0));
         Assertions.assertEquals("Rock", acalDTOs.get(1).getGenre());
 
-        acaDTOs = artistCategoryRepository.getAllWithArtistByIdOrdered(artist1.getId());
-        Assertions.assertEquals(3, acaDTOs.size());
-
-        Assertions.assertEquals(0, artistCategoryRepository.getAllWithArtistByIdOrdered(777L).size());
+        var acaDTO1 = artistRepository.findFlatDTOById(artist1.getId());
+        Assertions.assertEquals(3, acaDTO1.size());
+        Assertions.assertEquals(0, artistRepository.findFlatDTOById(777L).size());
     }
 
 }
