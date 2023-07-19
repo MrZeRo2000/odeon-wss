@@ -209,5 +209,8 @@ public class RepositoryArtistTests {
                 .build();
         artistDetailRepository.delete(d);
         artistDetailRepository.save(d1);
+
+        assertThat(artistRepository.findFlatDTOById(a.getId()).get(0).getDetailId())
+                .isEqualTo(d1.getId());
     }
 }
