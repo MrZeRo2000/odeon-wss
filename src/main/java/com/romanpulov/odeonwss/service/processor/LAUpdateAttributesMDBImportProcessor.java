@@ -9,6 +9,6 @@ public class LAUpdateAttributesMDBImportProcessor extends AbstractMusicAttribute
     public LAUpdateAttributesMDBImportProcessor(
             ArtifactTypeRepository artifactTypeRepository,
             ArtifactRepository artifactRepository) {
-        super(MDBConst.LACONT_TABLE_NAME, artifactTypeRepository.getWithLA(), artifactRepository);
+        super(MDBConst.LACONT_TABLE_NAME, artifactTypeRepository, artifactRepository, ArtifactTypeRepository::getWithLA);
     }
 }

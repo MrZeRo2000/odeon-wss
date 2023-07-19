@@ -4,6 +4,7 @@ import com.healthmarketscience.jackcess.Row;
 import com.healthmarketscience.jackcess.Table;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import static com.romanpulov.odeonwss.service.processor.MDBConst.*;
 
@@ -18,17 +20,22 @@ public abstract class AbstractMusicAttributesMDBImportProcessor extends Abstract
 
     protected final String mdbTableName;
 
-    protected final ArtifactType artifactType;
-
     private final ArtifactRepository artifactRepository;
+
+    private final ArtifactTypeRepository artifactTypeRepository;
+
+    private final Function<ArtifactTypeRepository, ArtifactType> artifactTypeSupplier;
 
     public AbstractMusicAttributesMDBImportProcessor(
             String mdbTableName,
-            ArtifactType artifactType,
-            ArtifactRepository artifactRepository) {
+            ArtifactTypeRepository artifactTypeRepository,
+            ArtifactRepository artifactRepository,
+            Function<ArtifactTypeRepository, ArtifactType> artifactTypeSupplier
+            ) {
         this.mdbTableName = mdbTableName;
-        this.artifactType = artifactType;
+        this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
+        this.artifactTypeSupplier = artifactTypeSupplier;
     }
 
     static class ArtistTitleInsertDate {
@@ -88,10 +95,11 @@ public abstract class AbstractMusicAttributesMDBImportProcessor extends Abstract
     protected int updateArtifacts(Collection<ArtistTitleInsertDate> artistTitleInsertDates) {
         AtomicInteger counter = new AtomicInteger(0);
 
+        final ArtifactType artifactType = this.artifactTypeSupplier.apply(this.artifactTypeRepository);
         for (ArtistTitleInsertDate artistTitleInsertDate: artistTitleInsertDates) {
             artifactRepository
                     .findFirstByArtifactTypeAndArtistNameAndTitleAndYear(
-                            this.artifactType,
+                            artifactType,
                             artistTitleInsertDate.artistName,
                             artistTitleInsertDate.title,
                             Integer.valueOf(artistTitleInsertDate.year).longValue()
