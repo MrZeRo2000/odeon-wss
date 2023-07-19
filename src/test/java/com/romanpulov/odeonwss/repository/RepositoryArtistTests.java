@@ -185,4 +185,29 @@ public class RepositoryArtistTests {
         assertThat(flatDTOs.get(3).getHasLyrics()).isEqualTo(1L);
     }
 
+    @Test
+    @Order(6)
+    void testArtistDetailCRUD() {
+        var a = new EntityArtistBuilder()
+                .withType(ArtistType.ARTIST)
+                .withName("Artist Full Name")
+                .build();
+
+        var d = new EntityArtistDetailBuilder()
+                .withArtist(a)
+                .withBiography("Artist Full Bio")
+                .build();
+
+        a.setArtistDetails(List.of(d));
+
+        artistRepository.save(a);
+        artistDetailRepository.save(d);
+
+        var d1 = new EntityArtistDetailBuilder()
+                .withArtist(a)
+                .withBiography("Artist Full Bio 2")
+                .build();
+        artistDetailRepository.delete(d);
+        artistDetailRepository.save(d1);
+    }
 }
