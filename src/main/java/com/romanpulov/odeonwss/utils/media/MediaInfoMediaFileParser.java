@@ -78,13 +78,16 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
             } else {
                 MediaType mediaType = EnumUtils.getEnumFromString(MediaType.class, trackType.toUpperCase());
                 if (mediaType != null) {
+                    // to cover VBR
+                    Object bitRate = tracksMap.getOrDefault("BitRate",
+                            tracksMap.getOrDefault("BitRate_Maximum", "0"));
                     MediaStreamInfo mediaStream = MediaStreamInfo.createOrdered(
                             mediaType,
                             Long.parseLong((String) tracksMap.getOrDefault("StreamOrder", "0")),
                             Math.round(
                                     Double.parseDouble((String) tracksMap.getOrDefault("Duration", "0"))),
                             Math.round(
-                                    Long.parseLong((String) tracksMap.getOrDefault("BitRate", "0")) / 1000.0)
+                                    Long.parseLong((String) bitRate) / 1000.0)
                             );
                     mediaStreamMap.put(mediaType, mediaStream);
                 }

@@ -4,6 +4,7 @@ import com.romanpulov.odeonwss.utils.media.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
@@ -16,6 +17,19 @@ public class UnitMediaInfoMediaFileParserTest {
     private static final Logger logger = Logger.getLogger(UnitMediaInfoMediaFileParserTest.class.getSimpleName());
 
     MediaInfoMediaFileParser parser = new MediaInfoMediaFileParser("../MediaInfo");
+
+    static class TestMediaInfoMediaFileParser extends MediaInfoMediaFileParser {
+        public TestMediaInfoMediaFileParser() {
+            super("../MediaInfo");
+        }
+
+        @Override
+        protected MediaContentInfo parseOutput(String text) throws MediaInfoParsingException {
+            return super.parseOutput(text);
+        }
+    }
+
+    TestMediaInfoMediaFileParser testParser = new TestMediaInfoMediaFileParser();
 
     @Test
     void testNonMediaFile() {
@@ -167,6 +181,16 @@ public class UnitMediaInfoMediaFileParserTest {
         MediaFormatInfo formatInfo = contentInfo.getMediaFormatInfo();
         assertThat(formatInfo.getDuration()).isEqualTo(TEST_VOB_FILE_DURATION);
         assertThat(formatInfo.getSize()).isEqualTo(TEST_VOB_FILE_SIZE);
+    }
+
+    @Test
+    void testVBRMediaInfo() throws Exception {
+        Path path = Path.of("../odeon-test-data/files/vbr_mediainfo_output.json");
+        String content = Files.readString(path);
+
+        var contentInfo = testParser.parseOutput(content);
+        assertThat(contentInfo.getMediaFormatInfo().getBitRate()).isGreaterThan(0);
+        assertThat(contentInfo.getMediaFormatInfo().getBitRate()).isEqualTo(Math.round(37999872/1000.));
     }
 
 }
