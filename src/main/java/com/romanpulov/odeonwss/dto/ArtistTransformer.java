@@ -17,7 +17,11 @@ public class ArtistTransformer {
                 ArtistDTOImpl newDTO = new ArtistDTOImpl();
                 newDTO.setId(id);
                 newDTO.setArtistName(row.getArtistName());
-                newDTO.setArtistType(ArtistType.fromCode(row.getArtistTypeCode()));
+                if (row.getArtistTypeCode() != null) {
+                    newDTO.setArtistType(ArtistType.fromCode(row.getArtistTypeCode()));
+                } else {
+                    newDTO.setArtistType(row.getArtistType());
+                }
                 newDTO.setDetailId(row.getDetailId());
                 newDTO.setArtistBiography(row.getArtistBiography());
                 newDTO.setHasLyrics(TransformRules.booleanFromLong(row.getHasLyrics()));
@@ -30,6 +34,12 @@ public class ArtistTransformer {
                 if (row.getCategoryTypeCode().equals(ArtistCategoryType.GENRE.getCode())) {
                     dto.setGenre(row.getCategoryName());
                 } else if (row.getCategoryTypeCode().equals(ArtistCategoryType.STYLE.getCode())) {
+                    dto.getStyles().add(row.getCategoryName());
+                }
+            } else if (row.getCategoryType() != null) {
+                if (row.getCategoryType().equals(ArtistCategoryType.GENRE)) {
+                    dto.setGenre(row.getCategoryName());
+                } else if (row.getCategoryType().equals(ArtistCategoryType.STYLE)) {
                     dto.getStyles().add(row.getCategoryName());
                 }
             }

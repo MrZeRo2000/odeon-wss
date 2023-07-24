@@ -1,15 +1,17 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
 import com.romanpulov.odeonwss.builder.dtobuilder.ArtistCategoriesDetailDTOBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistCategoryBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistDetailBuilder;
+import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
+import com.romanpulov.odeonwss.dto.ArtistDTO;
+import com.romanpulov.odeonwss.dto.ArtistDTOImpl;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategoryType;
 import com.romanpulov.odeonwss.entity.ArtistDetail;
 import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistCategoryBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistDetailBuilder;
 import com.romanpulov.odeonwss.repository.ArtistCategoryRepository;
 import com.romanpulov.odeonwss.repository.ArtistDetailRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
@@ -140,12 +142,13 @@ public class ControllerArtistCategoryDetailsTest {
     @Test
     @Order(5)
     void putWithNewBiographyShouldBeOk() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.getById(2L);
-        acd.setArtistBiography("Bio 3 changed");
+        ArtistDTO acd = artistService.getById(2L);
+        ArtistDTOImpl dto = ArtistDTOImpl.fromArtistDTO(acd);
+        dto.setArtistBiography("Bio 3 changed");
 
-        String json = mapper.writeValueAsString(acd);
+        String json = mapper.writeValueAsString(dto);
 
-        this.mockMvc.perform(put("/api/artist-category-details")
+        this.mockMvc.perform(put("/api/artist")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
                 .accept(MediaType.APPLICATION_JSON))
@@ -156,13 +159,15 @@ public class ControllerArtistCategoryDetailsTest {
     @Test
     @Order(6)
     void putWithGenreAndStylesShouldBeOk() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.getById(2L);
-        acd.setGenre("Rock");
-        acd.setStyles(List.of("Rap", "Alternative Rock"));
+        ArtistDTO acd = artistService.getById(2L);
+        ArtistDTOImpl dto = ArtistDTOImpl.fromArtistDTO(acd);
 
-        String json = mapper.writeValueAsString(acd);
+        dto.setGenre("Rock");
+        dto.setStyles(List.of("Rap", "Alternative Rock"));
 
-        this.mockMvc.perform(put("/api/artist-category-details")
+        String json = mapper.writeValueAsString(dto);
+
+        this.mockMvc.perform(put("/api/artist")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                         .accept(MediaType.APPLICATION_JSON))
@@ -176,13 +181,15 @@ public class ControllerArtistCategoryDetailsTest {
     @Test
     @Order(7)
     void putWithRemovedGenreAndStylesShouldBeOk() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.getById(2L);
-        acd.setGenre(null);
-        acd.setStyles(List.of());
+        ArtistDTO acd = artistService.getById(2L);
+        ArtistDTOImpl dto = ArtistDTOImpl.fromArtistDTO(acd);
+
+        dto.setGenre(null);
+        dto.setStyles(List.of());
 
         String json = mapper.writeValueAsString(acd);
 
-        this.mockMvc.perform(put("/api/artist-category-details")
+        this.mockMvc.perform(put("/api/artist")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                         .accept(MediaType.APPLICATION_JSON))
@@ -195,12 +202,13 @@ public class ControllerArtistCategoryDetailsTest {
     @Test
     @Order(8)
     void putNotExistingArtistShouldFail() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.getById(2L);
-        acd.setId(777L);
+        ArtistDTO acd = artistService.getById(2L);
+        ArtistDTOImpl dto = ArtistDTOImpl.fromArtistDTO(acd);
+        dto.setId(777L);
 
-        String json = mapper.writeValueAsString(acd);
+        String json = mapper.writeValueAsString(dto);
 
-        this.mockMvc.perform(put("/api/artist-category-details")
+        this.mockMvc.perform(put("/api/artist")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                         .accept(MediaType.APPLICATION_JSON))
@@ -211,7 +219,7 @@ public class ControllerArtistCategoryDetailsTest {
     @Test
     @Order(9)
     void deleteNotExistingArtistShouldFail() throws Exception {
-        this.mockMvc.perform(delete("/api/artist-category-details/777"))
+        this.mockMvc.perform(delete("/api/artist/777"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", Matchers.containsString("not found")));
     }
@@ -219,15 +227,15 @@ public class ControllerArtistCategoryDetailsTest {
     @Test
     @Order(10)
     void deleteExistingArtistShouldBeOk() throws Exception {
-        this.mockMvc.perform(get("/api/artist-category-details/2")
+        this.mockMvc.perform(get("/api/artist/2")
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk());
 
-        this.mockMvc.perform(delete("/api/artist-category-details/2"))
+        this.mockMvc.perform(delete("/api/artist/2"))
                 .andExpect(status().isOk());
 
-        this.mockMvc.perform(get("/api/artist-category-details/2")
+        this.mockMvc.perform(get("/api/artist/2")
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isNotFound())

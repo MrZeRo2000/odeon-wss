@@ -33,7 +33,7 @@ public class AbstractEntityServiceRestController<
     }
 
     @PutMapping
-    ResponseEntity<DTO> put(@RequestBody DTO dto) throws CommonEntityNotFoundException {
+    ResponseEntity<DTO> put(@RequestBody DTO dto) throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException {
         return ResponseEntity.ok(service.update(dto));
     }
 

@@ -21,21 +21,24 @@ public class ArtistCategoryDetailsController {
 
     @GetMapping("/{id}")
     ResponseEntity<ArtistCategoriesDetailDTO> get(@PathVariable Long id) throws CommonEntityNotFoundException {
-        return ResponseEntity.ok(artistService.getById(id));
+        return ResponseEntity.badRequest().build();
+        //return ResponseEntity.ok(artistService.getById(id));
     }
 
     @PostMapping
     ResponseEntity<ArtistCategoriesDetailDTO> post(@RequestBody ArtistCategoriesDetailDTO acd)
             throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException
     {
-        return ResponseEntity.ok(artistService.insert(acd));
+        return ResponseEntity.badRequest().build();
+        //return ResponseEntity.ok(artistService.insert(acd));
     }
 
     @PutMapping()
     ResponseEntity<ArtistCategoriesDetailDTO> put(@RequestBody ArtistCategoriesDetailDTO acd)
             throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException
     {
-        return ResponseEntity.ok(artistService.update(acd));
+        return ResponseEntity.badRequest().build();
+        //return ResponseEntity.ok(artistService.update(acd));
     }
 
     @DeleteMapping("/{id}")

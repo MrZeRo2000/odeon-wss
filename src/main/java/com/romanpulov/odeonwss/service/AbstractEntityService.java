@@ -64,7 +64,7 @@ public abstract class AbstractEntityService<
     }
 
     @Transactional
-    public DTO update(DTO dto) throws CommonEntityNotFoundException {
+    public DTO update(DTO dto) throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException {
         E entity = repository.findById(dto.getId())
                 .orElseThrow(() -> new CommonEntityNotFoundException(this.entityName, dto.getId()));
         mapper.update(entity, dto);

@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.mapper;
 
 import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
 import com.romanpulov.odeonwss.dto.ArtistCategoryDetailDTO;
+import com.romanpulov.odeonwss.dto.ArtistDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
 import com.romanpulov.odeonwss.entity.ArtistCategoryType;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Component
 public class ArtistCategoryMapper {
@@ -38,7 +38,7 @@ public class ArtistCategoryMapper {
         return result;
     }
 
-    public List<ArtistCategory> createFromArtistCategoriesDetailDTO(Artist artist, ArtistCategoriesDetailDTO acd) {
+    public List<ArtistCategory> createFromArtistDTO(Artist artist, ArtistDTO acd) {
         List<ArtistCategory> artistCategories = new ArrayList<>();
 
         // artist category genre
@@ -51,7 +51,7 @@ public class ArtistCategoryMapper {
             artistCategories.add(artistCategory);
         }
 
-        for (String style: acd.getStyles().stream().distinct().sorted().collect(Collectors.toList())) {
+        for (String style: acd.getStyles().stream().distinct().sorted().toList()) {
             ArtistCategory artistCategory = new ArtistCategory();
             artistCategory.setArtist(artist);
             artistCategory.setType(ArtistCategoryType.STYLE);

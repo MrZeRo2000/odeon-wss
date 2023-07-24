@@ -3,12 +3,8 @@ package com.romanpulov.odeonwss.mapper;
 import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
 import com.romanpulov.odeonwss.dto.ArtistDTO;
 import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.ArtistCategory;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class ArtistMapper implements EntityDTOMapper<Artist, ArtistDTO> {
@@ -23,6 +19,7 @@ public class ArtistMapper implements EntityDTOMapper<Artist, ArtistDTO> {
 
         // immutable fields
         entity.setId(dto.getId());
+        entity.setType(dto.getArtistType() == null? ArtistType.ARTIST : dto.getArtistType());
 
         // mutable fields
         this.update(entity, dto);

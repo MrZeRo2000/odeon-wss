@@ -16,6 +16,20 @@ public class ArtistDTOImpl implements ArtistDTO {
     private String artistBiography;
     private Boolean hasLyrics;
 
+    public static ArtistDTOImpl fromArtistDTO(ArtistDTO dto) {
+        ArtistDTOImpl instance = new ArtistDTOImpl();
+        instance.setId(dto.getId());
+        instance.setArtistName(dto.getArtistName());
+        instance.setArtistType(dto.getArtistType());
+        instance.setGenre(dto.getGenre());
+        instance.setStyles(dto.getStyles());
+        instance.setDetailId(dto.getDetailId());
+        instance.setArtistBiography(dto.getArtistBiography());
+        instance.setHasLyrics(dto.getHasLyrics());
+
+        return instance;
+    }
+
     @Override
     public Long getId() {
         return id;

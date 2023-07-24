@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.dto.ArtistDTO;
+import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.dto.IdNameDTO;
@@ -14,17 +15,16 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping(value = "/api/artist", produces = MediaType.APPLICATION_JSON_VALUE)
-public class ArtistController {
+public class ArtistController
+        extends AbstractEntityServiceRestController<Artist, ArtistDTO, ArtistRepository, ArtistService> {
 
     private final ArtistRepository artistRepository;
-
-    private final ArtistService artistService;
 
     public ArtistController(
             ArtistRepository artistRepository,
             ArtistService artistService) {
-        this.artistRepository = artistRepository;
-        this.artistService = artistService;
+        super(artistService);
+        this. artistRepository = artistRepository;
     }
 
     @GetMapping("/artists/table-id-name")
@@ -34,6 +34,6 @@ public class ArtistController {
 
     @GetMapping("/artists/table")
     ResponseEntity<List<ArtistDTO>> getTable() {
-        return ResponseEntity.ok(artistService.getTable());
+        return ResponseEntity.ok(service.getTable());
     }
 }

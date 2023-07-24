@@ -1,9 +1,9 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
-import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
 import com.romanpulov.odeonwss.builder.dtobuilder.ArtifactEditDTOBuilder;
-import com.romanpulov.odeonwss.builder.dtobuilder.ArtistCategoriesDetailDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.ArtistDTOBuilder;
+import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
+import com.romanpulov.odeonwss.dto.ArtistDTO;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -32,23 +33,23 @@ public class ServiceArtifactTest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     void testInsertShouldBeOk() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.insert(
-                new ArtistCategoriesDetailDTOBuilder()
+        ArtistDTO acd = artistService.insert(
+                new ArtistDTOBuilder()
                         .withArtistName("Name 1")
                         .withArtistType(ArtistType.ARTIST)
                         .withArtistBiography("Bio 1")
                         .withGenre("Pop")
-                        .withStyles("Electronic", "Rap", "Electronic")
+                        .withStyles(List.of("Electronic", "Rap", "Electronic"))
                         .build()
         );
 
-        ArtistCategoriesDetailDTO pacd = artistService.insert(
-                new ArtistCategoriesDetailDTOBuilder()
+        ArtistDTO pacd = artistService.insert(
+                new ArtistDTOBuilder()
                         .withArtistName("Performer Name 1")
                         .withArtistType(ArtistType.ARTIST)
                         .withArtistBiography("Performer Bio 1")
                         .withGenre("Pop")
-                        .withStyles("Electronic", "Rap", "Electronic")
+                        .withStyles(List.of("Electronic", "Rap", "Electronic"))
                         .build()
         );
 

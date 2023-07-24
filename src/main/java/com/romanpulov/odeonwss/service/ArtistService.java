@@ -1,9 +1,6 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
-import com.romanpulov.odeonwss.dto.ArtistCategoryDetailDTO;
-import com.romanpulov.odeonwss.dto.ArtistDTO;
-import com.romanpulov.odeonwss.dto.ArtistTransformer;
+import com.romanpulov.odeonwss.dto.*;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
 import com.romanpulov.odeonwss.entity.ArtistDetail;
@@ -20,12 +17,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ArtistService implements EditableObjectService<ArtistCategoriesDetailDTO> {
+public class ArtistService
+        extends AbstractEntityService<Artist, ArtistDTO, ArtistRepository>
+        implements EditableObjectService<ArtistDTO> {
     private final Logger logger = LoggerFactory.getLogger(ArtistService.class);
 
     private final ArtistCategoryRepository artistCategoryRepository;
@@ -35,10 +34,6 @@ public class ArtistService implements EditableObjectService<ArtistCategoriesDeta
     private final ArtistDetailRepository artistDetailRepository;
 
     private final ArtistDetailMapper artistDetailMapper;
-
-    private final ArtistRepository artistRepository;
-
-    private final ArtistMapper artistMapper;
 
     private final ArtistTransformer artistTransformer;
 
@@ -50,70 +45,71 @@ public class ArtistService implements EditableObjectService<ArtistCategoriesDeta
             ArtistRepository artistRepository,
             ArtistMapper artistMapper,
             ArtistTransformer artistTransformer) {
+        super(artistRepository, artistMapper);
         this.artistCategoryRepository = artistCategoryRepository;
         this.artistCategoryMapper = artistCategoryMapper;
         this.artistDetailRepository = artistDetailRepository;
         this.artistDetailMapper = artistDetailMapper;
-        this.artistRepository = artistRepository;
-        this.artistMapper = artistMapper;
         this.artistTransformer = artistTransformer;
     }
 
     @Override
-    public ArtistCategoriesDetailDTO getById(Long id) throws CommonEntityNotFoundException {
-        List<ArtistCategoryDetailDTO> acdList = artistCategoryRepository.getArtistCategoryDetailsByArtistId(id);
-        if (acdList.size() == 0) {
-            throw new CommonEntityNotFoundException("Artist Category Details", id);
+    @Transactional
+    public ArtistDTO getById(Long id) throws CommonEntityNotFoundException {
+        List<ArtistFlatDTO> flatDTOS = repository.findFlatDTOById(id);
+        if (flatDTOS.size() == 0) {
+            throw new CommonEntityNotFoundException(this.entityName, id);
         } else {
-            return artistCategoryMapper.fromArtistCategoryDetailDTO(acdList);
+            return artistTransformer.transform(flatDTOS).get(0);
         }
     }
 
     @Override
     @Transactional
-    public ArtistCategoriesDetailDTO insert(ArtistCategoriesDetailDTO acd)
+    public ArtistDTO insert(ArtistDTO acd)
             throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException
     {
         // check artist
-        Optional<Artist> existingArtist = artistRepository.findFirstByName(acd.getArtistName());
+        Optional<Artist> existingArtist = repository.findFirstByName(acd.getArtistName());
         if (existingArtist.isPresent()) {
             throw new CommonEntityAlreadyExistsException(existingArtist.get().getName(), existingArtist.get().getId());
         }
 
         // save artist
-        Artist artist = artistRepository.save(artistMapper.fromDTO(acd));
+        Artist artist = repository.save(mapper.fromDTO(acd));
 
         // save artist detail
         if ((acd.getArtistBiography() != null) && !acd.getArtistBiography().isBlank()) {
-            artistDetailRepository.save(artistDetailMapper.fromArtistCategoriesDetailDTO(artist, acd));
+            artistDetailRepository.save(artistDetailMapper.fromArtistDTO(artist, acd));
         }
 
         // save artist categories
-        List<ArtistCategory> artistCategories = artistCategoryMapper.createFromArtistCategoriesDetailDTO(artist, acd);
+        List<ArtistCategory> artistCategories = artistCategoryMapper.createFromArtistDTO(artist, acd);
         if (artistCategories.size() > 0) {
             artistCategoryRepository.saveAll(artistCategories);
         }
 
-        return getById(artist.getId());
+        return this.getById(artist.getId());
     }
 
     @Override
     @Transactional
-    public ArtistCategoriesDetailDTO update(ArtistCategoriesDetailDTO acd)
+    public ArtistDTO update(ArtistDTO acd)
             throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException {
         // check existing artist
-        Optional<Artist> existingArtist = artistRepository.findById(acd.getId());
+        Optional<Artist> existingArtist = repository.findById(acd.getId());
         if (existingArtist.isPresent()) {
             Artist artist = existingArtist.get();
 
             // check for artist after name change
-            Optional<Artist> newArtist = artistRepository.findFirstByName(acd.getArtistName());
+            Optional<Artist> newArtist = repository.findFirstByName(acd.getArtistName());
             if (newArtist.isPresent() && !newArtist.get().getId().equals(artist.getId())) {
                 throw new CommonEntityAlreadyExistsException(acd.getArtistName(), newArtist.get().getId());
             }
 
             // save artist
-            artistRepository.save(artistMapper.update(artist, acd));
+            mapper.update(artist, acd);
+            repository.save(artist);
 
             // save artist detail
             Optional<ArtistDetail> existingArtistDetail = artistDetailRepository.findArtistDetailByArtist(artist);
@@ -125,13 +121,13 @@ public class ArtistService implements EditableObjectService<ArtistCategoriesDeta
                 }
             } else {
                 if ((acd.getArtistBiography() != null) && !acd.getArtistBiography().isBlank()) {
-                    artistDetailRepository.save(artistDetailMapper.fromArtistCategoriesDetailDTO(artist, acd));
+                    artistDetailRepository.save(artistDetailMapper.fromArtistDTO(artist, acd));
                 }
             }
 
             // get artist categories
             List<ArtistCategory> existingCategories = artistCategoryRepository.getArtistCategoriesByArtistOrderByTypeAscNameAsc(artist);
-            List<ArtistCategory> categories = artistCategoryMapper.createFromArtistCategoriesDetailDTO(artist, acd);
+            List<ArtistCategory> categories = artistCategoryMapper.createFromArtistDTO(artist, acd);
 
             // merge new with existing
             Pair<List<ArtistCategory>, List<ArtistCategory>> mergedCategories = artistCategoryMapper.mergeCategories(existingCategories, categories);
@@ -152,17 +148,7 @@ public class ArtistService implements EditableObjectService<ArtistCategoriesDeta
         }
     }
 
-    @Override
-    public void deleteById(Long id) throws CommonEntityNotFoundException {
-        Optional<Artist> existingArtist = artistRepository.findById(id);
-        if (existingArtist.isPresent()) {
-            artistRepository.delete(existingArtist.get());
-        } else {
-            throw new CommonEntityNotFoundException("Artist", id);
-        }
-    }
-
     public List<ArtistDTO> getTable() {
-        return artistTransformer.transform(artistRepository.findAllFlatDTO());
+        return artistTransformer.transform(repository.findAllFlatDTO());
     }
 }

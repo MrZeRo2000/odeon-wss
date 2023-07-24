@@ -1,7 +1,8 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
-import com.romanpulov.odeonwss.builder.dtobuilder.ArtistCategoriesDetailDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.ArtistDTOBuilder;
+import com.romanpulov.odeonwss.dto.ArtistDTO;
+import com.romanpulov.odeonwss.dto.ArtistDTOImpl;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
@@ -25,13 +26,13 @@ public class ServiceArtistTest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     void createNewShouldBeOk() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.insert(
-            new ArtistCategoriesDetailDTOBuilder()
+        ArtistDTO acd = artistService.insert(
+            new ArtistDTOBuilder()
                     .withArtistName("Name 1")
                     .withArtistType(ArtistType.ARTIST)
                     .withArtistBiography("Bio 1")
                     .withGenre("Pop")
-                    .withStyles("Electronic", "Rap", "Electronic")
+                    .withStyles(List.of("Electronic", "Rap", "Electronic"))
                     .build()
         );
 
@@ -46,7 +47,7 @@ public class ServiceArtistTest {
     @Test
     @Order(2)
     void updateNotExistingShouldFail() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.getById(1L);
+        ArtistDTO acd = artistService.getById(1L);
         Assertions.assertNotNull(acd);
         Assertions.assertNotNull(acd.getId());
 
@@ -57,19 +58,22 @@ public class ServiceArtistTest {
     @Test
     @Order(3)
     void updateStylesWithDuplicates() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.getById(1L);
-        acd.setStyles(List.of("Rap", "Dance", "R&B", "Dance"));
-        acd = artistService.update(acd);
-        Assertions.assertEquals(List.of("Dance", "R&B", "Rap"), acd.getStyles());
+        ArtistDTO acd = artistService.getById(1L);
+        ArtistDTOImpl dto = ArtistDTOImpl.fromArtistDTO(acd);
+
+        dto.setStyles(List.of("Rap", "Dance", "R&B", "Dance"));
+        ArtistDTO updatedDTO = artistService.update(dto);
+        Assertions.assertEquals(List.of("Dance", "R&B", "Rap"), updatedDTO.getStyles());
     }
 
     @Test
     @Order(4)
     void updateStylesReduced() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.getById(1L);
-        acd.setStyles(List.of("Rap"));
-        acd = artistService.update(acd);
-        Assertions.assertEquals(List.of("Rap"), acd.getStyles());
+        ArtistDTO acd = artistService.getById(1L);
+        ArtistDTOImpl dto = ArtistDTOImpl.fromArtistDTO(acd);
+        dto.setStyles(List.of("Rap"));
+        ArtistDTO updatedDTO = artistService.update(dto);
+        Assertions.assertEquals(List.of("Rap"), updatedDTO.getStyles());
     }
 
     @Test
@@ -83,7 +87,7 @@ public class ServiceArtistTest {
     void insertWithConflictShouldFail() {
         Assertions.assertThrows(CommonEntityAlreadyExistsException.class, () ->
                 artistService.insert(
-                        new ArtistCategoriesDetailDTOBuilder()
+                        new ArtistDTOBuilder()
                                 .withArtistName("Name 1")
                                 .withArtistType(ArtistType.ARTIST)
                                 .withArtistBiography("Bio 3")
@@ -97,7 +101,7 @@ public class ServiceArtistTest {
     @Order(7)
     void updateWithConflictShouldFail() throws Exception {
         artistService.insert(
-                new ArtistCategoriesDetailDTOBuilder()
+                new ArtistDTOBuilder()
                         .withArtistName("Name 2")
                         .withArtistType(ArtistType.ARTIST)
                         .withArtistBiography("Bio 2")
@@ -105,13 +109,14 @@ public class ServiceArtistTest {
                         .build()
         );
 
-        ArtistCategoriesDetailDTO acd = artistService.getById(1L);
-        acd.setArtistName("Name 2");
+        ArtistDTO acd = artistService.getById(1L);
+        ArtistDTOImpl dto = ArtistDTOImpl.fromArtistDTO(acd);
+        dto.setArtistName("Name 2");
         Assertions.assertThrows(CommonEntityAlreadyExistsException.class, () ->
-                artistService.update(acd));
+                artistService.update(dto));
 
-        acd.setArtistName("Name 3");
-        artistService.update(acd);
+        dto.setArtistName("Name 3");
+        artistService.update(dto);
     }
 
     @Test
@@ -123,44 +128,45 @@ public class ServiceArtistTest {
     @Test
     @Order(9)
     void saveWithoutBiographyShouldBeOk() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.insert(
-                new ArtistCategoriesDetailDTOBuilder()
+        ArtistDTO acd = artistService.insert(
+                new ArtistDTOBuilder()
                         .withArtistName("Name 9")
                         .withArtistType(ArtistType.ARTIST)
                         .withGenre("Pop")
                         .build()
         );
+        ArtistDTOImpl dto = ArtistDTOImpl.fromArtistDTO(acd);
 
-        acd.setArtistName("Name 99");
-        acd = artistService.update(acd);
+        dto.setArtistName("Name 99");
+        ArtistDTO updatedDTO = artistService.update(dto);
 
-        Assertions.assertNull(acd.getArtistBiography());
+        Assertions.assertNull(updatedDTO.getArtistBiography());
 
-        acd.setArtistBiography("Bio 99");
-        acd = artistService.update(acd);
-        Assertions.assertEquals("Bio 99", acd.getArtistBiography());
+        dto.setArtistBiography("Bio 99");
+        updatedDTO = artistService.update(dto);
+        Assertions.assertEquals("Bio 99", updatedDTO.getArtistBiography());
 
-        acd.setArtistBiography("Bio 999");
-        acd = artistService.update(acd);
-        Assertions.assertEquals("Bio 999", acd.getArtistBiography());
+        dto.setArtistBiography("Bio 999");
+        updatedDTO = artistService.update(dto);
+        Assertions.assertEquals("Bio 999", updatedDTO.getArtistBiography());
 
-        acd.setArtistBiography(null);
-        acd = artistService.update(acd);
-        Assertions.assertNull(acd.getArtistBiography());
+        dto.setArtistBiography(null);
+        updatedDTO = artistService.update(dto);
+        Assertions.assertNull(updatedDTO.getArtistBiography());
     }
 
     @Test
     @Order(10)
     void saveWithNameOnlyShouldBeOk() throws Exception {
-        ArtistCategoriesDetailDTO acd = artistService.insert(
-                new ArtistCategoriesDetailDTOBuilder()
+        ArtistDTO acd = artistService.insert(
+                new ArtistDTOBuilder()
                         .withArtistName("Name 10")
                         .build()
         );
+        ArtistDTOImpl dto = ArtistDTOImpl.fromArtistDTO(acd);
 
-        acd.setArtistName("Name 10 1");
-        acd = artistService.update(acd);
-        Assertions.assertEquals("Name 10 1", acd.getArtistName());
+        dto.setArtistName("Name 10 1");
+        ArtistDTO updatedDTO = artistService.update(dto);
+        Assertions.assertEquals("Name 10 1", updatedDTO.getArtistName());
     }
-
 }

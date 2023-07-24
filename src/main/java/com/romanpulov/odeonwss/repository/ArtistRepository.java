@@ -31,7 +31,8 @@ public interface ArtistRepository extends EntityDTORepository<Artist, ArtistDTO>
             "ar.type AS artistType, " +
             "ac.type AS categoryType, " +
             "ac.name AS categoryName, " +
-            "ad.id AS detailId " +
+            "ad.id AS detailId, " +
+            "ad.biography AS artistBiography " +
             "FROM Artist AS ar " +
             "LEFT OUTER JOIN ArtistCategory AS ac ON ar.id = ac.artist.id " +
             "LEFT OUTER JOIN ArtistDetail AS ad ON ar.id = ad.artist.id " +
