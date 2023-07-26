@@ -278,7 +278,8 @@ public class RepositoryArtifactTests {
     void testArtifactsWithNoMonotonicallyIncreasingTrackNumbers() {
         var noNumbers = artifactRepository
                 .getArtifactsWithNoMonotonicallyIncreasingTrackNumbers(
-                        artifactTypeRepository.getWithDVMovies().getId());
+                        List.of(ArtistType.ARTIST.getCode()),
+                        List.of(artifactTypeRepository.getWithDVMovies().getId()));
         assertThat(noNumbers.size()).isEqualTo(0);
 
         var artifact = trackRepository.getTracksByArtifactType(artifactTypeRepository.getWithDVMovies()).get(0).getArtifact();
@@ -295,13 +296,16 @@ public class RepositoryArtifactTests {
 
         var hasNumbers = artifactRepository
                 .getArtifactsWithNoMonotonicallyIncreasingTrackNumbers(
-                        artifactTypeRepository.getWithDVMovies().getId());
+                        null,
+                        List.of(artifactTypeRepository.getWithDVMovies().getId()));
         assertThat(hasNumbers.size()).isEqualTo(1);
         assertThat(hasNumbers.get(0).getId()).isNotNull();
         assertThat(hasNumbers.get(0).getTitle()).isEqualTo("Title No Artist");
 
         assertThat(artifactRepository
                 .getArtifactsWithNoMonotonicallyIncreasingTrackNumbers(
-                        artifactTypeRepository.getWithDVMusic().getId()).size()).isEqualTo(0);
+                        List.of(ArtistType.ARTIST.getCode()),
+                        List.of(artifactTypeRepository.getWithDVMusic().getId()))
+                .size()).isEqualTo(0);
     }
 }

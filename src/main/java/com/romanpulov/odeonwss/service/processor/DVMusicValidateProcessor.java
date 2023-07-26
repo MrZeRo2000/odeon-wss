@@ -71,7 +71,8 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
                 TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
                         this,
                         artifactRepository,
-                        artifactType);
+                        List.of(ArtistType.ARTIST, ArtistType.CLASSICS),
+                        List.of(artifactType));
             }
         }
     }

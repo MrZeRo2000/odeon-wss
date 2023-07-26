@@ -81,7 +81,8 @@ public class DVMoviesValidateProcessor extends AbstractFileSystemProcessor {
             TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
                     this,
                     artifactRepository,
-                    artifactType);
+                    null,
+                    List.of(artifactType));
         }
     }
 }

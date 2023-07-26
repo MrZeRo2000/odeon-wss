@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.service.processor.utils;
 
 import com.romanpulov.odeonwss.dto.ArtifactFlatDTO;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.service.processor.AbstractProcessor;
 import com.romanpulov.odeonwss.service.processor.PathValidator;
@@ -15,9 +16,12 @@ public class TracksValidateUtil {
     public static void validateMonotonicallyIncreasingTrackNumbers(
             AbstractProcessor processor,
             ArtifactRepository artifactRepository,
-            ArtifactType artifactType) {
+            List<ArtistType> artistTypes,
+            List<ArtifactType> artifactTypes) {
         List<ArtifactFlatDTO> tns = artifactRepository
-                .getArtifactsWithNoMonotonicallyIncreasingTrackNumbers(artifactType.getId());
+                .getArtifactsWithNoMonotonicallyIncreasingTrackNumbers(
+                        artistTypes == null ? null : artistTypes.stream().map(ArtistType::getCode).toList(),
+                        artifactTypes.stream().map(ArtifactType::getId).toList());
         if (ValueValidator.validateNonEmptyCollection(
                 processor,
                 tns,

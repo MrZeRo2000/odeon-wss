@@ -89,7 +89,7 @@ public class ServiceProcessValidateMP3Test {
                 .getAllByType(ArtistType.ARTIST)
                 .stream()
                 .map(Artist::getName)
-                .collect(Collectors.toList());
+                .toList();
 
         int id = 0;
         assertThat(processDetails.get(id++)).isEqualTo(

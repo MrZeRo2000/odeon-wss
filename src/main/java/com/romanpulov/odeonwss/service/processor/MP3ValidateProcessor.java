@@ -73,7 +73,8 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
                 TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
                         this,
                         artifactRepository,
-                        artifactType);
+                        List.of(ArtistType.ARTIST),
+                        List.of(artifactType));
             }
         }
     }

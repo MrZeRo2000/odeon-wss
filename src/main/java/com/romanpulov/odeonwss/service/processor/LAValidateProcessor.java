@@ -71,7 +71,8 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                 TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
                         this,
                         artifactRepository,
-                        artifactType);
+                        List.of(ArtistType.ARTIST),
+                        List.of(artifactType));
             }
         }
         logger.info("Completed LAValidateProcessor execution");

@@ -99,11 +99,12 @@ public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifa
         FROM tracks t
         INNER JOIN artifacts a on t.artf_id = a.artf_id
         LEFT OUTER JOIN artists ar ON a.arts_id = ar.arts_id
-        WHERE a.attp_id = :artifactTypeId
+        WHERE a.attp_id IN (:artifactTypeIds)
+          AND (ar.arts_type_code IS NULL OR ar.arts_type_code IN (:artistTypeCodes))
         )
         WHERE trck_num != trck_num_row
     """,nativeQuery = true)
-    List<ArtifactFlatDTO> getArtifactsWithNoMonotonicallyIncreasingTrackNumbers(Long artifactTypeId);
+    List<ArtifactFlatDTO> getArtifactsWithNoMonotonicallyIncreasingTrackNumbers(List<String> artistTypeCodes, List<Long> artifactTypeIds);
 
     @Query(
             "SELECT a " +

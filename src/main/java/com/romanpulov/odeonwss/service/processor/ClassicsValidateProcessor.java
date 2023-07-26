@@ -1,8 +1,10 @@
 package com.romanpulov.odeonwss.service.processor;
 
+import com.romanpulov.odeonwss.dto.IdTitleDTO;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.dto.IdTitleDTO;
+import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
+import com.romanpulov.odeonwss.service.processor.utils.TracksValidateUtil;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
@@ -15,9 +17,13 @@ import java.util.stream.Collectors;
 public class ClassicsValidateProcessor extends AbstractFileSystemProcessor {
 
     private final ArtifactRepository artifactRepository;
+    private final ArtifactTypeRepository artifactTypeRepository;
 
-    public ClassicsValidateProcessor(ArtifactRepository artifactRepository) {
+    public ClassicsValidateProcessor(
+            ArtifactRepository artifactRepository,
+            ArtifactTypeRepository artifactTypeRepository) {
         this.artifactRepository = artifactRepository;
+        this.artifactTypeRepository = artifactTypeRepository;
     }
 
     @Override
@@ -32,6 +38,12 @@ public class ClassicsValidateProcessor extends AbstractFileSystemProcessor {
 
         if (validateArtifacts(pathValidation, dbValidation)) {
             infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
+
+            TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
+                    this,
+                    artifactRepository,
+                    List.of(ArtistType.CLASSICS),
+                    List.of(artifactTypeRepository.getWithMP3(), artifactTypeRepository.getWithLA()));
         }
     }
 
