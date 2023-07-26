@@ -20,11 +20,11 @@ public class Artist extends AbstractBaseMigratedEntity {
     @Convert(converter = ArtistTypeConverter.class)
     private ArtistType type;
 
-    public ArtistType getType() {
+    public @NotNull ArtistType getType() {
         return type;
     }
 
-    public void setType(ArtistType type) {
+    public void setType(@NotNull ArtistType type) {
         this.type = type;
     }
 
@@ -32,11 +32,11 @@ public class Artist extends AbstractBaseMigratedEntity {
     @NotNull
     private String name;
 
-    public String getName() {
+    public @NotNull String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(@NotNull String name) {
         this.name = name;
     }
 
@@ -108,7 +108,7 @@ public class Artist extends AbstractBaseMigratedEntity {
     public Artist() {
     }
 
-    public Artist(Long id, ArtistType type, String name) {
+    public Artist(Long id, @NotNull ArtistType type, @NotNull String name) {
         this.setId(id);
         this.type = type;
         this.name = name;

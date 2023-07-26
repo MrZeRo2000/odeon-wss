@@ -21,11 +21,11 @@ public class DVProduct extends AbstractBaseMigratedEntity {
     @NotNull
     private ArtifactType artifactType;
 
-    public ArtifactType getArtifactType() {
+    public @NotNull ArtifactType getArtifactType() {
         return artifactType;
     }
 
-    public void setArtifactType(ArtifactType artifactType) {
+    public void setArtifactType(@NotNull ArtifactType artifactType) {
         this.artifactType = artifactType;
     }
 
@@ -34,11 +34,11 @@ public class DVProduct extends AbstractBaseMigratedEntity {
     @NotNull
     private DVOrigin dvOrigin;
 
-    public DVOrigin getDvOrigin() {
+    public @NotNull DVOrigin getDvOrigin() {
         return dvOrigin;
     }
 
-    public void setDvOrigin(DVOrigin dvOrigin) {
+    public void setDvOrigin(@NotNull DVOrigin dvOrigin) {
         this.dvOrigin = dvOrigin;
     }
 
@@ -46,11 +46,11 @@ public class DVProduct extends AbstractBaseMigratedEntity {
     @NotNull
     private String title;
 
-    public String getTitle() {
+    public @NotNull String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@NotNull String title) {
         this.title = title;
     }
 
@@ -153,7 +153,7 @@ public class DVProduct extends AbstractBaseMigratedEntity {
         return dvProduct;
     }
 
-    public DVProduct(Long id, DVOrigin dvOrigin, String title, String originalTitle, Long year, String frontInfo, String description, String notes) {
+    public DVProduct(Long id, @NotNull DVOrigin dvOrigin, @NotNull String title, String originalTitle, Long year, String frontInfo, String description, String notes) {
         this.setId(id);
         this.dvOrigin = dvOrigin;
         this.title = title;

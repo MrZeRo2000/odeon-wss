@@ -107,7 +107,7 @@ public class ProcessInfoRepository {
     }
 
     @Transactional
-    void saveDbProcessDetails(ProcessInfo processInfo, DBProcessInfo dbProcessInfo) {
+    public void saveDbProcessDetails(ProcessInfo processInfo, DBProcessInfo dbProcessInfo) {
         processInfo.getProcessDetails().forEach(
                 processDetail -> {
                     DBProcessDetail dbProcessDetail = new DBProcessDetail();
@@ -128,7 +128,7 @@ public class ProcessInfoRepository {
     }
 
     @Transactional
-    void saveDbProcessDetailItems(DBProcessDetail dbProcessDetail, List<String> items) {
+    public void saveDbProcessDetailItems(DBProcessDetail dbProcessDetail, List<String> items) {
         items.forEach(item -> {
             DBProcessDetailItem dbProcessDetailItem = new DBProcessDetailItem();
             dbProcessDetailItem.setDbProcessDetail(dbProcessDetail);
@@ -139,7 +139,7 @@ public class ProcessInfoRepository {
     }
 
     @Transactional
-    void saveDbProcessDetailActions(DBProcessDetail dbProcessDetail, ProcessingAction processingAction) {
+    public void saveDbProcessDetailActions(DBProcessDetail dbProcessDetail, ProcessingAction processingAction) {
         DBProcessDetailAction dbProcessDetailAction = new DBProcessDetailAction();
         dbProcessDetailAction.setDbProcessDetail(dbProcessDetail);
         dbProcessDetailAction.setActionType(processingAction.getActionType());

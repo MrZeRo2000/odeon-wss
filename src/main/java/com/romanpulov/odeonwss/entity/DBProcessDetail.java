@@ -19,11 +19,11 @@ public class DBProcessDetail extends AbstractBaseEntity {
     @NotNull
     private DBProcessInfo dbProcessInfo;
 
-    public DBProcessInfo getDbProcessInfo() {
+    public @NotNull DBProcessInfo getDbProcessInfo() {
         return dbProcessInfo;
     }
 
-    public void setDbProcessInfo(DBProcessInfo dbProcessInfo) {
+    public void setDbProcessInfo(@NotNull DBProcessInfo dbProcessInfo) {
         this.dbProcessInfo = dbProcessInfo;
     }
 
@@ -31,11 +31,11 @@ public class DBProcessDetail extends AbstractBaseEntity {
     @NotNull
     private String message;
 
-    public String getMessage() {
+    public @NotNull String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(@NotNull String message) {
         this.message = message;
     }
 
@@ -44,11 +44,11 @@ public class DBProcessDetail extends AbstractBaseEntity {
     @Convert(converter = ProcessingStatusConverter.class)
     private ProcessingStatus processingStatus;
 
-    public ProcessingStatus getProcessingStatus() {
+    public @NotNull ProcessingStatus getProcessingStatus() {
         return processingStatus;
     }
 
-    public void setProcessingStatus(ProcessingStatus processingStatus) {
+    public void setProcessingStatus(@NotNull ProcessingStatus processingStatus) {
         this.processingStatus = processingStatus;
     }
 
@@ -68,11 +68,11 @@ public class DBProcessDetail extends AbstractBaseEntity {
     @Convert(converter = DateTimeConverter.class)
     private LocalDateTime updateDateTime;
 
-    public LocalDateTime getUpdateDateTime() {
+    public @NotNull LocalDateTime getUpdateDateTime() {
         return updateDateTime;
     }
 
-    public void setUpdateDateTime(LocalDateTime updateDateTime) {
+    public void setUpdateDateTime(@NotNull LocalDateTime updateDateTime) {
         this.updateDateTime = updateDateTime;
     }
 

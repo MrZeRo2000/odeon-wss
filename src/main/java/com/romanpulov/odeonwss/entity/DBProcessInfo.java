@@ -22,11 +22,11 @@ public class DBProcessInfo extends AbstractBaseEntity {
     @Convert(converter = ProcessorTypeConverter.class)
     private ProcessorType processorType;
 
-    public ProcessorType getProcessorType() {
+    public @NotNull ProcessorType getProcessorType() {
         return processorType;
     }
 
-    public void setProcessorType(ProcessorType processorType) {
+    public void setProcessorType(@NotNull ProcessorType processorType) {
         this.processorType = processorType;
     }
 
@@ -35,11 +35,11 @@ public class DBProcessInfo extends AbstractBaseEntity {
     @Convert(converter = ProcessingStatusConverter.class)
     private ProcessingStatus processingStatus;
 
-    public ProcessingStatus getProcessingStatus() {
+    public @NotNull ProcessingStatus getProcessingStatus() {
         return processingStatus;
     }
 
-    public void setProcessingStatus(ProcessingStatus processingStatus) {
+    public void setProcessingStatus(@NotNull ProcessingStatus processingStatus) {
         this.processingStatus = processingStatus;
     }
 
@@ -48,11 +48,11 @@ public class DBProcessInfo extends AbstractBaseEntity {
     @Convert(converter = DateTimeConverter.class)
     private LocalDateTime updateDateTime;
 
-    public LocalDateTime getUpdateDateTime() {
+    public @NotNull LocalDateTime getUpdateDateTime() {
         return updateDateTime;
     }
 
-    public void setUpdateDateTime(LocalDateTime updateDateTime) {
+    public void setUpdateDateTime(@NotNull LocalDateTime updateDateTime) {
         this.updateDateTime = updateDateTime;
     }
 

@@ -19,11 +19,11 @@ public class Artifact extends AbstractBaseMigratedEntity {
     @NotNull
     private ArtifactType artifactType;
 
-    public ArtifactType getArtifactType() {
+    public @NotNull @NotNull ArtifactType getArtifactType() {
         return artifactType;
     }
 
-    public void setArtifactType(ArtifactType artifactType) {
+    public void setArtifactType(@NotNull @NotNull ArtifactType artifactType) {
         this.artifactType = artifactType;
     }
 
@@ -57,11 +57,11 @@ public class Artifact extends AbstractBaseMigratedEntity {
     @NotNull
     private String title;
 
-    public String getTitle() {
+    public @NotNull @NotNull String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@NotNull @NotNull String title) {
         this.title = title;
     }
 

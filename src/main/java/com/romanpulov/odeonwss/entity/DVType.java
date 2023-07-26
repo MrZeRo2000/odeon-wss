@@ -14,18 +14,18 @@ public class DVType extends AbstractBaseModifiableEntity {
     @NotNull
     private String name;
 
-    public String getName() {
+    public @NotNull String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(@NotNull String name) {
         this.name = name;
     }
 
     public DVType() {
     }
 
-    public DVType(Long id, String name) {
+    public DVType(Long id, @NotNull String name) {
         this.setId(id);
         this.name = name;
     }

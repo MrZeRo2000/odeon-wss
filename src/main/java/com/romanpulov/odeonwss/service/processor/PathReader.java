@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PathReader {
@@ -30,7 +29,7 @@ public class PathReader {
             Collection<Path> paths) throws ProcessorException
     {
         try (Stream<Path> stream = Files.list(path)) {
-            for (Path p: stream.collect(Collectors.toList())) {
+            for (Path p: stream.toList()) {
                 if (ReadRule.validateRule(p, filterRule)) {
                     if (!ReadRule.validateRule(p, validationRule)) {
                         // add path to display in the error message

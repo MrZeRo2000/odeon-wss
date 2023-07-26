@@ -3,7 +3,6 @@ package com.romanpulov.odeonwss.service.processor.model;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class ProcessDetail {
 
@@ -90,7 +89,7 @@ public class ProcessDetail {
     }
 
     public static ProcessingStatus getFinalProcessingStatus(List<ProcessDetail> processDetails) {
-        List<ProcessingStatus> processingStatuses = processDetails.stream().map(p -> p.status).distinct().collect(Collectors.toList());
+        List<ProcessingStatus> processingStatuses = processDetails.stream().map(p -> p.status).distinct().toList();
         if (processingStatuses.contains(ProcessingStatus.FAILURE)) {
             return ProcessingStatus.FAILURE;
         } else if (processingStatuses.contains(ProcessingStatus.WARNING)) {

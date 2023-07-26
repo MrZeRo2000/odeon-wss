@@ -1,7 +1,5 @@
 package com.romanpulov.odeonwss.mapper;
 
-import com.romanpulov.odeonwss.dto.ArtistCategoriesDetailDTO;
-import com.romanpulov.odeonwss.dto.ArtistCategoryDetailDTO;
 import com.romanpulov.odeonwss.dto.ArtistDTO;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistCategory;
@@ -15,28 +13,6 @@ import java.util.Objects;
 
 @Component
 public class ArtistCategoryMapper {
-
-    public ArtistCategoriesDetailDTO fromArtistCategoryDetailDTO(List<ArtistCategoryDetailDTO> acdList) {
-        ArtistCategoriesDetailDTO result = null;
-
-        for (ArtistCategoryDetailDTO acd: acdList) {
-            if (result == null) {
-                result = new ArtistCategoriesDetailDTO();
-                result.setId(acd.getId());
-                result.setArtistType(acd.getArtistType());
-                result.setArtistName(acd.getArtistName());
-
-                result.setArtistBiography(acd.getArtistBiography());
-            }
-            if (ArtistCategoryType.GENRE.equals(acd.getCategoryType())) {
-                result.setGenre(acd.getCategoryName());
-            } else if (ArtistCategoryType.STYLE.equals(acd.getCategoryType())) {
-                result.getStyles().add(acd.getCategoryName());
-            }
-        }
-
-        return result;
-    }
 
     public List<ArtistCategory> createFromArtistDTO(Artist artist, ArtistDTO acd) {
         List<ArtistCategory> artistCategories = new ArrayList<>();

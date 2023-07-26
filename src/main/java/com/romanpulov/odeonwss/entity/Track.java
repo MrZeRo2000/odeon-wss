@@ -19,11 +19,11 @@ public class Track extends AbstractBaseMigratedEntity {
     @NotNull
     private Artifact artifact;
 
-    public Artifact getArtifact() {
+    public @NotNull Artifact getArtifact() {
         return artifact;
     }
 
-    public void setArtifact(Artifact artifact) {
+    public void setArtifact(@NotNull Artifact artifact) {
         this.artifact = artifact;
     }
 
@@ -73,11 +73,11 @@ public class Track extends AbstractBaseMigratedEntity {
     @NotNull
     private String title;
 
-    public String getTitle() {
+    public @NotNull String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@NotNull String title) {
         this.title = title;
     }
 

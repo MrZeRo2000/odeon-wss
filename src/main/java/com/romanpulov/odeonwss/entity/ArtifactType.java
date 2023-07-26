@@ -15,11 +15,11 @@ public class ArtifactType extends AbstractBaseModifiableEntity {
     @NotNull
     private String name;
 
-    public String getName() {
+    public @NotNull String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(@NotNull String name) {
         this.name = name;
     }
 
@@ -50,7 +50,7 @@ public class ArtifactType extends AbstractBaseModifiableEntity {
     public ArtifactType() {
     }
 
-    public ArtifactType(Long id, String name, @Nullable Long parentId) {
+    public ArtifactType(Long id, @NotNull String name, @Nullable Long parentId) {
         this.setId(id);
         this.name = name;
         this.parentId = parentId;

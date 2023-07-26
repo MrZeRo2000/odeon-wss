@@ -17,11 +17,11 @@ public class DVCategory extends AbstractBaseMigratedEntity {
     @NotNull
     private String name;
 
-    public String getName() {
+    public @NotNull String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(@NotNull String name) {
         this.name = name;
     }
 
@@ -39,7 +39,7 @@ public class DVCategory extends AbstractBaseMigratedEntity {
     public DVCategory() {
     }
 
-    public DVCategory(Long id, String name) {
+    public DVCategory(Long id, @NotNull String name) {
         this.setId(id);
         this.name = name;
     }

@@ -14,11 +14,11 @@ public class ArtistDetail extends AbstractBaseModifiableEntity {
     @NotNull
     private Artist artist;
 
-    public Artist getArtist() {
+    public @NotNull Artist getArtist() {
         return artist;
     }
 
-    public void setArtist(Artist artist) {
+    public void setArtist(@NotNull Artist artist) {
         this.artist = artist;
     }
 
@@ -26,11 +26,11 @@ public class ArtistDetail extends AbstractBaseModifiableEntity {
     @NotNull
     private String biography;
 
-    public String getBiography() {
+    public @NotNull String getBiography() {
         return biography;
     }
 
-    public void setBiography(String biography) {
+    public void setBiography(@NotNull String biography) {
         this.biography = biography;
     }
 }

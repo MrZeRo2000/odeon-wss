@@ -117,7 +117,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
         List<Path> directoryFolderPaths = directoryPaths
                 .stream()
                 .filter(Files::isDirectory)
-                .collect(Collectors.toList());
+                .toList();
 
         Map<Path, Integer> directoryFolderDisksPaths = directoryFolderPaths
                 .stream()
@@ -140,13 +140,13 @@ public class LALoadProcessor extends AbstractArtistProcessor {
             List<String> directoryFileNames = directoryPaths
                     .stream()
                     .map(p -> p.getFileName().toString())
-                    .collect(Collectors.toList());
+                    .toList();
 
             //validation for Cue
             List<Path> cuePaths = directoryPaths
                     .stream()
                     .filter(p -> p.toString().toLowerCase().endsWith("cue"))
-                    .collect(Collectors.toList());
+                    .toList();
             if (cuePaths.size() > 0) {
                 logger.debug("Cue files found, processing");
                 boolean cueProcessed = false;
@@ -156,7 +156,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                     List<String> cueFiles = cueTracks
                             .stream()
                             .map(CueParser.CueTrack::getFileName)
-                            .distinct().collect(Collectors.toList());
+                            .distinct().toList();
 
                     if (new HashSet<>(directoryFileNames).containsAll(cueFiles)) {
                         logger.debug("Contains all for " + cuePath);

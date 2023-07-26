@@ -52,7 +52,7 @@ public class ValueValidator {
             Function<T, Object> valueMapper,
             Function<T, String> errorMessageMapper
             ) {
-        List<T> emptyList = list.stream().filter(v -> Objects.isNull(valueMapper.apply(v))).collect(Collectors.toList());
+        List<T> emptyList = list.stream().filter(v -> Objects.isNull(valueMapper.apply(v))).toList();
         if (emptyList.size() > 0) {
             processor.errorHandler(errorMessage, sortedCollection(
                     emptyList.stream().map(errorMessageMapper).collect(Collectors.toList())

@@ -14,11 +14,11 @@ public class ArtistLyrics extends AbstractBaseModifiableEntity {
     @NotNull
     private Artist artist;
 
-    public Artist getArtist() {
+    public @NotNull Artist getArtist() {
         return artist;
     }
 
-    public void setArtist(Artist artist) {
+    public void setArtist(@NotNull Artist artist) {
         this.artist = artist;
     }
 
@@ -26,11 +26,11 @@ public class ArtistLyrics extends AbstractBaseModifiableEntity {
     @NotNull
     private String title;
 
-    public String getTitle() {
+    public @NotNull String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@NotNull String title) {
         this.title = title;
     }
 
@@ -38,11 +38,11 @@ public class ArtistLyrics extends AbstractBaseModifiableEntity {
     @NotNull
     private String text;
 
-    public String getText() {
+    public @NotNull String getText() {
         return text;
     }
 
-    public void setText(String text) {
+    public void setText(@NotNull String text) {
         this.text = text;
     }
 }

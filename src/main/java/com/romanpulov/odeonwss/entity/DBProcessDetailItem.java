@@ -15,11 +15,11 @@ public class DBProcessDetailItem extends AbstractBaseEntity {
     @NotNull
     private DBProcessDetail dbProcessDetail;
 
-    public DBProcessDetail getDbProcessDetail() {
+    public @NotNull DBProcessDetail getDbProcessDetail() {
         return dbProcessDetail;
     }
 
-    public void setDbProcessDetail(DBProcessDetail dbProcessDetail) {
+    public void setDbProcessDetail(@NotNull DBProcessDetail dbProcessDetail) {
         this.dbProcessDetail = dbProcessDetail;
     }
 
@@ -27,11 +27,11 @@ public class DBProcessDetailItem extends AbstractBaseEntity {
     @NotNull
     private String value;
 
-    public String getValue() {
+    public @NotNull String getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(@NotNull String value) {
         this.value = value;
     }
 
