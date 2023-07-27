@@ -43,7 +43,7 @@ public class ArtifactTransformer {
             }
 
             if (row.getPerformerArtistId() != null) {
-                newDTO.setArtist(artistDTOMap.computeIfAbsent(
+                newDTO.setPerformerArtist(artistDTOMap.computeIfAbsent(
                         row.getPerformerArtistId(),
                         v -> {
                             ArtistDTOImpl newPerformerArtistDTO = new ArtistDTOImpl();
@@ -66,5 +66,9 @@ public class ArtifactTransformer {
         }
 
         return result;
+    }
+
+    public ArtifactDTO transformOne(ArtifactFlatDTO dto) {
+        return this.transform(List.of(dto)).get(0);
     }
 }

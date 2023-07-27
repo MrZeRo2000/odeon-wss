@@ -1,63 +1,59 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.dto.ArtifactDTO;
+import com.romanpulov.odeonwss.dto.ArtifactTransformer;
 import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.ArtifactMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
+import com.romanpulov.odeonwss.repository.ArtistRepository;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
-import java.util.Optional;
+import java.util.List;
 
 @Service
-public class ArtifactService implements EditableObjectService<ArtifactEditDTO> {
-    private final ArtifactRepository artifactRepository;
+public class ArtifactService
+        extends AbstractEntityService<Artifact, ArtifactDTO, ArtifactRepository>
+        implements EditableObjectService<ArtifactDTO> {
 
-    private final ArtifactMapper artifactMapper;
+    private final ArtifactTransformer artifactTransformer;
 
-    public ArtifactService(ArtifactRepository artifactRepository, ArtifactMapper artifactMapper) {
-        this.artifactRepository = artifactRepository;
-        this.artifactMapper = artifactMapper;
+    public ArtifactService(
+            ArtifactRepository artifactRepository,
+            ArtifactMapper artifactMapper,
+            ArtifactTransformer artifactTransformer,
+            ArtistRepository artistRepository) {
+        super(artifactRepository, artifactMapper);
+        this.artifactTransformer = artifactTransformer;
+
+        this.setOnBeforeSaveEntityHandler(entity -> {
+            if ((entity.getArtist() != null)
+                    && (entity.getArtist().getId() != null)
+                    && (!artistRepository.existsById(entity.getArtist().getId()))
+            ) {
+                throw new CommonEntityNotFoundException("Artist", entity.getArtist().getId());
+            }
+
+            if ((entity.getPerformerArtist() != null)
+                    && (entity.getPerformerArtist().getId() != null)
+                    && (!artistRepository.existsById(entity.getPerformerArtist().getId()))
+            ) {
+                throw new CommonEntityNotFoundException("Artist", entity.getPerformerArtist().getId());
+            }
+        });
     }
 
     @Override
-    public ArtifactEditDTO getById(Long id) throws CommonEntityNotFoundException {
-        return artifactRepository
-                .findArtifactEditById(id)
-                .map(artifactMapper::toDTO)
+    public ArtifactDTO getById(Long id) throws CommonEntityNotFoundException {
+        return repository
+                .findFlatDTOById(id)
+                .map(this.artifactTransformer::transformOne)
                 .orElseThrow(() -> new CommonEntityNotFoundException("Artifact", id));
     }
 
-    @Override
-    @Transactional
-    public ArtifactEditDTO insert(ArtifactEditDTO aed) throws CommonEntityNotFoundException {
-        Artifact artifact = artifactMapper.fromDTO(aed);
-        artifactRepository.save(artifact);
-        return getById(artifact.getId());
-    }
-
-    @Override
-    @Transactional
-    public ArtifactEditDTO update(ArtifactEditDTO aed) throws CommonEntityNotFoundException {
-        Optional<Artifact> existingArtifact = artifactRepository.findById(aed.getId());
-        if (existingArtifact.isPresent()) {
-            Artifact artifact = artifactMapper.fromDTO(aed);
-            artifact.setInsertDateTime(existingArtifact.get().getInsertDateTime());
-            artifactRepository.save(artifact);
-            return getById(artifact.getId());
-        } else {
-            throw new CommonEntityNotFoundException("Artifact", aed.getId());
-        }
-    }
-
-    @Override
-    public void deleteById(Long id) throws CommonEntityNotFoundException {
-        Optional<Artifact> existingArtifact = artifactRepository.findById(id);
-        if (existingArtifact.isPresent()) {
-            artifactRepository.delete(existingArtifact.get());
-        } else {
-            throw new CommonEntityNotFoundException("Artifact", id);
-        }
+    public List<ArtifactDTO> getTable(ArtistType artistType, List<Long> artifactTypeIds) {
+        return this.artifactTransformer.transform(
+                repository.findAllFlatDTOByArtistTypeAndArtifactTypeIds(artistType, artifactTypeIds));
     }
 }

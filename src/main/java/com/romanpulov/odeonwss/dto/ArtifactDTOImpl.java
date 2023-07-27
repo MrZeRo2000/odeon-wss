@@ -13,6 +13,21 @@ public class ArtifactDTOImpl implements ArtifactDTO {
     Long size;
     LocalDateTime insertDateTime;
 
+    public static ArtifactDTOImpl fromArtifactDTO(ArtifactDTO dto) {
+        ArtifactDTOImpl instance = new ArtifactDTOImpl();
+        instance.setId(dto.getId());
+        instance.setArtifactType(dto.getArtifactType());
+        instance.setArtist(dto.getArtist());
+        instance.setPerformerArtist(dto.getPerformerArtist());
+        instance.setTitle(dto.getTitle());
+        instance.setYear(dto.getYear());
+        instance.setDuration(dto.getDuration());
+        instance.setSize(dto.getSize());
+        instance.setInsertDateTime(dto.getInsertDateTime());
+
+        return instance;
+    }
+
     @Override
     public Long getId() {
         return id;

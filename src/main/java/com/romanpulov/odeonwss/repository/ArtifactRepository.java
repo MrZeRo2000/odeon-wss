@@ -1,14 +1,13 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.dto.ArtifactDTO;
 import com.romanpulov.odeonwss.dto.ArtifactFlatDTO;
-import com.romanpulov.odeonwss.dto.ArtifactTableDTO;
+import com.romanpulov.odeonwss.dto.IdTitleDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.dto.IdTitleDTO;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -17,7 +16,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
-public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifact, Long> {
+public interface ArtifactRepository
+        extends MappedMigratedIdJpaRepository<Artifact, Long>,
+        EntityDTORepository<Artifact, ArtifactDTO> {
     List<Artifact> getAllByArtifactType(ArtifactType artifactType);
 
     @Query("SELECT a FROM Artifact a LEFT JOIN FETCH a.tracks WHERE a.artifactType = :artifactType")
@@ -52,35 +53,60 @@ public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifa
             Long year
     );
 
-    @Query(
-        "SELECT new com.romanpulov.odeonwss.dto.ArtifactTableDTO(" +
-                "a.id," +
-                "at.name," +
-                "ar.type, " +
-                "ar.name, " +
-                "par.name, " +
-                "a.title, " +
-                "a.year," +
-                "a.duration," +
-                "a.size," +
-                "a.insertDateTime" +
-                ") " +
-                "FROM Artifact as a " +
-                "INNER JOIN ArtifactType as at ON a.artifactType = at " +
-                "LEFT OUTER JOIN Artist as ar ON a.artist = ar " +
-                "LEFT OUTER JOIN Artist as par ON a.performerArtist = par " +
-                "WHERE (at.parentId = 200 OR ar.type IS NULL OR ar.type=:artistType) " +
-                "AND a.artifactType.id IN (:artifactTypeIds) " +
-                "ORDER BY ar.name, a.year, a.title"
-    )
-    List<ArtifactTableDTO> getArtifactTableByArtistTypeAndArtifactTypeIds(ArtistType artistType, List<Long> artifactTypeIds);
+    @Query("""
+        SELECT
+          a.id AS id,
+          at.id AS artifactTypeId,
+          at.name AS artifactTypeName,
+          ar.type AS artistType,
+          ar.id AS artistId,
+          ar.name AS artistName,
+          par.id AS performerArtistId,
+          par.name AS performerArtistName,
+          a.title AS title,
+          a.year AS year,
+          a.duration AS duration,
+          a.size AS size,
+          a.insertDateTime AS insertDateTime
+        FROM Artifact as a
+        INNER JOIN ArtifactType as at ON a.artifactType = at
+        LEFT OUTER JOIN Artist as ar ON a.artist = ar
+        LEFT OUTER JOIN Artist as par ON a.performerArtist = par
+        WHERE a.id = :id
+    """)
+    Optional<ArtifactFlatDTO> findFlatDTOById(long id);
+
+    @Query("""
+        SELECT
+          a.id AS id,
+          at.id AS artifactTypeId,
+          at.name AS artifactTypeName,
+          ar.type AS artistType,
+          ar.id AS artistId,
+          ar.name AS artistName,
+          par.id AS performerArtistId,
+          par.name AS performerArtistName,
+          a.title AS title,
+          a.year AS year,
+          a.duration AS duration,
+          a.size AS size,
+          a.insertDateTime AS insertDateTime
+        FROM Artifact as a
+        INNER JOIN ArtifactType as at ON a.artifactType = at
+        LEFT OUTER JOIN Artist as ar ON a.artist = ar
+        LEFT OUTER JOIN Artist as par ON a.performerArtist = par
+        WHERE (at.parentId = 200 OR ar.type IS NULL OR ar.type=:artistType)
+        AND a.artifactType.id IN (:artifactTypeIds)
+        ORDER BY ar.name, a.year, a.title
+    """)
+    List<ArtifactFlatDTO> findAllFlatDTOByArtistTypeAndArtifactTypeIds(ArtistType artistType, List<Long> artifactTypeIds);
 
     @Query(
             "SELECT a " +
             "FROM Artifact as a " +
             "WHERE a.artist.type = :artistType"
     )
-    List<IdTitleDTO> getArtifactsByArtistType(@Param("artistType") ArtistType artistType);
+    List<IdTitleDTO> getArtifactsByArtistType(ArtistType artistType);
 
     @Query(value ="""
         SELECT DISTINCT
@@ -105,16 +131,6 @@ public interface ArtifactRepository extends MappedMigratedIdJpaRepository<Artifa
         WHERE trck_num != trck_num_row
     """,nativeQuery = true)
     List<ArtifactFlatDTO> getArtifactsWithNoMonotonicallyIncreasingTrackNumbers(List<String> artistTypeCodes, List<Long> artifactTypeIds);
-
-    @Query(
-            "SELECT a " +
-                    "FROM Artifact as a " +
-                    "INNER JOIN FETCH a.artifactType " +
-                    "LEFT JOIN FETCH a.artist " +
-                    "LEFT JOIN FETCH a.performerArtist " +
-                    "WHERE a.id = :id"
-    )
-    Optional<Artifact> findArtifactEditById(Long id);
 
     @Query("SELECT a FROM Artifact a INNER JOIN FETCH a.artist LEFT JOIN FETCH a.performerArtist WHERE a.title = :title")
     Optional<Artifact> getArtifactWithArtistByTitle(String title);

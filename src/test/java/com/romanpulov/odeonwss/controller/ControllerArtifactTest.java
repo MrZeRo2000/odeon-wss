@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entity.Artist;
@@ -32,8 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ControllerArtifactTest {
     final static Logger logger = LoggerFactory.getLogger(ControllerArtifactTest.class);
 
-    final ObjectMapper mapper = new ObjectMapper();
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -49,7 +46,7 @@ public class ControllerArtifactTest {
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
-    void prepareDataShouldBeOk() throws Exception {
+    void prepareDataShouldBeOk() {
         Artist artist1 = artistRepository.save(
                 new EntityArtistBuilder()
                         .withType(ArtistType.ARTIST)
@@ -163,8 +160,8 @@ public class ControllerArtifactTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(1)))
-                .andExpect(jsonPath("$[0].artistName", Matchers.equalTo("Classics 1")))
-                .andExpect(jsonPath("$[0].performerArtistName", Matchers.equalTo("Performer Artist 1")))
+                .andExpect(jsonPath("$[0].artist.artistName", Matchers.equalTo("Classics 1")))
+                .andExpect(jsonPath("$[0].performerArtist.artistName", Matchers.equalTo("Performer Artist 1")))
         ;
     }
 

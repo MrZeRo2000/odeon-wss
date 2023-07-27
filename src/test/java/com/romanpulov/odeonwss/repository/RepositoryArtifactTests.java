@@ -4,14 +4,14 @@ import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityTrackBuilder;
-import com.romanpulov.odeonwss.dto.ArtifactTableDTO;
+import com.romanpulov.odeonwss.dto.ArtifactFlatDTO;
 import com.romanpulov.odeonwss.entity.*;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Logger;
@@ -120,21 +120,21 @@ public class RepositoryArtifactTests {
     @Test
     @Order(4)
     void testArtifactTable() {
-        List<ArtifactTableDTO> at = artifactRepository.getArtifactTableByArtistTypeAndArtifactTypeIds(
+        List<ArtifactFlatDTO> at = artifactRepository.findAllFlatDTOByArtistTypeAndArtifactTypeIds(
                 ArtistType.ARTIST,
                 List.of(artifactTypeRepository.getWithMP3().getId(), artifactTypeRepository.getWithLA().getId())
         );
         Assertions.assertEquals(1, at.size());
 
         Assertions.assertEquals(0,
-            artifactRepository.getArtifactTableByArtistTypeAndArtifactTypeIds(
+            artifactRepository.findAllFlatDTOByArtistTypeAndArtifactTypeIds(
                     ArtistType.ARTIST,
                     List.of(artifactTypeRepository.getWithLA().getId())
             ).size()
         );
 
         Assertions.assertEquals(0,
-                artifactRepository.getArtifactTableByArtistTypeAndArtifactTypeIds(
+                artifactRepository.findAllFlatDTOByArtistTypeAndArtifactTypeIds(
                         ArtistType.CLASSICS,
                         List.of(artifactTypeRepository.getWithMP3().getId())
                 ).size()
@@ -179,8 +179,8 @@ public class RepositoryArtifactTests {
     @Test
     @Order(7)
     void testArtifactWithoutArtist() {
-        List<ArtifactTableDTO> prevArtifactTable = artifactRepository
-                .getArtifactTableByArtistTypeAndArtifactTypeIds(
+        List<ArtifactFlatDTO> prevArtifactTable = artifactRepository
+                .findAllFlatDTOByArtistTypeAndArtifactTypeIds(
                         ArtistType.ARTIST,
                         List.of(artifactTypeRepository.getWithDVMovies().getId()));
         assertThat(prevArtifactTable.size()).isEqualTo(0);
@@ -194,8 +194,8 @@ public class RepositoryArtifactTests {
 
         artifactRepository.save(artifact);
 
-        List<ArtifactTableDTO> artifactTable = artifactRepository
-                .getArtifactTableByArtistTypeAndArtifactTypeIds(
+        List<ArtifactFlatDTO> artifactTable = artifactRepository
+                .findAllFlatDTOByArtistTypeAndArtifactTypeIds(
                         ArtistType.ARTIST,
                         List.of(artifactTypeRepository.getWithDVMovies().getId()));
         assertThat(artifactTable.size()).isEqualTo(1);

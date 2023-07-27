@@ -1,9 +1,8 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
-import com.romanpulov.odeonwss.dto.ArtifactTableDTO;
+import com.romanpulov.odeonwss.dto.ArtifactDTO;
+import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.service.ArtifactService;
 import org.springframework.http.MediaType;
@@ -16,42 +15,17 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping(value = "/api/artifact", produces = MediaType.APPLICATION_JSON_VALUE)
-public class ArtifactController {
+public class ArtifactController
+        extends AbstractEntityServiceRestController<Artifact, ArtifactDTO, ArtifactRepository, ArtifactService> {
 
-    private final ArtifactRepository artifactRepository;
-    private final ArtifactService artifactService;
-
-
-    public ArtifactController(ArtifactRepository artifactRepository, ArtifactService artifactService) {
-        this.artifactRepository = artifactRepository;
-        this.artifactService = artifactService;
+    public ArtifactController(ArtifactService artifactService) {
+        super(artifactService);
     }
 
     @GetMapping("/table")
-    ResponseEntity<List<ArtifactTableDTO>> getTable(@RequestParam String artistTypeCode, @RequestParam List<String> artifactTypeCodes) {
+    ResponseEntity<List<ArtifactDTO>> getTable(@RequestParam String artistTypeCode, @RequestParam List<String> artifactTypeCodes) {
         ArtistType artistType = ArtistType.fromCode(artistTypeCode);
         List<Long> artifactTypeIds = artifactTypeCodes.stream().map(Long::valueOf).collect(Collectors.toList());
-        return ResponseEntity.ok(artifactRepository.getArtifactTableByArtistTypeAndArtifactTypeIds(artistType, artifactTypeIds));
-    }
-
-    @GetMapping("/{id}")
-    ResponseEntity<ArtifactEditDTO> get(@PathVariable Long id) throws CommonEntityNotFoundException {
-        return ResponseEntity.ok(artifactService.getById(id));
-    }
-
-    @PostMapping
-    ResponseEntity<ArtifactEditDTO> post(@RequestBody ArtifactEditDTO aed) throws CommonEntityNotFoundException  {
-        return ResponseEntity.ok(artifactService.insert(aed));
-    }
-
-    @PutMapping
-    ResponseEntity<ArtifactEditDTO> put(@RequestBody ArtifactEditDTO aed) throws CommonEntityNotFoundException  {
-        return ResponseEntity.ok(artifactService.update(aed));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) throws CommonEntityNotFoundException {
-        artifactService.deleteById(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(service.getTable(artistType, artifactTypeIds));
     }
 }

@@ -1,12 +1,14 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.builder.dtobuilder.ArtifactEditDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.ArtifactDTOBuilder;
 import com.romanpulov.odeonwss.builder.dtobuilder.ArtistDTOBuilder;
-import com.romanpulov.odeonwss.dto.ArtifactEditDTO;
+import com.romanpulov.odeonwss.dto.ArtifactDTO;
+import com.romanpulov.odeonwss.dto.ArtifactDTOImpl;
 import com.romanpulov.odeonwss.dto.ArtistDTO;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
+import com.romanpulov.odeonwss.repository.ArtistRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +30,8 @@ public class ServiceArtifactTest {
 
     @Autowired
     private ArtistService artistService;
+    @Autowired
+    private ArtistRepository artistRepository;
 
     @Test
     @Order(1)
@@ -54,24 +58,24 @@ public class ServiceArtifactTest {
         );
 
 
-        ArtifactEditDTO aed = new ArtifactEditDTOBuilder()
+        ArtifactDTO aed = new ArtifactDTOBuilder()
                 .withArtifactTypeId(artifactTypeRepository.getWithMP3().getId())
-                .withArtistId(acd.getId())
-                .withPerformerArtistId(pacd.getId())
+                .withArtist(acd)
+                .withPerformerArtist(pacd)
                 .withTitle("Title 1")
                 .build();
 
-        aed = artifactService.insert(aed);
+        ArtifactDTO insertedDTO = artifactService.insert(aed);
 
-        Assertions.assertEquals(1, aed.getId());
-        Assertions.assertEquals(acd.getId(), aed.getArtistId());
-        Assertions.assertEquals(pacd.getId(), aed.getPerformerArtistId());
+        Assertions.assertEquals(1, insertedDTO.getId());
+        Assertions.assertEquals(acd.getId(), insertedDTO.getArtist().getId());
+        Assertions.assertEquals(pacd.getId(), insertedDTO.getPerformerArtist().getId());
     }
 
     @Test
     @Order(2)
     void testInsertWithoutArtistShouldBeOk() throws Exception {
-        ArtifactEditDTO aed = artifactService.insert(new ArtifactEditDTOBuilder()
+        artifactService.insert(new ArtifactDTOBuilder()
                 .withArtifactTypeId(artifactTypeRepository.getWithDVMovies().getId())
                 .withTitle("Title 2")
                 .build()
@@ -82,8 +86,8 @@ public class ServiceArtifactTest {
     @Order(3)
     void testInsertWithoutTitleShouldFail() {
         Assertions.assertThrows(Exception.class, () -> {
-            artifactService.insert(new ArtifactEditDTOBuilder()
-                    .withArtistId(1L)
+            artifactService.insert(new ArtifactDTOBuilder()
+                    .withArtist(artistRepository.findDTOById(1L).orElseThrow())
                     .withArtifactTypeId(artifactTypeRepository.getWithMP3().getId())
                     .build()
             );
@@ -93,17 +97,20 @@ public class ServiceArtifactTest {
     @Test
     @Order(4)
     void testUpdateYearShouldBeOk() throws Exception {
-        ArtifactEditDTO aed = artifactService.getById(1L);
-        aed.setYear(2000L);
-        aed = artifactService.update(aed);
+        ArtifactDTO aed = artifactService.getById(1L);
 
-        Assertions.assertEquals(2000, aed.getYear());
+        ArtifactDTOImpl dto = ArtifactDTOImpl.fromArtifactDTO(aed);
+
+        dto.setYear(2000L);
+        var updatedDTO = artifactService.update(dto);
+
+        Assertions.assertEquals(2000, updatedDTO.getYear());
     }
 
     @Test
     @Order(5)
     void testUpdateNotExistingShouldFail() {
-        ArtifactEditDTO aed = new ArtifactEditDTOBuilder()
+        ArtifactDTO aed = new ArtifactDTOBuilder()
                 .withId(888L)
                 .build();
         Assertions.assertThrows(CommonEntityNotFoundException.class, () -> artifactService.update(aed));
