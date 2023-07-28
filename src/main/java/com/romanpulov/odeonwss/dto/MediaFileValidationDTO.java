@@ -55,17 +55,6 @@ public class MediaFileValidationDTO extends TrackValidationDTO {
 
     public MediaFileValidationDTO() {}
 
-    public static Set<String> getMusicMediaFiles(List<MediaFileValidationDTO> data) {
-        return data.stream()
-                .map(d ->
-                        d.getArtistName() +
-                                FORMAT_DELIMITER +
-                                d.getArtifactYear() + " " + d.getArtifactTitle() +
-                                FORMAT_DELIMITER +
-                                d.getMediaFileName())
-                .collect(Collectors.toSet());
-    }
-
     public static Set<String> getMusicTracks(List<MediaFileValidationDTO> data) {
         return data.stream()
                 .map(d ->

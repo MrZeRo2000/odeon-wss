@@ -16,6 +16,8 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ControllerMediaFileTest {
+    final static Logger logger = LoggerFactory.getLogger(ControllerMediaFileTest.class);
 
     @Autowired
     private MockMvc mockMvc;
@@ -47,13 +50,10 @@ public class ControllerMediaFileTest {
     @Autowired
     private MediaFileRepository mediaFileRepository;
 
-    @Autowired
-    private MediaFileService mediaFileService;
-
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
-    void prepareDataShouldBeOk() throws Exception {
+    void prepareDataShouldBeOk() {
         Artist artist1 = artistRepository.save(
                 new EntityArtistBuilder()
                         .withType(ArtistType.ARTIST)
@@ -98,7 +98,6 @@ public class ControllerMediaFileTest {
                         .withFormat("ape")
                         .withBitrate(1001L)
                         .withSize(3424L)
-                        .withDuration(57474L)
                         .build()
         );
 
@@ -118,12 +117,24 @@ public class ControllerMediaFileTest {
     @Test
     @Order(2)
     void testGetTableArtifact1() throws Exception {
-        this.mockMvc.perform(get("/api/media-file/table/1")
+        var result = this.mockMvc.perform(get("/api/media-file/table/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(6)))
+                .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].name", Matchers.equalTo("Name 11")))
+                .andExpect(jsonPath("$[0].format", Matchers.equalTo("ape")))
+                .andExpect(jsonPath("$[0].bitrate", Matchers.equalTo(1000)))
+                .andExpect(jsonPath("$[0].duration", Matchers.equalTo(52345)))
+                .andExpect(jsonPath("$[0].size", Matchers.equalTo(3423)))
+                .andExpect(jsonPath("$[1]", Matchers.aMapWithSize(5)))
+                .andExpect(jsonPath("$[1].id", Matchers.equalTo(2)))
+                .andExpect(jsonPath("$[1].duration").doesNotExist())
+                .andReturn()
         ;
+        logger.debug("testGetTableArtifact1:" + result.getResponse().getContentAsString());
 
     }
 
@@ -137,7 +148,6 @@ public class ControllerMediaFileTest {
                 .andExpect(jsonPath("$", Matchers.hasSize(1)))
                 .andExpect(jsonPath("$[0].size").exists())
         ;
-
     }
 
     @Test

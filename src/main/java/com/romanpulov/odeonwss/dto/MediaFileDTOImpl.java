@@ -1,26 +1,34 @@
 package com.romanpulov.odeonwss.dto;
 
-public class MediaFileTableDTO {
+public class MediaFileDTOImpl implements MediaFileDTO {
     private Long id;
-
+    private Long artifactId;
     private String name;
-
     private String format;
-
     private Long size;
-
     private Long bitrate;
-
     private Long duration;
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }
 
+    @Override
+    public Long getArtifactId() {
+        return artifactId;
+    }
+
+    public void setArtifactId(Long artifactId) {
+        this.artifactId = artifactId;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
@@ -29,6 +37,7 @@ public class MediaFileTableDTO {
         this.name = name;
     }
 
+    @Override
     public String getFormat() {
         return format;
     }
@@ -37,6 +46,7 @@ public class MediaFileTableDTO {
         this.format = format;
     }
 
+    @Override
     public Long getSize() {
         return size;
     }
@@ -45,6 +55,7 @@ public class MediaFileTableDTO {
         this.size = size;
     }
 
+    @Override
     public Long getBitrate() {
         return bitrate;
     }
@@ -53,6 +64,7 @@ public class MediaFileTableDTO {
         this.bitrate = bitrate;
     }
 
+    @Override
     public Long getDuration() {
         return duration;
     }
@@ -61,22 +73,11 @@ public class MediaFileTableDTO {
         this.duration = duration;
     }
 
-    public MediaFileTableDTO(Long id, String name, String format, Long size, Long bitrate, Long duration) {
-        this.id = id;
-        this.name = name;
-        this.format = format;
-        this.size = size;
-        this.bitrate = bitrate;
-        this.duration = duration;
-    }
-
-    public MediaFileTableDTO() {
-    }
-
     @Override
     public String toString() {
-        return "MediaFileTableDTO{" +
+        return "MediaFileDTOImpl{" +
                 "id=" + id +
+                ", artifactId=" + artifactId +
                 ", name='" + name + '\'' +
                 ", format='" + format + '\'' +
                 ", size=" + size +
