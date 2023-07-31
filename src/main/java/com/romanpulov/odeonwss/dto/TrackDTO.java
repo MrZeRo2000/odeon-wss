@@ -6,8 +6,7 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public interface TrackDTO extends BaseEntityDTO {
-    Long getArtifactId();
-    String getArtifactTitle();
+    ArtifactDTO getArtifact();
     ArtistDTO getArtist();
     ArtistDTO getPerformerArtist();
     IdNameDTO getDvType();
@@ -17,6 +16,6 @@ public interface TrackDTO extends BaseEntityDTO {
     Long getNum();
     Long getSize();
     Long getBitRate();
-    List<String> getFileNames();
+    List<MediaFileDTO> getMediaFiles();
     DVProductDTO getDvProduct();
 }

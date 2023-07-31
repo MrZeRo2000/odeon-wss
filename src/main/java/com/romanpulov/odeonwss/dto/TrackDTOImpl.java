@@ -6,8 +6,7 @@ import java.util.Objects;
 
 public class TrackDTOImpl implements TrackDTO {
     private Long id;
-    private String artifactTitle;
-    private Long artifactId;
+    private ArtifactDTO artifact;
     private ArtistDTO artist;
     private ArtistDTO performerArtist;
     private IdNameDTO dvType;
@@ -17,8 +16,27 @@ public class TrackDTOImpl implements TrackDTO {
     private Long num;
     private Long size;
     private Long bitRate;
-    private List<String> fileNames = new ArrayList<>();
+    private List<MediaFileDTO> mediaFiles = new ArrayList<>();
     private DVProductDTO dvProduct;
+
+    public static TrackDTOImpl fromTrackDTO(TrackDTO dto) {
+        TrackDTOImpl instance = new TrackDTOImpl();
+        instance.setId(dto.getId());
+        instance.setArtifact(dto.getArtifact());
+        instance.setArtist(dto.getArtist());
+        instance.setPerformerArtist(dto.getPerformerArtist());
+        instance.setDvType(dto.getDvType());
+        instance.setTitle(dto.getTitle());
+        instance.setDuration(dto.getDuration());
+        instance.setDiskNum(dto.getDiskNum());
+        instance.setNum(dto.getNum());
+        instance.setSize(dto.getSize());
+        instance.setBitRate(dto.getBitRate());
+        instance.setMediaFiles(dto.getMediaFiles());
+        instance.setDvProduct(dto.getDvProduct());
+
+        return instance;
+    }
 
     @Override
     public Long getId() {
@@ -31,21 +49,12 @@ public class TrackDTOImpl implements TrackDTO {
     }
 
     @Override
-    public String getArtifactTitle() {
-        return artifactTitle;
+    public ArtifactDTO getArtifact() {
+        return artifact;
     }
 
-    public void setArtifactTitle(String artifactTitle) {
-        this.artifactTitle = artifactTitle;
-    }
-
-    @Override
-    public Long getArtifactId() {
-        return artifactId;
-    }
-
-    public void setArtifactId(Long artifactId) {
-        this.artifactId = artifactId;
+    public void setArtifact(ArtifactDTO artifact) {
+        this.artifact = artifact;
     }
 
     @Override
@@ -129,13 +138,12 @@ public class TrackDTOImpl implements TrackDTO {
         this.bitRate = bitRate;
     }
 
-    @Override
-    public List<String> getFileNames() {
-        return fileNames;
+    public List<MediaFileDTO> getMediaFiles() {
+        return mediaFiles;
     }
 
-    public void setFileNames(List<String> fileNames) {
-        this.fileNames = fileNames;
+    public void setMediaFiles(List<MediaFileDTO> mediaFiles) {
+        this.mediaFiles = mediaFiles;
     }
 
     @Override
@@ -164,8 +172,7 @@ public class TrackDTOImpl implements TrackDTO {
     public String toString() {
         return "TrackDTOImpl{" +
                 "id=" + id +
-                ", artifactId=" + artifactId +
-                ", artifactTitle=" + artifactTitle +
+                ", artifact" + artifact +
                 ", artist=" + artist +
                 ", performerArtist=" + performerArtist +
                 ", dvType=" + dvType +
@@ -175,7 +182,7 @@ public class TrackDTOImpl implements TrackDTO {
                 ", num=" + num +
                 ", size=" + size +
                 ", bitRate=" + bitRate +
-                ", fileNames=" + fileNames +
+                ", mediaFiles=" + mediaFiles +
                 ", dvProduct=" + dvProduct +
                 '}';
     }

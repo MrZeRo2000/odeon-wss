@@ -1,20 +1,23 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.builder.dtobuilder.TrackEditDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.DVProductDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.MediaFileDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.TrackDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.*;
-import com.romanpulov.odeonwss.dto.TrackEditDTO;
+import com.romanpulov.odeonwss.dto.MediaFileDTO;
+import com.romanpulov.odeonwss.dto.TrackDTO;
+import com.romanpulov.odeonwss.dto.TrackDTOImpl;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.repository.*;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
-import jakarta.transaction.Transactional;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -112,8 +115,8 @@ public class ServiceTrackTest {
                 .build();
         dvProductRepository.save(product);
 
-        TrackEditDTO comp11 = trackService.insert(
-            new TrackEditDTOBuilder()
+        TrackDTO comp11 = trackService.insert(
+            new TrackDTOBuilder()
                     .withArtifactId(artifact1.getId())
                     .withArtistId(artist.getId())
                     .withPerformerArtistId(performerArtist.getId())
@@ -131,9 +134,9 @@ public class ServiceTrackTest {
         Assertions.assertEquals(1, comp11.getDiskNum());
         Assertions.assertEquals(4, comp11.getNum());
         Assertions.assertEquals(1234, comp11.getDuration());
-        Assertions.assertEquals(1, comp11.getArtistId());
-        Assertions.assertEquals(2, comp11.getPerformerArtistId());
-        Assertions.assertEquals(8, comp11.getDvTypeId());
+        Assertions.assertEquals(1, comp11.getArtist().getId());
+        Assertions.assertEquals(2, comp11.getPerformerArtist().getId());
+        Assertions.assertEquals(8, comp11.getDvType().getId());
 
 
         MediaFile mediaFile12 = mediaFileRepository.save(
@@ -148,7 +151,7 @@ public class ServiceTrackTest {
         );
 
         trackService.insert(
-                new TrackEditDTOBuilder()
+                new TrackDTOBuilder()
                         .withArtifactId(artifact1.getId())
                         .withTitle("Comp 1-2")
                         .withDiskNum(1L)
@@ -194,13 +197,14 @@ public class ServiceTrackTest {
         var table = trackService.getTableByProductId(1L);
         assertThat(table.size()).isEqualTo(1);
         var row = table.get(0);
-        assertThat(row.getArtifactId()).isEqualTo(1L);
-        assertThat(row.getArtifactTitle()).isEqualTo("Title 1");
+        assertThat(row.getArtifact().getId()).isEqualTo(1L);
+        assertThat(row.getArtifact().getTitle()).isEqualTo("Title 1");
         assertThat(row.getNum()).isEqualTo(5L);
         assertThat(row.getDuration()).isEqualTo(12L);
         assertThat(row.getTitle()).isEqualTo("Comp 1-2");
         assertThat(row.getDvType().getId()).isEqualTo(7L);
-        assertThat(row.getFileNames()).isEqualTo(List.of("Comp 1-2.mp3"));
+        assertThat(row.getMediaFiles().stream().map(MediaFileDTO::getName).collect(Collectors.toList()))
+                .isEqualTo(List.of("Comp 1-2.mp3"));
     }
 
     @Test
@@ -210,23 +214,22 @@ public class ServiceTrackTest {
     void testRemoveMediaFile() throws Exception {
         Assertions.assertEquals(2, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
 
-        TrackEditDTO dto = trackService.getById(1L);
+        TrackDTO dto = trackService.getById(1L);
         Assertions.assertEquals(1, trackRepository.findById(1L).orElseThrow().getMediaFiles().size());
 
-        dto.getMediaFileIds().clear();
+        dto.getMediaFiles().clear();
         dto = trackService.update(dto);
 
-        Assertions.assertEquals(0, dto.getMediaFileIds().size());
+        Assertions.assertEquals(0, dto.getMediaFiles().size());
     }
 
 
     @Test
     @Order(8)
-    @Transactional
     @Rollback(value = false)
     void testInsertMediaFile() throws Exception {
-        Assertions.assertEquals(0, trackRepository.findById(1L).orElseThrow().getMediaFiles().size());
-        TrackEditDTO dto = trackService.getById(1L);
+        Assertions.assertEquals(0, trackRepository.findByIdWithMediaFiles(1L).orElseThrow().getMediaFiles().size());
+        TrackDTOImpl dto = TrackDTOImpl.fromTrackDTO(trackService.getById(1L));
 
         MediaFile mediaFile = mediaFileRepository.save(
                 new EntityMediaFileBuilder()
@@ -239,27 +242,27 @@ public class ServiceTrackTest {
                         .build()
         );
 
-        dto.setMediaFiles(Set.of(mediaFile.getId()));
-        dto = trackService.update(dto);
-        Assertions.assertEquals(1, trackRepository.findById(1L).orElseThrow().getMediaFiles().size());
-        assertThat(dto.getMediaFileIds().size()).isEqualTo(1);
+        dto.setMediaFiles(List.of(new MediaFileDTOBuilder().withId(mediaFile.getId()).build()));
+        TrackDTO updatedDTO = trackService.update(dto);
+        Assertions.assertEquals(1, trackRepository.findByIdWithMediaFiles(1L).orElseThrow().getMediaFiles().size());
+        assertThat(updatedDTO.getMediaFiles().size()).isEqualTo(1);
     }
 
     @Test
     @Order(9)
     void testAssignProduct() throws Exception {
-        TrackEditDTO dto = trackService.getById(2L);
-        assertThat(dto.getDvProductId()).isEqualTo(1L);
+        TrackDTOImpl dto = TrackDTOImpl.fromTrackDTO(trackService.getById(2L));
+        assertThat(dto.getDvProduct().getId()).isEqualTo(1L);
 
-        dto.setDvProductId(null);
-        dto = trackService.update(dto);
+        dto.setDvProduct(null);
+        TrackDTO updatedDTO = trackService.update(dto);
 
-        assertThat(dto.getDvProductId()).isNull();
+        assertThat(updatedDTO.getDvProduct()).isNull();
 
-        dto.setDvProductId(1L);
-        dto = trackService.update(dto);
+        dto.setDvProduct(new DVProductDTOBuilder().withId(1L).build());
+        TrackDTO updateDTOProduct = trackService.update(dto);
 
-        assertThat(dto.getDvProductId()).isEqualTo(1L);
+        assertThat(updateDTOProduct.getDvProduct().getId()).isEqualTo(1L);
     }
 
 

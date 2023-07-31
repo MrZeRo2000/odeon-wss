@@ -1,134 +1,91 @@
 package com.romanpulov.odeonwss.mapper;
 
-import com.romanpulov.odeonwss.dto.TrackEditDTO;
+import com.romanpulov.odeonwss.dto.TrackDTO;
 import com.romanpulov.odeonwss.entity.*;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
-public class TrackMapper {
-    public void update(
-            Track track,
-            TrackEditDTO editDTO,
-            Artifact artifact,
-            Set<MediaFile> mediaFiles,
-            Set<DVProduct> dvProducts) {
-        track.setId(editDTO.getId());
-        track.setArtifact(artifact);
-
-        if (editDTO.getArtistId() != null) {
-            Artist artist = new Artist();
-            artist.setId(editDTO.getArtistId());
-            track.setArtist(artist);
-        } else {
-            track.setArtist(null);
-        }
-
-        if (editDTO.getPerformerArtistId() != null) {
-            Artist performerArtist = new Artist();
-            performerArtist.setId(editDTO.getPerformerArtistId());
-            track.setPerformerArtist(performerArtist);
-        } else {
-            track.setPerformerArtist(null);
-        }
-
-        if (editDTO.getDvTypeId() != null) {
-            DVType dvType = new DVType();
-            dvType.setId(editDTO.getDvTypeId());
-            track.setDvType(dvType);
-        } else {
-            track.setDvType(null);
-        }
-
-        track.setTitle(editDTO.getTitle());
-        track.setDuration(editDTO.getDuration());
-        track.setDiskNum(editDTO.getDiskNum());
-        track.setNum(editDTO.getNum());
-
-        track.setMediaFiles(mediaFiles);
-        track.setDvProducts(dvProducts);
+public class TrackMapper implements EntityDTOMapper<Track, TrackDTO> {
+    @Override
+    public String getEntityName() {
+        return "Track";
     }
 
-    public Track fromDTO(TrackEditDTO editDTO, Artifact artifact) {
-        Track track = new Track();
+    @Override
+    public Track fromDTO(TrackDTO dto) {
+        Track entity = new Track();
 
-        track.setId(editDTO.getId());
-        track.setArtifact(artifact);
+        // immutable fields
+        entity.setId(dto.getId());
 
-        if (editDTO.getArtistId() != null) {
+        // mutable fields
+        this.update(entity, dto);
+
+        return entity;
+    }
+
+    @Override
+    public void update(Track entity, TrackDTO dto) {
+        if ((dto.getArtifact() != null) && (dto.getArtifact().getId() != null)) {
+            Artifact artifact = new Artifact();
+            artifact.setId(dto.getArtifact().getId());
+            entity.setArtifact(artifact);
+        }
+
+        if ((dto.getArtist() != null) && (dto.getArtist().getId() != null)) {
             Artist artist = new Artist();
-            artist.setId(editDTO.getArtistId());
-            track.setArtist(artist);
+            artist.setId(dto.getArtist().getId());
+            entity.setArtist(artist);
+        } else {
+            entity.setArtist(null);
         }
 
-        if (editDTO.getPerformerArtistId() != null) {
+        if ((dto.getPerformerArtist() != null) && (dto.getPerformerArtist().getId() != null)) {
             Artist performerArtist = new Artist();
-            performerArtist.setId(editDTO.getPerformerArtistId());
-            track.setPerformerArtist(performerArtist);
+            performerArtist.setId(dto.getPerformerArtist().getId());
+            entity.setPerformerArtist(performerArtist);
+        } else {
+            entity.setPerformerArtist(null);
         }
 
-        if (editDTO.getDvTypeId() != null) {
+        if (dto.getDvType().getId() != null) {
             DVType dvType = new DVType();
-            dvType.setId(editDTO.getDvTypeId());
-            track.setDvType(dvType);
+            dvType.setId(dto.getDvType().getId());
+            entity.setDvType(dvType);
+        } else {
+            entity.setDvType(null);
         }
 
-        track.setTitle(editDTO.getTitle());
-        track.setDuration(editDTO.getDuration());
-        track.setDiskNum(editDTO.getDiskNum());
-        track.setNum(editDTO.getNum());
-
-        track.setMediaFiles(editDTO.getMediaFileIds()
+        entity.setMediaFiles(dto
+                .getMediaFiles()
                 .stream()
-                .map(MediaFile::fromId)
+                .map(d -> {
+                    MediaFile mediaFile = new MediaFile();
+                    mediaFile.setId(d.getId());
+                    return mediaFile;
+                })
                 .collect(Collectors.toSet()));
 
-        track.setDvProducts(Stream.ofNullable(editDTO.getDvProductId())
-                .map(DVProduct::fromId)
-                .collect(Collectors.toSet()));
-
-        return track;
-    }
-
-    public TrackEditDTO toDTO(Track track) {
-        TrackEditDTO dto = new TrackEditDTO();
-
-        dto.setId(track.getId());
-        dto.setArtifactId(track.getArtifact().getId());
-
-        Artist artist = track.getArtist();
-        if (artist != null) {
-            dto.setArtistId(artist.getId());
-            dto.setArtistName(artist.getName());
+        if (dto.getDvProduct() != null) {
+            entity.setDvProducts(
+                    Stream.of(dto.getDvProduct())
+                            .map(d -> {
+                                DVProduct dvProduct = new DVProduct();
+                                dvProduct.setId(d.getId());
+                                return dvProduct;
+                            })
+                            .collect(Collectors.toSet()));
+        } else {
+            entity.setDvProducts(new HashSet<>());
         }
 
-        Artist performerArtist = track.getPerformerArtist();
-        if (performerArtist != null) {
-            dto.setPerformerArtistId(performerArtist.getId());
-            dto.setPerformerArtistName(performerArtist.getName());
-        }
-
-        DVType dvType = track.getDvType();
-        if (dvType != null) {
-            dto.setDvTypeId(dvType.getId());
-            dto.setDvTypeName(dvType.getName());
-        }
-
-        dto.setTitle(track.getTitle());
-        dto.setDuration(track.getDuration());
-        dto.setDiskNum(track.getDiskNum());
-        dto.setNum(track.getNum());
-        dto.setMediaFiles(track.getMediaFiles().stream().map(MediaFile::getId).collect(Collectors.toSet()));
-
-        if (track.getDvProducts().size() > 0) {
-            DVProduct dvProduct = track.getDvProducts().stream().findFirst().orElseThrow();
-            dto.setDvProductId(dvProduct.getId());
-            dto.setDvProductTitle(dvProduct.getTitle());
-        }
-
-        return dto;
+        entity.setTitle(dto.getTitle());
+        entity.setDuration(dto.getDuration());
+        entity.setDiskNum(dto.getDiskNum());
+        entity.setNum(dto.getNum());
     }
 }

@@ -1,10 +1,7 @@
 package com.romanpulov.odeonwss.builder.entitybuilder;
 
 import com.romanpulov.odeonwss.builder.AbstractClassBuilder;
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.Track;
-import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.entity.*;
 
 public class EntityTrackBuilder extends AbstractClassBuilder<Track> {
 
@@ -49,6 +46,11 @@ public class EntityTrackBuilder extends AbstractClassBuilder<Track> {
 
     public EntityTrackBuilder withNum(long num) {
         instance.setNum(num);
+        return this;
+    }
+
+    public EntityTrackBuilder withDvType(DVType dvType) {
+        instance.setDvType(dvType);
         return this;
     }
 

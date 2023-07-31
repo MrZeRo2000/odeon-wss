@@ -2,7 +2,6 @@ package com.romanpulov.odeonwss.mapper;
 
 import com.romanpulov.jutilscore.io.FileUtils;
 import com.romanpulov.odeonwss.dto.MediaFileDTO;
-import com.romanpulov.odeonwss.dto.TrackEditDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
@@ -39,23 +38,6 @@ public class MediaFileMapper implements EntityDTOMapper<MediaFile, MediaFileDTO>
         entity.setSize(dto.getSize());
         entity.setBitrate(dto.getBitrate());
         entity.setDuration(dto.getDuration());
-    }
-
-    public MediaFile fromTrackEditDTO(TrackEditDTO editDTO) {
-        MediaFile mediaFile = new MediaFile();
-
-        Artifact artifact = new Artifact();
-        artifact.setId(editDTO.getArtifactId());
-        mediaFile.setArtifact(artifact);
-
-        return mediaFile;
-    }
-
-    public MediaFile fromTrackEditDTO(TrackEditDTO editDTO, MediaFile mediaFile) {
-        MediaFile updatedMediaFile = fromTrackEditDTO(editDTO);
-        updatedMediaFile.setId(mediaFile.getId());
-
-        return updatedMediaFile;
     }
 
     public MediaFile fromMediaFileInfo(MediaFileInfo mediaFileInfo) {

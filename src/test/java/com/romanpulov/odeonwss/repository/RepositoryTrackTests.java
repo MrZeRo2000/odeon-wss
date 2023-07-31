@@ -162,11 +162,11 @@ public class RepositoryTrackTests {
     @Order(3)
     void testTrackTableDTO() {
         Artifact artifact1 = artifactRepository.findById(1L).orElseThrow();
-        var flatTracks1 = trackRepository.findAllFlatDTOByArtifact(artifact1);
+        var flatTracks1 = trackRepository.findAllFlatDTOByArtifactId(artifact1.getId());
         assertThat(flatTracks1.size()).isEqualTo(2);
 
         Artifact artifact2 = artifactRepository.findById(2L).orElseThrow();
-        var flatTracks2 = trackRepository.findAllFlatDTOByArtifact(artifact2);
+        var flatTracks2 = trackRepository.findAllFlatDTOByArtifactId(artifact2.getId());
         assertThat(flatTracks2.size()).isEqualTo(0);
 
         assertThatThrownBy(() -> artifactRepository.findById(3L).orElseThrow()).isInstanceOf(NoSuchElementException.class);

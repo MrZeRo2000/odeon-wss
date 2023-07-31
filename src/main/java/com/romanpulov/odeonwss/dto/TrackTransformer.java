@@ -8,6 +8,7 @@ import java.util.*;
 public class TrackTransformer {
     public List<TrackDTO> transform(List<TrackFlatDTO> rs) {
         final Map<Long, TrackDTOImpl> trackDTOMap = new LinkedHashMap<>();
+        final Map<Long, ArtifactDTO> artifactDTOMap = new HashMap<>();
         final Map<Long, ArtistDTO> artistDTOMap = new HashMap<>();
         final Map<Long, IdNameDTO> dvTypeDTOMap = new HashMap<>();
 
@@ -15,8 +16,17 @@ public class TrackTransformer {
             TrackDTOImpl dto = Optional.ofNullable(trackDTOMap.get(row.getId())).orElseGet(() -> {
                 TrackDTOImpl newDTO = new TrackDTOImpl();
                 newDTO.setId(row.getId());
-                newDTO.setArtifactId(row.getArtifactId());
-                newDTO.setArtifactTitle(row.getArtifactTitle());
+
+                if (row.getArtifactId() != null) {
+                    newDTO.setArtifact(Optional.ofNullable(artifactDTOMap.get(row.getArtifactId())).orElseGet(() -> {
+                        ArtifactDTOImpl newArtifactDTO = new ArtifactDTOImpl();
+                        newArtifactDTO.setId(row.getArtifactId());
+                        newArtifactDTO.setTitle(row.getArtifactTitle());
+
+                        artifactDTOMap.putIfAbsent(row.getArtifactId(), newArtifactDTO);
+                        return newArtifactDTO;
+                    }));
+                }
 
                 if (row.getArtistId() != null) {
                     newDTO.setArtist(Optional.ofNullable(artistDTOMap.get(row.getArtistId())).orElseGet(() -> {
@@ -68,8 +78,12 @@ public class TrackTransformer {
                 return newDTO;
             });
 
-            if (row.getFileName() != null) {
-                dto.getFileNames().add(row.getFileName());
+            if ((row.getMediaFileId() != null) || (row.getMediaFileName() != null)) {
+                MediaFileDTOImpl mediaFileDTO = new MediaFileDTOImpl();
+                mediaFileDTO.setId(row.getMediaFileId());
+                mediaFileDTO.setName(row.getMediaFileName());
+
+                dto.getMediaFiles().add(mediaFileDTO);
             }
 
             //accumulate size
@@ -86,7 +100,7 @@ public class TrackTransformer {
 
         // calc average bitrate
         trackDTOMap.values().forEach(t -> {
-            int files = t.getFileNames().size();
+            int files = t.getMediaFiles().size();
             if ((files > 0) && (t.getBitRate() != null)) {
                 t.setBitRate(t.getBitRate() / files);
             }

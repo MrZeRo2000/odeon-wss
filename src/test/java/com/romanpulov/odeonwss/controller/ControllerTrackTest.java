@@ -1,9 +1,6 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVProductBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityTrackBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import com.romanpulov.odeonwss.entity.DVProduct;
@@ -93,6 +90,7 @@ public class ControllerTrackTest {
                 .withDiskNum(1L)
                 .withNum(8L)
                 .withDuration(6665L)
+                .withDvType(new EntityDvTypeBuilder().withId(7L).build())
                 .build();
         track.getDvProducts().add(dvProduct);
 
@@ -117,9 +115,21 @@ public class ControllerTrackTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(8)))
+                .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].artifact.id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].artifact.title", Matchers.equalTo("Title 1")))
+                .andExpect(jsonPath("$[0].dvType.id", Matchers.equalTo(7)))
+                .andExpect(jsonPath("$[0].dvType.name", Matchers.equalTo("AVC")))
                 .andExpect(jsonPath("$[0].title", Matchers.equalTo("Track title")))
+                .andExpect(jsonPath("$[0].duration", Matchers.equalTo(6665)))
                 .andExpect(jsonPath("$[0].num", Matchers.equalTo(8)))
+                .andExpect(jsonPath("$[0].mediaFiles").isArray())
+                .andExpect(jsonPath("$[0].mediaFiles").isEmpty())
+                .andExpect(jsonPath("$[0].dvProduct.id", Matchers.equalTo(2)))
                 .andExpect(jsonPath("$[0].dvProduct.title", Matchers.equalTo("Big")))
+                .andExpect(jsonPath("$[0].dvProduct.dvCategories").isArray())
+                .andExpect(jsonPath("$[0].dvProduct.dvCategories").isEmpty())
                 .andReturn()
                 ;
         logger.debug("Get 2 result:" + result_2.getResponse().getContentAsString());
