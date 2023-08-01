@@ -52,7 +52,7 @@ public class TrackMapper implements EntityDTOMapper<Track, TrackDTO> {
             entity.setPerformerArtist(null);
         }
 
-        if (dto.getDvType().getId() != null) {
+        if ((dto.getDvType() != null) && (dto.getDvType().getId() != null)) {
             DVType dvType = new DVType();
             dvType.setId(dto.getDvType().getId());
             entity.setDvType(dvType);
