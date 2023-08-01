@@ -1,10 +1,13 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.romanpulov.odeonwss.builder.entitybuilder.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.romanpulov.odeonwss.builder.dtobuilder.TrackDTOBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVProductBuilder;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import com.romanpulov.odeonwss.entity.DVProduct;
-import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.repository.*;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
@@ -16,12 +19,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,19 +46,19 @@ public class ControllerTrackTest {
     private ArtifactRepository artifactRepository;
 
     @Autowired
-    private TrackRepository trackRepository;
-
-    @Autowired
     private DVOriginRepository dvOriginRepository;
 
     @Autowired
     private DVProductRepository dvProductRepository;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Test
     @Sql({"/schema.sql", "/data.sql"})
     @Order(1)
     @Rollback(value = false)
-    void testGenerateTestData() {
+    void testGenerateTestData() throws Exception {
         logger.debug("Generating data");
         // create product
         DVOrigin origin = dvOriginRepository.save(
@@ -84,6 +89,29 @@ public class ControllerTrackTest {
 
         DVProduct dvProduct = dvProductRepository.findById(2L).orElseThrow();
 
+        String json = mapper.writeValueAsString(
+                new TrackDTOBuilder()
+                        .withArtifactId(artifact.getId())
+                        .withTitle("Track title")
+                        .withDiskNum(1L)
+                        .withNum(8L)
+                        .withDuration(6665L)
+                        .withDvTypeId(7L)
+                        .withDvProductId(dvProduct.getId())
+                        .build()
+        );
+
+        var result = this.mockMvc.perform(
+                        post("/api/track").accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        logger.info("result:" + result.getResponse().getContentAsString());
+
+
+        /*
         Track track = new EntityTrackBuilder()
                 .withArtifact(artifact)
                 .withTitle("Track title")
@@ -96,6 +124,8 @@ public class ControllerTrackTest {
 
         trackRepository.save(track);
         assertThat(track.getId()).isGreaterThan(0);
+
+         */
 
         logger.debug("Data generated");
     }

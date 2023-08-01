@@ -1,16 +1,15 @@
 package com.romanpulov.odeonwss.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.romanpulov.odeonwss.builder.dtobuilder.MediaFileDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.MediaFileRepository;
-import com.romanpulov.odeonwss.service.MediaFileService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -26,6 +25,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,12 +48,12 @@ public class ControllerMediaFileTest {
     private ArtifactRepository artifactRepository;
 
     @Autowired
-    private MediaFileRepository mediaFileRepository;
+    private ObjectMapper mapper;
 
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
-    void prepareDataShouldBeOk() {
+    void prepareDataShouldBeOk() throws Exception {
         Artist artist1 = artistRepository.save(
                 new EntityArtistBuilder()
                         .withType(ArtistType.ARTIST)
@@ -81,9 +81,9 @@ public class ControllerMediaFileTest {
                         .build()
         );
 
-        mediaFileRepository.save(
-                new EntityMediaFileBuilder()
-                        .withArtifact(artifact1)
+        String json11 = mapper.writeValueAsString(
+                new MediaFileDTOBuilder()
+                        .withArtifactId(artifact1.getId())
                         .withName("Name 11")
                         .withFormat("ape")
                         .withBitrate(1000L)
@@ -91,9 +91,19 @@ public class ControllerMediaFileTest {
                         .withDuration(52345L)
                         .build()
         );
-        mediaFileRepository.save(
-                new EntityMediaFileBuilder()
-                        .withArtifact(artifact1)
+
+        var result11 = this.mockMvc.perform(
+                        post("/api/media-file").accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json11)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        logger.info("result 11:" + result11.getResponse().getContentAsString());
+
+        String json12 = mapper.writeValueAsString(
+                new MediaFileDTOBuilder()
+                        .withArtifactId(artifact1.getId())
                         .withName("Name 12")
                         .withFormat("ape")
                         .withBitrate(1001L)
@@ -101,10 +111,18 @@ public class ControllerMediaFileTest {
                         .build()
         );
 
+        var result12 = this.mockMvc.perform(
+                        post("/api/media-file").accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json12)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        logger.info("result 12:" + result12.getResponse().getContentAsString());
 
-        mediaFileRepository.save(
-                new EntityMediaFileBuilder()
-                        .withArtifact(artifact2)
+        String json21 = mapper.writeValueAsString(
+                new MediaFileDTOBuilder()
+                        .withArtifactId(artifact2.getId())
                         .withName("Name 21")
                         .withFormat("ape")
                         .withBitrate(1004L)
@@ -112,6 +130,15 @@ public class ControllerMediaFileTest {
                         .withDuration(57428L)
                         .build()
         );
+
+        var result21 = this.mockMvc.perform(
+                        post("/api/media-file").accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json21)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        logger.info("result 21:" + result21.getResponse().getContentAsString());
     }
 
     @Test

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonDeserialize(as = ArtistDTOImpl.class)
+@JsonDeserialize(as = MediaFileDTOImpl.class)
 public interface MediaFileDTO extends BaseEntityDTO {
     Long getArtifactId();
     String getName();
