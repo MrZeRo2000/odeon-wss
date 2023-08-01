@@ -15,7 +15,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -48,16 +47,14 @@ public class TrackService
                 entity
                         .getMediaFiles()
                         .stream()
-                        .map(m -> mediaFileRepository.findById(m.getId()).orElse(null))
-                        .filter(v -> !Objects.isNull(v))
+                        .filter(v -> (v.getId() != null) && (mediaFileRepository.existsById(v.getId())))
                         .collect(Collectors.toSet())
             );
             entity.setDvProducts(
                     entity
                             .getDvProducts()
                             .stream()
-                            .map(p -> dvProductRepository.findById(p.getId()).orElse(null))
-                            .filter(v -> !Objects.isNull(v))
+                            .filter(v -> (v.getId() != null) && (dvProductRepository.existsById(v.getId())))
                             .collect(Collectors.toSet())
             );
         });

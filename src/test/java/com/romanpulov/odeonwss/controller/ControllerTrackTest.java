@@ -164,4 +164,21 @@ public class ControllerTrackTest {
                 ;
         logger.debug("Get 2 result:" + result_2.getResponse().getContentAsString());
     }
+
+    @Test
+    @Order(10)
+    void testUIDataPost() throws Exception {
+        var json = """
+            {"artifact":{"id":1},"diskNum":1,"num":13,"artist":{},"performerArtist":{},"dvType":{},"title":"34","duration":11,"mediaFiles":[{"id":1},{"id":2}],"dvProduct":{}}
+                """;
+        var result = this.mockMvc.perform(
+                        post("/api/track").accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        logger.info("result:" + result.getResponse().getContentAsString());
+
+    }
 }
