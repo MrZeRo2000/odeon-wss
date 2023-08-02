@@ -1,8 +1,8 @@
 package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.*;
-import com.romanpulov.odeonwss.dto.TrackValidationDTO;
 import com.romanpulov.odeonwss.entity.*;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,7 +10,6 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -91,14 +90,6 @@ public class RepositoryTrackTests {
                         .build()
         );
 
-        //validation DTO without track
-        List<TrackValidationDTO> trackValidationList =
-                trackRepository.getTrackValidationMusic(artifactTypeRepository.getWithMP3());
-        Assertions.assertNotNull(trackValidationList.get(0).getArtistName());
-        Assertions.assertNotNull(trackValidationList.get(0).getArtifactTitle());
-        Assertions.assertNull(trackValidationList.get(0).getTrackNum());
-        Assertions.assertNull(trackValidationList.get(0).getTrackTitle());
-
         //Track 1
         Track wrong_track = new EntityTrackBuilder()
                 .withTitle("Track title")
@@ -147,15 +138,6 @@ public class RepositoryTrackTests {
 
         Assertions.assertEquals(2, trackRepository.getTracksByArtifactType(artifactTypeRepository.getWithMP3()).size());
         Assertions.assertEquals(0, trackRepository.getTracksByArtifactType(artifactTypeRepository.getWithDVMovies()).size());
-    }
-
-    @Test
-    @Order(2)
-    void testValidationDTO() {
-        List<TrackValidationDTO> trackValidationList =
-                trackRepository.getTrackValidationMusic(artifactTypeRepository.getWithMP3());
-        Assertions.assertEquals(3, trackValidationList.size());
-        Assertions.assertEquals(1982, trackValidationList.get(0).getArtifactYear());
     }
 
     @Test

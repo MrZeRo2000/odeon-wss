@@ -119,15 +119,17 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
                                             .build()
                             );
                         } else {
-                            result.add(new MediaFileValidationDTO(
-                                    artistPath.getFileName().toString(),
-                                    yt.getTitle(),
-                                    (long)yt.getYear(),
-                                    nt.getNumber(),
-                                    nt.getTitle(),
-                                    trackPath.getFileName().toString(),
-                                    MEDIA_FILE_FORMAT
-                            ));
+                            result.add(
+                              new MediaFileValidationDTOBuilder()
+                                      .withArtifactTitle(yt.getTitle())
+                                      .withArtifactYear(yt.getYear())
+                                      .withArtistName(artistPath.getFileName().toString())
+                                      .withTrackNum(nt.getNumber())
+                                      .withTrackTitle(nt.getTitle())
+                                      .withMediaFileName(trackPath.getFileName().toString())
+                                      .withMediaFileFormat(MEDIA_FILE_FORMAT)
+                                      .build()
+                            );
                         }
                     }
                 }

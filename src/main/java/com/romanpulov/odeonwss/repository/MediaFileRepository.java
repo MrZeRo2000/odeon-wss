@@ -74,15 +74,13 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
 
     @Query("""
         SELECT
-            new com.romanpulov.odeonwss.dto.MediaFileValidationDTO(
-                ar.name,
-                af.title,
-                af.year,
-                c.num,
-                c.title,
-                m.name,
-                m.format
-            )
+            ar.name AS artistName,
+            af.title AS artifactTitle,
+            af.year AS artifactYear,
+            c.num AS trackNum,
+            c.title AS trackTitle,
+            m.name AS mediaFileName,
+            m.format AS mediaFileFormat
         FROM Artist AS ar
         INNER JOIN Artifact af ON af.artist = ar
         LEFT OUTER JOIN Track c ON c.artifact = af
@@ -94,46 +92,49 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
     )
     List<MediaFileValidationDTO> getTrackMediaFileValidationMusic(ArtistType artistType, ArtifactType artifactType);
 
-    @Query("SELECT " +
-            "new com.romanpulov.odeonwss.dto.MediaFileValidationDTO(" +
-            "af.title, " +
-            "af.year, " +
-            "m.name, " +
-            "m.format) " +
-            "FROM Artifact af " +
-            "LEFT OUTER JOIN Track c ON c.artifact = af " +
-            "LEFT OUTER JOIN TrackMediaFile cm ON cm.trackId = c.id " +
-            "LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId " +
-            "WHERE af.artifactType = :artifactType " +
-            "ORDER BY af.title"
+    @Query(""" 
+        SELECT
+            af.title AS artifactTitle,
+            af.year AS artifactYear,
+            m.name AS mediaFileName,
+            m.format AS mediaFileFormat
+        FROM Artifact af
+        LEFT OUTER JOIN Track c ON c.artifact = af
+        LEFT OUTER JOIN TrackMediaFile cm ON cm.trackId = c.id
+        LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId
+        WHERE af.artifactType = :artifactType
+        ORDER BY af.title
+    """
     )
     List<MediaFileValidationDTO> getTrackMediaFileValidationDV(ArtifactType artifactType);
 
-    @Query("SELECT " +
-            "new com.romanpulov.odeonwss.dto.MediaFileValidationDTO(" +
-            "af.title, " +
-            "af.year, " +
-            "m.name, " +
-            "m.format) " +
-            "FROM Artifact af " +
-            "LEFT OUTER JOIN MediaFile m ON m.artifact = af " +
-            "WHERE af.artifactType = :artifactType " +
-            "ORDER BY af.title"
+    @Query("""
+        SELECT
+            af.title AS artifactTitle,
+            af.year AS artifactYear,
+            m.name AS mediaFileName,
+            m.format AS mediaFileFormat
+        FROM Artifact af
+        LEFT OUTER JOIN MediaFile m ON m.artifact = af
+        WHERE af.artifactType = :artifactType
+        ORDER BY af.title
+    """
     )
     List<MediaFileValidationDTO> getArtifactMediaFileValidationDV(ArtifactType artifactType);
 
-    @Query("SELECT " +
-            "new com.romanpulov.odeonwss.dto.MediaFileValidationDTO(" +
-            "ar.name, " +
-            "af.title, " +
-            "af.year, " +
-            "m.name, " +
-            "m.format) " +
-            "FROM Artist AS ar " +
-            "INNER JOIN Artifact af ON af.artist = ar " +
-            "LEFT OUTER JOIN MediaFile m ON m.artifact = af " +
-            "WHERE af.artifactType = ?1 " +
-            "ORDER BY ar.name, af.year, af.title, m.name"
+    @Query("""
+        SELECT
+            ar.name AS artistName,
+            af.title AS artifactTitle,
+            af.year AS artifactYear,
+            m.name AS mediaFileName,
+            m.format AS mediaFileFormat
+        FROM Artist AS ar
+        INNER JOIN Artifact af ON af.artist = ar
+        LEFT OUTER JOIN MediaFile m ON m.artifact = af
+        WHERE af.artifactType = :artifactType
+        ORDER BY ar.name, af.year, af.title, m.name
+    """
     )
     List<MediaFileValidationDTO> getArtifactMediaFileValidationMusic(ArtifactType artifactType);
 

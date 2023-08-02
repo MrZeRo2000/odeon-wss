@@ -2,7 +2,6 @@ package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.dto.TrackDTO;
 import com.romanpulov.odeonwss.dto.TrackFlatDTO;
-import com.romanpulov.odeonwss.dto.TrackValidationDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Track;
@@ -30,21 +29,6 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
             "WHERE a.artifactType=:artifactType"
     )
     List<Track> getTracksByArtifactType(ArtifactType artifactType);
-
-    @Query("SELECT " +
-            "new com.romanpulov.odeonwss.dto.TrackValidationDTO(" +
-            "ar.name, " +
-            "af.title, " +
-            "af.year, " +
-            "c.num, " +
-            "c.title) " +
-            "FROM Artist AS ar " +
-            "INNER JOIN Artifact af ON af.artist = ar " +
-            "LEFT OUTER JOIN Track c ON c.artifact = af " +
-            "WHERE af.artifactType = ?1 " +
-            "ORDER BY ar.name, af.year, af.title, c.num"
-    )
-    List<TrackValidationDTO> getTrackValidationMusic(ArtifactType artifactType);
 
     @Query("SELECT " +
             "c.id AS id, " +

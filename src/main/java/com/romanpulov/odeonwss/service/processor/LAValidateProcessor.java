@@ -113,7 +113,7 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                             .collect(Collectors.toList());
                 }
 
-                if (directoryFolderDisksPaths != null && directoryFolderDisksPaths.size() > 0) {
+                if (directoryFolderDisksPaths != null && !directoryFolderDisksPaths.isEmpty()) {
                     for (Path directoryFolderDiskPath: directoryFolderDisksPaths) {
                         loadFromArtifactPathParent(artistPath, directoryFolderDiskPath, yt, result);
                     }
@@ -123,18 +123,16 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                             .map(f -> f.getFileName().toString())
                             .filter(f -> NamesParser.validateFileNameMediaFormat(f, this.artifactType.getMediaFileFormats()))
                             .toList();
-                    if (trackFileNames.size() == 0) {
+                    if (trackFileNames.isEmpty()) {
                         errorHandler(ProcessorMessages.ERROR_TRACK_FILES_NOT_FOUND_FOR_ARTIFACT, artifactPath.toString());
                     } else {
-                        trackFileNames.forEach(trackFileName -> result.add(new MediaFileValidationDTO(
-                                artistPath.getFileName().toString(),
-                                yt.getTitle(),
-                                (long) yt.getYear(),
-                                null,
-                                null,
-                                trackFileName,
-                                null
-                        )));
+                        trackFileNames.forEach(trackFileName -> result.add(
+                                new MediaFileValidationDTOBuilder()
+                                        .withArtistName(artistPath.getFileName().toString())
+                                        .withArtifactTitle(yt.getTitle())
+                                        .withArtifactYear(yt.getYear())
+                                        .withMediaFileName(trackFileName)
+                                        .build()));
                     }
                 }
             }

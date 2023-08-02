@@ -1,95 +1,11 @@
 package com.romanpulov.odeonwss.dto;
 
-import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-public class MediaFileValidationDTO extends TrackValidationDTO {
-    private static final String FORMAT_DELIMITER = " >> ";
-
-    private String mediaFileName;
-
-    public String getMediaFileName() {
-        return mediaFileName;
-    }
-
-    public void setMediaFileName(String mediaFileName) {
-        this.mediaFileName = mediaFileName;
-    }
-
-    private String mediaFileFormat;
-
-    public String getMediaFileFormat() {
-        return mediaFileFormat;
-    }
-
-    public void setMediaFileFormat(String mediaFileFormat) {
-        this.mediaFileFormat = mediaFileFormat;
-    }
-
-    public MediaFileValidationDTO(String artistName, String artifactTitle, Long artifactYear, Long trackNum, String trackTitle, String mediaFileName, String mediaFileFormat) {
-        super(artistName, artifactTitle, artifactYear, trackNum, trackTitle);
-        this.mediaFileName = mediaFileName;
-        this.mediaFileFormat = mediaFileFormat;
-    }
-
-    public MediaFileValidationDTO(String artistName, String artifactTitle, Long artifactYear, String mediaFileName, String mediaFileFormat) {
-        this(artistName, artifactTitle, artifactYear, null, null, mediaFileName, mediaFileFormat);
-    }
-
-    public MediaFileValidationDTO(String artifactTitle, Long artifactYear, String mediaFileName, String mediaFileFormat) {
-        this(null, artifactTitle, artifactYear, null, null, mediaFileName, mediaFileFormat);
-    }
-
-    public static MediaFileValidationDTO fromDVMediaFile(String artifactTitle, Long artifactYear, String mediaFileName) {
-        MediaFileValidationDTO result = new MediaFileValidationDTO();
-        result.setArtifactTitle(artifactTitle);
-        result.setArtifactYear(artifactYear);
-        result.setMediaFileName(mediaFileName);
-
-        return result;
-    }
-
-    public MediaFileValidationDTO() {}
-
-    public static Set<String> getMusicTracks(List<MediaFileValidationDTO> data) {
-        return data.stream()
-                .map(d ->
-                d.getArtistName() +
-                        FORMAT_DELIMITER +
-                        NamesParser.formatMusicArtifact(d.getArtifactYear(), d.getArtifactTitle()) +
-                        FORMAT_DELIMITER +
-                        NamesParser.formatMusicTrackWithFile(d.getTrackNum(), d.getTrackTitle(), d.getMediaFileName()))
-                .collect(Collectors.toSet());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        MediaFileValidationDTO that = (MediaFileValidationDTO) o;
-        return mediaFileName.equals(that.mediaFileName) && mediaFileFormat.equals(that.mediaFileFormat);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), mediaFileName, mediaFileFormat);
-    }
-
-    @Override
-    public String toString() {
-        return "MediaFileValidationDTO{" +
-                "artistName='" + getArtistName() + '\'' +
-                ", artifactTitle='" + getArtifactTitle() + '\'' +
-                ", artifactYear=" + getArtifactYear() +
-                ", trackNum=" + getTrackNum() +
-                ", trackTitle='" + getTrackTitle() + '\'' +
-                ", mediaFileName='" + mediaFileName + '\'' +
-                ", mediaFileFormat='" + mediaFileFormat + '\'' +
-                '}';
-    }
+public interface MediaFileValidationDTO {
+    String getArtifactTitle();
+    Long getArtifactYear();
+    String getArtistName();
+    Long getTrackNum();
+    String getTrackTitle();
+    String getMediaFileName();
+    String getMediaFileFormat();
 }

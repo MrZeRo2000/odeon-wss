@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
+import com.romanpulov.odeonwss.dto.MediaFileValidationDTOBuilder;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 
 import java.nio.file.Path;
@@ -30,10 +31,12 @@ public class PathValidationLoader {
                         p -> NamesParser.validateFileNameMediaFormat(p.getFileName().toString(), mediaFileFormats),
                         trackPaths)) {
                     trackPaths.forEach(trackPath ->
-                            result.add(MediaFileValidationDTO.fromDVMediaFile(
-                                    artifactPath.getFileName().toString(),
-                                    null,
-                                    trackPath.getFileName().toString())));
+                            result.add(new MediaFileValidationDTOBuilder()
+                                    .withArtifactTitle(artifactPath.getFileName().toString())
+                                    .withMediaFileName(trackPath.getFileName().toString())
+                                    .build()
+                            )
+                    );
                 } else {
                     break;
                 }
