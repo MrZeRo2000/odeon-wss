@@ -69,7 +69,9 @@ class FileRenamer:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("file_names", help="File with file names for renaming")
-    parser.add_argument("folder_name", help="Folder with files to be renamed")
+    # parser.add_argument("folder_name", help="Folder with files to be renamed")    
 
     args = parser.parse_args()
-    FileRenamer(args.file_names, args.folder_name, get_logger("rename_files"))()
+
+    folder_name = os.path.dirname(args.file_names)
+    FileRenamer(args.file_names, folder_name, get_logger("rename_files"))()
