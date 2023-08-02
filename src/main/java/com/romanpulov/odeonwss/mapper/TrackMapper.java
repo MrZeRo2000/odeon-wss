@@ -36,29 +36,9 @@ public class TrackMapper implements EntityDTOMapper<Track, TrackDTO> {
             entity.setArtifact(artifact);
         }
 
-        if ((dto.getArtist() != null) && (dto.getArtist().getId() != null)) {
-            Artist artist = new Artist();
-            artist.setId(dto.getArtist().getId());
-            entity.setArtist(artist);
-        } else {
-            entity.setArtist(null);
-        }
-
-        if ((dto.getPerformerArtist() != null) && (dto.getPerformerArtist().getId() != null)) {
-            Artist performerArtist = new Artist();
-            performerArtist.setId(dto.getPerformerArtist().getId());
-            entity.setPerformerArtist(performerArtist);
-        } else {
-            entity.setPerformerArtist(null);
-        }
-
-        if ((dto.getDvType() != null) && (dto.getDvType().getId() != null)) {
-            DVType dvType = new DVType();
-            dvType.setId(dto.getDvType().getId());
-            entity.setDvType(dvType);
-        } else {
-            entity.setDvType(null);
-        }
+        entity.setArtist(MapperUtils.createEntityFromDTO(dto.getArtist(), Artist.class));
+        entity.setPerformerArtist(MapperUtils.createEntityFromDTO(dto.getPerformerArtist(), Artist.class));
+        entity.setDvType(MapperUtils.createEntityFromDTO(dto.getDvType(), DVType.class));
 
         entity.setMediaFiles(dto
                 .getMediaFiles()

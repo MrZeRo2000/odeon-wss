@@ -31,21 +31,8 @@ public class ArtifactMapper implements EntityDTOMapper<Artifact, ArtifactDTO> {
 
     @Override
     public void update(Artifact entity, ArtifactDTO dto) {
-        if ((dto.getArtist() != null) && (dto.getArtist().getId() != null)) {
-            Artist artist = new Artist();
-            artist.setId(dto.getArtist().getId());
-            entity.setArtist(artist);
-        } else {
-            entity.setArtist(null);
-        }
-
-        if ((dto.getPerformerArtist() != null) && (dto.getPerformerArtist().getId() != null)) {
-            Artist performerArtist = new Artist();
-            performerArtist.setId(dto.getPerformerArtist().getId());
-            entity.setPerformerArtist(performerArtist);
-        } else {
-            entity.setPerformerArtist(null);
-        }
+        entity.setArtist(MapperUtils.createEntityFromDTO(dto.getArtist(), Artist.class));
+        entity.setPerformerArtist(MapperUtils.createEntityFromDTO(dto.getPerformerArtist(), Artist.class));
 
         entity.setTitle(dto.getTitle());
         entity.setYear(dto.getYear());

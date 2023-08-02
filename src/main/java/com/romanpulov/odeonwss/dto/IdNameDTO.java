@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(as = IdNameDTOImpl.class)
-public interface IdNameDTO {
-    Long getId();
+public interface IdNameDTO extends BaseEntityDTO {
     String getName();
 }

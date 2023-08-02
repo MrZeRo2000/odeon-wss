@@ -4,6 +4,7 @@ import com.romanpulov.odeonwss.service.processor.ProcessorException;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
 import com.romanpulov.odeonwss.utils.media.MediaFileParserInterface;
+import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
@@ -39,22 +40,10 @@ public class MediaParser {
             List<Path> trackPaths,
             Consumer<String> parsingFileCallback,
             Consumer<String> parsedFileCallback) throws ProcessorException {
-        List<Callable<Pair<Path, MediaFileInfo>>> callables = new ArrayList<>();
-
-        for (Path path: trackPaths) {
-            Callable<Pair<Path, MediaFileInfo>> callable = () -> {
-                logger.debug("Parsing track: " + path);
-                parsingFileCallback.accept(path.toString());
-
-                MediaFileInfo mediafileInfo = mediaFileParser.parseMediaFile(path);
-
-                parsedFileCallback.accept(path.toString());
-                logger.debug("Parsed track: " + path);
-
-                return Pair.of(path, mediafileInfo);
-            };
-            callables.add(callable);
-        }
+        List<Callable<Pair<Path, MediaFileInfo>>> callables = getParseCallables(
+                trackPaths,
+                parsingFileCallback,
+                parsedFileCallback);
 
         List<Future<Pair<Path, MediaFileInfo>>> futures;
         ExecutorService executorService = Executors.newFixedThreadPool(
@@ -86,5 +75,29 @@ public class MediaParser {
         }
 
         return result;
+    }
+
+    @NotNull
+    private List<Callable<Pair<Path, MediaFileInfo>>> getParseCallables(
+            List<Path> trackPaths,
+            Consumer<String> parsingFileCallback,
+            Consumer<String> parsedFileCallback) {
+        List<Callable<Pair<Path, MediaFileInfo>>> callables = new ArrayList<>();
+
+        for (Path path: trackPaths) {
+            Callable<Pair<Path, MediaFileInfo>> callable = () -> {
+                logger.debug("Parsing track: " + path);
+                parsingFileCallback.accept(path.toString());
+
+                MediaFileInfo mediafileInfo = mediaFileParser.parseMediaFile(path);
+
+                parsedFileCallback.accept(path.toString());
+                logger.debug("Parsed track: " + path);
+
+                return Pair.of(path, mediafileInfo);
+            };
+            callables.add(callable);
+        }
+        return callables;
     }
 }
