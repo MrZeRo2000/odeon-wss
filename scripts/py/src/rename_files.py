@@ -10,7 +10,7 @@ Arguments:
 import argparse
 import logging
 import os
-import math
+import re
 from logger import get_logger
 from file_utils import validate_file_name_and_path, get_file_lines
 
@@ -18,9 +18,11 @@ from file_utils import validate_file_name_and_path, get_file_lines
 class FileRenamer:
     MEDIA_FILE_EXTENSIONS = "AVI|M4V|MKV|MP4|MPG|VOB".split("|")
 
-    def __init__(self, file_names: str, folder_name: str, logger: logging.Logger):
+    def __init__(self, file_names: str, folder_name: str, display: bool, logger: logging.Logger):
         self.file_names = file_names
         self.folder_name = folder_name
+        self.display = display
+        self.name_parser = re.compile(r"[0-9]{2,}\s\S+")
         self.logger = logger
 
     def get_media_file_names(self) -> list[str]:
@@ -29,14 +31,25 @@ class FileRenamer:
                        and f.upper().split(".")[-1] in FileRenamer.MEDIA_FILE_EXTENSIONS])
 
     def rename_files(self, new_names: list[str], file_names: list[str]):
+        horizontal_delimiter = "".join("*" for _ in range(max([len(f) + 6 for f in file_names])))
         for idx, new_name in enumerate(new_names):
             file_name_from = os.path.join(self.folder_name, file_names[idx])
-            new_name_formatted = f"{idx + 1:02d} {new_name}" if len(new_names) < 100 else f"{idx + 1:03d} {new_name}"
+            if self.name_parser.match(new_name) is None:
+                new_name_formatted = f"{idx + 1:02d} {new_name}" if len(new_names) < 100 else f"{idx + 1:03d} {new_name}"
+            else:
+                new_name_formatted = new_name
             file_name_to = f"{os.path.join(self.folder_name, new_name_formatted)}.{file_names[idx].split('.')[-1]}"
 
-            self.logger.info(f"Renaming {file_name_from} to {file_name_to}")
-            os.replace(file_name_from, file_name_to)
-            self.logger.info(f"{file_name_from} renamed")
+            if self.display:
+                self.logger.info(horizontal_delimiter)
+                self.logger.info(f"From: {file_names[idx]}")
+                self.logger.info(f"  To: {new_name_formatted}")
+            else:
+                self.logger.info(f"Renaming {file_name_from} to {file_name_to}")
+                os.replace(file_name_from, file_name_to)
+                self.logger.info(f"{file_name_from} renamed")
+        if self.display:
+            self.logger.info(horizontal_delimiter)
 
     def execute(self):
         self.logger.info("Validating params")
@@ -62,16 +75,17 @@ class FileRenamer:
         self.rename_files(file_names, media_file_names)
         self.logger.info("Files renamed")
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self):
         self.execute()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("file_names", help="File with file names for renaming")
+    parser.add_argument("--display", action='store_true', help="Display renamed files, no renaming")
     # parser.add_argument("folder_name", help="Folder with files to be renamed")    
 
     args = parser.parse_args()
 
-    folder_name = os.path.dirname(args.file_names)
-    FileRenamer(args.file_names, folder_name, get_logger("rename_files"))()
+    args_folder_name = os.path.dirname(args.file_names)
+    FileRenamer(args.file_names, args_folder_name, args.display, get_logger("rename_files"))()
