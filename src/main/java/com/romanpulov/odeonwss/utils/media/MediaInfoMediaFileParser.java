@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
@@ -78,16 +79,36 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
             } else {
                 MediaType mediaType = EnumUtils.getEnumFromString(MediaType.class, trackType.toUpperCase());
                 if (mediaType != null) {
-                    // to cover VBR
-                    Object bitRate = tracksMap.getOrDefault("BitRate",
-                            tracksMap.getOrDefault("BitRate_Maximum", "0"));
+                    // to cover different kinds of bitrate
+                    Object bitRateObject =
+                            tracksMap.getOrDefault("BitRate",
+                            tracksMap.getOrDefault("BitRate_Maximum",
+                            tracksMap.getOrDefault("BitRate_Nominal", "0")));
+                    AtomicLong bitRate = new AtomicLong(Long.parseLong((String) bitRateObject));
+                    if (bitRate.get() == 0) {
+                        tracksMap
+                                .keySet()
+                                .stream()
+                                .filter(s -> s.startsWith("BitRate"))
+                                .forEach(bitRateKey -> {
+                            try {
+                                long newBitRate = Long.parseLong(bitRateKey);
+                                if (newBitRate > 0) {
+                                    bitRate.set(newBitRate);
+                                }
+                            } catch (NumberFormatException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                    }
+
                     MediaStreamInfo mediaStream = MediaStreamInfo.createOrdered(
                             mediaType,
                             Long.parseLong((String) tracksMap.getOrDefault("StreamOrder", "0")),
                             Math.round(
                                     Double.parseDouble((String) tracksMap.getOrDefault("Duration", "0"))),
                             Math.round(
-                                    Long.parseLong((String) bitRate) / 1000.0)
+                                    bitRate.get() / 1000.0)
                             );
                     mediaStreamMap.put(mediaType, mediaStream);
                 }
