@@ -1,11 +1,10 @@
 package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import com.romanpulov.odeonwss.service.processor.vo.SizeDuration;
 import org.springframework.stereotype.Component;
@@ -26,13 +25,9 @@ public class DVMoviesMediaFilesLoadProcessor extends AbstractDVMediaFilesLoadPro
                 artifactRepository,
                 trackRepository,
                 mediaFileRepository,
-                mediaParser
+                mediaParser,
+                ArtifactTypeRepository::getWithDVMovies
         );
-    }
-
-    @Override
-    protected ArtifactType getArtifactType() {
-        return artifactTypeRepository.getWithDVMovies();
     }
 
     @Override

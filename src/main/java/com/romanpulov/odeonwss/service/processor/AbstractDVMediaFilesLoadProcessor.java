@@ -20,12 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.ERROR_PARSING_FILE;
 import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.INFO_MEDIA_FILES_LOADED;
 
 public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSystemProcessor {
-    protected final ArtifactTypeRepository artifactTypeRepository;
+    private final ArtifactTypeRepository artifactTypeRepository;
 
     private final ArtifactRepository artifactRepository;
 
@@ -35,18 +36,22 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
 
     private final MediaParser mediaParser;
 
+    private final Function<ArtifactTypeRepository, ArtifactType> artifactTypeSupplier;
+
     public AbstractDVMediaFilesLoadProcessor(
             ArtifactTypeRepository artifactTypeRepository,
             ArtifactRepository artifactRepository,
             TrackRepository trackRepository,
             MediaFileRepository mediaFileRepository,
-            MediaParser mediaParser
+            MediaParser mediaParser,
+            Function<ArtifactTypeRepository, ArtifactType> artifactTypeSupplier
     ) {
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.trackRepository = trackRepository;
         this.mediaFileRepository = mediaFileRepository;
         this.mediaParser = mediaParser;
+        this.artifactTypeSupplier = artifactTypeSupplier;
     }
 
     @Override
@@ -59,7 +64,8 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
     public int processArtifactsPath(Path path) {
         AtomicInteger counter = new AtomicInteger(0);
 
-        List<MediaFile> emptyMediaFiles = mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(getArtifactType());
+        List<MediaFile> emptyMediaFiles = mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(
+                this.artifactTypeSupplier.apply(this.artifactTypeRepository));
         Map<Artifact, SizeDuration> artifactSizeDurationMap = new HashMap<>();
 
         String rootMediaPath = path.toAbsolutePath().toString();
@@ -94,8 +100,6 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
 
         return counter.get();
     }
-
-    protected abstract ArtifactType getArtifactType();
 
     protected abstract void processArtifactSizeDuration(Map<Artifact, SizeDuration> artifactSizeDurationMap);
 
