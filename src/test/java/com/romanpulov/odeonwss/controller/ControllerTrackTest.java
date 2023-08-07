@@ -166,6 +166,37 @@ public class ControllerTrackTest {
     }
 
     @Test
+    @Order(3)
+    void testGetTableByArtifactId() throws Exception {
+        var result_1 = mockMvc.perform(get("/api/track/table/10"))
+                .andExpect(status().isNotFound())
+                .andReturn();
+        logger.debug("Get 1 result:" + result_1.getResponse().getContentAsString());
+
+        var result_2 = mockMvc.perform(get("/api/track/table/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(8)))
+                .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].dvType.id", Matchers.equalTo(7)))
+                .andExpect(jsonPath("$[0].dvType.name", Matchers.equalTo("AVC")))
+                .andExpect(jsonPath("$[0].title", Matchers.equalTo("Track title")))
+                .andExpect(jsonPath("$[0].duration", Matchers.equalTo(6665)))
+                .andExpect(jsonPath("$[0].diskNum", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].num", Matchers.equalTo(8)))
+                .andExpect(jsonPath("$[0].mediaFiles").isArray())
+                .andExpect(jsonPath("$[0].mediaFiles").isEmpty())
+                .andExpect(jsonPath("$[0].dvProduct.id", Matchers.equalTo(2)))
+                .andExpect(jsonPath("$[0].dvProduct.title").doesNotExist())
+                .andExpect(jsonPath("$[0].dvProduct.dvCategories").isArray())
+                .andExpect(jsonPath("$[0].dvProduct.dvCategories").isEmpty())
+                .andReturn()
+                ;
+        logger.debug("Get 2 result:" + result_2.getResponse().getContentAsString());
+    }
+
+    @Test
     @Order(10)
     void testUIDataPost() throws Exception {
         var json = """

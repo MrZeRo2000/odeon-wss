@@ -61,7 +61,7 @@ public class TrackTransformer {
                     }));
                 }
 
-                if ((row.getDvProductId() != null) && (row.getDvProductTitle() != null)) {
+                if (row.getDvProductId() != null)  {
                     DVProductDTOImpl dvProductDTO = new DVProductDTOImpl();
                     dvProductDTO.setId(row.getDvProductId());
                     dvProductDTO.setTitle(row.getDvProductTitle());

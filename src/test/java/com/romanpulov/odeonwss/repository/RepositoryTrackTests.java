@@ -256,6 +256,18 @@ public class RepositoryTrackTests {
         Track savedTrack = trackRepository.findByIdWithProducts(1L).orElseThrow();
         assertThat(savedTrack.getDvProducts().size()).isEqualTo(1);
 
+        var trackDTO1 = trackRepository.findAllFlatDTOByArtifactId(savedTrack.getArtifact().getId())
+                .stream()
+                .filter(v -> v.getId().equals(1L))
+                .findFirst().orElseThrow();
+        assertThat(trackDTO1.getDvProductId()).isEqualTo(product.getId());
+
+        var trackDTO2 = trackRepository.findAllFlatDTOByArtifactId(savedTrack.getArtifact().getId())
+                .stream()
+                .filter(v -> v.getId().equals(2L))
+                .findFirst().orElseThrow();
+        assertThat(trackDTO2.getDvProductId()).isNull();
+
         savedTrack.setDvProducts(Set.of());
         trackRepository.save(savedTrack);
 
