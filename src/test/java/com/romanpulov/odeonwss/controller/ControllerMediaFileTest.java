@@ -188,14 +188,16 @@ public class ControllerMediaFileTest {
 
     @Test
     @Order(4)
-    void testGetTableIdName() throws Exception {
-        this.mockMvc.perform(get("/api/media-file/table-id-name/1")
+    void testGetTableIdNameDuration() throws Exception {
+        this.mockMvc.perform(get("/api/media-file/table-id-name-duration/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(3)))
                 .andExpect(jsonPath("$[0].id", Matchers.is(1)))
                 .andExpect(jsonPath("$[0].name", Matchers.is("Name 11")))
+                .andExpect(jsonPath("$[0].duration", Matchers.is(52345)))
                 .andExpect(jsonPath("$[0].size").doesNotExist())
         ;
     }

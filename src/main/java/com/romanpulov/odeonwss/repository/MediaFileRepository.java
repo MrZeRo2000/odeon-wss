@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.dto.IdNameDTO;
 import com.romanpulov.odeonwss.dto.MediaFileDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
@@ -23,9 +22,6 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
 
     @Transactional
     void deleteAllByArtifact(Artifact artifact);
-
-    List<IdNameDTO> findByArtifactOrderByName(Artifact artifact);
-
 
     @Query(
             "SELECT mf " +
@@ -71,6 +67,17 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
         ORDER BY m.name
     """)
     List<MediaFileDTO> findAllDTOByArtifactId(long artifactId);
+
+    @Query("""
+        SELECT
+          m.id AS id,
+          m.name AS name,
+          m.duration AS duration
+        FROM MediaFile m
+        WHERE m.artifact.id = :artifactId
+        ORDER BY m.name
+    """)
+    List<MediaFileDTO> findAllDTOIdNameDurationByArtifactId(long artifactId);
 
     @Query("""
         SELECT

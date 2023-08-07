@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.dto.IdNameDTO;
 import com.romanpulov.odeonwss.dto.MediaFileDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.MediaFile;
@@ -43,10 +42,9 @@ public class MediaFileService
         }
     }
 
-    public List<IdNameDTO> getTableIdName(Long artifactId) throws CommonEntityNotFoundException {
-        Optional<Artifact> existingArtifact = artifactRepository.findById(artifactId);
-        if (existingArtifact.isPresent()) {
-            return repository.findByArtifactOrderByName(existingArtifact.get());
+    public List<MediaFileDTO> getTableIdNameDuration(Long artifactId) throws CommonEntityNotFoundException {
+        if (artifactRepository.existsById(artifactId)) {
+            return repository.findAllDTOIdNameDurationByArtifactId(artifactId);
         } else {
             throw new CommonEntityNotFoundException("Artifact", artifactId);
         }

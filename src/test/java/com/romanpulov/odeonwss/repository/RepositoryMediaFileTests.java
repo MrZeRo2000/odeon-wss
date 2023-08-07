@@ -2,9 +2,8 @@ package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityTrackBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
-import com.romanpulov.odeonwss.dto.IdNameDTO;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityTrackBuilder;
 import com.romanpulov.odeonwss.dto.MediaFileDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.entity.*;
@@ -15,6 +14,8 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 import java.util.logging.Logger;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -151,13 +152,17 @@ public class RepositoryMediaFileTests {
 
     @Test
     @Order(6)
-    void testGetIdName() {
-        List<IdNameDTO> idNames = mediaFileRepository.findByArtifactOrderByName(
-                new EntityArtifactBuilder().withId(1L).build()
-        );
-        Assertions.assertEquals(3, idNames.size());
-        Assertions.assertEquals("AAA.mp3", idNames.get(0).getName());
-        Assertions.assertEquals("BBB.mp3", idNames.get(1).getName());
-        Assertions.assertEquals("CCC.mp3", idNames.get(2).getName());
+    void testGetIdNameDuration() {
+        List<MediaFileDTO> idNameDurations = mediaFileRepository.findAllDTOIdNameDurationByArtifactId(1L);
+
+        assertThat(idNameDurations.size()).isEqualTo(3);
+        assertThat(idNameDurations.get(0).getName()).isEqualTo("AAA.mp3");
+        assertThat(idNameDurations.get(0).getDuration()).isEqualTo(6234L);
+
+        assertThat(idNameDurations.get(1).getName()).isEqualTo("BBB.mp3");
+        assertThat(idNameDurations.get(1).getDuration()).isEqualTo(7234L);
+
+        assertThat(idNameDurations.get(2).getName()).isEqualTo("CCC.mp3");
+        assertThat(idNameDurations.get(2).getDuration()).isNull();
     }
 }

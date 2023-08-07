@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.romanpulov.odeonwss.dto.IdNameDTO;
 import com.romanpulov.odeonwss.dto.MediaFileDTO;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
@@ -27,8 +26,9 @@ public class MediaFileController
         return ResponseEntity.ok(service.getTable(artifactId));
     }
 
-    @GetMapping("/table-id-name/{artifactId}")
-    ResponseEntity<List<IdNameDTO>> getTableIdName(@PathVariable Long artifactId) throws CommonEntityNotFoundException {
-        return ResponseEntity.ok(service.getTableIdName(artifactId));
+    @GetMapping("/table-id-name-duration/{artifactId}")
+    ResponseEntity<List<MediaFileDTO>> getTableIdNameDuration(@PathVariable Long artifactId)
+            throws CommonEntityNotFoundException {
+        return ResponseEntity.ok(service.getTableIdNameDuration(artifactId));
     }
 }
