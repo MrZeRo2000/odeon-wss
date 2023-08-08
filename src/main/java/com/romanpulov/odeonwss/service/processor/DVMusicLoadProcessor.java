@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
+    @SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory.getLogger(DVMusicLoadProcessor.class);
 
     private ArtifactType artifactType;
