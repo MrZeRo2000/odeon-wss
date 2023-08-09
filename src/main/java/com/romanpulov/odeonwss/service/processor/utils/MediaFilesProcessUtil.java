@@ -43,7 +43,9 @@ public class MediaFilesProcessUtil {
                     mediaFile.setName(fileName);
 
                     mediaFileRepository.save(mediaFile);
-                    counter.getAndIncrement();
+                    if (counter != null) {
+                        counter.getAndIncrement();
+                    }
 
                 } catch (MediaFileInfoException e) {
                     parsingErrorCallback.accept(mediaFilePath.toAbsolutePath().toString());

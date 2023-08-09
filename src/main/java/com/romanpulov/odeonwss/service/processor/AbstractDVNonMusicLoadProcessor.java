@@ -8,8 +8,10 @@ import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import com.romanpulov.odeonwss.service.processor.utils.MediaFilesProcessUtil;
 import com.romanpulov.odeonwss.service.processor.utils.PathProcessUtil;
 import com.romanpulov.odeonwss.service.processor.vo.SizeDuration;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.util.Pair;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -108,10 +110,10 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
 
         int trackRows = processTracks(singleTracksArtifactPaths.keySet());
         int mediaFileRows = processMediaFiles(singleTracksArtifactPaths);
-        int tracksMediaFilesRows = processTracksAndMediaFiles(multipleTracksArtifactPaths);
+        Pair<Integer, Integer> tracksMediaFilesRows = processTracksAndMediaFiles(multipleTracksArtifactPaths);
 
-        infoHandler(ProcessorMessages.INFO_TRACKS_LOADED, trackRows + tracksMediaFilesRows);
-        infoHandler(ProcessorMessages.INFO_MEDIA_FILES_LOADED, mediaFileRows + tracksMediaFilesRows);
+        infoHandler(ProcessorMessages.INFO_TRACKS_LOADED, trackRows + tracksMediaFilesRows.getFirst());
+        infoHandler(ProcessorMessages.INFO_MEDIA_FILES_LOADED, mediaFileRows + tracksMediaFilesRows.getSecond());
     }
 
     private Map<Artifact, Collection<Path>> loadArtifactPaths(
@@ -224,9 +226,10 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
         return counter.get();
     }
 
-    private int processTracksAndMediaFiles(Map<Artifact, Collection<Path>> artifactPaths)
-    throws ProcessorException {
-        AtomicInteger counter = new AtomicInteger(0);
+    private Pair<Integer, Integer> processTracksAndMediaFiles(Map<Artifact, Collection<Path>> artifactPaths)
+            throws ProcessorException {
+        Map<String, Track> trackMap = new HashMap<>();
+        AtomicInteger mediaFilesCounter = new AtomicInteger();
 
         for (Artifact a : artifactPaths.keySet()) {
             Set<MediaFile> mediaFiles = MediaFilesProcessUtil.loadFromMediaFilesPaths(
@@ -235,7 +238,7 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
                     mediaParser,
                     mediaFileRepository,
                     mediaFileMapper,
-                    counter,
+                    mediaFilesCounter,
                     p -> processingEventHandler(ProcessorMessages.PROCESSING_PARSING_MEDIA_FILE, p),
                     p -> errorHandler(ProcessorMessages.ERROR_PARSING_FILE, p));
 
@@ -250,15 +253,20 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
                 sizeDuration.addSize(mediaFile.getSize());
                 sizeDuration.addDuration(mediaFile.getDuration());
 
-                // create track
-                Track track = new Track();
-                track.setArtifact(a);
-                track.setDvType(dvType);
-                track.setTitle(nt.getTitle());
-                track.setNum(nt.getNumber());
-                track.setDuration(mediaFile.getDuration());
-                dVProductRepository.findFirstByArtifactTypeAndTitle(artifactType, track.getTitle())
-                        .ifPresent(p -> track.setDvProducts(Set.of(p)));
+                // create track if not present yet, expect track title to be unique within artifact
+                Track track = trackMap.computeIfAbsent(nt.getTitle(), v -> {
+                    Track newTrack = new Track();
+                    newTrack.setArtifact(a);
+                    newTrack.setDvType(dvType);
+                    newTrack.setTitle(nt.getTitle());
+                    newTrack.setNum(nt.getNumber());
+                    dVProductRepository.findFirstByArtifactTypeAndTitle(artifactType, newTrack.getTitle())
+                            .ifPresent(p -> newTrack.setDvProducts(Set.of(p)));
+
+                    return newTrack;
+                });
+
+                track.setDuration(Optional.ofNullable(track.getDuration()).orElse(0L) + mediaFile.getDuration());
                 track.getMediaFiles().add(mediaFile);
 
                 trackRepository.save(track);
@@ -271,6 +279,6 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
             artifactRepository.save(a);
         }
 
-        return counter.get();
+        return Pair.of(trackMap.size(), mediaFilesCounter.get());
     }
 }
