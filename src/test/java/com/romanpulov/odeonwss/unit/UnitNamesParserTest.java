@@ -117,6 +117,17 @@ public class UnitNamesParserTest {
         assertThat(nt.getNumber()).isEqualTo(1L);
         assertThat(nt.getTitle()).isEqualTo("With 3 digits");
 
+        nt = NamesParser.parseVideoTrack("05 With brackets and space (part 1).mkv");
+        assertThat(nt).isNotNull();
+        assert nt != null;
+        assertThat(nt.getNumber()).isEqualTo(5L);
+        assertThat(nt.getTitle()).isEqualTo("With brackets and space");
+
+        nt = NamesParser.parseVideoTrack("04 With. brackets(part 1).mkv");
+        assertThat(nt).isNotNull();
+        assert nt != null;
+        assertThat(nt.getNumber()).isEqualTo(4L);
+        assertThat(nt.getTitle()).isEqualTo("With. brackets");
     }
 
     @Test
