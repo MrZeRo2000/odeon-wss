@@ -3,27 +3,26 @@ package com.romanpulov.odeonwss.service.processor;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
-import com.romanpulov.odeonwss.service.TrackService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.romanpulov.odeonwss.repository.TrackRepository;
+import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DVMoviesValidateProcessor extends AbstractDVNonMusicValidateProcessor {
-    @SuppressWarnings("unused")
-    private static final Logger logger = LoggerFactory.getLogger(DVMoviesValidateProcessor.class);
-
-    public DVMoviesValidateProcessor(
+public class DVAnimationMediaFilesLoadProcessor extends AbstractDVNonMusicMediaFilesLoadProcessor {
+    public DVAnimationMediaFilesLoadProcessor(
             ArtifactTypeRepository artifactTypeRepository,
             ArtifactRepository artifactRepository,
+            TrackRepository trackRepository,
             MediaFileRepository mediaFileRepository,
-            TrackService trackService) {
+            MediaParser mediaParser)
+    {
         super(
                 artifactTypeRepository,
                 artifactRepository,
+                trackRepository,
                 mediaFileRepository,
-                trackService,
-                ArtifactTypeRepository::getWithDVMovies
+                mediaParser,
+                ArtifactTypeRepository::getWithDVAnimation
         );
     }
 }

@@ -15,6 +15,7 @@ public class AppConfiguration {
         PT_CLASSICS,
         PT_DV_MUSIC,
         PT_DV_MOVIES,
+        PT_DV_ANIMATION,
         PT_MDB,
         PT_FFPROBE,
         PT_MEDIAINFO
@@ -26,6 +27,7 @@ public class AppConfiguration {
             PathType.PT_CLASSICS, "classics-path",
             PathType.PT_DV_MUSIC, "dv-music-path",
             PathType.PT_DV_MOVIES, "dv-movies-path",
+            PathType.PT_DV_ANIMATION, "dv-animation-path",
             PathType.PT_MDB, "mdb-path",
             PathType.PT_FFPROBE, "ffprobe-path",
             PathType.PT_MEDIAINFO, "mediainfo-path"

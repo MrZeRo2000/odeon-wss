@@ -22,45 +22,61 @@ public class ProcessorFactory {
     public ProcessorFactory(
             AppConfiguration appConfiguration,
             ArtistsMDBImportProcessor artistsMDBImportProcessor,
-            ClassicsMDBImportProcessor classicsMDBImportProcessor,
-            DVMusicMDBImportProcessor dvMusicMDBImportProcessor,
-            DVMusicMediaFilesLoadProcessor dvMusicMediaFilesLoadProcessor,
-            DVMusicValidateProcessor dvMusicValidateProcessor,
             DVProductMDBImportProcessor dvProductMDBImportProcessor,
-            DVMoviesMDBImportProcessor dvMoviesMDBImportProcessor,
-            DVMoviesMediaFilesLoadProcessor dvMoviesMediaFilesLoadProcessor,
+            MP3UpdateAttributesMDBImportProcessor mp3UpdateAttributesMDBImportProcessor,
+            LAUpdateAttributesMDBImportProcessor laUpdateAttributesMDBImportProcessor,
+
+            ClassicsMDBImportProcessor classicsMDBImportProcessor,
             ClassicsValidateProcessor classicsValidateProcessor,
+
             MP3LoadProcessor mp3LoadProcessor,
             MP3ValidateProcessor mp3ValidateProcessor,
             LALoadProcessor laLoadProcessor,
             LAValidateProcessor laValidateProcessor,
+
+            DVMusicMDBImportProcessor dvMusicMDBImportProcessor,
+            DVMusicLoadProcessor dvMusicLoadProcessor,
+            DVMusicValidateProcessor dvMusicValidateProcessor,
+            DVMusicMediaFilesLoadProcessor dvMusicMediaFilesLoadProcessor,
+
+            DVMoviesMDBImportProcessor dvMoviesMDBImportProcessor,
             DVMoviesLoadProcessor dvMoviesLoadProcessor,
             DVMoviesValidateProcessor dvMoviesValidateProcessor,
-            DVMusicLoadProcessor dvMusicLoadProcessor,
-            MP3UpdateAttributesMDBImportProcessor mp3UpdateAttributesMDBImportProcessor,
-            LAUpdateAttributesMDBImportProcessor laUpdateAttributesMDBImportProcessor
+            DVMoviesMediaFilesLoadProcessor dvMoviesMediaFilesLoadProcessor,
+
+            DVAnimationLoadProcessor dvAnimationLoadProcessor,
+            DVAnimationValidateProcessor dvAnimationValidateProcessor,
+            DVAnimationMediaFilesLoadProcessor dvAnimationMediaFilesLoadProcessor
     )
     {
         this.appConfiguration = appConfiguration;
 
         addProcessorMap(ProcessorType.ARTISTS_IMPORTER, artistsMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
+        addProcessorMap(ProcessorType.DV_PRODUCT_IMPORTER, dvProductMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
+        addProcessorMap(ProcessorType.MP3_UPDATE_ATTRIBUTES_IMPORTER, mp3UpdateAttributesMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
+        addProcessorMap(ProcessorType.LA_UPDATE_ATTRIBUTES_IMPORTER, laUpdateAttributesMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
+
         addProcessorMap(ProcessorType.CLASSICS_IMPORTER, classicsMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
         addProcessorMap(ProcessorType.CLASSICS_VALIDATOR, classicsValidateProcessor, AppConfiguration.PathType.PT_CLASSICS);
-        addProcessorMap(ProcessorType.DV_MUSIC_IMPORTER, dvMusicMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
-        addProcessorMap(ProcessorType.DV_MUSIC_MEDIA_LOADER, dvMusicMediaFilesLoadProcessor, AppConfiguration.PathType.PT_DV_MUSIC);
-        addProcessorMap(ProcessorType.DV_MUSIC_VALIDATOR, dvMusicValidateProcessor, AppConfiguration.PathType.PT_DV_MUSIC);
-        addProcessorMap(ProcessorType.DV_PRODUCT_IMPORTER, dvProductMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
-        addProcessorMap(ProcessorType.DV_MOVIES_IMPORTER, dvMoviesMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
-        addProcessorMap(ProcessorType.DV_MOVIES_MEDIA_LOADER, dvMoviesMediaFilesLoadProcessor, AppConfiguration.PathType.PT_DV_MOVIES);
+
         addProcessorMap(ProcessorType.MP3_LOADER, mp3LoadProcessor, AppConfiguration.PathType.PT_MP3);
         addProcessorMap(ProcessorType.MP3_VALIDATOR, mp3ValidateProcessor, AppConfiguration.PathType.PT_MP3);
         addProcessorMap(ProcessorType.LA_LOADER, laLoadProcessor, AppConfiguration.PathType.PT_LA);
         addProcessorMap(ProcessorType.LA_VALIDATOR, laValidateProcessor, AppConfiguration.PathType.PT_LA);
+
+        addProcessorMap(ProcessorType.DV_MUSIC_IMPORTER, dvMusicMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
+        addProcessorMap(ProcessorType.DV_MUSIC_LOADER, dvMusicLoadProcessor, AppConfiguration.PathType.PT_DV_MUSIC);
+        addProcessorMap(ProcessorType.DV_MUSIC_VALIDATOR, dvMusicValidateProcessor, AppConfiguration.PathType.PT_DV_MUSIC);
+        addProcessorMap(ProcessorType.DV_MUSIC_MEDIA_LOADER, dvMusicMediaFilesLoadProcessor, AppConfiguration.PathType.PT_DV_MUSIC);
+
+        addProcessorMap(ProcessorType.DV_MOVIES_IMPORTER, dvMoviesMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
         addProcessorMap(ProcessorType.DV_MOVIES_LOADER, dvMoviesLoadProcessor, AppConfiguration.PathType.PT_DV_MOVIES);
         addProcessorMap(ProcessorType.DV_MOVIES_VALIDATOR, dvMoviesValidateProcessor, AppConfiguration.PathType.PT_DV_MOVIES);
-        addProcessorMap(ProcessorType.DV_MUSIC_LOADER, dvMusicLoadProcessor, AppConfiguration.PathType.PT_DV_MUSIC);
-        addProcessorMap(ProcessorType.MP3_UPDATE_ATTRIBUTES_IMPORTER, mp3UpdateAttributesMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
-        addProcessorMap(ProcessorType.LA_UPDATE_ATTRIBUTES_IMPORTER, laUpdateAttributesMDBImportProcessor, AppConfiguration.PathType.PT_MDB);
+        addProcessorMap(ProcessorType.DV_MOVIES_MEDIA_LOADER, dvMoviesMediaFilesLoadProcessor, AppConfiguration.PathType.PT_DV_MOVIES);
+
+        addProcessorMap(ProcessorType.DV_ANIMATION_LOADER, dvAnimationLoadProcessor, AppConfiguration.PathType.PT_DV_ANIMATION);
+        addProcessorMap(ProcessorType.DV_ANIMATION_VALIDATOR, dvAnimationValidateProcessor, AppConfiguration.PathType.PT_DV_ANIMATION);
+        addProcessorMap(ProcessorType.DV_ANIMATION_MEDIA_LOADER, dvAnimationMediaFilesLoadProcessor, AppConfiguration.PathType.PT_DV_ANIMATION);
     }
 
     public AbstractProcessor fromProcessorType(ProcessorType processorType, ProgressHandler handler) {

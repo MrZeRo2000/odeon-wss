@@ -9,11 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DVMoviesValidateProcessor extends AbstractDVNonMusicValidateProcessor {
+public class DVAnimationValidateProcessor extends AbstractDVNonMusicValidateProcessor {
     @SuppressWarnings("unused")
-    private static final Logger logger = LoggerFactory.getLogger(DVMoviesValidateProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(DVAnimationValidateProcessor.class);
 
-    public DVMoviesValidateProcessor(
+    public DVAnimationValidateProcessor(
             ArtifactTypeRepository artifactTypeRepository,
             ArtifactRepository artifactRepository,
             MediaFileRepository mediaFileRepository,
@@ -23,7 +23,7 @@ public class DVMoviesValidateProcessor extends AbstractDVNonMusicValidateProcess
                 artifactRepository,
                 mediaFileRepository,
                 trackService,
-                ArtifactTypeRepository::getWithDVMovies
+                ArtifactTypeRepository::getWithDVAnimation
         );
     }
 }

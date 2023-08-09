@@ -8,5 +8,6 @@
 	<Parameter name="classics-path" value="J:/ARCHIVE/classics/"/>
 	<Parameter name="dv-music-path" value="L:/Music/"/>
 	<Parameter name="dv-movies-path" value="L:/Movies/"/>
+	<Parameter name="dv-animation-path" value="L:/Animation/"/>	
 	<Parameter name="mdb-path" value="D:/prj/Cat2000/"/>
 </Context>

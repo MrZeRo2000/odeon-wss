@@ -8,6 +8,7 @@
 	<Parameter name="classics-path" value="C:/Users/r1525/prj/odeon-test-data/classics/"/>
 	<Parameter name="dv-music-path" value="C:/Users/r1525/prj/odeon-test-data/dv_music/"/>
 	<Parameter name="dv-movies-path" value="C:/Users/r1525/prj/odeon-test-data/dv_movies/"/>
+	<Parameter name="dv-animation-path" value="C:/Users/r1525/prj/odeon-test-data/dv_animation/"/>
 	<Parameter name="mdb-path" value="C:/Users/r1525/prj/Cat2000/"/>
 	<Parameter name="spring.profiles.active" value="int"/>
 </Context>
