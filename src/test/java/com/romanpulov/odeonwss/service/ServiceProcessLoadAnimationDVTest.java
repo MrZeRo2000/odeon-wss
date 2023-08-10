@@ -198,54 +198,18 @@ public class ServiceProcessLoadAnimationDVTest {
     @Test
     @Order(5)
     @Rollback(value = false)
-    @Disabled("Not implemented yet")
     void testTrackNumber() {
         var artifact = artifactRepository
                 .getAllByArtifactTypeWithTracks(artifactType)
                 .stream()
-                .filter(a -> a.getTitle().equals("Коломбо"))
+                .filter(a -> a.getTitle().equals("Talespin"))
                 .findFirst()
                 .orElseThrow();
 
-        var track = trackRepository.findTrackByArtifactAndTitle(artifact, "Убийство по книге").orElseThrow();
+        var track = trackRepository.findTrackByArtifactAndTitle(artifact, "From Here to Machinery").orElseThrow();
         assertThat(track.getNum()).isEqualTo(2L);
 
-        track = trackRepository.findTrackByArtifactAndTitle(artifact, "Рецепт убийства").orElseThrow();
+        track = trackRepository.findTrackByArtifactAndTitle(artifact, "Plunder and Lightning").orElseThrow();
         assertThat(track.getNum()).isEqualTo(1L);
-    }
-
-    @Test
-    @Order(10)
-    @Sql({"/schema.sql", "/data.sql"})
-    @Rollback(value = false)
-    @Disabled("Not implemented yet")
-    void testLoadWithoutOneProduct() {
-        var dvProductList = Arrays.stream(DV_PRODUCT_NAMES).filter(s -> !s.equals(DV_PRODUCT_NAMES[0])).map(s -> {
-            DVProduct dvProduct = new DVProduct();
-            dvProduct.setArtifactType(artifactType);
-            dvProduct.setDvOrigin(dvOriginRepository.findById(1L).orElseGet(() -> {
-                DVOrigin dvOrigin = new DVOrigin();
-                dvOrigin.setName("New Origin");
-                dvOriginRepository.save(dvOrigin);
-
-                return dvOrigin;
-            }));
-            dvProduct.setTitle(s);
-
-            return dvProduct;
-        }).collect(Collectors.toList());
-
-        dvProductRepository.saveAll(dvProductList);
-
-        processService.executeProcessor(PROCESSOR_TYPE);
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
-
-        var resultTracks = trackRepository.getTracksByArtifactType(artifactType);
-        assertThat(resultTracks.size()).isEqualTo(5);
-
-        int tracksWithProducts = resultTracks.stream().map(track ->
-            trackRepository.findByIdWithProducts(track.getId()).orElseThrow().getDvProducts().size()
-        ).mapToInt(Integer::intValue).sum();
-        assertThat(tracksWithProducts).isEqualTo(4);
     }
 }
