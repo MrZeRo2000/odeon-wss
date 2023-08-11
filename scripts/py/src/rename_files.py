@@ -34,6 +34,10 @@ class FileRenamer:
         horizontal_delimiter = "".join("*" for _ in range(max([len(f) + 6 for f in file_names])))
         for idx, new_name in enumerate(new_names):
             file_name_from = os.path.join(self.folder_name, file_names[idx])
+
+            # cleanup name
+            new_name = new_name.replace("?", "")
+
             if self.name_parser.match(new_name) is None:
                 new_name_formatted = f"{idx + 1:02d} {new_name}" if len(new_names) < 100 else f"{idx + 1:03d} {new_name}"
             else:
