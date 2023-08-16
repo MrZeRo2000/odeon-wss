@@ -75,6 +75,7 @@ public class ServiceProcessValidateDVAnimationTest {
                 return dvOrigin;
             }));
             dvProduct.setTitle(s);
+            dvProduct.setOriginalTitle(s + " original");
 
             return dvProduct;
         }).collect(Collectors.toList());
@@ -416,7 +417,7 @@ public class ServiceProcessValidateDVAnimationTest {
         var track1 = trackRepository
                 .getTracksByArtifactType(artifactType)
                 .stream()
-                .filter(t -> t.getTitle().equals("From Here to Machinery"))
+                .filter(t -> t.getTitle().equals("From Here to Machinery original"))
                 .findFirst()
                 .orElseThrow();
         assertThat(track1.getNum()).isEqualTo(2L);
