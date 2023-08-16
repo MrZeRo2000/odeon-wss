@@ -3,12 +3,12 @@ package com.romanpulov.odeonwss.service.processor;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.*;
+import com.romanpulov.odeonwss.service.DVProductService;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import com.romanpulov.odeonwss.service.processor.utils.MediaFilesProcessUtil;
 import com.romanpulov.odeonwss.service.processor.utils.PathProcessUtil;
 import com.romanpulov.odeonwss.service.processor.vo.SizeDuration;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
@@ -42,7 +42,7 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
 
     private final DVTypeRepository dvTypeRepository;
 
-    private final DVProductRepository dVProductRepository;
+    private final DVProductService dVProductService;
 
     private final MediaParser mediaParser;
 
@@ -55,7 +55,7 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
             MediaFileRepository mediaFileRepository,
             MediaFileMapper mediaFileMapper,
             DVTypeRepository dvTypeRepository,
-            DVProductRepository dVProductRepository,
+            DVProductService dVProductService,
             MediaParser mediaParser,
             Function<ArtifactTypeRepository, ArtifactType> artifactTypeSupplier) {
         this.artifactTypeRepository = artifactTypeRepository;
@@ -64,7 +64,7 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
         this.mediaFileRepository = mediaFileRepository;
         this.mediaFileMapper = mediaFileMapper;
         this.dvTypeRepository = dvTypeRepository;
-        this.dVProductRepository = dVProductRepository;
+        this.dVProductService = dVProductService;
         this.mediaParser = mediaParser;
         this.artifactTypeSupplier = artifactTypeSupplier;
     }
@@ -163,7 +163,7 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
             track.setTitle(artifact.getTitle());
             track.setNum(1L);
             track.setDuration(artifact.getDuration());
-            dVProductRepository.findFirstByArtifactTypeAndTitle(artifactType, track.getTitle())
+            dVProductService.findProductByArtifactTypeAndTitle(artifactType, track.getTitle())
                     .ifPresent(p -> track.setDvProducts(Set.of(p)));
 
             trackRepository.save(track);
@@ -260,7 +260,7 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
                     newTrack.setDvType(dvType);
                     newTrack.setTitle(nt.getTitle());
                     newTrack.setNum(nt.getNumber());
-                    dVProductRepository.findFirstByArtifactTypeAndTitle(artifactType, newTrack.getTitle())
+                    dVProductService.findProductByArtifactTypeAndTitle(artifactType, newTrack.getTitle())
                             .ifPresent(p -> newTrack.setDvProducts(Set.of(p)));
 
                     return newTrack;

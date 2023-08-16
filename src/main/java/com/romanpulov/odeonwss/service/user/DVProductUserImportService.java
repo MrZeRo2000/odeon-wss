@@ -13,6 +13,7 @@ import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.DVCategoryRepository;
 import com.romanpulov.odeonwss.repository.DVOriginRepository;
 import com.romanpulov.odeonwss.repository.DVProductRepository;
+import com.romanpulov.odeonwss.service.DVProductService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -28,15 +29,19 @@ public class DVProductUserImportService {
 
     private final DVProductRepository dvProductRepository;
 
+    private final DVProductService dvProductService;
+
     public DVProductUserImportService(
             ArtifactTypeRepository artifactTypeRepository,
             DVOriginRepository dvOriginRepository,
             DVCategoryRepository dvCategoryRepository,
-            DVProductRepository dvProductRepository) {
+            DVProductRepository dvProductRepository,
+            DVProductService dvProductService) {
         this.artifactTypeRepository = artifactTypeRepository;
         this.dvOriginRepository = dvOriginRepository;
         this.dvCategoryRepository = dvCategoryRepository;
         this.dvProductRepository = dvProductRepository;
+        this.dvProductService = dvProductService;
     }
 
     private ArtifactType getArtifactType(Long artifactTypeId)
@@ -98,7 +103,7 @@ public class DVProductUserImportService {
             if (det.getTitle() == null) {
                 throw new EmptyParameterException("Title");
             }
-            dvProductRepository.findFirstByArtifactTypeAndTitle(artifactType, det.getTitle()).ifPresentOrElse(
+            dvProductService.findProductByArtifactTypeAndTitle(artifactType, det.getTitle()).ifPresentOrElse(
                     p -> result.addRowUpdated(det.getTitle()),
                     () -> result.addRowInserted(det.getTitle())
             );
@@ -120,8 +125,8 @@ public class DVProductUserImportService {
                 throw new EmptyParameterException("Title");
             }
 
-            DVProduct dvProduct = dvProductRepository
-                    .findFirstByArtifactTypeAndTitle(artifactType, det.getTitle())
+            DVProduct dvProduct = dvProductService
+                    .findProductByArtifactTypeAndTitle(artifactType, det.getTitle())
                     .orElseGet(() -> {
                         DVProduct newDvProduct = new DVProduct();
                         newDvProduct.setArtifactType(artifactType);

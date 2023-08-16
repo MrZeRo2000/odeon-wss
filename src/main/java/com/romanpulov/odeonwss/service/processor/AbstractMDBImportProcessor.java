@@ -14,7 +14,7 @@ import static com.romanpulov.odeonwss.service.processor.MDBConst.MDB_FILE_NAME;
 import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.*;
 
 public abstract class AbstractMDBImportProcessor extends AbstractFileSystemProcessor{
-    protected static class MDBReader implements Closeable {
+    public static class MDBReader implements Closeable {
         private final Database database;
 
         public MDBReader(File mFile) throws ProcessorException {

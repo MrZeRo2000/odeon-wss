@@ -10,6 +10,7 @@ import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.DVCategoryRepository;
 import com.romanpulov.odeonwss.repository.DVOriginRepository;
 import com.romanpulov.odeonwss.repository.DVProductRepository;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import jakarta.transaction.Transactional;
@@ -35,7 +36,6 @@ public class DVProductMDBImportProcessor extends AbstractMDBImportProcessor {
 
     private Map<Long, DVOrigin> dvOrigins;
     private Map<Long, DVCategory> dvCategories;
-    private Map<Long, DVProduct> dvProducts;
 
     private Map<Long, Long> dvOriginIds;
     private Map<Long, Collection<Long>> dvCategoryIds;
@@ -56,7 +56,6 @@ public class DVProductMDBImportProcessor extends AbstractMDBImportProcessor {
     protected void importMDB(MDBReader mdbReader) throws ProcessorException {
         dvOrigins = new HashMap<>();
         dvCategories = new HashMap<>();
-        dvProducts = new HashMap<>();
         productArtifactTypeMap = Map.of(
                 11, artifactTypeRepository.getWithDVMovies(),
                 12, artifactTypeRepository.getWithDVAnimation(),
@@ -135,16 +134,25 @@ public class DVProductMDBImportProcessor extends AbstractMDBImportProcessor {
         AtomicInteger counter = new AtomicInteger(0);
 
         Map<Long, DVProduct> migrationProducts = dvProductRepository.findAllMigrationIdMap();
+        Set<Pair<Integer, String>> originalTitles = new HashSet<>();
 
         for (Row row: table) {
             long id = row.getInt(VPRODUCT_ID_COLUMN_NAME).longValue();
             DVProduct product = migrationProducts.get(id);
             if (product == null) {
                 product = new DVProduct();
-                product.setArtifactType(productArtifactTypeMap.get(row.getInt(MC_PATH_ID_COLUMN_NAME)));
+                Integer artifactTypeId = row.getInt(MC_PATH_ID_COLUMN_NAME);
+                product.setArtifactType(productArtifactTypeMap.get(artifactTypeId));
                 product.setDvOrigin(dvOrigins.get(dvOriginIds.get(id)));
                 product.setTitle(row.getString(TITLE_COLUMN_NAME));
-                product.setOriginalTitle(row.getString(ORIG_TITLE_COLUMN_NAME));
+
+                // support of logic for unique original title
+                String originalTitle = row.getString(ORIG_TITLE_COLUMN_NAME);
+                if (originalTitles.contains(Pair.of(artifactTypeId, originalTitle))) {
+                    originalTitle = originalTitle + " " + id;
+                }
+                product.setOriginalTitle(originalTitle);
+                originalTitles.add(Pair.of(artifactTypeId, originalTitle));
 
                 String year = row.getString(YEAR_COLUMN_NAME);
                 if (year != null) {
@@ -172,8 +180,6 @@ public class DVProductMDBImportProcessor extends AbstractMDBImportProcessor {
 
                 counter.getAndIncrement();
             }
-
-            this.dvProducts.put(id, product);
         }
 
         return counter.get();

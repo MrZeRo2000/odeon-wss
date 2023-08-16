@@ -13,6 +13,7 @@ import com.romanpulov.odeonwss.repository.DVProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DVProductService
@@ -60,7 +61,7 @@ public class DVProductService
     @Override
     public DVProductDTO getById(Long id) throws CommonEntityNotFoundException {
         List<DVProductFlatDTO> dtoList = dvProductRepository.findFlatDTOById(id);
-        if (dtoList.size() == 0) {
+        if (dtoList.isEmpty()) {
             throw new CommonEntityNotFoundException(this.entityName, id);
         } else {
             return transformer.transform(dtoList, false).get(0);
@@ -91,5 +92,12 @@ public class DVProductService
         return dvProductRepository
                 .findNotesById(id)
                 .orElseThrow(() -> new CommonEntityNotFoundException("DVProduct", id));
+    }
+
+    public Optional<DVProduct> findProductByArtifactTypeAndTitle(ArtifactType artifactType, String title) {
+        return Optional.ofNullable(dvProductRepository.findFirstByArtifactTypeAndTitle(artifactType, title)
+                .orElse(dvProductRepository.findFirstByArtifactTypeAndOriginalTitle(artifactType, title)
+                        .orElse(null))
+        );
     }
 }

@@ -82,6 +82,7 @@ public class ServiceProcessLoadAnimationDVTest {
                 return dvOrigin;
             }));
             dvProduct.setTitle(s);
+            dvProduct.setOriginalTitle(s + " original");
 
             return dvProduct;
         }).collect(Collectors.toList());
@@ -206,7 +207,7 @@ public class ServiceProcessLoadAnimationDVTest {
                 .findFirst()
                 .orElseThrow();
 
-        var track = trackRepository.findTrackByArtifactAndTitle(artifact, "From Here to Machinery").orElseThrow();
+        var track = trackRepository.findTrackByArtifactAndTitle(artifact, "From Here to Machinery original").orElseThrow();
         assertThat(track.getNum()).isEqualTo(2L);
 
         track = trackRepository.findTrackByArtifactAndTitle(artifact, "Plunder and Lightning").orElseThrow();

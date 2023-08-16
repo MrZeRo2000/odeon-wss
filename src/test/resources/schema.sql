@@ -191,6 +191,7 @@ CREATE TABLE dv_products(
 );
 
 CREATE UNIQUE INDEX idx_dv_products_attp_id_dvpd_title ON dv_products(attp_id, dvpd_title);
+CREATE UNIQUE INDEX idx_dv_products_attp_id_dvpd_orig_title ON dv_products(attp_id, dvpd_orig_title);
 
 CREATE INDEX idx_dv_products_attp_id ON dv_products(attp_id);
 CREATE INDEX idx_dv_products_dvor_id ON dv_products(dvor_id);

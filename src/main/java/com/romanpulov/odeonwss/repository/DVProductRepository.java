@@ -15,7 +15,9 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public interface DVProductRepository
         extends MappedMigratedIdJpaRepository<DVProduct, Long>, EntityDTORepository<DVProduct, DVProductDTO> {
+
     Optional<DVProduct> findFirstByArtifactTypeAndTitle(ArtifactType artifactType, String title);
+    Optional<DVProduct> findFirstByArtifactTypeAndOriginalTitle(ArtifactType artifactType, String originalTitle);
 
     List<IdTitleDTO> findAllByArtifactTypeOrderByTitleAsc(ArtifactType artifactType);
 
