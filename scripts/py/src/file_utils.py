@@ -14,7 +14,7 @@ def validate_file_name_and_path(file_name: str, path: str):
 
 def get_file_lines(file_name: str) -> list[str]:
     result = []
-    with open(file_name, mode="r", encoding="utf-8") as f:
+    with open(file_name, mode="r", encoding="utf-8-sig") as f:
         for line in f:
             result.append(line.rstrip())
 

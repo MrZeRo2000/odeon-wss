@@ -22,7 +22,7 @@ class FileRenamer:
         self.file_names = file_names
         self.folder_name = folder_name
         self.display = display
-        self.name_parser = re.compile(r"[0-9]{2,}\s\S+")
+        self.name_parser = re.compile(r"^\d{2,3}\s\S+")
         self.logger = logger
 
     def get_media_file_names(self) -> list[str]:
@@ -40,14 +40,17 @@ class FileRenamer:
 
             if self.name_parser.match(new_name) is None:
                 new_name_formatted = f"{idx + 1:02d} {new_name}" if len(new_names) < 100 else f"{idx + 1:03d} {new_name}"
+                rename_mode = "Name formatted by index"
             else:
                 new_name_formatted = new_name
-            file_name_to = f"{os.path.join(self.folder_name, new_name_formatted)}.{file_names[idx].split('.')[-1]}"
+                rename_mode = "New name from file"
+            new_file_name_formatted = f"{new_name_formatted}.{file_names[idx].split('.')[-1]}" 
+            file_name_to = os.path.join(self.folder_name, new_file_name_formatted)
 
             if self.display:
                 self.logger.info(horizontal_delimiter)
                 self.logger.info(f"From: {file_names[idx]}")
-                self.logger.info(f"  To: {new_name_formatted}")
+                self.logger.info(f"  To: {new_file_name_formatted} ({rename_mode})")
             else:
                 self.logger.info(f"Renaming {file_name_from} to {file_name_to}")
                 os.replace(file_name_from, file_name_to)
