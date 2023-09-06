@@ -27,6 +27,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class ServiceProcessLoadAnimationDVTest {
     private final static String[] DV_PRODUCT_NAMES = {
             "Plunder and Lightning",
+            "Louie’s Last Stand",
             "From Here to Machinery",
             "Kak kazaki kulesh varili",
             "Kak kazaki v futbol igrali",
@@ -110,13 +111,13 @@ public class ServiceProcessLoadAnimationDVTest {
         assertThat(processDetails.get(2)).isEqualTo(new ProcessDetail(
                 ProcessDetailInfo.fromMessage("Tracks loaded"),
                 ProcessingStatus.INFO,
-                7,
+                8,
                 null));
 
         assertThat(processDetails.get(3)).isEqualTo(new ProcessDetail(
                 ProcessDetailInfo.fromMessage("Media files loaded"),
                 ProcessingStatus.INFO,
-                9,
+                10,
                 null));
 
         trackRepository.getTracksByArtifactType(artifactType).forEach(c -> {

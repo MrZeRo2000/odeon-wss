@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ServiceProcessValidateDVAnimationTest {
     private final static String[] DV_PRODUCT_NAMES = {
             "Plunder and Lightning",
+            "Louie’s Last Stand",
             "From Here to Machinery",
             "Kak kazaki kulesh varili",
             "Kak kazaki v futbol igrali",
