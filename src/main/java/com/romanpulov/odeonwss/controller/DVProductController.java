@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.dto.DVProductDTO;
-import com.romanpulov.odeonwss.dto.IdTitleDTO;
+import com.romanpulov.odeonwss.dto.IdTitleOriginalTitleDTO;
 import com.romanpulov.odeonwss.dto.TextDTO;
 import com.romanpulov.odeonwss.entity.DVProduct;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
@@ -24,7 +24,7 @@ public class DVProductController
     }
 
     @GetMapping("/dvproducts/table-id-title")
-    ResponseEntity<List<IdTitleDTO>> getTableIdTitle(@RequestParam Long artifactTypeId)
+    ResponseEntity<List<IdTitleOriginalTitleDTO>> getTableIdTitle(@RequestParam Long artifactTypeId)
             throws CommonEntityNotFoundException {
         return ResponseEntity.ok(service.getTableIdTitle(artifactTypeId));
     }

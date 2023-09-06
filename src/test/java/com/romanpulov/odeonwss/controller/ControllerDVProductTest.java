@@ -222,6 +222,22 @@ public class ControllerDVProductTest {
 
     @Test
     @Order(2)
+    void testGetTableIdTitle() throws Exception {
+        var result = mockMvc.perform(get("/api/dvproduct/dvproducts/table-id-title")
+                        .param("artifactTypeId", "202"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(3)))
+                .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].title", Matchers.equalTo("Green")))
+                .andExpect(jsonPath("$[0].originalTitle", Matchers.equalTo("Original green")))
+                ;
+        logger.debug("GetTableIdTitle result:" + result.andReturn().getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(2)
     void testGetDescriptionExistingOk() throws Exception {
         var result = mockMvc.perform(get("/api/dvproduct/description/1"))
                 .andExpect(status().isOk())

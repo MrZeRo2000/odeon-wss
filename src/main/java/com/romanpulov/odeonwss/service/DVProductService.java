@@ -68,7 +68,7 @@ public class DVProductService
         }
     }
 
-    public List<IdTitleDTO> getTableIdTitle(Long artifactTypeId) throws CommonEntityNotFoundException {
+    public List<IdTitleOriginalTitleDTO> getTableIdTitle(Long artifactTypeId) throws CommonEntityNotFoundException {
         ArtifactType artifactType = artifactTypeRepository.findById(artifactTypeId).orElseThrow(
                 () -> new CommonEntityNotFoundException("ArtifactType", artifactTypeId));
         return dvProductRepository.findAllByArtifactTypeOrderByTitleAsc(artifactType);

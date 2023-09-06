@@ -1,11 +1,8 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.dto.DVProductDTO;
-import com.romanpulov.odeonwss.dto.DVProductFlatDTO;
-import com.romanpulov.odeonwss.dto.TextDTO;
+import com.romanpulov.odeonwss.dto.*;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.DVProduct;
-import com.romanpulov.odeonwss.dto.IdTitleDTO;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +16,7 @@ public interface DVProductRepository
     Optional<DVProduct> findFirstByArtifactTypeAndTitle(ArtifactType artifactType, String title);
     Optional<DVProduct> findFirstByArtifactTypeAndOriginalTitle(ArtifactType artifactType, String originalTitle);
 
-    List<IdTitleDTO> findAllByArtifactTypeOrderByTitleAsc(ArtifactType artifactType);
+    List<IdTitleOriginalTitleDTO> findAllByArtifactTypeOrderByTitleAsc(ArtifactType artifactType);
 
     @Query("SELECT " +
             "dvp.id AS id, " +

@@ -7,7 +7,7 @@ import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVCategoryBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVProductBuilder;
 import com.romanpulov.odeonwss.dto.DVCategoryDTO;
-import com.romanpulov.odeonwss.dto.IdTitleDTO;
+import com.romanpulov.odeonwss.dto.IdTitleOriginalTitleDTO;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
@@ -68,6 +68,7 @@ public class ServiceUserImportDVProductTest {
                         .withOrigin(dvOrigin)
                         .withArtifactType(getArtifactType())
                         .withTitle(s)
+                        .withOriginalTitle(s + "(original)")
                         .build()
         ));
         dvCategoryRepository.saveAll(List.of(
@@ -81,9 +82,10 @@ public class ServiceUserImportDVProductTest {
     @Sql({"/schema.sql", "/data.sql"})
     void testPrepareShouldBeOk() {
         internalPrepare();
-        List<IdTitleDTO> dvProducts = dvProductRepository.findAllByArtifactTypeOrderByTitleAsc(getArtifactType());
+        List<IdTitleOriginalTitleDTO> dvProducts = dvProductRepository.findAllByArtifactTypeOrderByTitleAsc(getArtifactType());
         assertThat(dvProducts.size()).isEqualTo(2);
         assertThat(dvProducts.get(0).getTitle()).isEqualTo("Cruel Summer");
+        assertThat(dvProducts.get(0).getOriginalTitle()).isEqualTo("Cruel Summer(original)");
     }
 
     @Test
