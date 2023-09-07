@@ -68,10 +68,16 @@ public class DVProductService
         }
     }
 
-    public List<IdTitleOriginalTitleDTO> getTableIdTitle(Long artifactTypeId) throws CommonEntityNotFoundException {
+    public List<IdTitleDTO> getTableIdTitle(Long artifactTypeId) throws CommonEntityNotFoundException {
         ArtifactType artifactType = artifactTypeRepository.findById(artifactTypeId).orElseThrow(
                 () -> new CommonEntityNotFoundException("ArtifactType", artifactTypeId));
-        return dvProductRepository.findAllByArtifactTypeOrderByTitleAsc(artifactType);
+        return dvProductRepository.findAllIdTitle(artifactType);
+    }
+
+    public List<IdTitleOriginalTitleDTO> getTableIdTitleOriginalTitle(Long artifactTypeId) throws CommonEntityNotFoundException {
+        ArtifactType artifactType = artifactTypeRepository.findById(artifactTypeId).orElseThrow(
+                () -> new CommonEntityNotFoundException("ArtifactType", artifactTypeId));
+        return dvProductRepository.findAllIdTitleOriginalTitle(artifactType);
     }
 
     public List<DVProductDTO> getTable(Long artifactTypeId) throws CommonEntityNotFoundException {

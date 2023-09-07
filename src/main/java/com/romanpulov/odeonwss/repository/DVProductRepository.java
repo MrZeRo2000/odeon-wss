@@ -16,7 +16,26 @@ public interface DVProductRepository
     Optional<DVProduct> findFirstByArtifactTypeAndTitle(ArtifactType artifactType, String title);
     Optional<DVProduct> findFirstByArtifactTypeAndOriginalTitle(ArtifactType artifactType, String originalTitle);
 
-    List<IdTitleOriginalTitleDTO> findAllByArtifactTypeOrderByTitleAsc(ArtifactType artifactType);
+    @Query("""
+      SELECT
+        dvp.id AS id,
+        dvp.title AS title
+      FROM DVProduct dvp
+      WHERE dvp.artifactType = :artifactType
+      ORDER BY dvp.title
+    """)
+    List<IdTitleDTO> findAllIdTitle(ArtifactType artifactType);
+
+    @Query("""
+      SELECT
+        dvp.id AS id,
+        dvp.title AS title,
+        dvp.originalTitle AS originalTitle
+      FROM DVProduct dvp
+      WHERE dvp.artifactType = :artifactType
+      ORDER BY dvp.title
+    """)
+    List<IdTitleOriginalTitleDTO> findAllIdTitleOriginalTitle(ArtifactType artifactType);
 
     @Query("SELECT " +
             "dvp.id AS id, " +

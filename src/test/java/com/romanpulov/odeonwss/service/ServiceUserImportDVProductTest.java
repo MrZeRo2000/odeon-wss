@@ -82,7 +82,7 @@ public class ServiceUserImportDVProductTest {
     @Sql({"/schema.sql", "/data.sql"})
     void testPrepareShouldBeOk() {
         internalPrepare();
-        List<IdTitleOriginalTitleDTO> dvProducts = dvProductRepository.findAllByArtifactTypeOrderByTitleAsc(getArtifactType());
+        List<IdTitleOriginalTitleDTO> dvProducts = dvProductRepository.findAllIdTitleOriginalTitle(getArtifactType());
         assertThat(dvProducts.size()).isEqualTo(2);
         assertThat(dvProducts.get(0).getTitle()).isEqualTo("Cruel Summer");
         assertThat(dvProducts.get(0).getOriginalTitle()).isEqualTo("Cruel Summer(original)");

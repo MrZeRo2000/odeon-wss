@@ -149,7 +149,7 @@ public class RepositoryDVProductTests {
     @Order(5)
     void testFindByArtifactType() {
         var moviesList = dvProductRepository
-                .findAllByArtifactTypeOrderByTitleAsc(artifactTypeRepository.getWithDVMovies());
+                .findAllIdTitle(artifactTypeRepository.getWithDVMovies());
         assertThat(moviesList.size()).isEqualTo(2);
         assertThat(moviesList.get(0).getTitle()).isEqualTo("Product with categories");
         assertThat(moviesList.get(0).getId()).isEqualTo(2L);
@@ -157,13 +157,13 @@ public class RepositoryDVProductTests {
         assertThat(moviesList.get(1).getId()).isEqualTo(1L);
 
         var animationList = dvProductRepository
-                .findAllByArtifactTypeOrderByTitleAsc(artifactTypeRepository.getWithDVAnimation());
+                .findAllIdTitle(artifactTypeRepository.getWithDVAnimation());
         assertThat(animationList.size()).isEqualTo(1);
         assertThat(animationList.get(0).getId()).isEqualTo(3L);
         assertThat(animationList.get(0).getTitle()).isEqualTo("Product title");
 
         assertThat(dvProductRepository
-                .findAllByArtifactTypeOrderByTitleAsc(artifactTypeRepository.getWithDVMusic()).size())
+                .findAllIdTitle(artifactTypeRepository.getWithDVMusic()).size())
                 .isEqualTo(0);
     }
 

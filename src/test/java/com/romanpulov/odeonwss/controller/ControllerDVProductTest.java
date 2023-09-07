@@ -228,6 +228,21 @@ public class ControllerDVProductTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(2)))
+                .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].title", Matchers.equalTo("Green")))
+                ;
+        logger.debug("GetTableIdTitle result:" + result.andReturn().getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(2)
+    void testGetTableIdTitleOriginalTitle() throws Exception {
+        var result = mockMvc.perform(get("/api/dvproduct/dvproducts/table-id-title-original-title")
+                        .param("artifactTypeId", "202"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(1)))
                 .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(3)))
                 .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
                 .andExpect(jsonPath("$[0].title", Matchers.equalTo("Green")))
