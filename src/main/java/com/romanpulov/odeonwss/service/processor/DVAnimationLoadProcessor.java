@@ -20,6 +20,7 @@ public class DVAnimationLoadProcessor extends AbstractDVNonMusicLoadProcessor {
             MediaFileRepository mediaFileRepository,
             MediaFileMapper mediaFileMapper,
             DVTypeRepository dvTypeRepository,
+            DVProductRepository dvProductRepository,
             DVProductService dvProductService,
             MediaParser mediaParser) {
         super(
@@ -29,6 +30,7 @@ public class DVAnimationLoadProcessor extends AbstractDVNonMusicLoadProcessor {
                 mediaFileRepository,
                 mediaFileMapper,
                 dvTypeRepository,
+                dvProductRepository,
                 dvProductService,
                 mediaParser,
                 ArtifactTypeRepository::getWithDVAnimation);

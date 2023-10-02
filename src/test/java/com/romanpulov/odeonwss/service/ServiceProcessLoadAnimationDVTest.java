@@ -33,7 +33,8 @@ public class ServiceProcessLoadAnimationDVTest {
             "Kak kazaki v futbol igrali",
             "Остров сокровищ",
             "Puss Gets the Boot",
-            "The Midnight Snack"
+            "The Midnight Snack",
+            "Who Killed Who?"
     };
 
     private static final Logger log = Logger.getLogger(ServiceProcessLoadAnimationDVTest.class.getSimpleName());
@@ -111,13 +112,13 @@ public class ServiceProcessLoadAnimationDVTest {
         assertThat(processDetails.get(2)).isEqualTo(new ProcessDetail(
                 ProcessDetailInfo.fromMessage("Tracks loaded"),
                 ProcessingStatus.INFO,
-                8,
+                9,
                 null));
 
         assertThat(processDetails.get(3)).isEqualTo(new ProcessDetail(
                 ProcessDetailInfo.fromMessage("Media files loaded"),
                 ProcessingStatus.INFO,
-                10,
+                11,
                 null));
 
         trackRepository.getTracksByArtifactType(artifactType).forEach(c -> {

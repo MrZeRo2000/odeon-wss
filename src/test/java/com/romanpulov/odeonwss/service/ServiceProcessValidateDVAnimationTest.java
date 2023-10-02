@@ -29,7 +29,8 @@ public class ServiceProcessValidateDVAnimationTest {
             "Kak kazaki v futbol igrali",
             "Остров сокровищ",
             "Puss Gets the Boot",
-            "The Midnight Snack"
+            "The Midnight Snack",
+            "Who Killed Who?"
     };
 
     private static final Logger log = Logger.getLogger(ServiceProcessValidateDVAnimationTest.class.getSimpleName());

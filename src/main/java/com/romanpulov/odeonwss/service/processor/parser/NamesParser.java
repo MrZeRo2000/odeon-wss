@@ -12,6 +12,9 @@ public class NamesParser {
     private static final Pattern REGEXP_PATTERN_VIDEO_TRACK = Pattern.compile("^([0-9]{2,3})\\s(\\S.+?\\S)(?:\\s*\\([^)]+\\))*\\.\\S{2,4}$");
     private static final Pattern REGEXP_PATTERN_FOLDER_NAME_DISK_NUM = Pattern.compile("^CD(\\d+)$");
     private static final Pattern REGEXP_PATTERN_FILE_NAME_DISK_NUM = Pattern.compile("CD(\\d+)\\.");
+
+    private static final String REGEXP_STRING_FILE_NAME_CLEANUP = "[?:\">/<*]";
+
     private static final String FORMAT_MUSIC_ARTIFACT = "%d %s";
     private static final String FORMAT_MUSIC_TRACK = "%d - %s";
     private static final String FORMAT_MUSIC_WITH_FILE_NAME = "%s - %s (%s)";
@@ -143,5 +146,9 @@ public class NamesParser {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static String cleanupFileName(String fileName) {
+        return fileName.replaceAll(REGEXP_STRING_FILE_NAME_CLEANUP, "");
     }
 }

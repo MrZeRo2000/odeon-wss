@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.service.processor;
 
+import com.romanpulov.odeonwss.dto.IdTitleOriginalTitleDTO;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.*;
@@ -42,6 +43,8 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
 
     private final DVTypeRepository dvTypeRepository;
 
+    private final DVProductRepository dvProductRepository;
+
     private final DVProductService dVProductService;
 
     private final MediaParser mediaParser;
@@ -55,6 +58,7 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
             MediaFileRepository mediaFileRepository,
             MediaFileMapper mediaFileMapper,
             DVTypeRepository dvTypeRepository,
+            DVProductRepository dvProductRepository,
             DVProductService dVProductService,
             MediaParser mediaParser,
             Function<ArtifactTypeRepository, ArtifactType> artifactTypeSupplier) {
@@ -64,6 +68,7 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
         this.mediaFileRepository = mediaFileRepository;
         this.mediaFileMapper = mediaFileMapper;
         this.dvTypeRepository = dvTypeRepository;
+        this.dvProductRepository = dvProductRepository;
         this.dVProductService = dVProductService;
         this.mediaParser = mediaParser;
         this.artifactTypeSupplier = artifactTypeSupplier;
@@ -231,6 +236,17 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
         Map<String, Track> trackMap = new HashMap<>();
         AtomicInteger mediaFilesCounter = new AtomicInteger();
 
+        List<IdTitleOriginalTitleDTO> productIdTitlesOriginalTitles =
+                dvProductRepository.findAllIdTitleOriginalTitle(artifactType);
+        Map<String, Long> productTitles = productIdTitlesOriginalTitles
+                .stream()
+                .filter(v -> v.getTitle() != null)
+                .collect(Collectors.toMap(v -> NamesParser.cleanupFileName(v.getTitle()), IdTitleOriginalTitleDTO::getId));
+        Map<String, Long> productOriginalTitles = productIdTitlesOriginalTitles
+                .stream()
+                .filter(v -> v.getOriginalTitle() != null)
+                .collect(Collectors.toMap(v -> NamesParser.cleanupFileName(v.getOriginalTitle()), IdTitleOriginalTitleDTO::getId));
+
         for (Artifact a : artifactPaths.keySet()) {
             Set<MediaFile> mediaFiles = MediaFilesProcessUtil.loadFromMediaFilesPaths(
                     artifactPaths.get(a),
@@ -260,9 +276,19 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
                     newTrack.setDvType(dvType);
                     newTrack.setTitle(nt.getTitle());
                     newTrack.setNum(nt.getNumber());
+
+                    Long productId = productTitles.getOrDefault(newTrack.getTitle(),
+                            productOriginalTitles.getOrDefault(newTrack.getTitle(), null));
+                    if (productId != null) {
+                        dvProductRepository
+                                .findById(productId)
+                                .ifPresent(dvProduct -> newTrack.setDvProducts(Set.of(dvProduct)));
+                    }
+
+                    /*
                     dVProductService.findProductByArtifactTypeAndTitle(artifactType, newTrack.getTitle())
                             .ifPresent(p -> newTrack.setDvProducts(Set.of(p)));
-
+                     */
                     return newTrack;
                 });
 

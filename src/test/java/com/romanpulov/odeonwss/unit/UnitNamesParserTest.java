@@ -175,4 +175,10 @@ public class UnitNamesParserTest {
         assertThat(NamesParser.validateFileNameMediaFormat("mkv.abc", "MKV|AVI")).isFalse();
         assertThat(NamesParser.validateFileNameMediaFormat("abcmkv", "MKV|AVI")).isFalse();
     }
+
+    @Test
+    void testCleanupFileName() {
+        assertThat(NamesParser.cleanupFileName("Who Killed Who?")).isEqualTo("Who Killed Who");
+        assertThat(NamesParser.cleanupFileName("Attention: this is is")).isEqualTo("Attention this is is");
+    }
 }
