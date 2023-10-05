@@ -387,7 +387,7 @@ public class ServiceProcessValidateDVAnimationTest {
         //remove a product
         var track_to_remove = trackRepository.getTracksByArtifactType(artifactType)
                 .stream()
-                .filter(t -> t.getTitle().equals(DV_PRODUCT_NAMES[0]))
+                .filter(t -> t.getTitle().equals("Plunder and Lightning"))
                 .findFirst().orElseThrow();
 
         track_to_remove.setDvProducts(Set.of());
@@ -402,7 +402,7 @@ public class ServiceProcessValidateDVAnimationTest {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Tracks without product",
-                                List.of(DV_PRODUCT_NAMES[0])),
+                                List.of("Talespin >> Plunder and Lightning")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)

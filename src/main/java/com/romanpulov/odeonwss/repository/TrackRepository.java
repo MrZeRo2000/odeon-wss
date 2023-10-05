@@ -65,6 +65,8 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
     @Query("""
         SELECT
             c.id AS id,
+            a.id AS artifactId,
+            a.title AS artifactTitle,
             c.num AS num,
             dvt.id AS dvTypeId,
             dvt.name AS dvTypeName,

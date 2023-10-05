@@ -79,7 +79,7 @@ public abstract class AbstractDVNonMusicValidateProcessor extends AbstractFileSy
                     tracks,
                     ProcessorMessages.ERROR_TRACKS_WITHOUT_PRODUCT,
                     TrackDTO::getDvProduct,
-                    TrackDTO::getTitle)) {
+                    t -> PathValidator.DELIMITER_FORMAT.formatted(t.getArtifact().getTitle(), t.getTitle()))) {
                 infoHandler(ProcessorMessages.INFO_PRODUCTS_FOR_TRACKS_VALIDATED);
             }
 
