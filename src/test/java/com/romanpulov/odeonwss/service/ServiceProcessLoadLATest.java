@@ -121,10 +121,10 @@ public class ServiceProcessLoadLATest {
                 .getArtifactsByArtist(artist)
                 .stream()
                 .filter(a -> a.getTitle().equals(artifactName))
-                .collect(Collectors.toList());
+                .toList();
         Assertions.assertEquals(1, artifacts.size());
 
-        List<MediaFile> mediaFiles = mediaFileRepository.findAllByArtifact(artifacts.get(0));
+        List<MediaFile> mediaFiles = mediaFileRepository.findAllByArtifactId(artifacts.get(0).getId());
         Assertions.assertEquals(trackCount, mediaFiles.size());
 
         List<Track> tracks = trackRepository.findAllByArtifact(artifacts.get(0));
@@ -139,10 +139,10 @@ public class ServiceProcessLoadLATest {
                 .getArtifactsByArtist(artist)
                 .stream()
                 .filter(a -> a.getTitle().equals(artifactName))
-                .collect(Collectors.toList());
+                .toList();
         Assertions.assertEquals(1, artifacts.size());
 
-        List<MediaFile> mediaFiles = mediaFileRepository.findAllByArtifact(artifacts.get(0));
+        List<MediaFile> mediaFiles = mediaFileRepository.findAllByArtifactId(artifacts.get(0).getId());
         Assertions.assertEquals(diskCount, mediaFiles.size());
 
         List<Track> tracks = trackRepository.findAllByArtifact(artifacts.get(0));

@@ -18,7 +18,7 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
 
     Optional<MediaFile> findFirstByArtifactAndName(Artifact artifact, String name);
 
-    List<MediaFile> findAllByArtifact(Artifact artifact);
+    List<MediaFile> findAllByArtifactId(Long artifactId);
 
     @Transactional
     void deleteAllByArtifact(Artifact artifact);
@@ -39,6 +39,22 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
                     "WHERE a.artifactType = :artifactType"
     )
     List<MediaFile> getMediaFilesByArtifactType(ArtifactType artifactType);
+
+    @Query("""
+      SELECT
+        mf.id AS id,
+        mf.artifact.id AS artifactId,
+        mf.artifact.title AS artifactTitle,
+        mf.name AS name,
+        mf.size AS size,
+        mf.bitrate AS bitrate,
+        mf.duration AS duration
+      FROM MediaFile as mf
+      INNER JOIN Artifact as a ON mf.artifact = a
+      WHERE a.artifactType = :artifactType
+    """
+    )
+    List<MediaFileDTO> findAllDTOByArtifactType(ArtifactType artifactType);
 
     @Query("""
         SELECT

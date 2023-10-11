@@ -148,23 +148,31 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
         mediaFile.setSize(newSize);
         mediaFileRepository.save(mediaFile);
 
-        // run processor
-        service.executeProcessor(ProcessorType.DV_MOVIES_MEDIA_LOADER);
-        assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
-
         // check sizes: should be updated
-        Artifact updatedArtifact = artifactRepository.getAllByArtifactType(getArtifactType())
-                .stream()
-                .filter(a -> a.getTitle().equals(ARTIFACT_TITLE))
-                .findFirst()
-                .orElseThrow();
         MediaFile updatedMediaFile = mediaFileRepository.getMediaFilesByArtifactType(getArtifactType())
                 .stream()
                 .filter(m -> m.getName().equals(MEDIA_FILE_TITLE))
                 .findFirst()
                 .orElseThrow();
-
         assertThat(updatedMediaFile.getSize()).isEqualTo(newSize);
-        assertThat(updatedArtifact.getSize()).isEqualTo(newSize);
+
+        // run processor
+        service.executeProcessor(ProcessorType.DV_MOVIES_MEDIA_LOADER);
+        assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+
+        // check sizes: should be updated
+        Artifact processedArtifact = artifactRepository.getAllByArtifactType(getArtifactType())
+                .stream()
+                .filter(a -> a.getTitle().equals(ARTIFACT_TITLE))
+                .findFirst()
+                .orElseThrow();
+        MediaFile processedMediaFile = mediaFileRepository.getMediaFilesByArtifactType(getArtifactType())
+                .stream()
+                .filter(m -> m.getName().equals(MEDIA_FILE_TITLE))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(processedMediaFile.getSize()).isEqualTo(oldSize);
+        assertThat(processedArtifact.getSize()).isEqualTo(oldSize);
     }
 }

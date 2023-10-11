@@ -362,7 +362,7 @@ public class ServiceProcessValidateDVMusicTest {
                 .findFirst()
                 .orElseThrow();
         MediaFile mediaFile = mediaFileRepository
-                .findAllByArtifact(artifact)
+                .findAllByArtifactId(artifact.getId())
                 .stream()
                 .filter(m -> m.getName().equals("Tori Amos - Fade to Red Disk 2 2006.mkv"))
                 .findFirst()

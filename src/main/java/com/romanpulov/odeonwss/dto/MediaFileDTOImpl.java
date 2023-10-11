@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.dto;
 public class MediaFileDTOImpl implements MediaFileDTO {
     private Long id;
     private Long artifactId;
+    private String artifactTitle;
     private String name;
     private String format;
     private Long size;
@@ -17,6 +18,15 @@ public class MediaFileDTOImpl implements MediaFileDTO {
     @Override
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Override
+    public String getArtifactTitle() {
+        return artifactTitle;
+    }
+
+    public void setArtifactTitle(String artifactTitle) {
+        this.artifactTitle = artifactTitle;
     }
 
     @Override

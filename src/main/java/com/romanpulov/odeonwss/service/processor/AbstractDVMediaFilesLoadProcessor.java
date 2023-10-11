@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.service.processor;
 
+import com.romanpulov.odeonwss.dto.IdTitleDTO;
+import com.romanpulov.odeonwss.dto.MediaFileDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Track;
@@ -13,14 +15,14 @@ import com.romanpulov.odeonwss.service.processor.vo.SizeDuration;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.ERROR_PARSING_FILE;
 import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.INFO_MEDIA_FILES_LOADED;
@@ -61,16 +63,75 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
         infoHandler(INFO_MEDIA_FILES_LOADED, processArtifactsPath(path));
     }
 
-    public int processArtifactsPath(Path path) {
-        AtomicInteger counter = new AtomicInteger(0);
-
-        List<MediaFile> emptyMediaFiles = mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(
+    private Set<Long> getArtifactIdsToProcess(Path path) {
+        Set<IdTitleDTO> incompleteArtifacts = artifactRepository.findArtifactIdTitleWithIncompleteMediaFilesByArtifactType(
                 this.artifactTypeSupplier.apply(this.artifactTypeRepository));
-        Map<Artifact, SizeDuration> artifactSizeDurationMap = new HashMap<>();
+
+        List<MediaFileDTO> mediaFiles = mediaFileRepository.findAllDTOByArtifactType(
+                this.artifactTypeSupplier.apply(this.artifactTypeRepository));
 
         String rootMediaPath = path.toAbsolutePath().toString();
 
+        Set<Long> incorrectSizeArtifactIds = mediaFiles
+                .parallelStream()
+                .filter(m -> {
+                    Path mediaPath = Paths.get(rootMediaPath, m.getArtifactTitle(), m.getName());
+                    try {
+                        return (m.getSize() == null) || (Files.exists(mediaPath) && Files.size(mediaPath) != m.getSize());
+                        //return Files.exists(mediaPath) && Files.size(mediaPath)
+                    } catch (IOException e) {
+                        return false;
+                    }
+                })
+                .map(MediaFileDTO::getArtifactId)
+                .collect(Collectors.toSet());
+
+        Set<Long> result = incompleteArtifacts.stream().map(IdTitleDTO::getId).collect(Collectors.toSet());
+        result.addAll(incorrectSizeArtifactIds);
+
+        return result;
+    }
+
+    public int processArtifactsPath(Path path) {
+        AtomicInteger counter = new AtomicInteger(0);
+        Map<Artifact, SizeDuration> artifactSizeDurationMap = new HashMap<>();
+        String rootMediaPath = path.toAbsolutePath().toString();
+
+        Set<Long> artifactIds = getArtifactIdsToProcess(path);
+        for (long artifactId: artifactIds) {
+            List<MediaFile> mediaFiles = mediaFileRepository.findAllByArtifactId(artifactId);
+            Artifact artifact = artifactRepository.findById(artifactId).orElseThrow();
+
+            for (MediaFile mediaFile: mediaFiles) {
+                Path mediaFilePath = Paths.get(rootMediaPath, artifact.getTitle(), mediaFile.getName());
+                if (Files.exists(mediaFilePath)) {
+                    try {
+                        MediaFileInfo mediaFileInfo = mediaParser.parseTrack(mediaFilePath);
+
+                        mediaFile.setSize(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
+                        mediaFile.setBitrate(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getBitRate());
+                        mediaFile.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
+
+                        SizeDuration sd = artifactSizeDurationMap.getOrDefault(artifact, new SizeDuration());
+                        sd.setSize(sd.getSize() + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
+                        sd.setDuration(sd.getDuration() + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
+                        artifactSizeDurationMap.put(artifact, sd);
+
+                        mediaFileRepository.save(mediaFile);
+
+                        counter.getAndIncrement();
+                    } catch (MediaFileInfoException e) {
+                        errorHandler(ERROR_PARSING_FILE, mediaFilePath.toAbsolutePath().toString());
+                    }
+                }
+            }
+        }
+
         // update media files
+        /*
+        List<MediaFile> emptyMediaFiles = mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(
+                this.artifactTypeSupplier.apply(this.artifactTypeRepository));
+
         for (MediaFile emptyMediaFile: emptyMediaFiles) {
             Path trackPath = Paths.get(rootMediaPath, emptyMediaFile.getArtifact().getTitle(), emptyMediaFile.getName());
             if (Files.exists(trackPath)) {
@@ -95,6 +156,8 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
                 }
             }
         }
+
+         */
 
         processArtifactSizeDuration(artifactSizeDurationMap);
 

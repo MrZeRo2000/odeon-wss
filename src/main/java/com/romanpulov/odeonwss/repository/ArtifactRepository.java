@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
@@ -134,4 +135,15 @@ public interface ArtifactRepository
 
     @Query("SELECT a FROM Artifact a INNER JOIN FETCH a.artist LEFT JOIN FETCH a.performerArtist WHERE a.title = :title")
     Optional<Artifact> getArtifactWithArtistByTitle(String title);
+
+    @Query("""
+      SELECT DISTINCT
+        a.id AS id,
+        a.title AS title
+      FROM MediaFile as mf
+      INNER JOIN Artifact as a ON mf.artifact = a
+      WHERE a.artifactType = :artifactType
+        AND (mf.size = 0 OR mf.bitrate = 0 OR mf.bitrate IS NULL OR mf.duration = 0 OR mf.duration is NULL)
+    """)
+    Set<IdTitleDTO> findArtifactIdTitleWithIncompleteMediaFilesByArtifactType(ArtifactType artifactType);
 }
