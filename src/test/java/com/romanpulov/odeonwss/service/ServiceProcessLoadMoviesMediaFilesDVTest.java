@@ -19,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,8 +29,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles(value = "test-01")
 public class ServiceProcessLoadMoviesMediaFilesDVTest {
     private static final Logger log = Logger.getLogger(ServiceProcessLoadMoviesMediaFilesDVTest.class.getSimpleName());
-    public static final String ARTIFACT_TITLE = "Лицензия на убийство";
-    public static final String MEDIA_FILE_TITLE = "Licence to Kill (HD).m4v";
 
     @Autowired
     ProcessService service;
@@ -59,6 +58,10 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
             service.executeProcessor(ProcessorType.DV_MOVIES_IMPORTER);
             assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
             log.info("Movies Importer Processing info: " + service.getProcessInfo());
+
+            service.executeProcessor(ProcessorType.DV_MOVIES_LOADER);
+            assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+            log.info("Movies Loader Processing info: " + service.getProcessInfo());
         });
     }
 
@@ -115,7 +118,7 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
 
         List<Track> tracks = artifacts.stream().map(Artifact::getTracks).flatMap(List::stream).toList();
         assertThat(tracks.isEmpty()).isFalse();
-        assertThat(artifacts.size()).isEqualTo(tracks.size());
+        assertThat(artifacts.size()).isLessThanOrEqualTo(tracks.size());
 
         List<Track> emptyDurationTracks = tracks
                 .stream()
@@ -131,27 +134,27 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
     void testChangedFileSize() {
         Artifact artifact = artifactRepository.getAllByArtifactType(getArtifactType())
                 .stream()
-                .filter(a -> a.getTitle().equals(ARTIFACT_TITLE))
+                .filter(a -> a.getTitle().equals("Коломбо"))
                 .findFirst()
                 .orElseThrow();
         MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(getArtifactType())
                 .stream()
-                .filter(m -> m.getName().equals(MEDIA_FILE_TITLE))
+                .filter(m -> m.getName().equals("01 Рецепт убийства.MKV"))
                 .findFirst()
                 .orElseThrow();
 
-        long oldSize = mediaFile.getSize();
-        assertThat(artifact.getSize()).isEqualTo(oldSize);
+        long oldMediaFileSize = mediaFile.getSize();
+        long oldArtifactSize = Optional.ofNullable(artifact.getSize()).orElseThrow();
 
-        // change file name
-        long newSize = oldSize + 1000L;
+        // change file size
+        long newSize = oldMediaFileSize + 1000L;
         mediaFile.setSize(newSize);
         mediaFileRepository.save(mediaFile);
 
         // check sizes: should be updated
         MediaFile updatedMediaFile = mediaFileRepository.getMediaFilesByArtifactType(getArtifactType())
                 .stream()
-                .filter(m -> m.getName().equals(MEDIA_FILE_TITLE))
+                .filter(m -> m.getName().equals("01 Рецепт убийства.MKV"))
                 .findFirst()
                 .orElseThrow();
         assertThat(updatedMediaFile.getSize()).isEqualTo(newSize);
@@ -163,16 +166,16 @@ public class ServiceProcessLoadMoviesMediaFilesDVTest {
         // check sizes: should be updated
         Artifact processedArtifact = artifactRepository.getAllByArtifactType(getArtifactType())
                 .stream()
-                .filter(a -> a.getTitle().equals(ARTIFACT_TITLE))
+                .filter(a -> a.getTitle().equals("Коломбо"))
                 .findFirst()
                 .orElseThrow();
         MediaFile processedMediaFile = mediaFileRepository.getMediaFilesByArtifactType(getArtifactType())
                 .stream()
-                .filter(m -> m.getName().equals(MEDIA_FILE_TITLE))
+                .filter(m -> m.getName().equals("01 Рецепт убийства.MKV"))
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(processedMediaFile.getSize()).isEqualTo(oldSize);
-        assertThat(processedArtifact.getSize()).isEqualTo(oldSize);
+        assertThat(processedMediaFile.getSize()).isEqualTo(oldMediaFileSize);
+        assertThat(processedArtifact.getSize()).isEqualTo(oldArtifactSize);
     }
 }

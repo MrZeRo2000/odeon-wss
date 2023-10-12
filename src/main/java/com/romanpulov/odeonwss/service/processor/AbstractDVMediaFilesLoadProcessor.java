@@ -127,38 +127,6 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
             }
         }
 
-        // update media files
-        /*
-        List<MediaFile> emptyMediaFiles = mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(
-                this.artifactTypeSupplier.apply(this.artifactTypeRepository));
-
-        for (MediaFile emptyMediaFile: emptyMediaFiles) {
-            Path trackPath = Paths.get(rootMediaPath, emptyMediaFile.getArtifact().getTitle(), emptyMediaFile.getName());
-            if (Files.exists(trackPath)) {
-                try {
-                    MediaFileInfo mediaFileInfo = mediaParser.parseTrack(trackPath);
-                    //MediaFile getMediaFile = mediaFileRepository.findById(emptyMediaFile.getId()).orElseThrow();
-
-                    emptyMediaFile.setSize(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
-                    emptyMediaFile.setBitrate(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getBitRate());
-                    emptyMediaFile.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
-
-                    SizeDuration sd = artifactSizeDurationMap.getOrDefault(emptyMediaFile.getArtifact(), new SizeDuration());
-                    sd.setSize(sd.getSize() + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
-                    sd.setDuration(sd.getDuration() + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
-                    artifactSizeDurationMap.put(emptyMediaFile.getArtifact(), sd);
-
-                    mediaFileRepository.save(emptyMediaFile);
-
-                    counter.getAndIncrement();
-                } catch (MediaFileInfoException e) {
-                    errorHandler(ERROR_PARSING_FILE, trackPath.toAbsolutePath().toString());
-                }
-            }
-        }
-
-         */
-
         processArtifactSizeDuration(artifactSizeDurationMap);
 
         return counter.get();
