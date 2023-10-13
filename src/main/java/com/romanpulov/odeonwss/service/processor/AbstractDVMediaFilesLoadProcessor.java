@@ -4,27 +4,29 @@ import com.romanpulov.odeonwss.dto.IdTitleDTO;
 import com.romanpulov.odeonwss.dto.MediaFileDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import com.romanpulov.odeonwss.service.processor.vo.SizeDuration;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
-import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
+import org.springframework.data.util.Pair;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.ERROR_PARSING_FILE;
 import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.INFO_MEDIA_FILES_LOADED;
 
 public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSystemProcessor {
@@ -92,7 +94,7 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
         return result;
     }
 
-    public int processArtifactsPath(Path path) {
+    public int processArtifactsPath(Path path) throws ProcessorException {
         AtomicInteger counter = new AtomicInteger(0);
         Map<Artifact, SizeDuration> artifactSizeDurationMap = new HashMap<>();
         String rootMediaPath = path.toAbsolutePath().toString();
@@ -102,6 +104,38 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
             List<MediaFile> mediaFiles = mediaFileRepository.findAllByArtifactId(artifactId);
             Artifact artifact = artifactRepository.findById(artifactId).orElseThrow();
 
+            Map<Path, MediaFile> mediaFilePathMap = mediaFiles
+                    .stream()
+                    .map(m -> Pair.of(Paths.get(rootMediaPath, artifact.getTitle(), m.getName()), m))
+                    .filter(p -> Files.exists(p.getFirst()))
+                    .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+
+            Map<Path, MediaFileInfo> parsedMediaFileInfo = mediaParser.parseTracks(
+                    mediaFilePathMap.keySet(),
+                    (parsing -> synchronizedProcessingEventHandler(
+                            ProcessorMessages.PROCESSING_PARSING_MEDIA_FILE, parsing)),
+                    (parsed -> synchronizedProcessingEventHandler(
+                            ProcessorMessages.PROCESSING_PARSED_MEDIA_FILE, parsed)));
+
+            for (Map.Entry<Path, MediaFile> e: mediaFilePathMap.entrySet()) {
+                MediaFile mediaFile = e.getValue();
+                MediaFileInfo mediaFileInfo = parsedMediaFileInfo.get(e.getKey());
+
+                mediaFile.setSize(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
+                mediaFile.setBitrate(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getBitRate());
+                mediaFile.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
+
+                SizeDuration sd = artifactSizeDurationMap.getOrDefault(artifact, new SizeDuration());
+                sd.setSize(sd.getSize() + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
+                sd.setDuration(sd.getDuration() + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
+                artifactSizeDurationMap.put(artifact, sd);
+
+                mediaFileRepository.save(mediaFile);
+
+                counter.getAndIncrement();
+            }
+
+            /*
             for (MediaFile mediaFile: mediaFiles) {
                 Path mediaFilePath = Paths.get(rootMediaPath, artifact.getTitle(), mediaFile.getName());
                 if (Files.exists(mediaFilePath)) {
@@ -125,6 +159,8 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
                     }
                 }
             }
+
+             */
         }
 
         processArtifactSizeDuration(artifactSizeDurationMap);

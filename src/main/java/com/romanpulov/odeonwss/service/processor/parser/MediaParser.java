@@ -11,10 +11,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 
@@ -22,7 +19,6 @@ import static com.romanpulov.odeonwss.service.processor.parser.ParserMessages.*;
 
 @Component
 public class MediaParser {
-
     private static final Logger logger = LoggerFactory.getLogger(MediaParser.class);
 
     private final MediaFileParserInterface mediaFileParser;
@@ -37,15 +33,15 @@ public class MediaParser {
     }
 
     public Map<Path, MediaFileInfo> parseTracks(
-            List<Path> trackPaths,
+            Collection<Path> trackPaths,
             Consumer<String> parsingFileCallback,
             Consumer<String> parsedFileCallback) throws ProcessorException {
-        List<Callable<Pair<Path, MediaFileInfo>>> callables = getParseCallables(
+        Collection<Callable<Pair<Path, MediaFileInfo>>> callables = getParseCallables(
                 trackPaths,
                 parsingFileCallback,
                 parsedFileCallback);
 
-        List<Future<Pair<Path, MediaFileInfo>>> futures;
+        Collection<Future<Pair<Path, MediaFileInfo>>> futures;
         ExecutorService executorService = Executors.newFixedThreadPool(
                 Runtime.getRuntime().availableProcessors() + 1);
         try {
@@ -78,8 +74,8 @@ public class MediaParser {
     }
 
     @NotNull
-    private List<Callable<Pair<Path, MediaFileInfo>>> getParseCallables(
-            List<Path> trackPaths,
+    private Collection<Callable<Pair<Path, MediaFileInfo>>> getParseCallables(
+            Collection<Path> trackPaths,
             Consumer<String> parsingFileCallback,
             Consumer<String> parsedFileCallback) {
         List<Callable<Pair<Path, MediaFileInfo>>> callables = new ArrayList<>();
