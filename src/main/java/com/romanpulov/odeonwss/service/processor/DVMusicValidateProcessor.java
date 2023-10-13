@@ -68,6 +68,15 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
                     infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
                 }
 
+                if (ValueValidator.validateConditionValue(
+                        this,
+                        dbArtifactValidation,
+                        ProcessorMessages.ERROR_MEDIA_FILES_EMPTY_BITRATE,
+                        m -> Optional.ofNullable(m.getMediaFileBitrate()).orElse(0L).equals(0L),
+                        m -> PathValidator.DELIMITER_FORMAT.formatted(m.getArtifactTitle(), m.getMediaFileName()))) {
+                    infoHandler(ProcessorMessages.INFO_MEDIA_FILES_BITRATE_VALIDATED);
+                }
+
                 TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
                         this,
                         artifactRepository,
@@ -97,7 +106,7 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
                 .filter(a -> a.getArtist() == null)
                 .map(Artifact::getTitle)
                 .collect(Collectors.toList());
-        if (artifactsWithoutArtists.size() > 0) {
+        if (!artifactsWithoutArtists.isEmpty()) {
             errorHandler(
                     ProcessorMessages.ERROR_ARTIFACTS_WITHOUT_ARTISTS,
                     artifactsWithoutArtists

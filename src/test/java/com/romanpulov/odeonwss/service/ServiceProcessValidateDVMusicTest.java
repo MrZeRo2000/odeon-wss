@@ -182,6 +182,14 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProcessDetails().get(5)).isEqualTo(
                 new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Media files bitrate validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
+                new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
                         ProcessingStatus.INFO,
                         null,
@@ -189,7 +197,7 @@ public class ServiceProcessValidateDVMusicTest {
         );
 
 
-        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
@@ -453,6 +461,33 @@ public class ServiceProcessValidateDVMusicTest {
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifact media files not in database",
                                 List.of("The Cure - Picture Show 1991.mp4")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(20)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testMediaFileEmptyBitrateShouldFail() {
+        this.internalPrepareExisting();
+        MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(artifactType)
+                .stream()
+                .filter(m -> m.getName().equals("The Cure - Picture Show 1991.mp4"))
+                .findFirst()
+                .orElseThrow();
+        mediaFile.setBitrate(0L);
+        mediaFileRepository.save(mediaFile);
+
+        ProcessInfo pi = executeProcessor();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(5)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Media files with empty bitrate",
+                                List.of("The Cure - Picture Show 1991 >> The Cure - Picture Show 1991.mp4")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)

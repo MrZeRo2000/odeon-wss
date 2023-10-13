@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -73,12 +74,21 @@ public abstract class AbstractDVNonMusicValidateProcessor extends AbstractFileSy
                 infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
             }
 
+            if (ValueValidator.validateConditionValue(
+                    this,
+                    dbArtifactValidation,
+                    ProcessorMessages.ERROR_MEDIA_FILES_EMPTY_BITRATE,
+                    m -> Optional.ofNullable(m.getMediaFileBitrate()).orElse(0L).equals(0L),
+                    m -> PathValidator.DELIMITER_FORMAT.formatted(m.getArtifactTitle(), m.getMediaFileName()))) {
+                infoHandler(ProcessorMessages.INFO_MEDIA_FILES_BITRATE_VALIDATED);
+            }
+
             List<TrackDTO> tracks = trackService.getTableByArtifactTypeId(this.artifactType.getId());
-            if (ValueValidator.validateEmptyValue(
+            if (ValueValidator.validateConditionValue(
                     this,
                     tracks,
                     ProcessorMessages.ERROR_TRACKS_WITHOUT_PRODUCT,
-                    TrackDTO::getDvProduct,
+                    t -> Objects.isNull(t.getDvProduct()),
                     t -> PathValidator.DELIMITER_FORMAT.formatted(t.getArtifact().getTitle(), t.getTitle()))) {
                 infoHandler(ProcessorMessages.INFO_PRODUCTS_FOR_TRACKS_VALIDATED);
             }

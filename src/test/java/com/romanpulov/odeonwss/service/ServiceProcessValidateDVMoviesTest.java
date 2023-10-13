@@ -130,13 +130,21 @@ public class ServiceProcessValidateDVMoviesTest {
 
         assertThat(pi.getProcessDetails().get(4)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Products for tracks validated"),
+                        ProcessDetailInfo.fromMessage("Media files bitrate validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
 
         assertThat(pi.getProcessDetails().get(5)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Products for tracks validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
                         ProcessingStatus.INFO,
@@ -145,7 +153,7 @@ public class ServiceProcessValidateDVMoviesTest {
         );
 
 
-        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
@@ -393,7 +401,7 @@ public class ServiceProcessValidateDVMoviesTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(4)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(5)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Tracks without product",
@@ -403,7 +411,6 @@ public class ServiceProcessValidateDVMoviesTest {
                         null)
         );
     }
-
 
     @Test
     @Order(11)
@@ -427,7 +434,7 @@ public class ServiceProcessValidateDVMoviesTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(5)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Track numbers for artifact not increasing monotonically",
@@ -437,5 +444,35 @@ public class ServiceProcessValidateDVMoviesTest {
                         null)
         );
 
+    }
+
+    @Test
+    @Order(12)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testHasZeroBitrateShouldFail() {
+        this.internalPrepare();
+
+        MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(artifactType)
+                .stream()
+                .filter(m -> m.getName().equals("Part 2.avi"))
+                .findFirst()
+                .orElseThrow();
+        mediaFile.setBitrate(0L);
+        mediaFileRepository.save(mediaFile);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(4)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Media files with empty bitrate",
+                                List.of("Обыкновенное чудо >> Part 2.avi")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
     }
 }

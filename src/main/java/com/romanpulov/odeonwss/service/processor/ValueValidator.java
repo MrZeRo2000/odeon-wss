@@ -45,15 +45,15 @@ public class ValueValidator {
         return result;
     }
 
-    public static <T> boolean validateEmptyValue(
+    public static <T> boolean validateConditionValue(
             AbstractProcessor processor,
             Collection<T> list,
             String errorMessage,
-            Function<T, Object> valueMapper,
+            Function<T, Boolean> conditionMapper,
             Function<T, String> errorMessageMapper
-            ) {
-        List<T> emptyList = list.stream().filter(v -> Objects.isNull(valueMapper.apply(v))).toList();
-        if (emptyList.size() > 0) {
+    ) {
+        List<T> emptyList = list.stream().filter(conditionMapper::apply).toList();
+        if (!emptyList.isEmpty()) {
             processor.errorHandler(errorMessage, sortedCollection(
                     emptyList.stream().map(errorMessageMapper).collect(Collectors.toList())
             ));
@@ -70,7 +70,7 @@ public class ValueValidator {
             Function<T, String> errorMessageMapper
     ) {
         List<T> list = collection.stream().toList();
-        if (list.size() > 0) {
+        if (!list.isEmpty()) {
             processor.errorHandler(errorMessage, sortedCollection(
                     list.stream().map(errorMessageMapper).collect(Collectors.toList())
             ));

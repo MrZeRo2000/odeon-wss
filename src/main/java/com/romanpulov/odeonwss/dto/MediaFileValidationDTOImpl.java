@@ -72,6 +72,17 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
         this.mediaFileFormat = mediaFileFormat;
     }
 
+    private Long mediaFileBitrate;
+
+    @Override
+    public Long getMediaFileBitrate() {
+        return mediaFileBitrate;
+    }
+
+    public void setMediaFileBitrate(Long mediaFileBitrate) {
+        this.mediaFileBitrate = mediaFileBitrate;
+    }
+
     @Override
     public String toString() {
         return "MediaFileValidationDTO{" +

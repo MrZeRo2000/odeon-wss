@@ -8,4 +8,5 @@ public interface MediaFileValidationDTO {
     String getTrackTitle();
     String getMediaFileName();
     String getMediaFileFormat();
+    Long getMediaFileBitrate();
 }
