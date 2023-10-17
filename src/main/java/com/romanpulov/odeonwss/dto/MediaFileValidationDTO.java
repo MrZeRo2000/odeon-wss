@@ -9,4 +9,5 @@ public interface MediaFileValidationDTO {
     String getMediaFileName();
     String getMediaFileFormat();
     Long getMediaFileBitrate();
+    Long getMediaFileSize();
 }

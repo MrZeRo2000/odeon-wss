@@ -4,6 +4,8 @@ import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTOBuilder;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,18 +26,26 @@ public class PathValidationLoader {
         List<Path> artifactPaths = new ArrayList<>();
         if (PathReader.readPathFoldersOnly(processor, path, artifactPaths)) {
             for (Path artifactPath: artifactPaths) {
-                List<Path> trackPaths = new ArrayList<>();
+                List<Path> mediaFilePaths = new ArrayList<>();
                 if (PathReader.readPathPredicateFilesOnly(
                         processor,
                         artifactPath,
                         p -> NamesParser.validateFileNameMediaFormat(p.getFileName().toString(), mediaFileFormats),
-                        trackPaths)) {
-                    trackPaths.forEach(trackPath ->
-                            result.add(new MediaFileValidationDTOBuilder()
+                        mediaFilePaths)) {
+                    mediaFilePaths.forEach(mediaFilePath -> {
+                        long mediaFileSize;
+                        try {
+                            mediaFileSize = Files.size(mediaFilePath);
+                        } catch (IOException e) {
+                            mediaFileSize = 0;
+                        }
+                        result.add(new MediaFileValidationDTOBuilder()
                                     .withArtifactTitle(artifactPath.getFileName().toString())
-                                    .withMediaFileName(trackPath.getFileName().toString())
+                                    .withMediaFileName(mediaFilePath.getFileName().toString())
+                                    .withMediaFileSize(mediaFileSize)
                                     .build()
-                            )
+                            );
+                        }
                     );
                 } else {
                     break;

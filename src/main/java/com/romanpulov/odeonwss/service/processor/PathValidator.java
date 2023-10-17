@@ -3,9 +3,7 @@ package com.romanpulov.odeonwss.service.processor;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -19,7 +17,7 @@ public class PathValidator {
         return s == null ? EMPTY_STRING_VALUE : s;
     }
 
-    private interface MediaFileValidationDTOMapper extends Function<MediaFileValidationDTO, String> {
+    public interface MediaFileValidationDTOMapper extends Function<MediaFileValidationDTO, String> {
         @Override
         String apply(MediaFileValidationDTO mediaFileValidationDTO);
     }
@@ -198,4 +196,37 @@ public class PathValidator {
                 ProcessorMessages.ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_DB
         );
     }
+
+    public static boolean validateMediaFileSize(
+            AbstractProcessor processor,
+            List<MediaFileValidationDTO> pathValidation,
+            List<MediaFileValidationDTO> dbValidation) {
+        Map<String, Long> pathSizes = pathValidation
+                .stream()
+                .collect(Collectors.toMap(
+                        ARTIFACT_MEDIA_FILE_MAPPER,
+                        p -> Optional.ofNullable(p.getMediaFileSize()).orElse(0L)));
+
+        Map<String, Long> dbSizes = dbValidation
+                .stream()
+                .collect(Collectors.toMap(
+                        ARTIFACT_MEDIA_FILE_MAPPER,
+                        p -> Optional.ofNullable(p.getMediaFileSize()).orElse(0L)));
+
+        List<String> mismatchPaths = pathSizes
+                .entrySet()
+                .stream()
+                .filter(e -> !dbSizes.getOrDefault(e.getKey(), 0L).equals(e.getValue()))
+                .map(Map.Entry::getKey)
+                .sorted()
+                .toList();
+
+        if (mismatchPaths.isEmpty()) {
+            return true;
+        } else {
+            processor.errorHandler(ProcessorMessages.ERROR_MEDIA_FILES_SIZE_MISMATCH, mismatchPaths);
+            return false;
+        }
+    }
+
 }

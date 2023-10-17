@@ -53,6 +53,7 @@ public class ProcessorMessages {
     static final String ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_FILES = "Artifact media files not in files";
     static final String ERROR_MEDIA_FILES_EMPTY_SIZE = "Media files with empty size";
     static final String ERROR_MEDIA_FILES_EMPTY_BITRATE = "Media files with empty bitrate";
+    static final String ERROR_MEDIA_FILES_SIZE_MISMATCH = "Media files size mismatch";
     static final String ERROR_TRACKS_WITHOUT_PRODUCT = "Tracks without product";
     public static final String ERROR_NO_MONOTONICALLY_INCREASING_TRACK_NUMBERS = "Track numbers for artifact not increasing monotonically";
 
@@ -60,6 +61,7 @@ public class ProcessorMessages {
     public static final String INFO_ARTIFACT_MEDIA_FILES_VALIDATED = "Artifact media files validated";
     static final String INFO_MEDIA_FILES_LOADED = "Media files loaded";
     static final String INFO_MEDIA_FILES_SIZE_VALIDATED = "Media files size validated";
+    static final String INFO_MEDIA_FILES_SIZE_MISMATCH_VALIDATED = "Media files size mismatch validated";
     static final String INFO_MEDIA_FILES_BITRATE_VALIDATED = "Media files bitrate validated";
     static final String INFO_PRODUCTS_FOR_TRACKS_VALIDATED = "Products for tracks validated";
 

@@ -103,7 +103,8 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
             c.num AS trackNum,
             c.title AS trackTitle,
             m.name AS mediaFileName,
-            m.format AS mediaFileFormat
+            m.format AS mediaFileFormat,
+            m.size AS mediaFileSize
         FROM Artist AS ar
         INNER JOIN Artifact af ON af.artist = ar
         LEFT OUTER JOIN Track c ON c.artifact = af
@@ -120,7 +121,8 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
             af.title AS artifactTitle,
             af.year AS artifactYear,
             m.name AS mediaFileName,
-            m.format AS mediaFileFormat
+            m.format AS mediaFileFormat,
+            m.size AS mediaFileSize
         FROM Artifact af
         LEFT OUTER JOIN Track c ON c.artifact = af
         LEFT OUTER JOIN TrackMediaFile cm ON cm.trackId = c.id
@@ -137,7 +139,8 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
             af.year AS artifactYear,
             m.name AS mediaFileName,
             m.format AS mediaFileFormat,
-            m.bitrate AS mediaFileBitrate
+            m.bitrate AS mediaFileBitrate,
+            m.size AS mediaFileSize
         FROM Artifact af
         LEFT OUTER JOIN MediaFile m ON m.artifact = af
         WHERE af.artifactType = :artifactType
@@ -153,7 +156,8 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
             af.year AS artifactYear,
             m.name AS mediaFileName,
             m.format AS mediaFileFormat,
-            m.bitrate AS mediaFileBitrate
+            m.bitrate AS mediaFileBitrate,
+            m.size AS mediaFileSize
         FROM Artist AS ar
         INNER JOIN Artifact af ON af.artist = ar
         LEFT OUTER JOIN MediaFile m ON m.artifact = af

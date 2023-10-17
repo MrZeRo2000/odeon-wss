@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.service;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
+import com.romanpulov.odeonwss.service.processor.PathValidator;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -151,6 +153,14 @@ public class ServiceProcessValidateDVAnimationTest {
 
         assertThat(pi.getProcessDetails().get(6)).isEqualTo(
                 new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
+                new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
                         ProcessingStatus.INFO,
                         null,
@@ -158,7 +168,7 @@ public class ServiceProcessValidateDVAnimationTest {
         );
 
 
-        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(8)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
@@ -440,7 +450,7 @@ public class ServiceProcessValidateDVAnimationTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Track numbers for artifact not increasing monotonically",
@@ -449,6 +459,40 @@ public class ServiceProcessValidateDVAnimationTest {
                         null,
                         null)
         );
+    }
 
+    @Test
+    @Order(12)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testMediaFileSizeDifferentShouldFail() {
+        this.internalPrepare();
+
+        MediaFile mediaFile = mediaFileRepository
+                .getMediaFilesByArtifactType(artifactType)
+                .stream()
+                .findFirst()
+                .orElseThrow();
+        mediaFile.setSize(mediaFile.getSize() + 500L);
+        mediaFileRepository.save(mediaFile);
+        log.info("Saved media file: " + mediaFile);
+
+        Artifact artifact = mediaFile.getArtifact();
+        artifact.setSize(Optional.ofNullable(artifact.getSize()).orElse(0L) + 500L);
+        artifactRepository.save(artifact);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Media files size mismatch",
+                                List.of(PathValidator.DELIMITER_FORMAT.formatted(mediaFile.getArtifact().getTitle(), mediaFile.getName()))),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
     }
 }

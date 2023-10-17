@@ -42,6 +42,12 @@ public class MediaFileValidationDTOBuilder {
         return this;
     }
 
+    public MediaFileValidationDTOBuilder withMediaFileSize(long mediaFileSize) {
+        instance.setMediaFileSize(mediaFileSize);
+        return this;
+    }
+
+
     public MediaFileValidationDTO build() {
         return instance;
     }
