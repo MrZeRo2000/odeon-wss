@@ -18,6 +18,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -162,6 +163,13 @@ public class ServiceProcessValidateLATest {
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifact media files validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -330,6 +338,13 @@ public class ServiceProcessValidateLATest {
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifact media files validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -638,11 +653,44 @@ public class ServiceProcessValidateLATest {
         List<ProcessDetail> processDetails = pi.getProcessDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(processDetails.get(5)).isEqualTo(
+        assertThat(processDetails.get(6)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Track numbers for artifact not increasing monotonically",
                                 List.of("Abigail Williams >> 2010 In The Absence Of Light")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(21)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testMediaFileSizeDifferentShouldFail() {
+        this.prepareInternal();
+
+        MediaFile mediaFile = mediaFileRepository
+                .getMediaFilesByArtifactType(artifactTypeRepository.getWithLA())
+                .stream()
+                .filter(m -> m.getName().equals("06 What Hells Await Me.flac"))
+                .findFirst()
+                .orElseThrow();
+        mediaFile.setSize(mediaFile.getSize() + 200L);
+        mediaFileRepository.save(mediaFile);
+
+        Artifact artifact = mediaFile.getArtifact();
+        artifact.setSize(Optional.ofNullable(artifact.getSize()).orElse(0L) + 200L);
+        artifactRepository.save(artifact);
+
+        ProcessInfo pi = executeProcessor();
+        org.assertj.core.api.Assertions.assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(5)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Media files size mismatch",
+                                List.of("Abigail Williams >> 2010 In The Absence Of Light >> 06 What Hells Await Me.flac")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)

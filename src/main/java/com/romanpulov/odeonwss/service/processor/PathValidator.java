@@ -198,20 +198,45 @@ public class PathValidator {
         );
     }
 
-    public static boolean validateMediaFileSize(
+    public static boolean validateMediaFileSize (
             AbstractProcessor processor,
+            List<MediaFileValidationDTO> pathValidation,
+            List<MediaFileValidationDTO> dbValidation) {
+        return internalValidateMediaFileSize(
+                processor,
+                ARTIFACT_MEDIA_FILE_MAPPER,
+                pathValidation,
+                dbValidation
+        );
+    }
+
+    public static boolean validateMediaFileSizeMusic (
+            AbstractProcessor processor,
+            List<MediaFileValidationDTO> pathValidation,
+            List<MediaFileValidationDTO> dbValidation) {
+        return internalValidateMediaFileSize(
+                processor,
+                ARTIFACT_MEDIA_FILE_MUSIC_MAPPER,
+                pathValidation,
+                dbValidation
+        );
+    }
+
+    private static boolean internalValidateMediaFileSize (
+            AbstractProcessor processor,
+            MediaFileValidationDTOMapper mapper,
             List<MediaFileValidationDTO> pathValidation,
             List<MediaFileValidationDTO> dbValidation) {
         Map<String, Long> pathSizes = pathValidation
                 .stream()
                 .collect(Collectors.toMap(
-                        ARTIFACT_MEDIA_FILE_MAPPER,
+                        mapper,
                         p -> Optional.ofNullable(p.getMediaFileSize()).orElse(0L)));
 
         Map<String, Long> dbSizes = dbValidation
                 .stream()
                 .map(v -> Pair.of(
-                        ARTIFACT_MEDIA_FILE_MAPPER.apply(v),
+                        mapper.apply(v),
                         Optional.ofNullable(v.getMediaFileSize()).orElse(0L)))
                 .distinct()
                 .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));

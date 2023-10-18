@@ -61,7 +61,7 @@ public class ProcessorMessages {
     public static final String INFO_ARTIFACT_MEDIA_FILES_VALIDATED = "Artifact media files validated";
     static final String INFO_MEDIA_FILES_LOADED = "Media files loaded";
     static final String INFO_MEDIA_FILES_SIZE_VALIDATED = "Media files size validated";
-    static final String INFO_MEDIA_FILES_SIZE_MISMATCH_VALIDATED = "Media files size mismatch validated";
+    public static final String INFO_MEDIA_FILES_SIZE_MISMATCH_VALIDATED = "Media files size mismatch validated";
     static final String INFO_MEDIA_FILES_BITRATE_VALIDATED = "Media files bitrate validated";
     static final String INFO_PRODUCTS_FOR_TRACKS_VALIDATED = "Products for tracks validated";
 
@@ -99,4 +99,5 @@ public class ProcessorMessages {
     static final String VALIDATING_TRACKS = "Validating tracks";
     public static final String VALIDATING_MEDIA_FILES = "Validating media files";
     public static final String VALIDATING_ARTIFACT_MEDIA_FILES = "Validating artifact media files";
+    public static final String VALIDATING_MEDIA_FILES_SIZE = "Validating media files size";
 }

@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -118,21 +120,32 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                         loadFromArtifactPathParent(artistPath, directoryFolderDiskPath, yt, result);
                     }
                 } else {
-                    List<String> trackFileNames = trackPaths
+                    List<Path> mediaPaths = trackPaths
                             .stream()
-                            .map(f -> f.getFileName().toString())
-                            .filter(f -> NamesParser.validateFileNameMediaFormat(f, this.artifactType.getMediaFileFormats()))
+                            .filter(f -> NamesParser.validateFileNameMediaFormat(
+                                    f.getFileName().toString(), this.artifactType.getMediaFileFormats()))
                             .toList();
-                    if (trackFileNames.isEmpty()) {
+                    if (mediaPaths.isEmpty()) {
                         errorHandler(ProcessorMessages.ERROR_TRACK_FILES_NOT_FOUND_FOR_ARTIFACT, artifactPath.toString());
                     } else {
-                        trackFileNames.forEach(trackFileName -> result.add(
-                                new MediaFileValidationDTOBuilder()
-                                        .withArtistName(artistPath.getFileName().toString())
-                                        .withArtifactTitle(yt.getTitle())
-                                        .withArtifactYear(yt.getYear())
-                                        .withMediaFileName(trackFileName)
-                                        .build()));
+                        mediaPaths.forEach(mediaPath -> {
+                            long mediaFileSize;
+                            try {
+                                mediaFileSize = Files.size(mediaPath);
+                            } catch (IOException e) {
+                                mediaFileSize = 0;
+                            }
+
+                            result.add(
+                                    new MediaFileValidationDTOBuilder()
+                                            .withArtistName(artistPath.getFileName().toString())
+                                            .withArtifactTitle(yt.getTitle())
+                                            .withArtifactYear(yt.getYear())
+                                            .withMediaFileName(mediaPath.getFileName().toString())
+                                            .withMediaFileSize(mediaFileSize)
+                                            .build());
+                            }
+                        );
                     }
                 }
             }

@@ -27,6 +27,16 @@ public class MediaFilesValidateUtil {
         }
     }
 
+    public static void validateMediaFileSizeMusic(
+            AbstractProcessor processor,
+            List<MediaFileValidationDTO> pathValidation,
+            List<MediaFileValidationDTO> dbArtifactValidation) {
+        processor.processingEventHandler(ProcessorMessages.VALIDATING_MEDIA_FILES_SIZE);
+        if (PathValidator.validateMediaFileSizeMusic(processor, pathValidation, dbArtifactValidation)) {
+            processor.infoHandler(ProcessorMessages.INFO_MEDIA_FILES_SIZE_MISMATCH_VALIDATED);
+        }
+    }
+
     public static void validateMediaFilesAll(
             AbstractProcessor processor,
             List<MediaFileValidationDTO> pathValidation,
@@ -34,6 +44,6 @@ public class MediaFilesValidateUtil {
             List<MediaFileValidationDTO> dbArtifactValidation) {
         validateMediaFilesMusic(processor, pathValidation, dbValidation);
         validateArtifactMediaFilesMusic(processor, pathValidation, dbArtifactValidation);
+        validateMediaFileSizeMusic(processor, pathValidation, dbValidation);
     }
-
 }

@@ -6,6 +6,7 @@ import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.model.*;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -179,6 +181,14 @@ public class ServiceProcessValidateMP3Test {
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifact media files validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -387,6 +397,13 @@ public class ServiceProcessValidateMP3Test {
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifact media files validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -649,6 +666,39 @@ public class ServiceProcessValidateMP3Test {
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifact media files not in database",
                                 List.of("Kosheen >> 2007 Damage >> 01 - Damage.mp3")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(20)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testMediaFileSizeDifferentShouldFail() {
+        this.prepareInternal();
+
+        MediaFile mediaFile = mediaFileRepository
+                .getMediaFilesByArtifactType(artifactType)
+                .stream()
+                .filter(m -> m.getName().equals("01 - Wasting My Time.mp3"))
+                .findFirst()
+                .orElseThrow();
+        mediaFile.setSize(mediaFile.getSize() + 100L);
+        mediaFileRepository.save(mediaFile);
+
+        Artifact artifact = mediaFile.getArtifact();
+        artifact.setSize(Optional.ofNullable(artifact.getSize()).orElse(0L) + 100L);
+        artifactRepository.save(artifact);
+
+        ProcessInfo pi = executeProcessor();
+        Assertions.assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        Assertions.assertThat(pi.getProcessDetails().get(6)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Media files size mismatch",
+                                List.of("Kosheen >> 2004 Kokopelli >> 01 - Wasting My Time.mp3")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)

@@ -4,6 +4,7 @@ import com.romanpulov.odeonwss.service.processor.model.ProcessingActionType;
 import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractProcessor {
@@ -42,7 +43,7 @@ public abstract class AbstractProcessor {
     }
 
     protected void errorHandler(String errorMessage, List<String> items) {
-        progressHandler.handleProgress(ProcessDetail.fromErrorMessage(errorMessage, items));
+        progressHandler.handleProgress(ProcessDetail.fromErrorMessage(errorMessage, new ArrayList<>(items)));
     }
 
     protected void errorHandler(String errorMessage, Object ...args) {

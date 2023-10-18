@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -119,6 +121,13 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
                                             .build()
                             );
                         } else {
+                            long mediaFileSize;
+                            try {
+                                mediaFileSize = Files.size(trackPath);
+                            } catch (IOException e) {
+                                mediaFileSize = 0;
+                            }
+
                             result.add(
                               new MediaFileValidationDTOBuilder()
                                       .withArtifactTitle(yt.getTitle())
@@ -128,6 +137,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
                                       .withTrackTitle(nt.getTitle())
                                       .withMediaFileName(trackPath.getFileName().toString())
                                       .withMediaFileFormat(MEDIA_FILE_FORMAT)
+                                      .withMediaFileSize(mediaFileSize)
                                       .build()
                             );
                         }
