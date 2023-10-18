@@ -203,4 +203,14 @@ public class UnitMediaInfoMediaFileParserTest {
         assertThat(contentInfo.getMediaFormatInfo().getBitRate()).isEqualTo(Math.round(1300000/1000.));
     }
 
+    @Test
+    void testNoVideoBitrate() throws Exception {
+        Path path = Path.of("../odeon-test-data/files/mediainfo_output_nbr_mkv.json");
+        String content = Files.readString(path);
+
+        var contentInfo = testParser.parseOutput(content);
+        assertThat(contentInfo.getMediaFormatInfo().getBitRate()).isGreaterThan(0);
+        assertThat(contentInfo.getMediaFormatInfo().getBitRate()).isEqualTo(796L);
+    }
+
 }

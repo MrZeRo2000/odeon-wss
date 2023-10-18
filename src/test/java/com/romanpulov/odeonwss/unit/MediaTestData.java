@@ -32,5 +32,4 @@ public class MediaTestData {
     static final long TEST_VOB_FILE_SIZE = 8615936L;
     static final long TEST_VOB_WIDTH = 960L;
     static final long TEST_VOB_HEIGHT = 400L;
-
 }
