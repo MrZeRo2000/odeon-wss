@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
+import org.springframework.data.util.Pair;
 
 import java.util.*;
 import java.util.function.Function;
@@ -209,9 +210,11 @@ public class PathValidator {
 
         Map<String, Long> dbSizes = dbValidation
                 .stream()
-                .collect(Collectors.toMap(
-                        ARTIFACT_MEDIA_FILE_MAPPER,
-                        p -> Optional.ofNullable(p.getMediaFileSize()).orElse(0L)));
+                .map(v -> Pair.of(
+                        ARTIFACT_MEDIA_FILE_MAPPER.apply(v),
+                        Optional.ofNullable(v.getMediaFileSize()).orElse(0L)))
+                .distinct()
+                .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
 
         List<String> mismatchPaths = pathSizes
                 .entrySet()

@@ -77,6 +77,10 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
                     infoHandler(ProcessorMessages.INFO_MEDIA_FILES_BITRATE_VALIDATED);
                 }
 
+                if (PathValidator.validateMediaFileSize(this, pathValidation, dbValidation)) {
+                    infoHandler(ProcessorMessages.INFO_MEDIA_FILES_SIZE_MISMATCH_VALIDATED);
+                }
+
                 TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
                         this,
                         artifactRepository,

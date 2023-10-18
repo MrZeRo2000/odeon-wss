@@ -14,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -190,6 +191,14 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProcessDetails().get(6)).isEqualTo(
                 new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
+                new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
                         ProcessingStatus.INFO,
                         null,
@@ -197,7 +206,7 @@ public class ServiceProcessValidateDVMusicTest {
         );
 
 
-        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(8)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
@@ -493,5 +502,42 @@ public class ServiceProcessValidateDVMusicTest {
                         null)
         );
     }
+
+    @Test
+    @Order(21)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testMediaFileSizeDifferentShouldFail() {
+        this.internalPrepareExisting();
+
+        MediaFile mediaFile = mediaFileRepository
+                .getMediaFilesByArtifactType(artifactType)
+                .stream()
+                .filter(m -> m.getName().equals("The Cure - Picture Show 1991.mp4"))
+                .findFirst()
+                .orElseThrow();
+        mediaFile.setSize(mediaFile.getSize() + 500L);
+        mediaFileRepository.save(mediaFile);
+        log.info("Saved media file: " + mediaFile);
+
+        Artifact artifact = mediaFile.getArtifact();
+        artifact.setSize(Optional.ofNullable(artifact.getSize()).orElse(0L) + 500L);
+        artifactRepository.save(artifact);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Media files size mismatch",
+                                List.of("The Cure - Picture Show 1991 >> The Cure - Picture Show 1991.mp4")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
 
 }
