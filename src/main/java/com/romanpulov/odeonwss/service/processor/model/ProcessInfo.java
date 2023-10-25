@@ -67,6 +67,9 @@ public class ProcessInfo {
     }
 
     public void finalizeProcess() {
+        // clear any intermediate statuses
+        this.clearProcessingEvent();
+
         // set final status
         ProcessDetail finalProcessDetail = ProcessDetail.createFinalProgressDetail(getProcessDetails());
         addProcessDetails(finalProcessDetail);
