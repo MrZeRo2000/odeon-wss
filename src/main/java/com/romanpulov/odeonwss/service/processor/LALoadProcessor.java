@@ -128,7 +128,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                 .sorted(Map.Entry.comparingByValue())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
-        if (directoryFolderDisksPaths.size() > 0) {
+        if (!directoryFolderDisksPaths.isEmpty()) {
             if (directoryFolderPaths.size() > directoryFolderDisksPaths.size()) {
                 errorHandler(ProcessorMessages.ERROR_FOLDER_WITH_DISK_NUMBERS_CONTAINS_OTHER, path.toString());
             } else {
@@ -147,7 +147,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
                     .stream()
                     .filter(p -> p.toString().toLowerCase().endsWith("cue"))
                     .toList();
-            if (cuePaths.size() > 0) {
+            if (!cuePaths.isEmpty()) {
                 logger.debug("Cue files found, processing");
                 boolean cueProcessed = false;
                 for (Path cuePath : cuePaths) {
@@ -297,7 +297,7 @@ public class LALoadProcessor extends AbstractArtistProcessor {
         processingEventHandler(ProcessorMessages.PROCESSING_TRACKS, path.toAbsolutePath());
 
         Map<String, NamesParser.NumberTitle> parsedTrackFileNames = parseTrackFileNames(directoryPaths);
-        if (parsedTrackFileNames.size() > 0) {
+        if (!parsedTrackFileNames.isEmpty()) {
             List<MediaFile> mediaFiles = new ArrayList<>();
             List<Track> tracks = new ArrayList<>();
 

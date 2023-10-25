@@ -47,13 +47,13 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
         List<Pair<Path, Artist>> pathArtists = processArtists(path);
         infoHandler(ProcessorMessages.INFO_ARTISTS_LOADED, pathArtists.size());
 
-        if (pathArtists.size() > 0) {
+        if (!pathArtists.isEmpty()) {
             List<Pair<Path, Artifact>> pathArtifacts = processArtifacts(pathArtists);
             infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED, pathArtifacts.size());
 
             List<Pair<Path, Artifact>> processPathArtifacts = preparePathArtifacts(path);
 
-            if (processPathArtifacts.size() > 0) {
+            if (!processPathArtifacts.isEmpty()) {
                 infoHandler(ProcessorMessages.INFO_TRACKS_LOADED, processTracks(processPathArtifacts));
             }
         }

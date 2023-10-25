@@ -1,5 +1,9 @@
 package com.romanpulov.odeonwss.service.processor.parser;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -12,6 +16,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class CueParser {
+    private final static Logger logger = LoggerFactory.getLogger(CueParser.class);
+
     private static final Pattern REGEXP_PATTERN_FILE = Pattern.compile("FILE\\s+\"(.*)\"");
     private static final Pattern REGEXP_PATTERN_TITLE = Pattern.compile("TITLE\\s+\"(.*)\"");
     private static final Pattern REGEXP_PATTERN_TRACK = Pattern.compile("TRACK\\s+(\\d+)");
@@ -137,10 +143,10 @@ public class CueParser {
         try (BufferedReader reader = Files.newBufferedReader(file)) {
             lines = reader.lines().collect(Collectors.toList());
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.debug(ExceptionUtils.getStackTrace(e));
             throw new UncheckedIOException("Error reading file:" + file.toAbsolutePath() + ": " + e.getMessage(), e);
         } catch (UncheckedIOException e) {
-            e.printStackTrace();
+            logger.debug(ExceptionUtils.getStackTrace(e));
             throw new UncheckedIOException(
                     "Error reading file:" + file.toAbsolutePath() + ": possibly UTF-8 decoding failure: " + e.getMessage(),
                     e.getCause());

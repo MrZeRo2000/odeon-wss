@@ -216,7 +216,7 @@ public class DVMoviesMDBImportProcessor extends AbstractMDBImportProcessor {
                     (track != null)
                             && (dvProduct != null)
                             && (!savedTracks.contains(track))
-                            && (track.getDvProducts().size() == 0)) {
+                            && (track.getDvProducts().isEmpty())) {
                 track.getDvProducts().add(dvProduct);
                 trackRepository.save(track);
 

@@ -1,5 +1,9 @@
 package com.romanpulov.odeonwss.service.processor.parser;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -7,6 +11,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NamesParser {
+    private final static Logger logger = LoggerFactory.getLogger(NamesParser.class);
+
     private static final Pattern REGEXP_PATTERN_MUSIC_ARTIFACT = Pattern.compile("^((?:19|20)[0-9]{2})\\s(\\S.*)");
     private static final Pattern REGEXP_PATTERN_MUSIC_TRACK = Pattern.compile("^([0-9]{2,3})\\s-\\s(\\S.*)\\.\\S{2,4}$");
     private static final Pattern REGEXP_PATTERN_VIDEO_TRACK = Pattern.compile("^([0-9]{2,3})\\s(\\S.+?\\S)(?:\\s*\\([^)]+\\))*\\.\\S{2,4}$");
@@ -143,7 +149,7 @@ public class NamesParser {
                             Pattern.CASE_INSENSITIVE));
             return pattern.matcher(fileName).find();
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+            logger.debug(ExceptionUtils.getStackTrace(e));
             return false;
         }
     }

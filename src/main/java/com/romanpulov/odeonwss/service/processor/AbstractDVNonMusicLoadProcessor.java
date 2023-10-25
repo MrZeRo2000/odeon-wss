@@ -285,10 +285,6 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
                                 .ifPresent(dvProduct -> newTrack.setDvProducts(Set.of(dvProduct)));
                     }
 
-                    /*
-                    dVProductService.findProductByArtifactTypeAndTitle(artifactType, newTrack.getTitle())
-                            .ifPresent(p -> newTrack.setDvProducts(Set.of(p)));
-                     */
                     return newTrack;
                 });
 

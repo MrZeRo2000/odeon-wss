@@ -135,32 +135,6 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
                 counter.getAndIncrement();
             }
 
-            /*
-            for (MediaFile mediaFile: mediaFiles) {
-                Path mediaFilePath = Paths.get(rootMediaPath, artifact.getTitle(), mediaFile.getName());
-                if (Files.exists(mediaFilePath)) {
-                    try {
-                        MediaFileInfo mediaFileInfo = mediaParser.parseTrack(mediaFilePath);
-
-                        mediaFile.setSize(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
-                        mediaFile.setBitrate(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getBitRate());
-                        mediaFile.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
-
-                        SizeDuration sd = artifactSizeDurationMap.getOrDefault(artifact, new SizeDuration());
-                        sd.setSize(sd.getSize() + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
-                        sd.setDuration(sd.getDuration() + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
-                        artifactSizeDurationMap.put(artifact, sd);
-
-                        mediaFileRepository.save(mediaFile);
-
-                        counter.getAndIncrement();
-                    } catch (MediaFileInfoException e) {
-                        errorHandler(ERROR_PARSING_FILE, mediaFilePath.toAbsolutePath().toString());
-                    }
-                }
-            }
-
-             */
         }
 
         processArtifactSizeDuration(artifactSizeDurationMap);

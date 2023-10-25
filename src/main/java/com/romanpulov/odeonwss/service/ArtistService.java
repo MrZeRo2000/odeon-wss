@@ -57,7 +57,7 @@ public class ArtistService
     @Transactional
     public ArtistDTO getById(Long id) throws CommonEntityNotFoundException {
         List<ArtistFlatDTO> flatDTOS = repository.findFlatDTOById(id);
-        if (flatDTOS.size() == 0) {
+        if (flatDTOS.isEmpty()) {
             throw new CommonEntityNotFoundException(this.entityName, id);
         } else {
             return artistTransformer.transform(flatDTOS).get(0);
@@ -85,7 +85,7 @@ public class ArtistService
 
         // save artist categories
         List<ArtistCategory> artistCategories = artistCategoryMapper.createFromArtistDTO(artist, acd);
-        if (artistCategories.size() > 0) {
+        if (!artistCategories.isEmpty()) {
             artistCategoryRepository.saveAll(artistCategories);
         }
 
@@ -133,12 +133,12 @@ public class ArtistService
             Pair<List<ArtistCategory>, List<ArtistCategory>> mergedCategories = artistCategoryMapper.mergeCategories(existingCategories, categories);
 
             // artist categories deleted
-            if (mergedCategories.getSecond().size() > 0) {
+            if (!mergedCategories.getSecond().isEmpty()) {
                 artistCategoryRepository.deleteAll(mergedCategories.getSecond());
             }
 
             // artist categories created
-            if (mergedCategories.getFirst().size() > 0) {
+            if (!mergedCategories.getFirst().isEmpty()) {
                 artistCategoryRepository.saveAll(mergedCategories.getFirst());
             }
 

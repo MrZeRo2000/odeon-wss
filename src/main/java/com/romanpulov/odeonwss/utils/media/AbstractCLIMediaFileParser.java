@@ -12,7 +12,7 @@ public abstract class AbstractCLIMediaFileParser implements MediaFileParserInter
 
     private static MediaType getPrimaryMediaTypeFromStreams(List<MediaStreamInfo> mediaStreams)
             throws MediaInfoParsingException {
-        if (mediaStreams.size() > 0) {
+        if (!mediaStreams.isEmpty()) {
             return mediaStreams.get(0).getMediaType();
         } else {
             throw new MediaInfoParsingException("Error obtaining media primary type from streams");

@@ -38,7 +38,7 @@ public abstract class AbstractMusicAttributesMDBImportProcessor extends Abstract
         this.artifactTypeSupplier = artifactTypeSupplier;
     }
 
-    static class ArtistTitleInsertDate {
+    public static class ArtistTitleInsertDate {
         final String artistName;
         final String title;
         final int year;

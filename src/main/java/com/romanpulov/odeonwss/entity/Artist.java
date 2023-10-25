@@ -97,10 +97,10 @@ public class Artist extends AbstractBaseMigratedEntity {
 
     @PreRemove
     private void removeArtist() {
-        if (artifacts != null && artifacts.size() > 0) {
+        if (artifacts != null && !artifacts.isEmpty()) {
             throw new HibernateException("Unable to delete " + this + " because it has child artifacts");
         }
-        if (tracks != null && tracks.size() > 0) {
+        if (tracks != null && !tracks.isEmpty()) {
             throw new HibernateException("Unable to delete " + this + " because it has child tracks");
         }
     }

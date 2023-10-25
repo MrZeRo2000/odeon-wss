@@ -1,9 +1,12 @@
 package com.romanpulov.odeonwss.utils.media;
 
 import com.romanpulov.odeonwss.utils.EnumUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -11,6 +14,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
+    private final Logger logger = LoggerFactory.getLogger(MediaInfoMediaFileParser.class);
+
     private final static String MEDIA_INFO_FILE_NAME = "MediaInfo.exe";
 
     public MediaInfoMediaFileParser(String mediaInfoPath) {
@@ -37,7 +42,7 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
             try {
                 jsonObject = new JSONObject(text);
             } catch (JSONException e) {
-                e.printStackTrace();
+                logger.debug(ExceptionUtils.getStackTrace(e));
             }
 
             if (jsonObject == null) {
@@ -100,7 +105,7 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
                                     bitRate.set(newBitRate);
                                 }
                             } catch (NumberFormatException e) {
-                                e.printStackTrace();
+                                logger.debug(ExceptionUtils.getStackTrace(e));
                             }
                         });
                     }

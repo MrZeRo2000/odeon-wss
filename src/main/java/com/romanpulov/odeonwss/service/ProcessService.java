@@ -1,13 +1,21 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.repository.ProcessInfoRepository;
-import com.romanpulov.odeonwss.service.processor.*;
-import com.romanpulov.odeonwss.service.processor.model.*;
+import com.romanpulov.odeonwss.service.processor.AbstractProcessor;
+import com.romanpulov.odeonwss.service.processor.ProcessorFactory;
+import com.romanpulov.odeonwss.service.processor.ProcessorMessages;
+import com.romanpulov.odeonwss.service.processor.ProgressHandler;
+import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
+import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
+import com.romanpulov.odeonwss.service.processor.model.ProcessingEvent;
+import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
 import java.util.concurrent.atomic.AtomicReference;
 
 @Service
@@ -85,8 +93,7 @@ public class ProcessService implements ProgressHandler {
                 currentProcessor.get().execute();
 
             } catch (Exception e) {
-                e.printStackTrace();
-                logger.debug("Error executing: " + processorType + ": " + e.getMessage());
+                logger.debug("Error executing: " + processorType + ": " + ExceptionUtils.getStackTrace(e));
                 processInfo.addProcessDetails(ProcessDetail.fromException(e));
             } finally {
                 // final status
@@ -113,7 +120,7 @@ public class ProcessService implements ProgressHandler {
                 logger.debug("Saved processing info");
             } catch (Exception e) {
                 logger.error("Error saving processing info: " + e.getMessage());
-                e.printStackTrace();
+                logger.debug(ExceptionUtils.getStackTrace(e));
             }
         }
     }
