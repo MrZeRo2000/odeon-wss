@@ -5,7 +5,7 @@ import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.service.processor.AbstractProcessor;
-import com.romanpulov.odeonwss.service.processor.PathValidator;
+import com.romanpulov.odeonwss.service.processor.MediaFileValidator;
 import com.romanpulov.odeonwss.service.processor.ProcessorMessages;
 import com.romanpulov.odeonwss.service.processor.ValueValidator;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
@@ -29,7 +29,7 @@ public class TracksValidateUtil {
                 dto -> dto.getArtistName() == null ?
                         dto.getTitle() :
                         String.format(
-                                PathValidator.DELIMITER_FORMAT,
+                                MediaFileValidator.DELIMITER_FORMAT,
                                 dto.getArtistName(),
                                 dto.getYear() == null ?
                                         dto.getTitle() :

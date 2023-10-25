@@ -32,6 +32,28 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
         this.artistName = artistName;
     }
 
+    private Long artifactSize;
+
+    @Override
+    public Long getArtifactSize() {
+        return artifactSize;
+    }
+
+    public void setArtifactSize(Long artifactSize) {
+        this.artifactSize = artifactSize;
+    }
+
+    private Long artifactDuration;
+
+    @Override
+    public Long getArtifactDuration() {
+        return artifactDuration;
+    }
+
+    public void setArtifactDuration(Long artifactDuration) {
+        this.artifactDuration = artifactDuration;
+    }
+
     private Long trackNum;
 
     public Long getTrackNum() {
@@ -94,16 +116,32 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
         this.mediaFileSize = mediaFileSize;
     }
 
+    private Long mediaFileDuration;
+
+    @Override
+    public Long getMediaFileDuration() {
+        return mediaFileDuration;
+    }
+
+    public void setMediaFileDuration(Long mediaFileDuration) {
+        this.mediaFileDuration = mediaFileDuration;
+    }
+
     @Override
     public String toString() {
-        return "MediaFileValidationDTO{" +
-                "artistName='" + getArtistName() + '\'' +
-                ", artifactTitle='" + getArtifactTitle() + '\'' +
-                ", artifactYear=" + getArtifactYear() +
-                ", trackNum=" + getTrackNum() +
-                ", trackTitle='" + getTrackTitle() + '\'' +
+        return "MediaFileValidationDTOImpl{" +
+                "artifactTitle='" + artifactTitle + '\'' +
+                ", artifactYear=" + artifactYear +
+                ", artistName='" + artistName + '\'' +
+                ", artifactSize=" + artifactSize +
+                ", artifactDuration=" + artifactDuration +
+                ", trackNum=" + trackNum +
+                ", trackTitle='" + trackTitle + '\'' +
                 ", mediaFileName='" + mediaFileName + '\'' +
                 ", mediaFileFormat='" + mediaFileFormat + '\'' +
+                ", mediaFileBitrate=" + mediaFileBitrate +
+                ", mediaFileSize=" + mediaFileSize +
+                ", mediaFileDuration=" + mediaFileDuration +
                 '}';
     }
 }

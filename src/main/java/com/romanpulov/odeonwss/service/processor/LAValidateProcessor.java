@@ -57,11 +57,11 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
 
         logger.info("Validating ArtistNames");
         processingEventHandler(ProcessorMessages.VALIDATING_ARTISTS);
-        if (PathValidator.validateArtistNamesArtifactsTracks(this, pathValidation, dbValidation)) {
+        if (MediaFileValidator.validateArtistNamesArtifactsTracks(this, pathValidation, dbValidation)) {
             infoHandler(ProcessorMessages.INFO_ARTISTS_VALIDATED);
 
             processingEventHandler(ProcessorMessages.VALIDATING_ARTIFACTS);
-            if (PathValidator.validateArtifactsMusic(this, pathValidation, dbValidation)) {
+            if (MediaFileValidator.validateArtifactsMusic(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
                 MediaFilesValidateUtil.validateMediaFilesAll(

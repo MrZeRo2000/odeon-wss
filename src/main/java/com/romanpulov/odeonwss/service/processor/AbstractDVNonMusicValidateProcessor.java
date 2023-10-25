@@ -60,18 +60,22 @@ public abstract class AbstractDVNonMusicValidateProcessor extends AbstractFileSy
                 this.artifactType.getMediaFileFormats());
         logger.info("pathValidation:" + pathValidation);
 
-        if (PathValidator.validateArtifacts(this, pathValidation, dbValidation)) {
+        if (MediaFileValidator.validateArtifacts(this, pathValidation, dbValidation)) {
             infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
-            if (PathValidator.validateMediaFiles(this, pathValidation, dbValidation)) {
+            if (MediaFileValidator.validateMediaFiles(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
             }
 
             List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
                     .getArtifactMediaFileValidationDV(artifactType);
 
-            if (PathValidator.validateArtifactMediaFiles(this, pathValidation, dbArtifactValidation)) {
+            if (MediaFileValidator.validateArtifactMediaFiles(this, pathValidation, dbArtifactValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
+            }
+
+            if (MediaFileValidator.validateArtifactMediaFileSize(this, dbArtifactValidation)) {
+                infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_SIZE_VALIDATED);
             }
 
             if (ValueValidator.validateConditionValue(
@@ -79,7 +83,7 @@ public abstract class AbstractDVNonMusicValidateProcessor extends AbstractFileSy
                     dbArtifactValidation,
                     ProcessorMessages.ERROR_MEDIA_FILES_EMPTY_BITRATE,
                     m -> Optional.ofNullable(m.getMediaFileBitrate()).orElse(0L).equals(0L),
-                    m -> PathValidator.DELIMITER_FORMAT.formatted(m.getArtifactTitle(), m.getMediaFileName()))) {
+                    m -> MediaFileValidator.DELIMITER_FORMAT.formatted(m.getArtifactTitle(), m.getMediaFileName()))) {
                 infoHandler(ProcessorMessages.INFO_MEDIA_FILES_BITRATE_VALIDATED);
             }
 
@@ -89,11 +93,11 @@ public abstract class AbstractDVNonMusicValidateProcessor extends AbstractFileSy
                     tracks,
                     ProcessorMessages.ERROR_TRACKS_WITHOUT_PRODUCT,
                     t -> Objects.isNull(t.getDvProduct()),
-                    t -> PathValidator.DELIMITER_FORMAT.formatted(t.getArtifact().getTitle(), t.getTitle()))) {
+                    t -> MediaFileValidator.DELIMITER_FORMAT.formatted(t.getArtifact().getTitle(), t.getTitle()))) {
                 infoHandler(ProcessorMessages.INFO_PRODUCTS_FOR_TRACKS_VALIDATED);
             }
 
-            if (PathValidator.validateMediaFileSize(this, pathValidation, dbValidation)) {
+            if (MediaFileValidator.validateMediaFileSize(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_MEDIA_FILES_SIZE_MISMATCH_VALIDATED);
             }
 

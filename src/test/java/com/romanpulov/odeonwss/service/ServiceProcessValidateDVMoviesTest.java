@@ -131,7 +131,7 @@ public class ServiceProcessValidateDVMoviesTest {
 
         assertThat(pi.getProcessDetails().get(4)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Media files bitrate validated"),
+                        ProcessDetailInfo.fromMessage("Artifact media files size validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -139,7 +139,7 @@ public class ServiceProcessValidateDVMoviesTest {
 
         assertThat(pi.getProcessDetails().get(5)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Products for tracks validated"),
+                        ProcessDetailInfo.fromMessage("Media files bitrate validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -147,13 +147,21 @@ public class ServiceProcessValidateDVMoviesTest {
 
         assertThat(pi.getProcessDetails().get(6)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
+                        ProcessDetailInfo.fromMessage("Products for tracks validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
 
         assertThat(pi.getProcessDetails().get(7)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(pi.getProcessDetails().get(8)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
                         ProcessingStatus.INFO,
@@ -162,7 +170,7 @@ public class ServiceProcessValidateDVMoviesTest {
         );
 
 
-        assertThat(pi.getProcessDetails().get(8)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(9)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
@@ -409,7 +417,7 @@ public class ServiceProcessValidateDVMoviesTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(5)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Tracks without product",
@@ -442,7 +450,7 @@ public class ServiceProcessValidateDVMoviesTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(8)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Track numbers for artifact not increasing monotonically",
@@ -473,7 +481,7 @@ public class ServiceProcessValidateDVMoviesTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(4)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(5)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Media files with empty bitrate",
@@ -509,11 +517,43 @@ public class ServiceProcessValidateDVMoviesTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Media files size mismatch",
                                 List.of("Обыкновенное чудо >> Part 1.avi")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(14)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testArtifactMediaFileSizeDifferentShouldFail() {
+        this.internalPrepare();
+
+        Artifact artifact = artifactRepository
+                .getAllByArtifactType(artifactType)
+                .stream()
+                .filter(a -> a.getTitle().equals("Крепкий орешек"))
+                .findFirst()
+                .orElseThrow();
+        artifact.setSize(Optional.ofNullable(artifact.getSize()).orElse(0L) + 530);
+        artifactRepository.save(artifact);
+        log.info("Saved artifact: " + artifact);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(4)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Artifact size does not match media files size",
+                                List.of(artifact.getTitle())),
                         ProcessingStatus.FAILURE,
                         null,
                         null)

@@ -54,17 +54,17 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
         }
 
         if (validateArtifactsWithoutArtists()) {
-            if (PathValidator.validateArtifacts(this, pathValidation, dbValidation)) {
+            if (MediaFileValidator.validateArtifacts(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
-                if (PathValidator.validateMediaFiles(this, pathValidation, dbValidation)) {
+                if (MediaFileValidator.validateMediaFiles(this, pathValidation, dbValidation)) {
                     infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
                 }
 
                 List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
                         .getArtifactMediaFileValidationMusic(artifactType);
 
-                if (PathValidator.validateArtifactMediaFiles(this, pathValidation, dbArtifactValidation)) {
+                if (MediaFileValidator.validateArtifactMediaFiles(this, pathValidation, dbArtifactValidation)) {
                     infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
                 }
 
@@ -73,11 +73,11 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
                         dbArtifactValidation,
                         ProcessorMessages.ERROR_MEDIA_FILES_EMPTY_BITRATE,
                         m -> Optional.ofNullable(m.getMediaFileBitrate()).orElse(0L).equals(0L),
-                        m -> PathValidator.DELIMITER_FORMAT.formatted(m.getArtifactTitle(), m.getMediaFileName()))) {
+                        m -> MediaFileValidator.DELIMITER_FORMAT.formatted(m.getArtifactTitle(), m.getMediaFileName()))) {
                     infoHandler(ProcessorMessages.INFO_MEDIA_FILES_BITRATE_VALIDATED);
                 }
 
-                if (PathValidator.validateMediaFileSize(this, pathValidation, dbValidation)) {
+                if (MediaFileValidator.validateMediaFileSize(this, pathValidation, dbValidation)) {
                     infoHandler(ProcessorMessages.INFO_MEDIA_FILES_SIZE_MISMATCH_VALIDATED);
                 }
 

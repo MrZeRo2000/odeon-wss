@@ -54,15 +54,15 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
                 .getTrackMediaFileValidationMusic(ArtistType.ARTIST, artifactType);
 
         processingEventHandler(ProcessorMessages.VALIDATING_ARTISTS);
-        if (PathValidator.validateArtistNamesArtifactsTracks(this, pathValidation, dbValidation)) {
+        if (MediaFileValidator.validateArtistNamesArtifactsTracks(this, pathValidation, dbValidation)) {
             infoHandler(ProcessorMessages.INFO_ARTISTS_VALIDATED);
 
             processingEventHandler(ProcessorMessages.VALIDATING_ARTIFACTS);
-            if (PathValidator.validateArtifactsMusic(this, pathValidation, dbValidation)) {
+            if (MediaFileValidator.validateArtifactsMusic(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
                 processingEventHandler(ProcessorMessages.VALIDATING_TRACKS);
-                if (PathValidator.validateTracksMusic(this, pathValidation, dbValidation)) {
+                if (MediaFileValidator.validateTracksMusic(this, pathValidation, dbValidation)) {
                     infoHandler(ProcessorMessages.INFO_TRACKS_VALIDATED);
                 }
 
@@ -88,7 +88,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
         if (yt == null) {
             errorHandlerItem(
                     ProcessorMessages.ERROR_PARSING_ARTIFACT_NAME,
-                    String.format(PathValidator.DELIMITER_FORMAT, artistPath.getFileName().toString(),
+                    String.format(MediaFileValidator.DELIMITER_FORMAT, artistPath.getFileName().toString(),
                     artifactPath.getFileName().toString()));
             result.add(
                     new MediaFileValidationDTOBuilder()

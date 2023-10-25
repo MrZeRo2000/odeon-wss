@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class PathValidator {
+public class MediaFileValidator {
     public static final String DELIMITER_FORMAT = "%s >> %s";
     private static final String MUSIC_ARTIFACT_ENTITY_FORMAT = "%s >> %d %s >> %s";
     private static final String MUSIC_ARTIFACT_TRACK_FORMAT = "%s >> %d %s >> %02d - %s";
@@ -253,6 +253,39 @@ public class PathValidator {
             return true;
         } else {
             processor.errorHandler(ProcessorMessages.ERROR_MEDIA_FILES_SIZE_MISMATCH, mismatchPaths);
+            return false;
+        }
+    }
+
+    public static boolean validateArtifactMediaFileSize(
+            AbstractProcessor processor,
+            List<MediaFileValidationDTO> dbArtifactValidation) {
+        Map<String, Long> artifactSizes = dbArtifactValidation
+                .stream()
+                .map(v -> Pair.of(
+                        v.getArtifactTitle(),
+                        Optional.ofNullable(v.getArtifactSize()).orElse(0L)))
+                .distinct()
+                .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+
+        Map<String, Long> artifactMediaFileSizes = dbArtifactValidation
+                .stream()
+                .collect(Collectors.groupingBy(
+                        MediaFileValidationDTO::getArtifactTitle,
+                        Collectors.summingLong(v -> Optional.ofNullable(v.getMediaFileSize()).orElse(0L))));
+
+        List<String> mismatchArtifactTitles = artifactSizes
+                .entrySet()
+                .stream()
+                .filter(a -> !artifactMediaFileSizes.getOrDefault(a.getKey(), 0L).equals(a.getValue()))
+                .map(Map.Entry::getKey)
+                .sorted()
+                .toList();
+
+        if (mismatchArtifactTitles.isEmpty()) {
+            return true;
+        } else {
+            processor.errorHandler(ProcessorMessages.ERROR_ARTIFACT_MEDIA_FILES_SIZE_MISMATCH, mismatchArtifactTitles);
             return false;
         }
     }

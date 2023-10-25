@@ -109,7 +109,7 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
                     errorHandlerItem(
                             ProcessorMessages.ERROR_PARSING_ARTIFACT_NAME,
                             String.format(
-                                    PathValidator.DELIMITER_FORMAT,
+                                    MediaFileValidator.DELIMITER_FORMAT,
                                     pathArtistPair.getFirst().getFileName(),
                                     p.toAbsolutePath().getFileName().toString()));
                     return result;

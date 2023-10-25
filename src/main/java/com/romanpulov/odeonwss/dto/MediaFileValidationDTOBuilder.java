@@ -22,6 +22,16 @@ public class MediaFileValidationDTOBuilder {
         return this;
     }
 
+    public MediaFileValidationDTOBuilder withArtifactSize(long artifactSize) {
+        instance.setArtifactSize(artifactSize);
+        return this;
+    }
+
+    public MediaFileValidationDTOBuilder withArtifactDuration(long artifactDuration) {
+        instance.setArtifactDuration(artifactDuration);
+        return this;
+    }
+
     public MediaFileValidationDTOBuilder withTrackNum(long trackNum) {
         instance.setTrackNum(trackNum);
         return this;
@@ -47,6 +57,10 @@ public class MediaFileValidationDTOBuilder {
         return this;
     }
 
+    public MediaFileValidationDTOBuilder withMediaFileDuration(long mediaFileDuration) {
+        instance.setMediaFileDuration(mediaFileDuration);
+        return this;
+    }
 
     public MediaFileValidationDTO build() {
         return instance;
