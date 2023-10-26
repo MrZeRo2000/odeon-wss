@@ -38,6 +38,13 @@ public class MediaFilesValidateUtil {
             processor.infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
         }
 
+        if (MediaFileValidator.validateArtifactMediaFileSize(
+                processor,
+                MediaFileValidator.ARTIFACT_MUSIC_MAPPER,
+                dbArtifactValidation)) {
+            processor.infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_SIZE_VALIDATED);
+        }
+
         processor.processingEventHandler(ProcessorMessages.VALIDATING_MEDIA_FILES_SIZE);
         if (MediaFileValidator.validateMediaFileSize(
                 processor,
