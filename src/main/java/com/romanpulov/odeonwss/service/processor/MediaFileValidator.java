@@ -142,20 +142,6 @@ public class MediaFileValidator {
         );
     }
 
-    public static boolean validateMediaFiles(
-            AbstractProcessor processor,
-            List<MediaFileValidationDTO> pathValidation,
-            List<MediaFileValidationDTO> dbValidation) {
-        return validate(
-                processor,
-                pathValidation,
-                dbValidation,
-                ARTIFACT_MEDIA_FILE_MAPPER,
-                ProcessorMessages.ERROR_MEDIA_FILES_NOT_IN_FILES,
-                ProcessorMessages.ERROR_MEDIA_FILES_NOT_IN_DB
-        );
-    }
-
     public static boolean validateMediaFilesMusic(
             AbstractProcessor processor,
             List<MediaFileValidationDTO> pathValidation,

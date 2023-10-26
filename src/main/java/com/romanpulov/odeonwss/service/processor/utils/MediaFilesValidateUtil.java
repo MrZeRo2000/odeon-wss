@@ -58,7 +58,13 @@ public class MediaFilesValidateUtil {
             List<MediaFileValidationDTO> pathValidation,
             List<MediaFileValidationDTO> dbValidation,
             List<MediaFileValidationDTO> dbArtifactValidation) {
-        if (MediaFileValidator.validateMediaFiles(processor, pathValidation, dbValidation)) {
+        if (MediaFileValidator.validate(
+                processor,
+                pathValidation,
+                dbValidation,
+                MediaFileValidator.ARTIFACT_MEDIA_FILE_MAPPER,
+                ProcessorMessages.ERROR_MEDIA_FILES_NOT_IN_FILES,
+                ProcessorMessages.ERROR_MEDIA_FILES_NOT_IN_DB)) {
             processor.infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
         }
 
