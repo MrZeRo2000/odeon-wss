@@ -87,16 +87,6 @@ public abstract class AbstractDVNonMusicValidateProcessor extends AbstractFileSy
                 infoHandler(ProcessorMessages.INFO_MEDIA_FILES_BITRATE_VALIDATED);
             }
 
-            List<TrackDTO> tracks = trackService.getTableByArtifactTypeId(this.artifactType.getId());
-            if (ValueValidator.validateConditionValue(
-                    this,
-                    tracks,
-                    ProcessorMessages.ERROR_TRACKS_WITHOUT_PRODUCT,
-                    t -> Objects.isNull(t.getDvProduct()),
-                    t -> MediaFileValidator.DELIMITER_FORMAT.formatted(t.getArtifact().getTitle(), t.getTitle()))) {
-                infoHandler(ProcessorMessages.INFO_PRODUCTS_FOR_TRACKS_VALIDATED);
-            }
-
             if (MediaFileValidator.validateMediaFileSize(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_MEDIA_FILES_SIZE_MISMATCH_VALIDATED);
             }
@@ -106,6 +96,16 @@ public abstract class AbstractDVNonMusicValidateProcessor extends AbstractFileSy
                     artifactRepository,
                     null,
                     List.of(artifactType));
+
+            List<TrackDTO> tracks = trackService.getTableByArtifactTypeId(this.artifactType.getId());
+            if (ValueValidator.validateConditionValue(
+                    this,
+                    tracks,
+                    ProcessorMessages.ERROR_TRACKS_WITHOUT_PRODUCT,
+                    t -> Objects.isNull(t.getDvProduct()),
+                    t -> MediaFileValidator.DELIMITER_FORMAT.formatted(t.getArtifact().getTitle(), t.getTitle()))) {
+                infoHandler(ProcessorMessages.INFO_PRODUCTS_FOR_TRACKS_VALIDATED);
+            }
         }
     }
 }

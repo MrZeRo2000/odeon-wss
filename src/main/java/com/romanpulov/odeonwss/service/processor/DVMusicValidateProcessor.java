@@ -68,6 +68,10 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
                     infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
                 }
 
+                if (MediaFileValidator.validateArtifactMediaFileSize(this, dbArtifactValidation)) {
+                    infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_SIZE_VALIDATED);
+                }
+
                 if (ValueValidator.validateConditionValue(
                         this,
                         dbArtifactValidation,

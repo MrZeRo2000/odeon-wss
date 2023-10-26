@@ -153,7 +153,7 @@ public class ServiceProcessValidateDVAnimationTest {
 
         assertThat(pi.getProcessDetails().get(6)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Products for tracks validated"),
+                        ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -161,7 +161,7 @@ public class ServiceProcessValidateDVAnimationTest {
 
         assertThat(pi.getProcessDetails().get(7)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
+                        ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -169,12 +169,11 @@ public class ServiceProcessValidateDVAnimationTest {
 
         assertThat(pi.getProcessDetails().get(8)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
+                        ProcessDetailInfo.fromMessage("Products for tracks validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
-
 
         assertThat(pi.getProcessDetails().get(9)).isEqualTo(
                 new ProcessDetail(
@@ -424,7 +423,7 @@ public class ServiceProcessValidateDVAnimationTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(8)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Tracks without product",
@@ -458,7 +457,7 @@ public class ServiceProcessValidateDVAnimationTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(8)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Track numbers for artifact not increasing monotonically",
@@ -493,7 +492,7 @@ public class ServiceProcessValidateDVAnimationTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Media files size mismatch",
