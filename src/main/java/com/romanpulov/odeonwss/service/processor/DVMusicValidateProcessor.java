@@ -8,6 +8,7 @@ import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.service.processor.utils.MediaFilesValidateUtil;
 import com.romanpulov.odeonwss.service.processor.utils.TracksValidateUtil;
 import org.springframework.stereotype.Component;
 
@@ -57,33 +58,14 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
             if (MediaFileValidator.validateArtifacts(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
-                if (MediaFileValidator.validateMediaFiles(this, pathValidation, dbValidation)) {
-                    infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
-                }
-
                 List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
                         .getArtifactMediaFileValidationMusic(artifactType);
 
-                if (MediaFileValidator.validateArtifactMediaFiles(this, pathValidation, dbArtifactValidation)) {
-                    infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
-                }
-
-                if (MediaFileValidator.validateArtifactMediaFileSize(this, dbArtifactValidation)) {
-                    infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_SIZE_VALIDATED);
-                }
-
-                if (ValueValidator.validateConditionValue(
+                MediaFilesValidateUtil.validateMediaFilesVideoAll(
                         this,
-                        dbArtifactValidation,
-                        ProcessorMessages.ERROR_MEDIA_FILES_EMPTY_BITRATE,
-                        m -> Optional.ofNullable(m.getMediaFileBitrate()).orElse(0L).equals(0L),
-                        m -> MediaFileValidator.DELIMITER_FORMAT.formatted(m.getArtifactTitle(), m.getMediaFileName()))) {
-                    infoHandler(ProcessorMessages.INFO_MEDIA_FILES_BITRATE_VALIDATED);
-                }
-
-                if (MediaFileValidator.validateMediaFileSize(this, pathValidation, dbValidation)) {
-                    infoHandler(ProcessorMessages.INFO_MEDIA_FILES_SIZE_MISMATCH_VALIDATED);
-                }
+                        pathValidation,
+                        dbValidation,
+                        dbArtifactValidation);
 
                 TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
                         this,

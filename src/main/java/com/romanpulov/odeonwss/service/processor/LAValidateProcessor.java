@@ -64,7 +64,7 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
             if (MediaFileValidator.validateArtifactsMusic(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
-                MediaFilesValidateUtil.validateMediaFilesAll(
+                MediaFilesValidateUtil.validateMediaFilesMusicAll(
                         this,
                         pathValidation,
                         dbValidation,
