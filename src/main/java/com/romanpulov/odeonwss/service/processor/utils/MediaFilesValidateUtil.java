@@ -34,7 +34,11 @@ public class MediaFilesValidateUtil {
             List<MediaFileValidationDTO> pathValidation,
             List<MediaFileValidationDTO> dbArtifactValidation) {
         processor.processingEventHandler(ProcessorMessages.VALIDATING_MEDIA_FILES_SIZE);
-        if (MediaFileValidator.validateMediaFileSizeMusic(processor, pathValidation, dbArtifactValidation)) {
+        if (MediaFileValidator.validateMediaFileSize(
+                processor,
+                MediaFileValidator.ARTIFACT_MEDIA_FILE_MUSIC_MAPPER,
+                pathValidation,
+                dbArtifactValidation)) {
             processor.infoHandler(ProcessorMessages.INFO_MEDIA_FILES_SIZE_MISMATCH_VALIDATED);
         }
     }
@@ -62,7 +66,10 @@ public class MediaFilesValidateUtil {
             processor.infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
         }
 
-        if (MediaFileValidator.validateArtifactMediaFileSize(processor, dbArtifactValidation)) {
+        if (MediaFileValidator.validateArtifactMediaFileSize(
+                processor,
+                MediaFileValidator.ARTIFACT_TITLE_MAPPER,
+                dbArtifactValidation)) {
             processor.infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_SIZE_VALIDATED);
         }
 
@@ -75,7 +82,11 @@ public class MediaFilesValidateUtil {
             processor.infoHandler(ProcessorMessages.INFO_MEDIA_FILES_BITRATE_VALIDATED);
         }
 
-        if (MediaFileValidator.validateMediaFileSize(processor, pathValidation, dbValidation)) {
+        if (MediaFileValidator.validateMediaFileSize(
+                processor,
+                MediaFileValidator.ARTIFACT_MEDIA_FILE_MAPPER,
+                pathValidation,
+                dbValidation)) {
             processor.infoHandler(ProcessorMessages.INFO_MEDIA_FILES_SIZE_MISMATCH_VALIDATED);
         }
     }

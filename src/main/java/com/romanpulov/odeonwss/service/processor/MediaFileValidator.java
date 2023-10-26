@@ -23,28 +23,28 @@ public class MediaFileValidator {
         String apply(MediaFileValidationDTO mediaFileValidationDTO);
     }
 
-    private static final MediaFileValidationDTOMapper ARTIST_NAME_MAPPER = MediaFileValidationDTO::getArtistName;
-    private static final MediaFileValidationDTOMapper ARTIFACT_TITLE_MAPPER = MediaFileValidationDTO::getArtifactTitle;
-    private static final MediaFileValidationDTOMapper MEDIA_FILE_MAPPER = MediaFileValidationDTO::getMediaFileName;
+    public static final MediaFileValidationDTOMapper ARTIST_NAME_MAPPER = MediaFileValidationDTO::getArtistName;
+    public static final MediaFileValidationDTOMapper ARTIFACT_TITLE_MAPPER = MediaFileValidationDTO::getArtifactTitle;
+    public static final MediaFileValidationDTOMapper MEDIA_FILE_MAPPER = MediaFileValidationDTO::getMediaFileName;
 
-    private static final MediaFileValidationDTOMapper ARTIFACT_MUSIC_MAPPER = m -> String.format(
+    public static final MediaFileValidationDTOMapper ARTIFACT_MUSIC_MAPPER = m -> String.format(
             DELIMITER_FORMAT,
             m.getArtistName(),
             NamesParser.formatMusicArtifact(m.getArtifactYear(), m.getArtifactTitle()));
 
-    private static final MediaFileValidationDTOMapper ARTIFACT_MEDIA_FILE_MAPPER = m -> String.format(
+    public static final MediaFileValidationDTOMapper ARTIFACT_MEDIA_FILE_MAPPER = m -> String.format(
             DELIMITER_FORMAT,
             m.getArtifactTitle(),
             formatNullable(m.getMediaFileName()));
 
-    private static final MediaFileValidationDTOMapper ARTIFACT_MEDIA_FILE_MUSIC_MAPPER = m -> String.format(
+    public static final MediaFileValidationDTOMapper ARTIFACT_MEDIA_FILE_MUSIC_MAPPER = m -> String.format(
             MUSIC_ARTIFACT_ENTITY_FORMAT,
             m.getArtistName(),
             m.getArtifactYear(),
             m.getArtifactTitle(),
             formatNullable(m.getMediaFileName()));
 
-    private static final MediaFileValidationDTOMapper TRACK_MUSIC_MAPPER = d -> String.format(
+    public static final MediaFileValidationDTOMapper TRACK_MUSIC_MAPPER = d -> String.format(
             MUSIC_ARTIFACT_TRACK_FORMAT,
             d.getArtistName(),
             d.getArtifactYear(),
@@ -52,7 +52,7 @@ public class MediaFileValidator {
             d.getTrackNum(),
             formatNullable(d.getTrackTitle()));
 
-    private static final MediaFileValidationDTOMapper MEDIA_FILE_MUSIC_MAPPER = d -> String.format(
+    public static final MediaFileValidationDTOMapper MEDIA_FILE_MUSIC_MAPPER = d -> String.format(
             MUSIC_ARTIFACT_ENTITY_FORMAT,
             d.getArtistName(),
             d.getArtifactYear(),
@@ -200,30 +200,6 @@ public class MediaFileValidator {
 
     public static boolean validateMediaFileSize (
             AbstractProcessor processor,
-            List<MediaFileValidationDTO> pathValidation,
-            List<MediaFileValidationDTO> dbValidation) {
-        return internalValidateMediaFileSize(
-                processor,
-                ARTIFACT_MEDIA_FILE_MAPPER,
-                pathValidation,
-                dbValidation
-        );
-    }
-
-    public static boolean validateMediaFileSizeMusic (
-            AbstractProcessor processor,
-            List<MediaFileValidationDTO> pathValidation,
-            List<MediaFileValidationDTO> dbValidation) {
-        return internalValidateMediaFileSize(
-                processor,
-                ARTIFACT_MEDIA_FILE_MUSIC_MAPPER,
-                pathValidation,
-                dbValidation
-        );
-    }
-
-    private static boolean internalValidateMediaFileSize (
-            AbstractProcessor processor,
             MediaFileValidationDTOMapper mapper,
             List<MediaFileValidationDTO> pathValidation,
             List<MediaFileValidationDTO> dbValidation) {
@@ -259,11 +235,12 @@ public class MediaFileValidator {
 
     public static boolean validateArtifactMediaFileSize(
             AbstractProcessor processor,
+            MediaFileValidationDTOMapper mapper,
             List<MediaFileValidationDTO> dbArtifactValidation) {
         Map<String, Long> artifactSizes = dbArtifactValidation
                 .stream()
                 .map(v -> Pair.of(
-                        v.getArtifactTitle(),
+                        mapper.apply(v),
                         Optional.ofNullable(v.getArtifactSize()).orElse(0L)))
                 .distinct()
                 .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
@@ -271,7 +248,7 @@ public class MediaFileValidator {
         Map<String, Long> artifactMediaFileSizes = dbArtifactValidation
                 .stream()
                 .collect(Collectors.groupingBy(
-                        MediaFileValidationDTO::getArtifactTitle,
+                        mapper,
                         Collectors.summingLong(v -> Optional.ofNullable(v.getMediaFileSize()).orElse(0L))));
 
         List<String> mismatchArtifactTitles = artifactSizes
