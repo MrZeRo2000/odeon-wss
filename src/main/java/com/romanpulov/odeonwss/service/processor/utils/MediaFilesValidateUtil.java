@@ -10,47 +10,42 @@ import java.util.List;
 import java.util.Optional;
 
 public class MediaFilesValidateUtil {
-    public static void validateMediaFilesMusic(
-            AbstractProcessor processor,
-            List<MediaFileValidationDTO> pathValidation,
-            List<MediaFileValidationDTO> dbValidation) {
-        processor.processingEventHandler(ProcessorMessages.VALIDATING_MEDIA_FILES);
-        if (MediaFileValidator.validateMediaFilesMusic(processor, pathValidation, dbValidation)) {
-            processor.infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
-        }
-    }
-    public static void validateArtifactMediaFilesMusic(
-            AbstractProcessor processor,
-            List<MediaFileValidationDTO> pathValidation,
-            List<MediaFileValidationDTO> dbArtifactValidation) {
-        processor.processingEventHandler(ProcessorMessages.VALIDATING_ARTIFACT_MEDIA_FILES);
-        if (MediaFileValidator.validateArtifactMediaFilesMusic(processor, pathValidation, dbArtifactValidation)) {
-            processor.infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
-        }
-    }
-
-    public static void validateMediaFileSizeMusic(
-            AbstractProcessor processor,
-            List<MediaFileValidationDTO> pathValidation,
-            List<MediaFileValidationDTO> dbArtifactValidation) {
-        processor.processingEventHandler(ProcessorMessages.VALIDATING_MEDIA_FILES_SIZE);
-        if (MediaFileValidator.validateMediaFileSize(
-                processor,
-                MediaFileValidator.ARTIFACT_MEDIA_FILE_MUSIC_MAPPER,
-                pathValidation,
-                dbArtifactValidation)) {
-            processor.infoHandler(ProcessorMessages.INFO_MEDIA_FILES_SIZE_MISMATCH_VALIDATED);
-        }
-    }
 
     public static void validateMediaFilesMusicAll(
             AbstractProcessor processor,
             List<MediaFileValidationDTO> pathValidation,
             List<MediaFileValidationDTO> dbValidation,
             List<MediaFileValidationDTO> dbArtifactValidation) {
-        validateMediaFilesMusic(processor, pathValidation, dbValidation);
-        validateArtifactMediaFilesMusic(processor, pathValidation, dbArtifactValidation);
-        validateMediaFileSizeMusic(processor, pathValidation, dbValidation);
+        processor.processingEventHandler(ProcessorMessages.VALIDATING_MEDIA_FILES);
+        if (MediaFileValidator.validate(
+                processor,
+                pathValidation,
+                dbValidation,
+                MediaFileValidator.MEDIA_FILE_MUSIC_MAPPER,
+                ProcessorMessages.ERROR_MEDIA_FILES_NOT_IN_FILES,
+                ProcessorMessages.ERROR_MEDIA_FILES_NOT_IN_DB)) {
+            processor.infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
+        }
+
+        processor.processingEventHandler(ProcessorMessages.VALIDATING_ARTIFACT_MEDIA_FILES);
+        if (MediaFileValidator.validate(
+                processor,
+                pathValidation,
+                dbArtifactValidation,
+                MediaFileValidator.ARTIFACT_MEDIA_FILE_MUSIC_MAPPER,
+                ProcessorMessages.ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_FILES,
+                ProcessorMessages.ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_DB)) {
+            processor.infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
+        }
+
+        processor.processingEventHandler(ProcessorMessages.VALIDATING_MEDIA_FILES_SIZE);
+        if (MediaFileValidator.validateMediaFileSize(
+                processor,
+                MediaFileValidator.ARTIFACT_MEDIA_FILE_MUSIC_MAPPER,
+                pathValidation,
+                dbValidation)) {
+            processor.infoHandler(ProcessorMessages.INFO_MEDIA_FILES_SIZE_MISMATCH_VALIDATED);
+        }
     }
 
     public static void validateMediaFilesVideoAll(
@@ -68,7 +63,13 @@ public class MediaFilesValidateUtil {
             processor.infoHandler(ProcessorMessages.INFO_MEDIA_FILES_VALIDATED);
         }
 
-        if (MediaFileValidator.validateArtifactMediaFiles(processor, pathValidation, dbArtifactValidation)) {
+        if (MediaFileValidator.validate(
+                processor,
+                pathValidation,
+                dbArtifactValidation,
+                MediaFileValidator.MEDIA_FILE_MAPPER,
+                ProcessorMessages.ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_FILES,
+                ProcessorMessages.ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_DB)) {
             processor.infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_VALIDATED);
         }
 

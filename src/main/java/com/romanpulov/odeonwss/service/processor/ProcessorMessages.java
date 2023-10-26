@@ -49,8 +49,8 @@ public class ProcessorMessages {
 
     public static final String ERROR_MEDIA_FILES_NOT_IN_DB = "Media files not in database";
     public static final String ERROR_MEDIA_FILES_NOT_IN_FILES = "Media files not in files";
-    static final String ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_DB = "Artifact media files not in database";
-    static final String ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_FILES = "Artifact media files not in files";
+    public static final String ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_DB = "Artifact media files not in database";
+    public static final String ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_FILES = "Artifact media files not in files";
     static final String ERROR_ARTIFACT_MEDIA_FILES_SIZE_MISMATCH = "Artifact size does not match media files size";
     static final String ERROR_MEDIA_FILES_EMPTY_SIZE = "Media files with empty size";
     public static final String ERROR_MEDIA_FILES_EMPTY_BITRATE = "Media files with empty bitrate";
