@@ -87,6 +87,13 @@ public class MediaFilesValidateUtil {
             processor.infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_SIZE_VALIDATED);
         }
 
+        if (MediaFileValidator.validateArtifactMediaFileDuration(
+                processor,
+                MediaFileValidator.ARTIFACT_TITLE_MAPPER,
+                dbArtifactValidation)) {
+            processor.infoHandler(ProcessorMessages.INFO_ARTIFACT_MEDIA_FILES_DURATION_VALIDATED);
+        }
+
         if (ValueValidator.validateConditionValue(
                 processor,
                 dbArtifactValidation,

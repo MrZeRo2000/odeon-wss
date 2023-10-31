@@ -145,7 +145,7 @@ public class ServiceProcessValidateDVAnimationTest {
 
         assertThat(pi.getProcessDetails().get(5)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Media files bitrate validated"),
+                        ProcessDetailInfo.fromMessage("Artifact media files duration validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -153,7 +153,7 @@ public class ServiceProcessValidateDVAnimationTest {
 
         assertThat(pi.getProcessDetails().get(6)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
+                        ProcessDetailInfo.fromMessage("Media files bitrate validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -161,7 +161,7 @@ public class ServiceProcessValidateDVAnimationTest {
 
         assertThat(pi.getProcessDetails().get(7)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
+                        ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -169,13 +169,21 @@ public class ServiceProcessValidateDVAnimationTest {
 
         assertThat(pi.getProcessDetails().get(8)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Products for tracks validated"),
+                        ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
 
         assertThat(pi.getProcessDetails().get(9)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Products for tracks validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(pi.getProcessDetails().get(10)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
@@ -423,7 +431,7 @@ public class ServiceProcessValidateDVAnimationTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(8)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(9)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Tracks without product",
@@ -457,7 +465,7 @@ public class ServiceProcessValidateDVAnimationTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(8)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Track numbers for artifact not increasing monotonically",
@@ -492,7 +500,7 @@ public class ServiceProcessValidateDVAnimationTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Media files size mismatch",
@@ -528,6 +536,38 @@ public class ServiceProcessValidateDVAnimationTest {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifact size does not match media files size",
+                                List.of(artifact.getTitle())),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(14)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testArtifactMediaFileDurationDifferentShouldFail() {
+        this.internalPrepare();
+
+        Artifact artifact = artifactRepository
+                .getAllByArtifactType(artifactType)
+                .stream()
+                .filter(a -> a.getTitle().equals("Talespin"))
+                .findFirst()
+                .orElseThrow();
+        artifact.setDuration(Optional.ofNullable(artifact.getDuration()).orElse(0L) + 11);
+        artifactRepository.save(artifact);
+        log.info("Saved artifact: " + artifact);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(5)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Artifact duration does not match media files duration",
                                 List.of(artifact.getTitle())),
                         ProcessingStatus.FAILURE,
                         null,

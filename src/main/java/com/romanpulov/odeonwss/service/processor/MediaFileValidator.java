@@ -211,4 +211,38 @@ public class MediaFileValidator {
         }
     }
 
+    public static boolean validateArtifactMediaFileDuration(
+            AbstractProcessor processor,
+            MediaFileValidationDTOMapper mapper,
+            List<MediaFileValidationDTO> dbArtifactValidation) {
+        Map<String, Long> artifactDurations = dbArtifactValidation
+                .stream()
+                .map(v -> Pair.of(
+                        mapper.apply(v),
+                        Optional.ofNullable(v.getArtifactDuration()).orElse(0L)))
+                .distinct()
+                .collect(Collectors.toMap(Pair::getFirst, Pair::getSecond));
+
+        Map<String, Long> artifactMediaFileDurations = dbArtifactValidation
+                .stream()
+                .collect(Collectors.groupingBy(
+                        mapper,
+                        Collectors.summingLong(v -> Optional.ofNullable(v.getMediaFileDuration()).orElse(0L))));
+
+        List<String> mismatchArtifactTitles = artifactDurations
+                .entrySet()
+                .stream()
+                .filter(a -> !artifactMediaFileDurations.getOrDefault(a.getKey(), 0L).equals(a.getValue()))
+                .map(Map.Entry::getKey)
+                .sorted()
+                .toList();
+
+        if (mismatchArtifactTitles.isEmpty()) {
+            return true;
+        } else {
+            processor.errorHandler(ProcessorMessages.ERROR_ARTIFACT_MEDIA_FILES_DURATION_MISMATCH, mismatchArtifactTitles);
+            return false;
+        }
+    }
+
 }
