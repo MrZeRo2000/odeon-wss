@@ -176,6 +176,13 @@ public class ServiceProcessValidateLATest {
         );
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artifact media files duration validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
                         ProcessingStatus.INFO,
                         null,
@@ -352,6 +359,13 @@ public class ServiceProcessValidateLATest {
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifact media files size validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artifact media files duration validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -667,7 +681,7 @@ public class ServiceProcessValidateLATest {
         List<ProcessDetail> processDetails = pi.getProcessDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(processDetails.get(7)).isEqualTo(
+        assertThat(processDetails.get(8)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Track numbers for artifact not increasing monotonically",
@@ -700,7 +714,7 @@ public class ServiceProcessValidateLATest {
         ProcessInfo pi = executeProcessor();
         org.assertj.core.api.Assertions.assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Media files size mismatch",
@@ -710,7 +724,6 @@ public class ServiceProcessValidateLATest {
                         null)
         );
     }
-
 
     @Test
     @Order(21)
@@ -740,4 +753,31 @@ public class ServiceProcessValidateLATest {
         );
     }
 
+    @Test
+    @Order(23)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testArtifactMediaFileDurationDifferentShouldFail() {
+        this.prepareInternal();
+
+        Artifact artifact = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithLA())
+                .stream()
+                .filter(a -> a.getTitle().equals("Back To Basics"))
+                .findFirst().orElseThrow();
+
+        artifact.setDuration(Optional.ofNullable(artifact.getDuration()).orElse(0L) + 540);
+        artifactRepository.save(artifact);
+
+        ProcessInfo pi = executeProcessor();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Artifact duration does not match media files duration",
+                                List.of("Christina Aguilera >> 2006 Back To Basics")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
 }

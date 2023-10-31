@@ -196,6 +196,14 @@ public class ServiceProcessValidateMP3Test {
 
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artifact media files duration validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
                         ProcessingStatus.INFO,
                         null,
@@ -412,6 +420,13 @@ public class ServiceProcessValidateMP3Test {
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifact media files size validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artifact media files duration validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -709,7 +724,7 @@ public class ServiceProcessValidateMP3Test {
         ProcessInfo pi = executeProcessor();
         Assertions.assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        Assertions.assertThat(pi.getProcessDetails().get(7)).isEqualTo(
+        Assertions.assertThat(pi.getProcessDetails().get(8)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Media files size mismatch",
@@ -743,6 +758,34 @@ public class ServiceProcessValidateMP3Test {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifact size does not match media files size",
+                                List.of("Kosheen >> 2007 Damage")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(22)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testArtifactMediaFileDurationDifferentShouldFail() {
+        this.prepareInternal();
+
+        Artifact artifact = artifactRepository.getAllByArtifactType(artifactType)
+                .stream()
+                .filter(a -> a.getTitle().equals("Damage"))
+                .findFirst().orElseThrow();
+
+        artifact.setDuration(Optional.ofNullable(artifact.getDuration()).orElse(0L) + 540);
+        artifactRepository.save(artifact);
+
+        ProcessInfo pi = executeProcessor();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Artifact duration does not match media files duration",
                                 List.of("Kosheen >> 2007 Damage")),
                         ProcessingStatus.FAILURE,
                         null,
