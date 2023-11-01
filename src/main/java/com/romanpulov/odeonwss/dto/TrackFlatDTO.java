@@ -7,7 +7,10 @@ public interface TrackFlatDTO {
     Long getId();
     Long getArtifactId();
     String getArtifactTitle();
+    Long getArtifactYear();
     Long getArtifactDuration();
+    Long getArtifactArtistId();
+    String getArtifactArtistName();
     Long getArtistId();
     String getArtistName();
     Long getPerformerArtistId();

@@ -218,6 +218,14 @@ public class ServiceProcessValidateMP3Test {
                         null)
         );
 
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artifact tracks duration validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
         assertThat(processDetails.get(id)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
@@ -441,6 +449,13 @@ public class ServiceProcessValidateMP3Test {
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artifact tracks duration validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -786,6 +801,41 @@ public class ServiceProcessValidateMP3Test {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifact duration does not match media files duration",
+                                List.of("Kosheen >> 2007 Damage")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(23)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testArtifactTrackDurationDifferentShouldFail() {
+        this.prepareInternal();
+
+        Track track = trackRepository
+                .getTracksByArtifactType(artifactType)
+                .stream()
+                .filter(t -> t.getTitle().equals("Thief"))
+                .findFirst()
+                .orElseThrow();
+        Artifact artifact = artifactRepository
+                .findById(track.getArtifact().getId())
+                .orElseThrow();
+
+        track.setDuration(Optional.ofNullable(track.getDuration()).orElse(0L) + 5);
+        trackRepository.save(track);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        Assertions.assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        Assertions.assertThat(pi.getProcessDetails().get(10)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Artifact duration does not match tracks duration",
                                 List.of("Kosheen >> 2007 Damage")),
                         ProcessingStatus.FAILURE,
                         null,

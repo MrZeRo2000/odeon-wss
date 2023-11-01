@@ -79,10 +79,12 @@ public abstract class AbstractDVNonMusicValidateProcessor extends AbstractFileSy
                     null,
                     List.of(artifactType));
 
-
             List<TrackFlatDTO> tracks = trackRepository.findAllFlatDTOByArtifactTypeId(this.artifactType.getId());
 
-            TracksValidateUtil.validateTracksDuration(this, tracks);
+            TracksValidateUtil.validateTracksDuration(
+                    this,
+                    TrackValidator.ARTIFACT_TITLE_MAPPER,
+                    tracks);
 
             if (ValueValidator.validateConditionValue(
                     this,

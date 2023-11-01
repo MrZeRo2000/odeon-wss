@@ -2,11 +2,13 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTOBuilder;
+import com.romanpulov.odeonwss.dto.TrackFlatDTO;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 import com.romanpulov.odeonwss.service.processor.utils.MediaFilesValidateUtil;
 import com.romanpulov.odeonwss.service.processor.utils.TracksValidateUtil;
@@ -31,14 +33,17 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
     private final ArtifactTypeRepository artifactTypeRepository;
     private final ArtifactRepository artifactRepository;
     private final MediaFileRepository mediaFileRepository;
+    private final TrackRepository trackRepository;
 
     public LAValidateProcessor(
             ArtifactTypeRepository artifactTypeRepository,
             ArtifactRepository artifactRepository,
-            MediaFileRepository mediaFileRepository) {
+            MediaFileRepository mediaFileRepository,
+            TrackRepository trackRepository) {
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.mediaFileRepository = mediaFileRepository;
+        this.trackRepository = trackRepository;
     }
 
     @Override
@@ -75,6 +80,13 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                         artifactRepository,
                         List.of(ArtistType.ARTIST),
                         List.of(artifactType));
+
+                List<TrackFlatDTO> tracks = trackRepository.findAllFlatDTOByArtifactTypeId(artifactType.getId());
+
+                TracksValidateUtil.validateTracksDuration(
+                        this,
+                        TrackValidator.ARTIFACT_MUSIC_MAPPER,
+                        tracks);
             }
         }
         logger.info("Completed LAValidateProcessor execution");

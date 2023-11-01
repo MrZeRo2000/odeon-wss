@@ -9,6 +9,7 @@ import com.romanpulov.odeonwss.service.processor.*;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 
 import java.util.List;
+import java.util.function.Function;
 
 public class TracksValidateUtil {
     public static void validateMonotonicallyIncreasingTrackNumbers(
@@ -40,8 +41,12 @@ public class TracksValidateUtil {
 
     public static void validateTracksDuration (
             AbstractProcessor processor,
+            Function<TrackFlatDTO, String> mapper,
             List<TrackFlatDTO> tracks) {
-        if (TrackValidator.validateArtifactTrackDuration(processor, tracks)) {
+        if (TrackValidator.validateArtifactTrackDuration(
+                processor,
+                mapper,
+                tracks)) {
             processor.infoHandler(ProcessorMessages.INFO_ARTIFACT_TRACKS_DURATION_VALIDATED);
         }
     }

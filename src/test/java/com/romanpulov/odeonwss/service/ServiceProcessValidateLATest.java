@@ -62,6 +62,13 @@ public class ServiceProcessValidateLATest {
     @Autowired
     private DatabaseConfiguration databaseConfiguration;
 
+    private ArtifactType artifactType;
+
+    @BeforeEach
+    public void beforeEach() {
+        this.artifactType = artifactTypeRepository.getWithLA();
+    }
+
     private void prepareInternal() {
         DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_LOADED_LA, () -> {
             TEST_ARTISTS
@@ -191,6 +198,13 @@ public class ServiceProcessValidateLATest {
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artifact tracks duration validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -380,6 +394,13 @@ public class ServiceProcessValidateLATest {
         assertThat(processDetails.get(id++)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+        assertThat(processDetails.get(id++)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artifact tracks duration validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -775,6 +796,40 @@ public class ServiceProcessValidateLATest {
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifact duration does not match media files duration",
                                 List.of("Christina Aguilera >> 2006 Back To Basics")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+
+    @Test
+    @Order(24)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testArtifactTrackDurationDifferentShouldFail() {
+        this.prepareInternal();
+
+        Track track = trackRepository
+                .getTracksByArtifactType(artifactType)
+                .stream()
+                .filter(t -> t.getTitle().equals("My Immortal"))
+                .findFirst()
+                .orElseThrow();
+        Artifact artifact = artifactRepository
+                .findById(track.getArtifact().getId())
+                .orElseThrow();
+
+        track.setDuration(Optional.ofNullable(track.getDuration()).orElse(0L) + 5);
+        trackRepository.save(track);
+
+        ProcessInfo pi = executeProcessor();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(9)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Artifact duration does not match tracks duration",
+                                List.of("Evanescence >> 2000 Origin")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)

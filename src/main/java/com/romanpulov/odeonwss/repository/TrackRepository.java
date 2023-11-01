@@ -67,7 +67,10 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
             c.id AS id,
             a.id AS artifactId,
             a.title AS artifactTitle,
+            a.year AS artifactYear,
             a.duration AS artifactDuration,
+            ar.id AS artifactArtistId,
+            ar.name AS artifactArtistName,
             c.num AS num,
             dvt.id AS dvTypeId,
             dvt.name AS dvTypeName,
@@ -77,6 +80,7 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
             dvp.title AS dvProductTitle
         FROM Track c
         INNER JOIN Artifact a ON c.artifact = a
+        LEFT OUTER JOIN Artist ar ON ar = a.artist
         LEFT OUTER JOIN DVType dvt ON dvt = c.dvType
         LEFT OUTER JOIN TrackDVProduct tp ON tp.trackId = c.id
         LEFT OUTER JOIN DVProduct dvp ON tp.dvProductId = dvp.id
