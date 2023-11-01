@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
+import com.romanpulov.odeonwss.dto.TrackFlatDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
@@ -8,6 +9,7 @@ import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.processor.utils.MediaFilesValidateUtil;
 import com.romanpulov.odeonwss.service.processor.utils.TracksValidateUtil;
 import org.springframework.stereotype.Component;
@@ -27,13 +29,17 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
 
     private final MediaFileRepository mediaFileRepository;
 
+    private final TrackRepository trackRepository;
+
     public DVMusicValidateProcessor(
             ArtifactTypeRepository artifactTypeRepository,
             ArtifactRepository artifactRepository,
-            MediaFileRepository mediaFileRepository) {
+            MediaFileRepository mediaFileRepository,
+            TrackRepository trackRepository) {
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.mediaFileRepository = mediaFileRepository;
+        this.trackRepository = trackRepository;
     }
 
     @Override
@@ -72,6 +78,10 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
                         artifactRepository,
                         List.of(ArtistType.ARTIST, ArtistType.CLASSICS),
                         List.of(artifactType));
+
+                List<TrackFlatDTO> tracks = trackRepository.findAllFlatDTOByArtifactTypeId(this.artifactType.getId());
+
+                TracksValidateUtil.validateTracksDuration(this, tracks);
             }
         }
     }

@@ -79,13 +79,20 @@ public class ServiceProcessValidateDVMusicTest {
 
     private void internalPrepareExisting() {
         internalPrepareImported();
-        DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA_EXISTING, () ->
-                artifactRepository.getAllByArtifactType(artifactType)
-                .forEach(artifact -> {
-                    if (!EXISTING_ARTIFACT_TITLES.contains(artifact.getTitle())) {
-                        artifactRepository.delete(artifact);
+        DbManagerService.loadOrPrepare(databaseConfiguration,
+                DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA_EXISTING,
+                () ->
+                    artifactRepository.getAllByArtifactType(artifactType)
+                    .forEach(artifact -> {
+                        if (!EXISTING_ARTIFACT_TITLES.contains(artifact.getTitle())) {
+                            artifactRepository.delete(artifact);
+                        } else {
+                            Track firstTrack = trackRepository.findAllByArtifact(artifact).get(0);
+                            firstTrack.setDuration(artifact.getDuration());
+                            trackRepository.save(firstTrack);
+                        }
                     }
-                }));
+                ));
     }
 
     @Test
@@ -222,6 +229,14 @@ public class ServiceProcessValidateDVMusicTest {
         );
 
         assertThat(pi.getProcessDetails().get(10)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Artifact tracks duration validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(pi.getProcessDetails().get(11)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
@@ -610,6 +625,42 @@ public class ServiceProcessValidateDVMusicTest {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifact duration does not match media files duration",
+                                List.of(artifact.getTitle())),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(24)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testArtifactTrackDurationDifferentShouldFail() {
+        this.internalPrepareExisting();
+
+        Track track = trackRepository
+                .getTracksByArtifactType(artifactType)
+                .stream()
+                .filter(t -> t.getTitle().equals("Close To Me"))
+                .findFirst()
+                .orElseThrow();
+        Artifact artifact = artifactRepository
+                .findById(track.getArtifact().getId())
+                .orElseThrow();
+
+        track.setDuration(Optional.ofNullable(track.getDuration()).orElse(0L) + 5);
+        trackRepository.save(track);
+        log.info("Saved track: " + track);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(10)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Artifact duration does not match tracks duration",
                                 List.of(artifact.getTitle())),
                         ProcessingStatus.FAILURE,
                         null,
