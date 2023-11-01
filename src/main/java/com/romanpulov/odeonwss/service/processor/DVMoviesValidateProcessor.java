@@ -3,7 +3,7 @@ package com.romanpulov.odeonwss.service.processor;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
-import com.romanpulov.odeonwss.service.TrackService;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -17,12 +17,12 @@ public class DVMoviesValidateProcessor extends AbstractDVNonMusicValidateProcess
             ArtifactTypeRepository artifactTypeRepository,
             ArtifactRepository artifactRepository,
             MediaFileRepository mediaFileRepository,
-            TrackService trackService) {
+            TrackRepository trackRepository) {
         super(
                 artifactTypeRepository,
                 artifactRepository,
                 mediaFileRepository,
-                trackService,
+                trackRepository,
                 ArtifactTypeRepository::getWithDVMovies
         );
     }

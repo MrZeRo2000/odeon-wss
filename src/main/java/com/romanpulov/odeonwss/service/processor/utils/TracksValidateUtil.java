@@ -1,13 +1,11 @@
 package com.romanpulov.odeonwss.service.processor.utils;
 
 import com.romanpulov.odeonwss.dto.ArtifactFlatDTO;
+import com.romanpulov.odeonwss.dto.TrackFlatDTO;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.service.processor.AbstractProcessor;
-import com.romanpulov.odeonwss.service.processor.MediaFileValidator;
-import com.romanpulov.odeonwss.service.processor.ProcessorMessages;
-import com.romanpulov.odeonwss.service.processor.ValueValidator;
+import com.romanpulov.odeonwss.service.processor.*;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 
 import java.util.List;
@@ -37,6 +35,14 @@ public class TracksValidateUtil {
                         )
                 )) {
             processor.infoHandler(ProcessorMessages.INFO_MONOTONICALLY_INCREASING_TRACK_NUMBER_VALIDATED);
+        }
+    }
+
+    public static void validateTracksDuration (
+            AbstractProcessor processor,
+            List<TrackFlatDTO> tracks) {
+        if (TrackValidator.validateArtifactTrackDuration(processor, tracks)) {
+            processor.infoHandler(ProcessorMessages.INFO_ARTIFACT_TRACKS_DURATION_VALIDATED);
         }
     }
 }

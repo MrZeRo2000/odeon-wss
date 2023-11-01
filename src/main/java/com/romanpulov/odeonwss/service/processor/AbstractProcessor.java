@@ -42,7 +42,7 @@ public abstract class AbstractProcessor {
         progressHandler.handleProgress(ProcessDetail.fromErrorMessage(errorMessage));
     }
 
-    protected void errorHandler(String errorMessage, List<String> items) {
+    public void errorHandler(String errorMessage, List<String> items) {
         progressHandler.handleProgress(ProcessDetail.fromErrorMessage(errorMessage, new ArrayList<>(items)));
     }
 

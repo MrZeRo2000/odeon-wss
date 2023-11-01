@@ -53,6 +53,7 @@ public class ProcessorMessages {
     public static final String ERROR_ARTIFACT_MEDIA_FILES_NOT_IN_FILES = "Artifact media files not in files";
     static final String ERROR_ARTIFACT_MEDIA_FILES_SIZE_MISMATCH = "Artifact size does not match media files size";
     static final String ERROR_ARTIFACT_MEDIA_FILES_DURATION_MISMATCH = "Artifact duration does not match media files duration";
+    public static final String ERROR_ARTIFACT_TRACKS_DURATION_MISMATCH = "Artifact duration does not match tracks duration";
     static final String ERROR_MEDIA_FILES_EMPTY_SIZE = "Media files with empty size";
     public static final String ERROR_MEDIA_FILES_EMPTY_BITRATE = "Media files with empty bitrate";
     static final String ERROR_MEDIA_FILES_SIZE_MISMATCH = "Media files size mismatch";
@@ -63,6 +64,7 @@ public class ProcessorMessages {
     public static final String INFO_ARTIFACT_MEDIA_FILES_VALIDATED = "Artifact media files validated";
     public static final String INFO_ARTIFACT_MEDIA_FILES_SIZE_VALIDATED = "Artifact media files size validated";
     public static final String INFO_ARTIFACT_MEDIA_FILES_DURATION_VALIDATED = "Artifact media files duration validated";
+    public static final String INFO_ARTIFACT_TRACKS_DURATION_VALIDATED = "Artifact tracks duration validated";
     static final String INFO_MEDIA_FILES_LOADED = "Media files loaded";
     static final String INFO_MEDIA_FILES_SIZE_VALIDATED = "Media files size validated";
     public static final String INFO_MEDIA_FILES_SIZE_MISMATCH_VALIDATED = "Media files size mismatch validated";

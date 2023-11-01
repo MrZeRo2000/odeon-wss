@@ -1,12 +1,12 @@
 package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
-import com.romanpulov.odeonwss.dto.TrackDTO;
+import com.romanpulov.odeonwss.dto.TrackFlatDTO;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
-import com.romanpulov.odeonwss.service.TrackService;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.processor.utils.MediaFilesValidateUtil;
 import com.romanpulov.odeonwss.service.processor.utils.TracksValidateUtil;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ public abstract class AbstractDVNonMusicValidateProcessor extends AbstractFileSy
     private final ArtifactTypeRepository artifactTypeRepository;
     private final ArtifactRepository artifactRepository;
     private final MediaFileRepository mediaFileRepository;
-    private final TrackService trackService;
+    private final TrackRepository trackRepository;
 
     private final Function<ArtifactTypeRepository, ArtifactType> artifactTypeSupplier;
 
@@ -34,12 +34,12 @@ public abstract class AbstractDVNonMusicValidateProcessor extends AbstractFileSy
             ArtifactTypeRepository artifactTypeRepository,
             ArtifactRepository artifactRepository,
             MediaFileRepository mediaFileRepository,
-            TrackService trackService,
+            TrackRepository trackRepository,
             Function<ArtifactTypeRepository, ArtifactType> artifactTypeSupplier) {
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.mediaFileRepository = mediaFileRepository;
-        this.trackService = trackService;
+        this.trackRepository = trackRepository;
         this.artifactTypeSupplier = artifactTypeSupplier;
     }
 
@@ -79,13 +79,17 @@ public abstract class AbstractDVNonMusicValidateProcessor extends AbstractFileSy
                     null,
                     List.of(artifactType));
 
-            List<TrackDTO> tracks = trackService.getTableByArtifactTypeId(this.artifactType.getId());
+
+            List<TrackFlatDTO> tracks = trackRepository.findAllFlatDTOByArtifactTypeId(this.artifactType.getId());
+
+            TracksValidateUtil.validateTracksDuration(this, tracks);
+
             if (ValueValidator.validateConditionValue(
                     this,
                     tracks,
                     ProcessorMessages.ERROR_TRACKS_WITHOUT_PRODUCT,
-                    t -> Objects.isNull(t.getDvProduct()),
-                    t -> MediaFileValidator.DELIMITER_FORMAT.formatted(t.getArtifact().getTitle(), t.getTitle()))) {
+                    t -> Objects.isNull(t.getDvProductId()),
+                    t -> MediaFileValidator.DELIMITER_FORMAT.formatted(t.getArtifactTitle(), t.getTitle()))) {
                 infoHandler(ProcessorMessages.INFO_PRODUCTS_FOR_TRACKS_VALIDATED);
             }
         }

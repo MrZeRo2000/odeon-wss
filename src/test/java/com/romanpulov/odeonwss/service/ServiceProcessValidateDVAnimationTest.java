@@ -177,13 +177,21 @@ public class ServiceProcessValidateDVAnimationTest {
 
         assertThat(pi.getProcessDetails().get(9)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Products for tracks validated"),
+                        ProcessDetailInfo.fromMessage("Artifact tracks duration validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
 
         assertThat(pi.getProcessDetails().get(10)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Products for tracks validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(pi.getProcessDetails().get(11)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
@@ -431,7 +439,7 @@ public class ServiceProcessValidateDVAnimationTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(9)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(10)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Tracks without product",
@@ -568,6 +576,43 @@ public class ServiceProcessValidateDVAnimationTest {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifact duration does not match media files duration",
+                                List.of(artifact.getTitle())),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+
+    @Test
+    @Order(15)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testArtifactTrackDurationDifferentShouldFail() {
+        this.internalPrepare();
+
+        Track track = trackRepository
+                .getTracksByArtifactType(artifactType)
+                .stream()
+                .filter(t -> t.getTitle().equals("Puss Gets the Boot"))
+                .findFirst()
+                .orElseThrow();
+        Artifact artifact = artifactRepository
+                .findById(track.getArtifact().getId())
+                .orElseThrow();
+
+        track.setDuration(Optional.ofNullable(track.getDuration()).orElse(0L) + 5);
+        trackRepository.save(track);
+        log.info("Saved track: " + track);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(9)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Artifact duration does not match tracks duration",
                                 List.of(artifact.getTitle())),
                         ProcessingStatus.FAILURE,
                         null,

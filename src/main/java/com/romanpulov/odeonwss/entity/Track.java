@@ -3,6 +3,8 @@ package com.romanpulov.odeonwss.entity;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.Hibernate;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -167,7 +169,7 @@ public class Track extends AbstractBaseMigratedEntity {
     public String toString() {
         return "Track{" +
                 "id=" + getId() +
-                ", artifact=" + artifact +
+                ", artifact="  + (Hibernate.isInitialized(artifact) ? artifact : "not initialized") +
                 ", title='" + title + '\'' +
                 ", duration=" + duration +
                 ", diskNum=" + diskNum +
