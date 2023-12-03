@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.service;
 import com.romanpulov.odeonwss.dto.TrackDTO;
 import com.romanpulov.odeonwss.dto.TrackFlatDTO;
 import com.romanpulov.odeonwss.dto.TrackTransformer;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
@@ -73,8 +74,8 @@ public class TrackService
         }
     }
 
-    public List<TrackDTO> getTableByArtifactTypeId(Long artifactTypeId) {
-        return transformer.transform(repository.findAllFlatDTOByArtifactTypeId(artifactTypeId));
+    public List<TrackDTO> getTableByArtifactTypeId(ArtistType artistType, Long artifactTypeId) {
+        return transformer.transform(repository.findAllFlatDTOByArtifactTypeId(artistType, artifactTypeId));
     }
 
     public List<TrackDTO> getTableByProductId(Long productId) {

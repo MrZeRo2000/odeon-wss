@@ -179,7 +179,7 @@ public class ServiceTrackTest {
     @Test
     @Order(2)
     void testGetTableByArtifactTypeId() {
-        var table = trackService.getTableByArtifactTypeId(artifactTypeRepository.getWithMP3().getId());
+        var table = trackService.getTableByArtifactTypeId(ArtistType.ARTIST, artifactTypeRepository.getWithMP3().getId());
         assertThat(table.size()).isEqualTo(2);
         assertThat(table.get(0).getTitle()).isEqualTo("Comp 1-1");
         assertThat(table.get(0).getDvProduct()).isNull();

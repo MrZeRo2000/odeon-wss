@@ -4,6 +4,7 @@ import com.romanpulov.odeonwss.dto.TrackDTO;
 import com.romanpulov.odeonwss.dto.TrackFlatDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entity.Track;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,11 +85,11 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
         LEFT OUTER JOIN DVType dvt ON dvt = c.dvType
         LEFT OUTER JOIN TrackDVProduct tp ON tp.trackId = c.id
         LEFT OUTER JOIN DVProduct dvp ON tp.dvProductId = dvp.id
-        WHERE a.artifactType.id = :artifactTypeId
+        WHERE (ar.type IS NULL OR ar.type = :artistType) AND a.artifactType.id = :artifactTypeId
         ORDER BY a.title, c.num, c.title
     """
     )
-    List<TrackFlatDTO> findAllFlatDTOByArtifactTypeId(Long artifactTypeId);
+    List<TrackFlatDTO> findAllFlatDTOByArtifactTypeId(ArtistType artistType, Long artifactTypeId);
     
     @Query("""
         SELECT

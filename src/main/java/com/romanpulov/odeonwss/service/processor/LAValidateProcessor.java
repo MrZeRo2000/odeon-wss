@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 public class LAValidateProcessor extends AbstractFileSystemProcessor implements PathValidationLoader.ArtistArtifactPathLoader {
     private static final Logger logger = LoggerFactory.getLogger(LAValidateProcessor.class);
 
+    private final ArtistType artistType = ArtistType.ARTIST;
     private ArtifactType artifactType;
 
     private final ArtifactTypeRepository artifactTypeRepository;
@@ -55,7 +56,7 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
 
         processingEventHandler(ProcessorMessages.VALIDATING_LOADING_FROM_DB);
         List<MediaFileValidationDTO> dbValidation = mediaFileRepository
-                .getTrackMediaFileValidationMusic(ArtistType.ARTIST, artifactType);
+                .getTrackMediaFileValidationMusic(artistType, artifactType);
 
         processingEventHandler(ProcessorMessages.VALIDATING_LOADING_FROM_PATH, path.toAbsolutePath());
         List<MediaFileValidationDTO> pathValidation = loadFromPath(path);
@@ -73,15 +74,16 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                         this,
                         pathValidation,
                         dbValidation,
-                        mediaFileRepository.getArtifactMediaFileValidationMusic(artifactType));
+                        mediaFileRepository.getArtifactMediaFileValidationMusic(artistType, artifactType));
 
                 TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
                         this,
                         artifactRepository,
-                        List.of(ArtistType.ARTIST),
+                        List.of(artistType),
                         List.of(artifactType));
 
-                List<TrackFlatDTO> tracks = trackRepository.findAllFlatDTOByArtifactTypeId(artifactType.getId());
+                List<TrackFlatDTO> tracks = trackRepository.findAllFlatDTOByArtifactTypeId(
+                        artistType, artifactType.getId());
 
                 TracksValidateUtil.validateTracksDuration(
                         this,

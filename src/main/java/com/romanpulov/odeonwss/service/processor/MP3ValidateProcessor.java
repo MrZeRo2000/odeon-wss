@@ -48,6 +48,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
 
     @Override
     public void execute() throws ProcessorException {
+        ArtistType artistType = ArtistType.ARTIST;
         ArtifactType artifactType = artifactTypeRepository.getWithMP3();
 
         Path path = validateAndGetPath();
@@ -58,7 +59,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
 
         processingEventHandler(ProcessorMessages.VALIDATING_LOADING_FROM_DB);
         List<MediaFileValidationDTO> dbValidation = mediaFileRepository
-                .getTrackMediaFileValidationMusic(ArtistType.ARTIST, artifactType);
+                .getTrackMediaFileValidationMusic(artistType, artifactType);
 
         processingEventHandler(ProcessorMessages.VALIDATING_ARTISTS);
         if (MediaFileValidator.validateArtistNamesArtifactsTracks(this, pathValidation, dbValidation)) {
@@ -77,7 +78,7 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
                         this,
                         pathValidation,
                         dbValidation,
-                        mediaFileRepository.getArtifactMediaFileValidationMusic(artifactType));
+                        mediaFileRepository.getArtifactMediaFileValidationMusic(artistType, artifactType));
 
                 TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
                         this,
@@ -85,7 +86,8 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
                         List.of(ArtistType.ARTIST),
                         List.of(artifactType));
 
-                List<TrackFlatDTO> tracks = trackRepository.findAllFlatDTOByArtifactTypeId(artifactType.getId());
+                List<TrackFlatDTO> tracks = trackRepository.findAllFlatDTOByArtifactTypeId(
+                        artistType, artifactType.getId());
 
                 TracksValidateUtil.validateTracksDuration(
                         this,

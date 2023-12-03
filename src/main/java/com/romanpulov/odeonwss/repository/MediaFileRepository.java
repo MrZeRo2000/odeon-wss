@@ -167,10 +167,10 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
         FROM Artist AS ar
         INNER JOIN Artifact af ON af.artist = ar
         LEFT OUTER JOIN MediaFile m ON m.artifact = af
-        WHERE af.artifactType = :artifactType
+        WHERE ar.type = :artistType AND af.artifactType = :artifactType
         ORDER BY ar.name, af.year, af.title, m.name
     """
     )
-    List<MediaFileValidationDTO> getArtifactMediaFileValidationMusic(ArtifactType artifactType);
+    List<MediaFileValidationDTO> getArtifactMediaFileValidationMusic(ArtistType artistType, ArtifactType artifactType);
 
 }

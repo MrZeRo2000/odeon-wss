@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
+    private final ArtistType artistType = ArtistType.ARTIST;
     private ArtifactType artifactType;
 
     private final ArtifactTypeRepository artifactTypeRepository;
@@ -49,7 +50,7 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
         this.artifactType = Optional.ofNullable(this.artifactType).orElse(artifactTypeRepository.getWithDVMusic());
 
         final List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getTrackMediaFileValidationMusic(
-                ArtistType.ARTIST, artifactType
+                artistType, artifactType
         );
         final List<MediaFileValidationDTO> pathValidation = PathValidationLoader.loadFromPath(
                 this,
@@ -65,7 +66,7 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
                 List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
-                        .getArtifactMediaFileValidationMusic(artifactType);
+                        .getArtifactMediaFileValidationMusic(artistType, artifactType);
 
                 MediaFilesValidateUtil.validateMediaFilesVideoAll(
                         this,
@@ -79,7 +80,8 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
                         List.of(ArtistType.ARTIST, ArtistType.CLASSICS),
                         List.of(artifactType));
 
-                List<TrackFlatDTO> tracks = trackRepository.findAllFlatDTOByArtifactTypeId(this.artifactType.getId());
+                List<TrackFlatDTO> tracks = trackRepository.findAllFlatDTOByArtifactTypeId(
+                        artistType, this.artifactType.getId());
 
                 TracksValidateUtil.validateTracksDuration(
                         this,

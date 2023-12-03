@@ -63,6 +63,9 @@ public class ServiceProcessValidateMP3Test {
         DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_LOADED_MP3, () -> {
             service.executeProcessor(ProcessorType.MP3_LOADER, null);
             assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+
+            service.executeProcessor(ProcessorType.CLASSICS_IMPORTER);
+            assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         });
         if (this.artistNames == null) {
             this.artistNames = artistRepository
