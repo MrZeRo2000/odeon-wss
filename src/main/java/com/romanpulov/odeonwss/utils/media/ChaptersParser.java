@@ -13,15 +13,20 @@ public class ChaptersParser {
     private static final Pattern REGEXP_PATTERN_TIMESTAMP =
             Pattern.compile("=(\\d{1,2}):(\\d{1,2}):(\\d{1,2})\\.(\\d{1,3})");
 
-    public Collection<Long> parseFile(Path file) throws ChaptersParsingException {
+    public static Collection<Long> parseFile(Path file) throws ChaptersParsingException {
+        String fileName = file.getFileName().toString();
         List<String> lines;
         try {
             lines = Files.readAllLines(file);
         } catch (IOException e) {
             throw new ChaptersParsingException("Error reading chapters file %s: %s"
-                    .formatted(file.getFileName().toString(), e.getMessage()));
+                    .formatted(fileName, e.getMessage()));
         }
 
+        return parseLines(fileName, lines);
+    }
+
+    public static Collection<Long> parseLines(String fileName, Collection<String> lines) throws ChaptersParsingException {
         Long previousTimeStamp = null;
         List<Long> result = new ArrayList<>();
 
@@ -30,10 +35,10 @@ public class ChaptersParser {
             if (matcher.find() && matcher.groupCount() == 4)
                 try {
                     long timeStamp =
-                            (long) Integer.parseInt(matcher.group(0)) * 60 * 60 +
-                            (long) Integer.parseInt(matcher.group(1)) * 60 +
-                            Integer.parseInt(matcher.group(2)) +
-                            Math.round(Integer.parseInt(matcher.group(3)) / 1e4);
+                            (long) Integer.parseInt(matcher.group(1)) * 60 * 60 +
+                                    (long) Integer.parseInt(matcher.group(2)) * 60 +
+                                    Integer.parseInt(matcher.group(3)) +
+                                    Math.round(Integer.parseInt(matcher.group(4)) / 1e3);
 
                     if (previousTimeStamp != null) {
                         result.add(timeStamp - previousTimeStamp);
@@ -42,7 +47,7 @@ public class ChaptersParser {
 
                 } catch (NumberFormatException e) {
                     throw new ChaptersParsingException("Error reading parsing line: %s in chapters file %s: %s"
-                            .formatted(line, file.getFileName().toString(), e.getMessage()));
+                            .formatted(line, fileName, e.getMessage()));
                 }
         }
 
