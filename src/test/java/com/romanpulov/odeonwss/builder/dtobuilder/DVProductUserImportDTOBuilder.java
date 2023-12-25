@@ -2,8 +2,8 @@ package com.romanpulov.odeonwss.builder.dtobuilder;
 
 import com.romanpulov.odeonwss.builder.AbstractClassBuilder;
 import com.romanpulov.odeonwss.dto.DVCategoryDTO;
-import com.romanpulov.odeonwss.dto.DVProductUserImportDTO;
-import com.romanpulov.odeonwss.dto.DVProductUserImportDetailDTO;
+import com.romanpulov.odeonwss.dto.user.DVProductUserImportDTO;
+import com.romanpulov.odeonwss.dto.user.DVProductUserImportDetailDTO;
 
 import java.util.List;
 

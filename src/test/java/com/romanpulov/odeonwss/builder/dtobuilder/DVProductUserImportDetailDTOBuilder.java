@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.builder.dtobuilder;
 
 import com.romanpulov.odeonwss.builder.AbstractClassBuilder;
-import com.romanpulov.odeonwss.dto.DVProductUserImportDetailDTO;
+import com.romanpulov.odeonwss.dto.user.DVProductUserImportDetailDTO;
 
 public class DVProductUserImportDetailDTOBuilder extends AbstractClassBuilder<DVProductUserImportDetailDTO> {
     public DVProductUserImportDetailDTOBuilder() {

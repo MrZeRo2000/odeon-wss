@@ -3,11 +3,11 @@ package com.romanpulov.odeonwss.unit;
 import com.romanpulov.odeonwss.utils.media.ChaptersParser;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import java.util.List;
 import java.util.logging.Logger;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class UnitChaptersParserTest {
     Logger logger = Logger.getLogger(getClass().getSimpleName());
@@ -81,10 +81,10 @@ public class UnitChaptersParserTest {
         assertThat(iterator.next()).isEqualTo((32 - 26) * 60 + (51 - 18));
         assertThat(iterator.next()).isEqualTo((39 - 32) * 60 + (25 - 51));
         assertThat(iterator.next()).isEqualTo((45 - 39) * 60 + (33 - 25));
-        assertThat(iterator.next()).isEqualTo((52 - 45) * 60 + (00 - 33));
-        assertThat(iterator.next()).isEqualTo((58 - 52) * 60 + (22 - 00));
+        assertThat(iterator.next()).isEqualTo((52 - 45) * 60 - 33);
+        assertThat(iterator.next()).isEqualTo((58 - 52) * 60 + 22);
         assertThat(iterator.next()).isEqualTo(60 * 60 + (4 - 58) * 60 + (46 - 22));
-        assertThat(iterator.next()).isEqualTo((10 - 04) * 60 + (58 - 46));
+        assertThat(iterator.next()).isEqualTo((10 - 4) * 60 + (58 - 46));
         assertThat(iterator.next()).isEqualTo((17 - 10) * 60 + (18 - 58));
         assertThat(iterator.next()).isEqualTo((23 - 17) * 60 + (35 - 18));
     }

@@ -1,6 +1,7 @@
-package com.romanpulov.odeonwss.dto;
+package com.romanpulov.odeonwss.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.romanpulov.odeonwss.dto.DVCategoryDTO;
 
 import java.util.ArrayList;
 import java.util.List;

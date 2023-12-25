@@ -1,6 +1,6 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.romanpulov.odeonwss.dto.DVProductUserImportDTO;
+import com.romanpulov.odeonwss.dto.user.DVProductUserImportDTO;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.exception.EmptyParameterException;
 import com.romanpulov.odeonwss.service.user.DVProductUserImportService;

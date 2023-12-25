@@ -1,4 +1,4 @@
-package com.romanpulov.odeonwss.dto;
+package com.romanpulov.odeonwss.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
