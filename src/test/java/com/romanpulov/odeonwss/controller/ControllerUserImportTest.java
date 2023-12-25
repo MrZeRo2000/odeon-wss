@@ -2,18 +2,12 @@ package com.romanpulov.odeonwss.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.romanpulov.odeonwss.builder.dtobuilder.DVCategoryDTOBuilder;
-import com.romanpulov.odeonwss.builder.dtobuilder.DVProductUserImportDTOBuilder;
-import com.romanpulov.odeonwss.builder.dtobuilder.DVProductUserImportDetailDTOBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVCategoryBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVProductBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.*;
+import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.DVOrigin;
-import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
-import com.romanpulov.odeonwss.repository.DVCategoryRepository;
-import com.romanpulov.odeonwss.repository.DVOriginRepository;
-import com.romanpulov.odeonwss.repository.DVProductRepository;
+import com.romanpulov.odeonwss.repository.*;
+import org.assertj.core.util.Lists;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -38,12 +32,12 @@ import java.util.List;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ControllerUserImportDVProductTest {
-    final static Logger logger = LoggerFactory.getLogger(ControllerUserImportDVProductTest.class);
+public class ControllerUserImportTest {
+    final static Logger logger = LoggerFactory.getLogger(ControllerUserImportTest.class);
 
     List<String> PRODUCT_NAMES = List.of(
-            "The Idol",
-            "Cruel Summer"
+            "Street",
+            "Racer"
     );
 
     final static ObjectMapper mapper = new ObjectMapper();
@@ -67,8 +61,14 @@ public class ControllerUserImportDVProductTest {
     @Autowired
     ArtifactTypeRepository artifactTypeRepository;
 
+    @Autowired
+    ArtifactRepository artifactRepository;
+
+    @Autowired
+    MediaFileRepository mediaFileRepository;
+
     private ArtifactType getArtifactType() {
-        return artifactTypeRepository.getWithDVMovies();
+        return artifactTypeRepository.getWithDVAnimation();
     }
 
     @Test
@@ -88,12 +88,29 @@ public class ControllerUserImportDVProductTest {
                 (new EntityDVCategoryBuilder()).withName("Cat 01").build(),
                 (new EntityDVCategoryBuilder()).withName("Cat 02").build()
         ));
+
+        var artifactOne = new EntityArtifactBuilder()
+                .withArtifactType(getArtifactType())
+                .withTitle("Number One")
+                .withDuration(2500L)
+                .build();
+        artifactRepository.save(artifactOne);
+
+        var mediaFileFirst = new EntityMediaFileBuilder()
+                .withArtifact(artifactOne)
+                .withDuration(2000L)
+                .withName("Number One File Name First")
+                .withBitrate(1000L)
+                .withFormat("MKV")
+                .withSize(524456L)
+                .build();
+        mediaFileRepository.save(mediaFileFirst);
     }
 
     @Test
     @Order(2)
-    void testNoArtifactTypeShouldFail() throws Exception {
-        mockMvc.perform(post("/api/dvproduct-user-import/analyze")
+    void testDVProductAnalyzeNoArtifactTypeShouldFail() throws Exception {
+        mockMvc.perform(post("/api/user-import/dvproduct/analyze")
                     .contentType(MediaType.APPLICATION_JSON)
                         .content("{}")
                 )
@@ -102,7 +119,7 @@ public class ControllerUserImportDVProductTest {
 
     @Test
     @Order(2)
-    void testNoDvOriginShouldFail() throws Exception {
+    void testDVProductAnalyzeNoDvOriginShouldFail() throws Exception {
         var dataNoOrigin = (new DVProductUserImportDTOBuilder())
                 .withArtifactTypeId(getArtifactType().getId())
                 .build();
@@ -110,7 +127,7 @@ public class ControllerUserImportDVProductTest {
         String json = mapper.writeValueAsString(dataNoOrigin);
         logger.debug("no origin json:" + json);
 
-        mockMvc.perform(post("/api/dvproduct-user-import/analyze")
+        mockMvc.perform(post("/api/user-import/dvproduct/analyze")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                 )
@@ -119,7 +136,7 @@ public class ControllerUserImportDVProductTest {
 
     @Test
     @Order(2)
-    void testWrongCategoriesShouldFail() throws Exception {
+    void testDVProductAnalyzeWrongCategoriesShouldFail() throws Exception {
         var dataWrongCategories = (new DVProductUserImportDTOBuilder())
                 .withArtifactTypeId(getArtifactType().getId())
                 .withDvOriginId(dvOriginRepository.findById(1L).orElseThrow().getId())
@@ -132,7 +149,7 @@ public class ControllerUserImportDVProductTest {
         String json = mapper.writeValueAsString(dataWrongCategories);
         logger.debug("wrong categories json:" + json);
 
-        mockMvc.perform(post("/api/dvproduct-user-import/analyze")
+        mockMvc.perform(post("/api/user-import/dvproduct/analyze")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                 )
@@ -141,7 +158,7 @@ public class ControllerUserImportDVProductTest {
 
     @Test
     @Order(3)
-    void testInsertOneShouldBeOk() throws Exception {
+    void testDVProductExecuteInsertOneShouldBeOk() throws Exception {
         var data = (new DVProductUserImportDTOBuilder())
                 .withArtifactTypeId(getArtifactType().getId())
                 .withDvOriginId(dvOriginRepository.findById(1L).orElseThrow().getId())
@@ -158,7 +175,7 @@ public class ControllerUserImportDVProductTest {
         String json = mapper.writeValueAsString(data);
         logger.debug("ok data json:" + json);
 
-        var result = mockMvc.perform(post("/api/dvproduct-user-import/execute")
+        var result = mockMvc.perform(post("/api/user-import/dvproduct/execute")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                 )
@@ -170,7 +187,81 @@ public class ControllerUserImportDVProductTest {
                 .andExpect(jsonPath("$.rowsUpdated", Matchers.hasSize(0)))
                 .andReturn();
         logger.debug("Post result:" + result.getResponse().getContentAsString());
-
     }
 
+    @Test
+    @Order(11)
+    void testTrackExecuteShouldBeOk() throws Exception {
+        var chapters = new String[] {
+                "CHAPTER01=00:00:00.000",
+                "CHAPTER01NAME=Chapter 01",
+                "CHAPTER02=00:06:28.160",
+                "CHAPTER02NAME=Chapter 02",
+                "CHAPTER03=00:12:26.160",
+                "CHAPTER03NAME=Chapter 03",
+                "CHAPTER04=00:19:30.160",
+                "CHAPTER04NAME=Chapter 04"
+        };
+
+        var data = new TrackUserImportDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(1L).build())
+                .withDVType(new IdNameDTOBuilder().withId(2L).build())
+                .withMediaFile(new MediaFileDTOBuilder().withId(1L).build())
+                .withTitles(List.of("Street", "Racer", "Magenta"))
+                .withChapters(Lists.list(chapters))
+                .build();
+
+        String json = mapper.writeValueAsString(data);
+        logger.debug("ok data json:" + json);
+
+        var result = mockMvc.perform(post("/api/user-import/track/execute")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.rowsInserted").isArray())
+                .andExpect(jsonPath("$.rowsInserted", Matchers.hasSize(3)))
+                .andExpect(jsonPath("$.rowsInserted[0]", Matchers.equalTo("Street")))
+                .andExpect(jsonPath("$.rowsInserted[1]", Matchers.equalTo("Racer")))
+                .andExpect(jsonPath("$.rowsInserted[2]", Matchers.equalTo("Magenta")))
+                .andExpect(jsonPath("$.rowsUpdated").isArray())
+                .andExpect(jsonPath("$.rowsUpdated", Matchers.hasSize(0)))
+                .andReturn();
+        logger.debug("Post result:" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(11)
+    void testTrackExecuteTitlesMismatchShouldBeOk() throws Exception {
+        var chapters = new String[] {
+                "CHAPTER01=00:00:00.000",
+                "CHAPTER01NAME=Chapter 01",
+                "CHAPTER02=00:06:28.160",
+                "CHAPTER02NAME=Chapter 02",
+                "CHAPTER03=00:12:26.160",
+                "CHAPTER03NAME=Chapter 03",
+                "CHAPTER04=00:19:30.160",
+                "CHAPTER04NAME=Chapter 04"
+        };
+
+        var data = new TrackUserImportDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(1L).build())
+                .withDVType(new IdNameDTOBuilder().withId(2L).build())
+                .withMediaFile(new MediaFileDTOBuilder().withId(1L).build())
+                .withTitles(List.of("Slow", "Deep"))
+                .withChapters(Lists.list(chapters))
+                .build();
+
+        String json = mapper.writeValueAsString(data);
+        logger.debug("ok data json:" + json);
+
+        var result = mockMvc.perform(post("/api/user-import/track/execute")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", Matchers.equalTo("Wrong parameter Chapters value: Titles size:2 and chapters duration size:3 mismatch")))
+                .andReturn();
+        logger.debug("Post result:" + result.getResponse().getContentAsString());
+    }
 }
