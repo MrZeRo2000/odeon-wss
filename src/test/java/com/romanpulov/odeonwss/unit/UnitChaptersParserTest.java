@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class UnitChaptersParserTest {
+    @SuppressWarnings("unused")
     Logger logger = Logger.getLogger(getClass().getSimpleName());
 
     @Test
@@ -20,7 +21,7 @@ public class UnitChaptersParserTest {
                 "CHAPTER02=00:06:28.160",
                 "CHAPTER02NAME=Chapter 02"
         );
-        var result = ChaptersParser.parseLines("Test", chapters);
+        var result = ChaptersParser.parseLines(chapters);
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.iterator().next()).isEqualTo(6 * 60 + 28);
     }
@@ -33,7 +34,7 @@ public class UnitChaptersParserTest {
                 "CHAPTER02=00:23:34.960",
                 "CHAPTER02NAME=Chapter 02"
         );
-        var result = ChaptersParser.parseLines("Test", chapters);
+        var result = ChaptersParser.parseLines(chapters);
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.iterator().next()).isEqualTo(23 * 60 + 34 + 1);
     }
@@ -70,7 +71,7 @@ public class UnitChaptersParserTest {
             "CHAPTER14=01:23:34.960",
             "CHAPTER14NAME=Chapter 14"
         };
-        var result = ChaptersParser.parseLines("Test", Lists.list(chapters));
+        var result = ChaptersParser.parseLines(Lists.list(chapters));
         assertThat(result.size()).isEqualTo(13);
 
         var iterator = result.iterator();

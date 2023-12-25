@@ -2,23 +2,24 @@ package com.romanpulov.odeonwss.service.user;
 
 import com.romanpulov.odeonwss.dto.IdNameDTO;
 import com.romanpulov.odeonwss.dto.user.TrackUserImportDTO;
-import com.romanpulov.odeonwss.dto.user.TrackUserImportDetailDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.DVType;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.exception.EmptyParameterException;
+import com.romanpulov.odeonwss.exception.WrongParameterValueException;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.DVTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.DVProductService;
+import com.romanpulov.odeonwss.utils.media.ChaptersParser;
+import com.romanpulov.odeonwss.utils.media.ChaptersParsingException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class TrackUserImportService {
@@ -43,7 +44,7 @@ public class TrackUserImportService {
 
     @Transactional
     public ImportStats executeImportTracks(TrackUserImportDTO data)
-            throws CommonEntityNotFoundException, EmptyParameterException {
+            throws CommonEntityNotFoundException, EmptyParameterException, WrongParameterValueException {
         ImportStats result = ImportStats.empty();
 
         Artifact artifact = artifactRepository
@@ -60,13 +61,23 @@ public class TrackUserImportService {
                 .orElseThrow(() -> new CommonEntityNotFoundException("DVType", dvTypeDTO.getId()));
         Long num = Optional.ofNullable(data.getNum()).orElse(1L);
 
-        for (TrackUserImportDetailDTO det: data.getTrackDetails()) {
-            String title = Optional
-                    .ofNullable(det.getTitle())
-                    .orElseThrow(() -> new EmptyParameterException("Title"));
-            Long duration = Optional
-                    .ofNullable(det.getDuration())
-                    .orElseThrow(() -> new EmptyParameterException("Duration"));
+        List<String> titles = data.getTitles();
+
+        Collection<Long> durations;
+        try {
+            durations = ChaptersParser.parseLines(data.getChapters());
+        } catch (ChaptersParsingException e) {
+            throw new WrongParameterValueException("Chapters", e.getMessage());
+        }
+
+        if (titles.size() != durations.size()) {
+            throw new WrongParameterValueException("Chapters",
+                    "Titles size:%d and chapters duration size:%d mismatch".formatted(titles.size(), durations.size()));
+        }
+
+        Iterator<Long> durationsIterator = durations.iterator();
+        for (String title: titles) {
+            Long duration = durationsIterator.next();
 
             Track track = new Track();
             track.setArtifact(artifact);

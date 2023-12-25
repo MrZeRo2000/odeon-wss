@@ -5,7 +5,6 @@ import com.romanpulov.odeonwss.dto.ArtifactDTO;
 import com.romanpulov.odeonwss.dto.IdNameDTO;
 import com.romanpulov.odeonwss.dto.MediaFileDTO;
 import com.romanpulov.odeonwss.dto.user.TrackUserImportDTO;
-import com.romanpulov.odeonwss.dto.user.TrackUserImportDetailDTO;
 
 import java.util.List;
 
@@ -34,8 +33,13 @@ public class TrackUserImportDTOBuilder extends AbstractClassBuilder<TrackUserImp
         return this;
     }
 
-    public TrackUserImportDTOBuilder withTrackDetails(List<TrackUserImportDetailDTO> trackDetails) {
-        this.instance.setTrackDetails(trackDetails);
+    public TrackUserImportDTOBuilder withTitles(List<String> titles) {
+        this.instance.setTitles(titles);
+        return this;
+    }
+
+    public TrackUserImportDTOBuilder withChapters(List<String> chapters) {
+        this.instance.setChapters(chapters);
         return this;
     }
 }

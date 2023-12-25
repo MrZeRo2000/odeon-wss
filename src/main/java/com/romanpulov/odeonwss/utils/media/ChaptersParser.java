@@ -1,8 +1,5 @@
 package com.romanpulov.odeonwss.utils.media;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -13,20 +10,7 @@ public class ChaptersParser {
     private static final Pattern REGEXP_PATTERN_TIMESTAMP =
             Pattern.compile("=(\\d{1,2}):(\\d{1,2}):(\\d{1,2})\\.(\\d{1,3})");
 
-    public static Collection<Long> parseFile(Path file) throws ChaptersParsingException {
-        String fileName = file.getFileName().toString();
-        List<String> lines;
-        try {
-            lines = Files.readAllLines(file);
-        } catch (IOException e) {
-            throw new ChaptersParsingException("Error reading chapters file %s: %s"
-                    .formatted(fileName, e.getMessage()));
-        }
-
-        return parseLines(fileName, lines);
-    }
-
-    public static Collection<Long> parseLines(String fileName, Collection<String> lines) throws ChaptersParsingException {
+    public static Collection<Long> parseLines(Collection<String> lines) throws ChaptersParsingException {
         Long previousTimeStamp = null;
         List<Long> result = new ArrayList<>();
 
@@ -46,8 +30,8 @@ public class ChaptersParser {
                     previousTimeStamp = timeStamp;
 
                 } catch (NumberFormatException e) {
-                    throw new ChaptersParsingException("Error reading parsing line: %s in chapters file %s: %s"
-                            .formatted(line, fileName, e.getMessage()));
+                    throw new ChaptersParsingException("Error reading parsing line: %s: %s"
+                            .formatted(line, e.getMessage()));
                 }
         }
 

@@ -13,7 +13,8 @@ public class TrackUserImportDTO {
     private MediaFileDTO mediaFile;
     private IdNameDTO dvType;
     private Long num;
-    private List<TrackUserImportDetailDTO> trackDetails;
+    private List<String> titles;
+    private List<String> chapters;
 
     public ArtifactDTO getArtifact() {
         return artifact;
@@ -47,22 +48,31 @@ public class TrackUserImportDTO {
         this.num = num;
     }
 
-    public List<TrackUserImportDetailDTO> getTrackDetails() {
-        return trackDetails;
+    public List<String> getTitles() {
+        return titles;
     }
 
-    public void setTrackDetails(List<TrackUserImportDetailDTO> trackDetails) {
-        this.trackDetails = trackDetails;
+    public void setTitles(List<String> titles) {
+        this.titles = titles;
+    }
+
+    public List<String> getChapters() {
+        return chapters;
+    }
+
+    public void setChapters(List<String> chapters) {
+        this.chapters = chapters;
     }
 
     @Override
     public String toString() {
         return "TrackUserImportDTO{" +
                 "artifact=" + artifact +
-                ", mediaFileDTO=" + mediaFile +
+                ", mediaFile=" + mediaFile +
                 ", dvType=" + dvType +
                 ", num=" + num +
-                ", trackDetails=" + trackDetails +
+                ", titles=" + titles +
+                ", chapters=" + chapters +
                 '}';
     }
 }
