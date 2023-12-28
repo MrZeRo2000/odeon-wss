@@ -103,6 +103,8 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
             c.duration AS duration,
             dvp.id AS dvProductId,
             dvp.title AS dvProductTitle,
+            m.size AS size,
+            m.bitrate AS bitRate,
             m.name AS mediaFileName
         FROM Track c
         INNER JOIN Artifact a ON c.artifact = a

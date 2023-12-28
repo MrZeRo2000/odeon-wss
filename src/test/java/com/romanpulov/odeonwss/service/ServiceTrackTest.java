@@ -203,6 +203,8 @@ public class ServiceTrackTest {
         assertThat(row.getDuration()).isEqualTo(12L);
         assertThat(row.getTitle()).isEqualTo("Comp 1-2");
         assertThat(row.getDvType().getId()).isEqualTo(7L);
+        assertThat(row.getSize()).isEqualTo(776L);
+        assertThat(row.getBitRate()).isEqualTo(256L);
         assertThat(row.getMediaFiles().stream().map(MediaFileDTO::getName).collect(Collectors.toList()))
                 .isEqualTo(List.of("Comp 1-2.mp3"));
     }
