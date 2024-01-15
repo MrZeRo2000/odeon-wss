@@ -30,4 +30,9 @@ public class TrackController
     ResponseEntity<List<TrackDTO>> getTableByProductId(@RequestParam Long dvProductId) {
         return ResponseEntity.ok(service.getTableByProductId(dvProductId));
     }
+
+    @GetMapping("/with-artifact/{id}")
+    ResponseEntity<TrackDTO> getWithArtifactTable(@PathVariable Long id) throws CommonEntityNotFoundException {
+        return ResponseEntity.ok(service.getWithArtifactById(id));
+    }
 }

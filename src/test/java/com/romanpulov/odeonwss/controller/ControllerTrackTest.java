@@ -197,6 +197,24 @@ public class ControllerTrackTest {
     }
 
     @Test
+    @Order(3)
+    void testGetWithArtifactById() throws Exception {
+        var result_not_found = mockMvc.perform(get("/api/track/with-artifact/10"))
+                .andExpect(status().isNotFound())
+                .andReturn();
+        logger.debug("Get not found result:" + result_not_found.getResponse().getContentAsString());
+
+        var result_ok = mockMvc.perform(get("/api/track/with-artifact/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.aMapWithSize(3)))
+                .andExpect(jsonPath("$.artifact.id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$.artifact.artifactType.id", Matchers.equalTo(artifactTypeRepository.getWithDVMovies().getId().intValue())))
+                .andReturn()
+                ;
+        logger.debug("Get ok result:" + result_ok.getResponse().getContentAsString());
+    }
+
+    @Test
     @Order(10)
     void testUIDataPost() throws Exception {
         var json = """
