@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -207,6 +208,16 @@ public class ServiceTrackTest {
         assertThat(row.getBitRate()).isEqualTo(256L);
         assertThat(row.getMediaFiles().stream().map(MediaFileDTO::getName).collect(Collectors.toList()))
                 .isEqualTo(List.of("Comp 1-2.mp3"));
+    }
+
+    @Test
+    @Order(2)
+    void testGetWithArtifactById() throws Exception {
+        var track = trackService.getWithArtifactById(1L);
+        assertThat(track.getArtifact().getArtifactType().getId()).isEqualTo(artifactTypeRepository.getWithMP3().getId());
+        assertThat(track.getTitle()).isNull();
+
+        assertThatThrownBy(() -> trackService.getWithArtifactById(100L)).isInstanceOf(CommonEntityNotFoundException.class);
     }
 
     @Test

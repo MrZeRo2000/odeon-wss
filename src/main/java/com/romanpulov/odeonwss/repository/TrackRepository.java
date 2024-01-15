@@ -151,5 +151,17 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
     )    
     List<TrackFlatDTO> findFlatDTOById(long id);
 
+    @Query("""
+        SELECT
+            c.id AS id,
+            c.artifact.id AS artifactId,
+            a.artifactType.id AS artifactTypeId
+        FROM Track c
+        LEFT OUTER JOIN Artifact a ON a = c.artifact
+        WHERE c.id = :id
+   """
+    )
+    Optional<TrackFlatDTO> findWithArtifactFlatDTOById(long id);
+
     Optional<Track> findTrackByArtifactAndTitle(Artifact artifact, String title);
 }

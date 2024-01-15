@@ -11,7 +11,6 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -48,10 +47,7 @@ public class RepositoryTrackTests {
     @Sql({"/schema.sql", "/data.sql"})
     void testInsertGet() {
         //ArtifactType
-        ArtifactType artifactType = artifactTypeRepository
-                .findAllById(List.of(artifactTypeRepository.getWithMP3().getId()))
-                .iterator()
-                .next();
+        ArtifactType artifactType = artifactTypeRepository.getWithMP3();
         Assertions.assertNotNull(artifactType);
 
         //Artist
@@ -152,6 +148,19 @@ public class RepositoryTrackTests {
         assertThat(flatTracks2.size()).isEqualTo(0);
 
         assertThatThrownBy(() -> artifactRepository.findById(3L).orElseThrow()).isInstanceOf(NoSuchElementException.class);
+    }
+
+
+    @Test
+    @Order(4)
+    void testTrackArtifactDTO() {
+        var flatTrack = trackRepository.findWithArtifactFlatDTOById(1L).orElseThrow();
+        assertThat(flatTrack.getArtifactId()).isEqualTo(1);
+        assertThat(flatTrack.getArtifactTypeId()).isEqualTo(artifactTypeRepository.getWithMP3().getId());
+
+        assertThatThrownBy(
+                () -> trackRepository.findWithArtifactFlatDTOById(3L).orElseThrow())
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test

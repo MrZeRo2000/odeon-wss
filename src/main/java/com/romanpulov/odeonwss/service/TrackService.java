@@ -93,6 +93,14 @@ public class TrackService
         }
     }
 
+    public TrackDTO getWithArtifactById(Long id) throws CommonEntityNotFoundException {
+        return transformer.transform(
+                List.of(repository
+                    .findWithArtifactFlatDTOById(id)
+                    .orElseThrow(() -> new CommonEntityNotFoundException(this.entityName, id)))
+                ).get(0);
+    }
+
     @Transactional
     public void insertTrackWithMedia(Track track, MediaFile mediaFile) {
         if (mediaFile.getId() == null) {

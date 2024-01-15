@@ -9,6 +9,7 @@ public class TrackTransformer {
     public List<TrackDTO> transform(List<TrackFlatDTO> rs) {
         final Map<Long, TrackDTOImpl> trackDTOMap = new LinkedHashMap<>();
         final Map<Long, ArtifactDTO> artifactDTOMap = new HashMap<>();
+        final Map<Long, ArtifactTypeDTO> artifactTypeDTOMap = new HashMap<>();
         final Map<Long, ArtistDTO> artistDTOMap = new HashMap<>();
         final Map<Long, IdNameDTO> dvTypeDTOMap = new HashMap<>();
 
@@ -22,6 +23,18 @@ public class TrackTransformer {
                         ArtifactDTOImpl newArtifactDTO = new ArtifactDTOImpl();
                         newArtifactDTO.setId(row.getArtifactId());
                         newArtifactDTO.setTitle(row.getArtifactTitle());
+
+                        if (row.getArtifactTypeId() != null) {
+                            newArtifactDTO.setArtifactType(
+                                    Optional.ofNullable(artifactTypeDTOMap.get(row.getArtifactTypeId()))
+                                            .orElseGet(() -> {
+                                                ArtifactTypeDTOImpl newArtifactTypeDTO = new ArtifactTypeDTOImpl();
+                                                newArtifactTypeDTO.setId(row.getArtifactTypeId());
+
+                                                artifactTypeDTOMap.putIfAbsent(row.getArtifactTypeId(), newArtifactTypeDTO);
+                                                return newArtifactTypeDTO;
+                            }));
+                        }
 
                         artifactDTOMap.putIfAbsent(row.getArtifactId(), newArtifactDTO);
                         return newArtifactDTO;
