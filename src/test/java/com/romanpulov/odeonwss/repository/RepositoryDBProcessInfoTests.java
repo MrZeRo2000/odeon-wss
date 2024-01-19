@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDBProcessInfoBuilder;
 import com.romanpulov.odeonwss.entity.DBProcessInfo;
+import com.romanpulov.odeonwss.service.ProcessService;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 import org.junit.jupiter.api.MethodOrderer;
@@ -25,6 +26,9 @@ public class RepositoryDBProcessInfoTests {
     @Autowired
     DBProcessInfoRepository dbProcessInfoRepository;
 
+    @Autowired
+    private ProcessService processService;
+
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
@@ -47,6 +51,8 @@ public class RepositoryDBProcessInfoTests {
                 .withUpdateDateTime(LocalDateTime.of(2023, 7, 2, 10, 6, 45))
                 .build()
         );
+
+        processService.executeProcessor(ProcessorType.LA_LOADER, null);
     }
 
     @Test
@@ -55,7 +61,7 @@ public class RepositoryDBProcessInfoTests {
         List<DBProcessInfo> dbProcessInfoList = StreamSupport
                 .stream(dbProcessInfoRepository.findAll().spliterator(), false)
                 .toList();
-        assertThat(dbProcessInfoList.size()).isEqualTo(3L);
+        assertThat(dbProcessInfoList.size()).isEqualTo(4L);
 
         DBProcessInfo savedDBProcessInfo = dbProcessInfoList
                 .stream()
@@ -74,16 +80,26 @@ public class RepositoryDBProcessInfoTests {
     @Order(2)
     void testFindAllOrderedByUpdateDateTime() {
         var dbProcessList = dbProcessInfoRepository.findAllOrderedByUpdateDateTime();
-        assertThat(dbProcessList.size()).isEqualTo(3);
+        assertThat(dbProcessList.size()).isEqualTo(4);
 
-        assertThat(dbProcessList.get(0).getId()).isEqualTo(3L);
-        assertThat(dbProcessList.get(0).getProcessingStatus()).isEqualTo(ProcessingStatus.WARNING);
-        assertThat(dbProcessList.get(0).getProcessorType()).isEqualTo(ProcessorType.LA_LOADER);
+        assertThat(dbProcessList.get(1).getId()).isEqualTo(3L);
+        assertThat(dbProcessList.get(1).getProcessingStatus()).isEqualTo(ProcessingStatus.WARNING);
+        assertThat(dbProcessList.get(1).getProcessorType()).isEqualTo(ProcessorType.LA_LOADER);
 
-        assertThat(dbProcessList.get(1).getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
-        assertThat(dbProcessList.get(1).getProcessorType()).isEqualTo(ProcessorType.DV_MOVIES_VALIDATOR);
-        assertThat(dbProcessList.get(1).getUpdateDateTime())
+        assertThat(dbProcessList.get(2).getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+        assertThat(dbProcessList.get(2).getProcessorType()).isEqualTo(ProcessorType.DV_MOVIES_VALIDATOR);
+        assertThat(dbProcessList.get(2).getUpdateDateTime())
                 .isEqualTo(LocalDateTime.of(2023, 4, 7, 15, 9, 7));
+    }
+
+    @Test
+    @Order(2)
+    void testFindByIdWithDetails() {
+        var data_1 = dbProcessInfoRepository.findByIdWithDetails(1L).orElseThrow();
+        assertThat(data_1.getId()).isEqualTo(1L);
+
+        var data_4 = dbProcessInfoRepository.findByIdWithDetails(4L).orElseThrow();
+        assertThat(data_4.getId()).isEqualTo(4L);
     }
 }
 

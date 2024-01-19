@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional(readOnly = true)
 public interface DBProcessInfoRepository extends CrudRepository<DBProcessInfo, Long> {
@@ -23,4 +24,12 @@ public interface DBProcessInfoRepository extends CrudRepository<DBProcessInfo, L
         ORDER BY d.updateDateTime DESC
     """)
     List<DBProcessInfoDTO> findAllOrderedByUpdateDateTime();
+
+    @Query("""
+    SELECT d
+    FROM DBProcessInfo as d
+    LEFT JOIN FETCH d.dbProcessDetails
+    WHERE d.id = :id
+    """)
+    Optional<DBProcessInfo> findByIdWithDetails(long id);
 }
