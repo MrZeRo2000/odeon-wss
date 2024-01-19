@@ -118,7 +118,7 @@ public class ControllerTrackTest {
                 .withDiskNum(1L)
                 .withNum(8L)
                 .withDuration(6665L)
-                .withDvType(new EntityDvTypeBuilder().withId(7L).build())
+                .withDvType(new EntityDVTypeBuilder().withId(7L).build())
                 .build();
         track.getDvProducts().add(dvProduct);
 
