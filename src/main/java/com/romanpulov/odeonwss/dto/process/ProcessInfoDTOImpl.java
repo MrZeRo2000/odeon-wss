@@ -13,6 +13,7 @@ public class ProcessInfoDTOImpl implements ProcessInfoDTO {
     private ProcessingStatus processingStatus;
     private LocalDateTime updateDateTime;
     private List<ProcessDetailDTO> processDetails = new ArrayList<>();
+    private ProcessingEventDTO processingEvent;
 
     @Override
     public Long getId() {
@@ -61,6 +62,15 @@ public class ProcessInfoDTOImpl implements ProcessInfoDTO {
     }
 
     @Override
+    public ProcessingEventDTO getProcessingEvent() {
+        return processingEvent;
+    }
+
+    public void setProcessingEvent(ProcessingEventDTO processingEvent) {
+        this.processingEvent = processingEvent;
+    }
+
+    @Override
     public String toString() {
         return "ProcessInfoDTOImpl{" +
                 "id=" + id +
@@ -68,6 +78,7 @@ public class ProcessInfoDTOImpl implements ProcessInfoDTO {
                 ", processingStatus=" + processingStatus +
                 ", updateDateTime=" + updateDateTime +
                 ", processDetails=" + processDetails +
+                ", processingEvent=" + processingEvent +
                 '}';
     }
 }

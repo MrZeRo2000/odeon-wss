@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.dto.process;
 import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
 import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingAction;
+import com.romanpulov.odeonwss.service.processor.model.ProcessingEvent;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,6 +16,11 @@ public class ProcessInfoTransformer {
         result.setProcessorType(processInfo.getProcessorType());
         result.setProcessingStatus(processInfo.getProcessingStatus());
         result.setUpdateDateTime(processInfo.getLastUpdated());
+
+        ProcessingEvent processingEvent = processInfo.getProcessingEvent();
+        if (processingEvent != null) {
+            result.setProcessingEvent(ProcessingEventDTO.from(processingEvent.getLastUpdated(), processingEvent.getEventText()));
+        }
 
         for (ProcessDetail processDetail: processInfo.getProcessDetails()) {
             ProcessDetailDTOImpl processDetailDTO = new ProcessDetailDTOImpl();
@@ -33,7 +39,7 @@ public class ProcessInfoTransformer {
 
             ProcessingAction processingAction = processDetail.getProcessingAction();
             if (processingAction != null) {
-                processDetailDTO.setProcessingAction(ProcessingActionDTOImpl.from(
+                processDetailDTO.setProcessingAction(ProcessingActionDTO.from(
                         processingAction.getActionType(), processingAction.getValue()));
             }
 

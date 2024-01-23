@@ -14,4 +14,5 @@ public interface ProcessInfoDTO extends BaseEntityDTO {
     ProcessingStatus getProcessingStatus();
     LocalDateTime getUpdateDateTime();
     List<ProcessDetailDTO> getProcessDetails();
+    ProcessingEventDTO getProcessingEvent();
 }
