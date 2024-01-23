@@ -1,6 +1,6 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.dto.DBProcessInfoDTO;
+import com.romanpulov.odeonwss.dto.process.ProcessInfoDTO;
 import com.romanpulov.odeonwss.entity.DBProcessInfo;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -23,7 +23,7 @@ public interface DBProcessInfoRepository extends CrudRepository<DBProcessInfo, L
         FROM DBProcessInfo AS d
         ORDER BY d.updateDateTime DESC
     """)
-    List<DBProcessInfoDTO> findAllOrderedByUpdateDateTime();
+    List<ProcessInfoDTO> findAllOrderedByUpdateDateTime();
 
     @Query("""
     SELECT d

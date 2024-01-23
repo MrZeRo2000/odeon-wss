@@ -2,10 +2,11 @@ package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.dto.MessageDTO;
 import com.romanpulov.odeonwss.dto.ProcessorRequestDTO;
+import com.romanpulov.odeonwss.dto.process.ProcessInfoDTO;
 import com.romanpulov.odeonwss.exception.DataNotFoundException;
 import com.romanpulov.odeonwss.exception.WrongParameterValueException;
+import com.romanpulov.odeonwss.repository.DBProcessInfoRepository;
 import com.romanpulov.odeonwss.service.ProcessService;
-import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingAction;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 import com.romanpulov.odeonwss.utils.EnumUtils;
@@ -13,14 +14,20 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/api/process", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ProcessController {
 
-    final ProcessService processService;
+    private final ProcessService processService;
+    private final DBProcessInfoRepository dbProcessInfoRepository;
 
-    public ProcessController(ProcessService processService) {
+    public ProcessController(
+            ProcessService processService,
+            DBProcessInfoRepository dbProcessInfoRepository) {
         this.processService = processService;
+        this.dbProcessInfoRepository = dbProcessInfoRepository;
     }
 
     @PostMapping
@@ -35,11 +42,11 @@ public class ProcessController {
     }
 
     @GetMapping
-    ResponseEntity<ProcessInfo> getProcessInfo() throws DataNotFoundException {
+    ResponseEntity<ProcessInfoDTO> getProcessInfo() throws DataNotFoundException {
         if (processService.getProcessInfo() == null) {
             throw new DataNotFoundException("Progress data not available");
         } else {
-            return ResponseEntity.ok(processService.getProcessInfo());
+            return ResponseEntity.ok(processService.getProcessInfoDTO());
         }
     }
 
@@ -49,9 +56,14 @@ public class ProcessController {
         return ResponseEntity.ok(MessageDTO.fromMessage("Cleared"));
     }
 
+    @GetMapping("/table")
+    ResponseEntity<List<ProcessInfoDTO>> getTable() {
+        return ResponseEntity.ok(dbProcessInfoRepository.findAllOrderedByUpdateDateTime());
+    }
+
     @PostMapping("/resolve")
-    ResponseEntity<ProcessInfo> resolveAction(@RequestBody ProcessingAction processingAction) {
+    ResponseEntity<ProcessInfoDTO> resolveAction(@RequestBody ProcessingAction processingAction) {
         processService.getProcessInfo().resolveAction(processingAction);
-        return ResponseEntity.ok(processService.getProcessInfo());
+        return ResponseEntity.ok(processService.getProcessInfoDTO());
     }
 }

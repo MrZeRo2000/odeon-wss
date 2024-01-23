@@ -3,7 +3,10 @@ package com.romanpulov.odeonwss.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.odeonwss.dto.ProcessorRequestDTO;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ControllerProcessTest {
 
     final static Logger logger = LoggerFactory.getLogger(ControllerProcessTest.class);
@@ -44,6 +48,7 @@ public class ControllerProcessTest {
 
     @Test
     @Sql({"/schema.sql", "/data.sql"})
+    @Order(1)
     void getResult() throws Exception {
         MvcResult mvcResult;
 
@@ -84,8 +89,37 @@ public class ControllerProcessTest {
                 .andExpect(jsonPath("$.processorType", Matchers.is("MP3_VALIDATOR")))
                 .andExpect(jsonPath("$.processingStatus", Matchers.is("FAILURE")))
                 .andExpect(jsonPath("$.processDetails").isArray())
-                .andExpect(jsonPath("$.processDetails[0].info.message", Matchers.is("Started MP3 Validator")))
+                .andExpect(jsonPath("$.processDetails[0].message", Matchers.is("Started MP3 Validator")))
                 .andReturn();
         logger.debug("Get result after execute: " + mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(2)
+    void testTable() throws Exception {
+        String json = mapper.writeValueAsString(ProcessorRequestDTO.fromProcessorType("LA_VALIDATOR"));
+
+        this.mockMvc.perform(post("/api/process")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message", Matchers.is("Started")));
+
+        Thread.sleep(1000L);
+
+        var mvcResult = this.mockMvc.perform(get("/api/process/table"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].id").value(2))
+                .andExpect(jsonPath("$[1].id").value(1))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(4)))
+                .andExpect(jsonPath("$[0].processorType", Matchers.is("LA_VALIDATOR")))
+                .andExpect(jsonPath("$[0].processingStatus", Matchers.is("FAILURE")))
+                .andExpect(jsonPath("$[1].processorType", Matchers.is("MP3_VALIDATOR")))
+                .andExpect(jsonPath("$[1].processingStatus", Matchers.is("FAILURE")))
+                .andReturn();
+        logger.debug("Get result after execute table: " + mvcResult.getResponse().getContentAsString());
     }
 }

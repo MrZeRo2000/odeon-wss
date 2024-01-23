@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.dto.process.ProcessInfoDTO;
+import com.romanpulov.odeonwss.dto.process.ProcessInfoTransformer;
 import com.romanpulov.odeonwss.repository.ProcessInfoRepository;
 import com.romanpulov.odeonwss.service.processor.AbstractProcessor;
 import com.romanpulov.odeonwss.service.processor.ProcessorFactory;
@@ -24,8 +26,8 @@ public class ProcessService implements ProgressHandler {
     private final Logger logger = LoggerFactory.getLogger(ProcessService.class);
 
     private final ProcessorFactory processorFactory;
-
     private final ProcessInfoRepository processInfoRepository;
+    private final ProcessInfoTransformer processInfoTransformer;
 
     @Value("${dbprocess.logging}")
     private Boolean dbProcessLogging;
@@ -38,9 +40,13 @@ public class ProcessService implements ProgressHandler {
         this.dbProcessLogging = dbProcessLogging;
     }
 
-    public ProcessService(ProcessorFactory processorFactory, ProcessInfoRepository processInfoRepository) {
+    public ProcessService(
+            ProcessorFactory processorFactory,
+            ProcessInfoRepository processInfoRepository,
+            ProcessInfoTransformer processInfoTransformer) {
         this.processorFactory = processorFactory;
         this.processInfoRepository = processInfoRepository;
+        this.processInfoTransformer = processInfoTransformer;
     }
 
     final AtomicReference<AbstractProcessor> currentProcessor = new AtomicReference<>();
@@ -49,6 +55,10 @@ public class ProcessService implements ProgressHandler {
 
     public ProcessInfo getProcessInfo() {
         return processInfo;
+    }
+
+    public ProcessInfoDTO getProcessInfoDTO() {
+        return processInfo == null ? null : processInfoTransformer.transform(processInfo);
     }
 
     public void clearProcessInfo() {
