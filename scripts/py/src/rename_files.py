@@ -16,7 +16,7 @@ from file_utils import validate_file_name_and_path, get_file_lines
 
 
 class FileRenamer:
-    MEDIA_FILE_EXTENSIONS = "AVI|M4V|MKV|MP4|MPG|VOB".split("|")
+    MEDIA_FILE_EXTENSIONS = "AVI|M4V|MKV|MP4|MPG|VOB|WMV".split("|")
 
     def __init__(self, file_names: str, folder_name: str, display: bool, logger: logging.Logger):
         self.file_names = file_names
