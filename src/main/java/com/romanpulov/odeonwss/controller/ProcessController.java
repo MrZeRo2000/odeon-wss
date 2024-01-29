@@ -62,6 +62,11 @@ public class ProcessController {
         return ResponseEntity.ok(dbProcessInfoRepository.findAllOrderedByUpdateDateTime());
     }
 
+    @GetMapping("/{id}")
+    ResponseEntity<ProcessInfoDTO> get(@PathVariable Long id) throws CommonEntityNotFoundException {
+        return ResponseEntity.ok(processService.getById(id));
+    }
+
     @PostMapping("/resolve")
     ResponseEntity<ProcessInfoDTO> resolveAction(@RequestBody ProcessingAction processingAction) {
         processService.getProcessInfo().resolveAction(processingAction);
