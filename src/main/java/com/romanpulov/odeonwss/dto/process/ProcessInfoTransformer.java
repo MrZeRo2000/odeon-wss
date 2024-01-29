@@ -6,7 +6,10 @@ import com.romanpulov.odeonwss.service.processor.model.ProcessingAction;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingEvent;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class ProcessInfoTransformer {
@@ -44,6 +47,55 @@ public class ProcessInfoTransformer {
             }
 
             result.getProcessDetails().add(processDetailDTO);
+        }
+
+        return result;
+    }
+
+    public ProcessInfoDTO transform(Collection<ProcessInfoFlatDTO> rs) {
+        ProcessInfoDTOImpl result = new ProcessInfoDTOImpl();
+        final Map<Long, ProcessDetailDTOImpl> processDetailDTOMap = new HashMap<>();
+
+        for (ProcessInfoFlatDTO row: rs) {
+            if (result.getId() == null) {
+                result.setId(row.getId());
+                result.setProcessorType(row.getProcessorType());
+                result.setProcessingStatus(row.getProcessingStatus());
+                result.setUpdateDateTime(row.getUpdateDateTime());
+            }
+
+            if (row.getDetailId() != null) {
+                ProcessDetailDTOImpl processDetailDTO = processDetailDTOMap.computeIfAbsent(
+                        row.getDetailId(),
+                        v -> {
+                            ProcessDetailDTOImpl newProcessDetailDTO = new ProcessDetailDTOImpl();
+                            newProcessDetailDTO.setId(v);
+                            newProcessDetailDTO.setUpdateDateTime(row.getDetailUpdateDateTime());
+                            newProcessDetailDTO.setStatus(row.getDetailProcessingStatus());
+                            newProcessDetailDTO.setMessage(row.getDetailMessage());
+
+                            if (row.getDetailRows() != null) {
+                                newProcessDetailDTO.setRows(row.getDetailRows().longValue());
+                            }
+
+                            // add if not added before
+                            result.getProcessDetails().add(newProcessDetailDTO);
+
+                            return newProcessDetailDTO;
+                        }
+                );
+
+                if (row.getProcessingActionType() != null) {
+                    processDetailDTO.setProcessingAction(ProcessingActionDTO.from(
+                            row.getProcessingActionType(),
+                            row.getProcessingActionValue()
+                    ));
+                }
+
+                if (row.getDetailItem() != null) {
+                    processDetailDTO.getItems().add(row.getDetailItem());
+                }
+            }
         }
 
         return result;

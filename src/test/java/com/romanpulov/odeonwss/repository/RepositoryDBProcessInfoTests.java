@@ -3,6 +3,8 @@ package com.romanpulov.odeonwss.repository;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDBProcessInfoBuilder;
 import com.romanpulov.odeonwss.entity.DBProcessInfo;
 import com.romanpulov.odeonwss.service.ProcessService;
+import com.romanpulov.odeonwss.service.processor.model.ProcessingAction;
+import com.romanpulov.odeonwss.service.processor.model.ProcessingActionType;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 import org.junit.jupiter.api.MethodOrderer;
@@ -95,11 +97,19 @@ public class RepositoryDBProcessInfoTests {
     @Test
     @Order(2)
     void testFindByIdWithDetails() {
-        var data_1 = dbProcessInfoRepository.findByIdWithDetails(1L).orElseThrow();
-        assertThat(data_1.getId()).isEqualTo(1L);
+        var data_1 = dbProcessInfoRepository.findFlatDTOByIdWithDetails(1L);
+        assertThat(data_1.get(0).getId()).isEqualTo(1L);
 
-        var data_4 = dbProcessInfoRepository.findByIdWithDetails(4L).orElseThrow();
-        assertThat(data_4.getId()).isEqualTo(4L);
+        var data_4 = dbProcessInfoRepository.findFlatDTOByIdWithDetails(4L);
+        assertThat(data_4.get(0).getId()).isEqualTo(4L);
+        assertThat(data_4.get(0).getDetailMessage()).isEqualTo("Started LA Loader");
+        assertThat(data_4.get(0).getProcessingActionType()).isNull();
+        assertThat(data_4.get(0).getProcessingActionValue()).isNull();
+
+        assertThat(data_4.get(1).getDetailProcessingStatus()).isEqualTo(ProcessingStatus.WARNING);
+        assertThat(data_4.get(1).getDetailMessage()).contains("not found");
+        assertThat(data_4.get(1).getProcessingActionType()).isEqualTo(ProcessingActionType.ADD_ARTIST);
+        assertThat(data_4.get(1).getProcessingActionValue()).isNotNull();
     }
 }
 

@@ -1,7 +1,10 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.dto.process.ProcessInfoDTO;
+import com.romanpulov.odeonwss.dto.process.ProcessInfoFlatDTO;
 import com.romanpulov.odeonwss.dto.process.ProcessInfoTransformer;
+import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
+import com.romanpulov.odeonwss.repository.DBProcessInfoRepository;
 import com.romanpulov.odeonwss.repository.ProcessInfoRepository;
 import com.romanpulov.odeonwss.service.processor.AbstractProcessor;
 import com.romanpulov.odeonwss.service.processor.ProcessorFactory;
@@ -17,7 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Service
@@ -27,6 +32,7 @@ public class ProcessService implements ProgressHandler {
 
     private final ProcessorFactory processorFactory;
     private final ProcessInfoRepository processInfoRepository;
+    private final DBProcessInfoRepository dbProcessInfoRepository;
     private final ProcessInfoTransformer processInfoTransformer;
 
     @Value("${dbprocess.logging}")
@@ -43,9 +49,11 @@ public class ProcessService implements ProgressHandler {
     public ProcessService(
             ProcessorFactory processorFactory,
             ProcessInfoRepository processInfoRepository,
+            DBProcessInfoRepository dbProcessInfoRepository,
             ProcessInfoTransformer processInfoTransformer) {
         this.processorFactory = processorFactory;
         this.processInfoRepository = processInfoRepository;
+        this.dbProcessInfoRepository = dbProcessInfoRepository;
         this.processInfoTransformer = processInfoTransformer;
     }
 
@@ -59,6 +67,16 @@ public class ProcessService implements ProgressHandler {
 
     public ProcessInfoDTO getProcessInfoDTO() {
         return processInfo == null ? null : processInfoTransformer.transform(processInfo);
+    }
+
+    @Transactional(readOnly = true)
+    public ProcessInfoDTO getById(Long id) throws CommonEntityNotFoundException {
+        List<ProcessInfoFlatDTO> flatDTOS = dbProcessInfoRepository.findFlatDTOByIdWithDetails(id);
+        if (flatDTOS.isEmpty()) {
+            throw new CommonEntityNotFoundException("DBProcessInfo", id);
+        } else {
+            return processInfoTransformer.transform(flatDTOS);
+        }
     }
 
     public void clearProcessInfo() {

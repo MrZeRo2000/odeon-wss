@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.controller;
 import com.romanpulov.odeonwss.dto.MessageDTO;
 import com.romanpulov.odeonwss.dto.ProcessorRequestDTO;
 import com.romanpulov.odeonwss.dto.process.ProcessInfoDTO;
+import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.exception.DataNotFoundException;
 import com.romanpulov.odeonwss.exception.WrongParameterValueException;
 import com.romanpulov.odeonwss.repository.DBProcessInfoRepository;

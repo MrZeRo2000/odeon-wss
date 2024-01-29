@@ -12,8 +12,9 @@ public interface ProcessInfoFlatDTO {
     ProcessingStatus getProcessingStatus();
     LocalDateTime getUpdateDateTime();
     // detail
+    Long getDetailId();
     LocalDateTime getDetailUpdateDateTime();
-    ProcessingStatus getDetailStatus();
+    ProcessingStatus getDetailProcessingStatus();
     String getDetailMessage();
     Integer getDetailRows();
     // items

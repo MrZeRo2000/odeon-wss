@@ -8,6 +8,7 @@ import org.hibernate.Hibernate;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -74,6 +75,28 @@ public class DBProcessDetail extends AbstractBaseEntity {
 
     public void setUpdateDateTime(@NotNull LocalDateTime updateDateTime) {
         this.updateDateTime = updateDateTime;
+    }
+
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "dbProcessDetail", fetch = FetchType.LAZY)
+    private List<DBProcessDetailAction> dbProcessDetailActions;
+
+    public List<DBProcessDetailAction> getDbProcessDetailActions() {
+        return dbProcessDetailActions;
+    }
+
+    public void setDbProcessDetailActions(List<DBProcessDetailAction> dbProcessDetailActions) {
+        this.dbProcessDetailActions = dbProcessDetailActions;
+    }
+
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "dbProcessDetail", fetch = FetchType.LAZY)
+    public List<DBProcessDetailItem> dbProcessDetailItems;
+
+    public List<DBProcessDetailItem> getDbProcessDetailItems() {
+        return dbProcessDetailItems;
+    }
+
+    public void setDbProcessDetailItems(List<DBProcessDetailItem> dbProcessDetailItems) {
+        this.dbProcessDetailItems = dbProcessDetailItems;
     }
 
     @Override
