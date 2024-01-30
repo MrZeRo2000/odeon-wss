@@ -122,4 +122,35 @@ public class ControllerProcessTest {
                 .andReturn();
         logger.debug("Get result after execute table: " + mvcResult.getResponse().getContentAsString());
     }
+
+    @Test
+    @Order(3)
+    void testGetById() throws Exception {
+        this.mockMvc.perform(get("/api/process/777"))
+                .andExpect(status().isNotFound());
+
+        var mvcResult = this.mockMvc.perform(get("/api/process/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.aMapWithSize(5)))
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.processorType", Matchers.is("MP3_VALIDATOR")))
+                .andExpect(jsonPath("$.processingStatus", Matchers.is("FAILURE")))
+                .andExpect(jsonPath("$.updateDateTime").exists())
+                .andExpect(jsonPath("$.processDetails").isArray())
+
+                .andExpect(jsonPath("$.processDetails[0].message", Matchers.is("Started MP3 Validator")))
+                .andExpect(jsonPath("$.processDetails[0].status", Matchers.is("INFO")))
+                .andExpect(jsonPath("$.processDetails[0].items").isArray())
+                .andExpect(jsonPath("$.processDetails[0].items[0]").doesNotExist())
+
+                .andExpect(jsonPath("$.processDetails[1].items").isArray())
+                .andExpect(jsonPath("$.processDetails[1].items[0]", Matchers.is("Aerosmith")))
+                .andExpect(jsonPath("$.processDetails[1].items[1]", Matchers.is("Kosheen")))
+                .andExpect(jsonPath("$.processDetails[1].items[2]", Matchers.is("Various Artists")))
+                .andExpect(jsonPath("$.processDetails[1].items[3]").doesNotExist())
+
+                .andReturn();
+
+        logger.debug("Get result after execute getById: " + mvcResult.getResponse().getContentAsString());
+    }
 }
