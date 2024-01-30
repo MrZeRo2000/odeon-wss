@@ -1,14 +1,14 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,7 +140,7 @@ public class ServiceProcessLoadMP3Test {
     @Test
     @Order(3)
     @Sql({"/schema.sql", "/data.sql"})
-    void testNoArtistExistsShouldFail() {
+    void testNoArtistExistsShouldFail() throws Exception {
         List<ProcessDetail> processDetail;
 
         // warnings - no artists exist
@@ -227,6 +227,12 @@ public class ServiceProcessLoadMP3Test {
         Assertions.assertEquals(ProcessingActionType.ADD_ARTIST, pa.getActionType());
         Assertions.assertTrue(pa.getValue().contains("Aerosmith") || pa.getValue().contains("Kosheen"));
 
+        //Validate DTO
+        var dto = service.getById(1L);
+        assertThat(dto.getId()).isEqualTo(1L);
+        assertThat(dto.getProcessDetails().get(1).getStatus()).isEqualTo(ProcessingStatus.WARNING);
+        assertThat(dto.getProcessDetails().get(1).getProcessingAction().getActionType()).isEqualTo(ProcessingActionType.ADD_ARTIST);
+        assertThat(dto.getProcessDetails().get(1).getProcessingAction().getValue()).isEqualTo("Aerosmith");
     }
 
     @Test
@@ -253,7 +259,7 @@ public class ServiceProcessLoadMP3Test {
 
     @Test
     @Order(6)
-    void testWrongArtifactTitle() {
+    void testWrongArtifactTitle() throws Exception {
         Artist artist = new Artist();
         artist.setType(ArtistType.ARTIST);
         artist.setName("Aerosmith");
@@ -301,6 +307,9 @@ public class ServiceProcessLoadMP3Test {
         );
 
         //Assertions.assertTrue(service.getProcessInfo().getProcessDetails().get(service.getProcessInfo().getProcessDetails().size() - 2).getInfo().getMessage().contains("Error parsing artifact name"));
+        var dto = service.getById(3L);
+        assertThat(dto.getProcessDetails().get(2).getMessage()).isEqualTo("Error parsing artifact name");
+        assertThat(dto.getProcessDetails().get(2).getItems()).isEqualTo(List.of("Aerosmith >> 2004  Honkin'On Bobo"));
     }
 
     @Test

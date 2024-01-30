@@ -95,7 +95,7 @@ public class ServiceProcessLoadAnimationDVTest {
     @Test
     @Order(3)
     @Rollback(value = false)
-    void testSuccess() {
+    void testSuccess() throws Exception {
         processService.executeProcessor(PROCESSOR_TYPE);
         ProcessInfo pi = processService.getProcessInfo();
         List<ProcessDetail> processDetails = pi.getProcessDetails();
@@ -127,6 +127,16 @@ public class ServiceProcessLoadAnimationDVTest {
             //every track has a media file
             assertThat(trackRepository.findByIdWithMediaFiles(c.getId()).orElseThrow().getMediaFiles().size()).isGreaterThan(0);
         });
+
+        // validate DTO
+        var dto = processService.getById(1L);
+        assertThat(dto.getId()).isEqualTo(1L);
+        assertThat(dto.getProcessDetails().get(1).getUpdateDateTime()).isNotNull();
+        assertThat(dto.getProcessDetails().get(1).getMessage()).isEqualTo("Artifacts loaded");
+        assertThat(dto.getProcessDetails().get(1).getStatus()).isEqualTo(ProcessingStatus.INFO);
+        assertThat(dto.getProcessDetails().get(1).getRows()).isEqualTo(4L);
+        assertThat(dto.getProcessDetails().get(1).getItems().isEmpty()).isTrue();
+        assertThat(dto.getProcessDetails().get(1).getProcessingAction()).isNull();
     }
 
     @Test
