@@ -56,13 +56,16 @@ public class ServiceUserImportTrackTest {
     @Autowired
     DVProductRepository dvProductRepository;
 
-    private ArtifactType getArtifactType() {
+    private ArtifactType getNonMusicArtifactType() {
         return artifactTypeRepository.getWithDVAnimation();
+    }
+    private ArtifactType getMusicArtifactType() {
+        return artifactTypeRepository.getWithDVMusic();
     }
 
     private void internalPrepare() {
         var artifactOne = new EntityArtifactBuilder()
-                .withArtifactType(getArtifactType())
+                .withArtifactType(getNonMusicArtifactType())
                 .withTitle("Number One")
                 .withDuration(2500L)
                 .build();
@@ -89,7 +92,7 @@ public class ServiceUserImportTrackTest {
         mediaFileRepository.save(mediaFileSecond);
 
         var artifactTwo = new EntityArtifactBuilder()
-                .withArtifactType(getArtifactType())
+                .withArtifactType(getNonMusicArtifactType())
                 .withTitle("Number Two")
                 .withDuration(7832L)
                 .build();
@@ -100,12 +103,41 @@ public class ServiceUserImportTrackTest {
         PRODUCT_NAMES.forEach(name -> {
             var product = new EntityDVProductBuilder()
                     .withOrigin(dvOrigin)
-                    .withArtifactType(getArtifactType())
+                    .withArtifactType(getNonMusicArtifactType())
                     .withTitle(name)
                     .withOriginalTitle(name)
                     .build();
             dvProductRepository.save(product);
         });
+
+        // Music
+
+        var artifactMusicOne = new EntityArtifactBuilder()
+                .withArtifactType(getMusicArtifactType())
+                .withTitle("Music One")
+                .withDuration(48394L)
+                .build();
+        artifactRepository.save(artifactMusicOne);
+
+        var mediaFileMusicFirst = new EntityMediaFileBuilder()
+                .withArtifact(artifactMusicOne)
+                .withDuration(48394L)
+                .withName("Music One File Name First")
+                .withBitrate(6000L)
+                .withFormat("MKV")
+                .withSize(73495L)
+                .build();
+        mediaFileRepository.save(mediaFileMusicFirst);
+
+        var mediaFileMusicSecond = new EntityMediaFileBuilder()
+                .withArtifact(artifactMusicOne)
+                .withDuration(3842L)
+                .withName("Music One File Name Second")
+                .withBitrate(8000L)
+                .withFormat("MKV")
+                .withSize(28384L)
+                .build();
+        mediaFileRepository.save(mediaFileMusicSecond);
     }
 
     @Test
@@ -113,10 +145,11 @@ public class ServiceUserImportTrackTest {
     @Sql({"/schema.sql", "/data.sql"})
     void testPrepareShouldBeOk() {
         internalPrepare();
-        assertThat(artifactRepository.getAllByArtifactType(getArtifactType()).size()).isEqualTo(2L);
+        assertThat(artifactRepository.getAllByArtifactType(getNonMusicArtifactType()).size()).isEqualTo(2L);
+        assertThat(artifactRepository.getAllByArtifactType(getMusicArtifactType()).size()).isEqualTo(1L);
         assertThat(mediaFileRepository.findAllByArtifactId(1L).size()).isEqualTo(2L);
         assertThat(mediaFileRepository.findAllByArtifactId(2L).size()).isEqualTo(0L);
-        assertThat(dvProductRepository.findAllIdTitle(getArtifactType()).size()).isEqualTo(PRODUCT_NAMES.size());
+        assertThat(dvProductRepository.findAllIdTitle(getNonMusicArtifactType()).size()).isEqualTo(PRODUCT_NAMES.size());
     }
 
     @Test
@@ -210,6 +243,29 @@ public class ServiceUserImportTrackTest {
                 .withMediaFile(new MediaFileDTOBuilder().withId(1L).build())
                 .withTitles(List.of("White", "Green", "Magenta"))
                 .withChapters(Lists.list(chapters))
+                .build();
+
+        assertThatThrownBy(() -> service.executeImportTracks(data)).isInstanceOf(WrongParameterValueException.class);
+    }
+
+    @Test
+    @Order(10)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testWrongArtifactTypeShouldFail() {
+        internalPrepare();
+
+        var artifact = new EntityArtifactBuilder()
+                .withArtifactType(artifactTypeRepository.getWithMP3())
+                .withTitle("MP3 music")
+                .withDuration(48394L)
+                .build();
+        artifactRepository.save(artifact);
+
+        var data = new TrackUserImportDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(artifact.getId()).build())
+                .withDVType(new IdNameDTOBuilder().withId(2L).build())
+                .withMediaFile(new MediaFileDTOBuilder().withId(1L).build())
+                .withTitles(List.of("White", "Green", "Magenta"))
                 .build();
 
         assertThatThrownBy(() -> service.executeImportTracks(data)).isInstanceOf(WrongParameterValueException.class);

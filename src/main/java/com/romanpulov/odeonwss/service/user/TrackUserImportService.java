@@ -9,10 +9,7 @@ import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.exception.EmptyParameterException;
 import com.romanpulov.odeonwss.exception.WrongParameterValueException;
-import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.DVTypeRepository;
-import com.romanpulov.odeonwss.repository.MediaFileRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
+import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.DVProductService;
 import com.romanpulov.odeonwss.utils.media.ChaptersParser;
 import com.romanpulov.odeonwss.utils.media.ChaptersParsingException;
@@ -24,6 +21,7 @@ import java.util.*;
 @Service
 public class TrackUserImportService {
     private final ArtifactRepository artifactRepository;
+    private final ArtifactTypeRepository artifactTypeRepository;
     private final DVTypeRepository dvTypeRepository;
     private final TrackRepository trackRepository;
     private final DVProductService dvProductService;
@@ -31,11 +29,13 @@ public class TrackUserImportService {
 
     public TrackUserImportService(
             ArtifactRepository artifactRepository,
+            ArtifactTypeRepository artifactTypeRepository,
             DVTypeRepository dvTypeRepository,
             TrackRepository trackRepository,
             DVProductService dvProductService,
             MediaFileRepository mediaFileRepository) {
         this.artifactRepository = artifactRepository;
+        this.artifactTypeRepository = artifactTypeRepository;
         this.dvTypeRepository = dvTypeRepository;
         this.trackRepository = trackRepository;
         this.dvProductService = dvProductService;
@@ -59,13 +59,45 @@ public class TrackUserImportService {
         DVType dvType = dvTypeRepository
                 .findById(dvTypeDTO.getId())
                 .orElseThrow(() -> new CommonEntityNotFoundException("DVType", dvTypeDTO.getId()));
-        Long num = Optional.ofNullable(data.getNum()).orElse(1L);
+        long num = Optional.ofNullable(data.getNum()).orElse(1L);
+
+        if (!mediaFile.getArtifact().getId().equals(artifact.getId())) {
+            throw new WrongParameterValueException("MediaFile", "Artifact for media file does not match");
+        }
 
         List<String> titles = data.getTitles();
+        if (titles.isEmpty()) {
+            throw new EmptyParameterException("Titles");
+        }
+
+        if (List.of(artifactTypeRepository.getWithDVAnimation(), artifactTypeRepository.getWithDVMovies())
+                .contains(artifact.getArtifactType())) {
+            importNonMusicArtifact(data, artifact, mediaFile, dvType, num, titles, result);
+        } else {
+            throw new WrongParameterValueException("Artifact", "Unsupported artifact type");
+        }
+
+        return result;
+    }
+
+    private void importNonMusicArtifact(
+            TrackUserImportDTO data,
+            Artifact artifact,
+            MediaFile mediaFile,
+            DVType dvType,
+            long num,
+            List<String> titles,
+            ImportStats result)
+            throws EmptyParameterException, WrongParameterValueException {
+
+        List<String> chapters = data.getChapters();
+        if (chapters.isEmpty()) {
+            throw new EmptyParameterException("Chapters");
+        }
 
         Collection<Long> durations;
         try {
-            durations = ChaptersParser.parseLines(data.getChapters());
+            durations = ChaptersParser.parseLines(chapters);
         } catch (ChaptersParsingException e) {
             throw new WrongParameterValueException("Chapters", e.getMessage());
         }
@@ -96,7 +128,5 @@ public class TrackUserImportService {
 
             result.addRowInserted(title);
         }
-
-        return result;
     }
 }

@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.romanpulov.odeonwss.dto.ArtifactDTO;
+import com.romanpulov.odeonwss.dto.ArtistDTO;
 import com.romanpulov.odeonwss.dto.IdNameDTO;
 import com.romanpulov.odeonwss.dto.MediaFileDTO;
 
@@ -10,9 +11,11 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TrackUserImportDTO {
     private ArtifactDTO artifact;
+    private ArtistDTO artist;
     private MediaFileDTO mediaFile;
     private IdNameDTO dvType;
     private Long num;
+    private List<String> artists;
     private List<String> titles;
     private List<String> chapters;
 
@@ -22,6 +25,14 @@ public class TrackUserImportDTO {
 
     public void setArtifact(ArtifactDTO artifact) {
         this.artifact = artifact;
+    }
+
+    public ArtistDTO getArtist() {
+        return artist;
+    }
+
+    public void setArtist(ArtistDTO artist) {
+        this.artist = artist;
     }
 
     public MediaFileDTO getMediaFile() {
@@ -48,6 +59,14 @@ public class TrackUserImportDTO {
         this.num = num;
     }
 
+    public List<String> getArtists() {
+        return artists;
+    }
+
+    public void setArtists(List<String> artists) {
+        this.artists = artists;
+    }
+
     public List<String> getTitles() {
         return titles;
     }
@@ -68,9 +87,11 @@ public class TrackUserImportDTO {
     public String toString() {
         return "TrackUserImportDTO{" +
                 "artifact=" + artifact +
+                ", artist=" + artist +
                 ", mediaFile=" + mediaFile +
                 ", dvType=" + dvType +
                 ", num=" + num +
+                ", artists=" + artists +
                 ", titles=" + titles +
                 ", chapters=" + chapters +
                 '}';
