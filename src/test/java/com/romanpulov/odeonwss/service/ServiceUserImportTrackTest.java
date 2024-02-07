@@ -36,7 +36,9 @@ public class ServiceUserImportTrackTest {
 
     private static final List<String> ARTISTS = List.of(
             "Nightwish",
-            "Clawfinger"
+            "Clawfinger",
+            "Kylie Minogue",
+            "Various Artists"
     );
 
     @Autowired
@@ -362,5 +364,97 @@ public class ServiceUserImportTrackTest {
                 .hasMessageContaining("not found")
                 .hasMessageContaining("Joe Dassin")
                 .hasMessageNotContaining("Clawfinger");
+    }
+
+    @Test
+    @Order(20)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testMusicArtifactOneArtistShouldBeOk() throws Exception {
+        internalPrepare();
+
+        var artist = artistRepository.findById(2L).orElseThrow();
+
+        var artifact = new EntityArtifactBuilder()
+                .withArtifactType(artifactTypeRepository.getWithDVMusic())
+                .withArtist(artist)
+                .withTitle("DV music")
+                .withDuration(37654L)
+                .build();
+        artifactRepository.save(artifact);
+
+        var mediaFile = new EntityMediaFileBuilder()
+                .withArtifact(artifact)
+                .withDuration(48394L)
+                .withName("DV Music File Name")
+                .withBitrate(1500L)
+                .withFormat("MKV")
+                .withSize(73495L)
+                .build();
+        mediaFileRepository.save(mediaFile);
+
+        var result = service.executeImportTracks(
+                new TrackUserImportDTOBuilder()
+                        .withArtifact(new ArtifactDTOBuilder().withId(artifact.getId()).build())
+                        .withDVType(new IdNameDTOBuilder().withId(2L).build())
+                        .withMediaFile(new MediaFileDTOBuilder().withId(mediaFile.getId()).build())
+                        .withTitles(List.of("Dumb", "Nigger", "Recipe for hate"))
+                        .withArtists(List.of())
+                        .build());
+        assertThat(result.getRowsInserted().size()).isEqualTo(3);
+        assertThat(result.getRowsInserted()).containsAll(List.of("Dumb", "Nigger", "Recipe for hate"));
+    }
+
+    @Test
+    @Order(21)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testMusicArtifactMultipleArtistsShouldBeOk() throws Exception {
+        internalPrepare();
+
+        var artist = artistRepository.findFirstByTypeAndName(ArtistType.ARTIST, "Various Artists").orElseThrow();
+
+        var artifact = new EntityArtifactBuilder()
+                .withArtifactType(artifactTypeRepository.getWithDVMusic())
+                .withArtist(artist)
+                .withTitle("Various music")
+                .withDuration(84934L)
+                .build();
+        artifactRepository.save(artifact);
+
+        var mediaFile = new EntityMediaFileBuilder()
+                .withArtifact(artifact)
+                .withDuration(48334L)
+                .withName("Music Collection File Name")
+                .withBitrate(1500L)
+                .withFormat("MKV")
+                .withSize(737495L)
+                .build();
+        mediaFileRepository.save(mediaFile);
+
+        var result = service.executeImportTracks(
+                new TrackUserImportDTOBuilder()
+                        .withArtifact(new ArtifactDTOBuilder().withId(artifact.getId()).build())
+                        .withDVType(new IdNameDTOBuilder().withId(2L).build())
+                        .withMediaFile(new MediaFileDTOBuilder().withId(mediaFile.getId()).build())
+                        .withTitles(List.of("Dumb", "Spinning around"))
+                        .withArtists(List.of("Clawfinger", "Kylie Minogue"))
+                        .build());
+        assertThat(result.getRowsInserted().size()).isEqualTo(2);
+        assertThat(result.getRowsInserted()).containsAll(List.of("Dumb", "Spinning around"));
+
+        var tracks = trackRepository.findAllFlatDTOByArtifactId(artifact.getId());
+
+        assertThat(tracks.get(0).getNum()).isEqualTo(1L);
+        assertThat(tracks.get(0).getArtistName()).isEqualTo("Clawfinger");
+        assertThat(tracks.get(0).getTitle()).isEqualTo("Dumb");
+        assertThat(tracks.get(0).getDvTypeId()).isEqualTo(2L);
+        assertThat(tracks.get(0).getMediaFileName()).isEqualTo("Music Collection File Name");
+        assertThat(tracks.get(0).getDuration()).isNull();
+
+        assertThat(tracks.get(1).getNum()).isEqualTo(2L);
+        assertThat(tracks.get(1).getArtistName()).isEqualTo("Kylie Minogue");
+        assertThat(tracks.get(1).getTitle()).isEqualTo("Spinning around");
+        assertThat(tracks.get(1).getDvTypeId()).isEqualTo(2L);
+        assertThat(tracks.get(1).getMediaFileName()).isEqualTo("Music Collection File Name");
+        assertThat(tracks.get(1).getDuration()).isNull();
     }
 }

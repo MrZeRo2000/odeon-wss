@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.odeonwss.builder.dtobuilder.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import com.romanpulov.odeonwss.repository.*;
 import org.assertj.core.util.Lists;
@@ -40,9 +41,15 @@ public class ControllerUserImportTest {
             "Racer"
     );
 
+    List<String> ARTISTS = List.of(
+            "Fergie",
+            "Various Artists",
+            "Tool"
+    );
+
     final static ObjectMapper mapper = new ObjectMapper();
-    static
-    {
+
+    static {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
@@ -67,8 +74,15 @@ public class ControllerUserImportTest {
     @Autowired
     MediaFileRepository mediaFileRepository;
 
+    @Autowired
+    ArtistRepository artistRepository;
+
     private ArtifactType getArtifactType() {
         return artifactTypeRepository.getWithDVAnimation();
+    }
+
+    private ArtifactType getMusicArtifactType() {
+        return artifactTypeRepository.getWithDVMusic();
     }
 
     @Test
@@ -84,6 +98,11 @@ public class ControllerUserImportTest {
                         .withTitle(s)
                         .build()
         ));
+
+        ARTISTS.forEach(s -> artistRepository.save(
+                new EntityArtistBuilder().withType(ArtistType.ARTIST).withName(s).build()
+        ));
+
         dvCategoryRepository.saveAll(List.of(
                 (new EntityDVCategoryBuilder()).withName("Cat 01").build(),
                 (new EntityDVCategoryBuilder()).withName("Cat 02").build()
@@ -105,13 +124,32 @@ public class ControllerUserImportTest {
                 .withSize(524456L)
                 .build();
         mediaFileRepository.save(mediaFileFirst);
+
+        var artist = artistRepository.findFirstByTypeAndName(ArtistType.ARTIST, "Various Artists").orElseThrow();
+        var artifactMusic = new EntityArtifactBuilder()
+                .withArtifactType(getMusicArtifactType())
+                .withArtist(artist)
+                .withTitle("Music Title")
+                .withDuration(54564L)
+                .build();
+        artifactRepository.save(artifactMusic);
+
+        var mediaFileMusic = new EntityMediaFileBuilder()
+                .withArtifact(artifactMusic)
+                .withDuration(54564L)
+                .withName("Music File Name")
+                .withBitrate(2500L)
+                .withFormat("MKV")
+                .withSize(72834L)
+                .build();
+        mediaFileRepository.save(mediaFileMusic);
     }
 
     @Test
     @Order(2)
     void testDVProductAnalyzeNoArtifactTypeShouldFail() throws Exception {
         mockMvc.perform(post("/api/user-import/dvproduct/analyze")
-                    .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content("{}")
                 )
                 .andExpect(status().isBadRequest());
@@ -192,7 +230,7 @@ public class ControllerUserImportTest {
     @Test
     @Order(11)
     void testTrackExecuteShouldBeOk() throws Exception {
-        var chapters = new String[] {
+        var chapters = new String[]{
                 "CHAPTER01=00:00:00.000",
                 "CHAPTER01NAME=Chapter 01",
                 "CHAPTER02=00:06:28.160",
@@ -233,7 +271,7 @@ public class ControllerUserImportTest {
     @Test
     @Order(11)
     void testTrackExecuteTitlesMismatchShouldBeOk() throws Exception {
-        var chapters = new String[] {
+        var chapters = new String[]{
                 "CHAPTER01=00:00:00.000",
                 "CHAPTER01NAME=Chapter 01",
                 "CHAPTER02=00:06:28.160",
@@ -263,5 +301,33 @@ public class ControllerUserImportTest {
                 .andExpect(jsonPath("$.message", Matchers.equalTo("Wrong parameter Chapters value: Titles size:2 and chapters duration size:3 mismatch")))
                 .andReturn();
         logger.debug("Post result:" + result.getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(12)
+    void testTrackExecuteMusicShouldBeOk() throws Exception {
+        var data = new TrackUserImportDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(2L).build())
+                .withDVType(new IdNameDTOBuilder().withId(2L).build())
+                .withMediaFile(new MediaFileDTOBuilder().withId(2L).build())
+                .withTitles(List.of("Slow", "Deep"))
+                .withArtists(List.of("Tool", "Fergie"))
+                .build();
+
+        String json = mapper.writeValueAsString(data);
+        logger.debug("ok data json:" + json);
+
+        var result = mockMvc.perform(post("/api/user-import/track/execute")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.rowsInserted").isArray())
+                .andExpect(jsonPath("$.rowsInserted", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$.rowsInserted[0]", Matchers.equalTo("Slow")))
+                .andExpect(jsonPath("$.rowsInserted[1]", Matchers.equalTo("Deep")))
+                .andReturn();
+        logger.debug("Post result:" + result.getResponse().getContentAsString());
+
     }
 }

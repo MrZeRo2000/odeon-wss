@@ -142,21 +142,51 @@ public class TrackUserImportService {
             ImportStats result)
             throws EmptyParameterException, WrongParameterValueException {
 
+        Artist artifactArtist = artifact.getArtist();
+
+        // can be one artist from artifact or artist per title
         List<String> artists = data.getArtists();
-        if (artists == null || artists.isEmpty()) {
+        if (artifactArtist == null && (artists == null || artists.isEmpty())) {
             throw new EmptyParameterException("Artists");
+        } else if (artists != null && !artists.isEmpty() && artists.size() != titles.size()) {
+            throw new WrongParameterValueException("Artists",
+                    "Artists size:%d and titles size:%d mismatch".formatted(artists.size(), titles.size()));
         }
 
+        // find all artists if they exist
         Map<String, Artist> artistMap = new HashMap<>();
-        for (String artistName: artists) {
-            if (!artistMap.containsKey(artistName)) {
-                Optional<Artist> artist = artistRepository.findFirstByTypeAndName(ArtistType.ARTIST, artistName);
-                if (artist.isPresent()) {
-                    artistMap.put(artistName, artist.get());
-                } else {
-                    throw new WrongParameterValueException("Artists", artistName + " not found");
+        if (artists != null) {
+            for (String artistName : artists) {
+                if (!artistMap.containsKey(artistName)) {
+                    Optional<Artist> existingArtist = artistRepository.findFirstByTypeAndName(ArtistType.ARTIST, artistName);
+                    if (existingArtist.isPresent()) {
+                        artistMap.put(artistName, existingArtist.get());
+                    } else {
+                        throw new WrongParameterValueException("Artists", artistName + " not found");
+                    }
                 }
             }
+        }
+
+        // tracks insert
+        for (int i = 0; i < titles.size(); i++) {
+            String title = titles.get(i);
+            Artist artist = artists != null && !artists.isEmpty() ? artistMap.get(artists.get(i)) : artifactArtist;
+
+            Track track = new Track();
+            track.setArtifact(artifact);
+            track.setArtist(artist);
+            track.setDvType(dvType);
+            track.setTitle(title);
+            track.setNum(num ++);
+            track.setMediaFiles(Set.of(mediaFile));
+
+            trackRepository.save(track);
+
+            artifact.getTracks().add(track);
+            artifactRepository.save(artifact);
+
+            result.addRowInserted(title);
         }
     }
 }
