@@ -2,10 +2,7 @@ package com.romanpulov.odeonwss.service.user;
 
 import com.romanpulov.odeonwss.dto.IdNameDTO;
 import com.romanpulov.odeonwss.dto.user.TrackUserImportDTO;
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.DVType;
-import com.romanpulov.odeonwss.entity.MediaFile;
-import com.romanpulov.odeonwss.entity.Track;
+import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.exception.EmptyParameterException;
 import com.romanpulov.odeonwss.exception.WrongParameterValueException;
@@ -26,6 +23,7 @@ public class TrackUserImportService {
     private final TrackRepository trackRepository;
     private final DVProductService dvProductService;
     private final MediaFileRepository mediaFileRepository;
+    private final ArtistRepository artistRepository;
 
     public TrackUserImportService(
             ArtifactRepository artifactRepository,
@@ -33,13 +31,15 @@ public class TrackUserImportService {
             DVTypeRepository dvTypeRepository,
             TrackRepository trackRepository,
             DVProductService dvProductService,
-            MediaFileRepository mediaFileRepository) {
+            MediaFileRepository mediaFileRepository,
+            ArtistRepository artistRepository) {
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.dvTypeRepository = dvTypeRepository;
         this.trackRepository = trackRepository;
         this.dvProductService = dvProductService;
         this.mediaFileRepository = mediaFileRepository;
+        this.artistRepository = artistRepository;
     }
 
     @Transactional
@@ -66,13 +66,15 @@ public class TrackUserImportService {
         }
 
         List<String> titles = data.getTitles();
-        if (titles.isEmpty()) {
+        if (titles == null || titles.isEmpty()) {
             throw new EmptyParameterException("Titles");
         }
 
         if (List.of(artifactTypeRepository.getWithDVAnimation(), artifactTypeRepository.getWithDVMovies())
                 .contains(artifact.getArtifactType())) {
             importNonMusicArtifact(data, artifact, mediaFile, dvType, num, titles, result);
+        } else if (artifact.getArtifactType().equals(artifactTypeRepository.getWithDVMusic())) {
+            importMusicArtifact(data, artifact, mediaFile, dvType, num, titles, result);
         } else {
             throw new WrongParameterValueException("Artifact", "Unsupported artifact type");
         }
@@ -91,7 +93,7 @@ public class TrackUserImportService {
             throws EmptyParameterException, WrongParameterValueException {
 
         List<String> chapters = data.getChapters();
-        if (chapters.isEmpty()) {
+        if (chapters == null || chapters.isEmpty()) {
             throw new EmptyParameterException("Chapters");
         }
 
@@ -127,6 +129,34 @@ public class TrackUserImportService {
             artifactRepository.save(artifact);
 
             result.addRowInserted(title);
+        }
+    }
+
+    private void importMusicArtifact(
+            TrackUserImportDTO data,
+            Artifact artifact,
+            MediaFile mediaFile,
+            DVType dvType,
+            long num,
+            List<String> titles,
+            ImportStats result)
+            throws EmptyParameterException, WrongParameterValueException {
+
+        List<String> artists = data.getArtists();
+        if (artists == null || artists.isEmpty()) {
+            throw new EmptyParameterException("Artists");
+        }
+
+        Map<String, Artist> artistMap = new HashMap<>();
+        for (String artistName: artists) {
+            if (!artistMap.containsKey(artistName)) {
+                Optional<Artist> artist = artistRepository.findFirstByTypeAndName(ArtistType.ARTIST, artistName);
+                if (artist.isPresent()) {
+                    artistMap.put(artistName, artist.get());
+                } else {
+                    throw new WrongParameterValueException("Artists", artistName + " not found");
+                }
+            }
         }
     }
 }

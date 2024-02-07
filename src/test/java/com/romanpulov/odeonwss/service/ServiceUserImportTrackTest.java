@@ -1,12 +1,11 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.builder.dtobuilder.*;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVProductBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entity.DVOrigin;
+import com.romanpulov.odeonwss.exception.EmptyParameterException;
 import com.romanpulov.odeonwss.exception.WrongParameterValueException;
 import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.user.TrackUserImportService;
@@ -35,6 +34,11 @@ public class ServiceUserImportTrackTest {
             "White"
             );
 
+    private static final List<String> ARTISTS = List.of(
+            "Nightwish",
+            "Clawfinger"
+    );
+
     @Autowired
     TrackUserImportService service;
 
@@ -55,6 +59,9 @@ public class ServiceUserImportTrackTest {
 
     @Autowired
     DVProductRepository dvProductRepository;
+
+    @Autowired
+    ArtistRepository artistRepository;
 
     private ArtifactType getNonMusicArtifactType() {
         return artifactTypeRepository.getWithDVAnimation();
@@ -138,6 +145,10 @@ public class ServiceUserImportTrackTest {
                 .withSize(28384L)
                 .build();
         mediaFileRepository.save(mediaFileMusicSecond);
+
+        ARTISTS.forEach(s -> artistRepository.save(
+                        new EntityArtistBuilder().withType(ArtistType.ARTIST).withName(s).build()
+                ));
     }
 
     @Test
@@ -261,13 +272,95 @@ public class ServiceUserImportTrackTest {
                 .build();
         artifactRepository.save(artifact);
 
-        var data = new TrackUserImportDTOBuilder()
+        var mediaFile = new EntityMediaFileBuilder()
+                .withArtifact(artifact)
+                .withDuration(48394L)
+                .withName("MP3 File Name")
+                .withBitrate(320L)
+                .withFormat("MP3")
+                .withSize(73495L)
+                .build();
+        mediaFileRepository.save(mediaFile);
+
+        var dataWrongMediaFile = new TrackUserImportDTOBuilder()
                 .withArtifact(new ArtifactDTOBuilder().withId(artifact.getId()).build())
                 .withDVType(new IdNameDTOBuilder().withId(2L).build())
                 .withMediaFile(new MediaFileDTOBuilder().withId(1L).build())
                 .withTitles(List.of("White", "Green", "Magenta"))
                 .build();
 
-        assertThatThrownBy(() -> service.executeImportTracks(data)).isInstanceOf(WrongParameterValueException.class);
+        var dataWrongArtifactType = new TrackUserImportDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(artifact.getId()).build())
+                .withDVType(new IdNameDTOBuilder().withId(2L).build())
+                .withMediaFile(new MediaFileDTOBuilder().withId(mediaFile.getId()).build())
+                .withTitles(List.of("White", "Green", "Magenta"))
+                .build();
+
+        assertThatThrownBy(() -> service.executeImportTracks(dataWrongMediaFile))
+                .isInstanceOf(WrongParameterValueException.class)
+                .hasMessageContaining("Artifact for media file does not match");
+
+        assertThatThrownBy(() -> service.executeImportTracks(dataWrongArtifactType))
+                .isInstanceOf(WrongParameterValueException.class)
+                .hasMessageContaining("Unsupported artifact type");
+    }
+
+    @Test
+    @Order(11)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testMusicArtifactWrongTitlesArtistsShouldFail() {
+        internalPrepare();
+
+        var artifact = new EntityArtifactBuilder()
+                .withArtifactType(artifactTypeRepository.getWithDVMusic())
+                .withTitle("DV music")
+                .withDuration(37654L)
+                .build();
+        artifactRepository.save(artifact);
+
+        var mediaFile = new EntityMediaFileBuilder()
+                .withArtifact(artifact)
+                .withDuration(48394L)
+                .withName("DV Music File Name")
+                .withBitrate(1500L)
+                .withFormat("MKV")
+                .withSize(73495L)
+                .build();
+        mediaFileRepository.save(mediaFile);
+
+        assertThatThrownBy(() -> service.executeImportTracks(
+            new TrackUserImportDTOBuilder()
+                    .withArtifact(new ArtifactDTOBuilder().withId(artifact.getId()).build())
+                    .withDVType(new IdNameDTOBuilder().withId(2L).build())
+                    .withMediaFile(new MediaFileDTOBuilder().withId(mediaFile.getId()).build())
+                    .withTitles(List.of())
+                    .build()))
+                .isInstanceOf(EmptyParameterException.class)
+                .hasMessageContaining("Titles")
+                .hasMessage("Empty parameter: Titles");
+
+        assertThatThrownBy(() -> service.executeImportTracks(
+            new TrackUserImportDTOBuilder()
+                    .withArtifact(new ArtifactDTOBuilder().withId(artifact.getId()).build())
+                    .withDVType(new IdNameDTOBuilder().withId(2L).build())
+                    .withMediaFile(new MediaFileDTOBuilder().withId(mediaFile.getId()).build())
+                    .withTitles(List.of("Dumb", "Loser"))
+                    .build()))
+                .isInstanceOf(EmptyParameterException.class)
+                .hasMessageContaining("Artists");
+
+        assertThatThrownBy(() -> service.executeImportTracks(
+            new TrackUserImportDTOBuilder()
+                    .withArtifact(new ArtifactDTOBuilder().withId(artifact.getId()).build())
+                    .withDVType(new IdNameDTOBuilder().withId(2L).build())
+                    .withMediaFile(new MediaFileDTOBuilder().withId(mediaFile.getId()).build())
+                    .withTitles(List.of("Dumb", "Loser"))
+                    .withArtists(List.of("Clawfinger", "Joe Dassin"))
+                    .build()))
+                .isInstanceOf(WrongParameterValueException.class)
+                .hasMessageContaining("Artists")
+                .hasMessageContaining("not found")
+                .hasMessageContaining("Joe Dassin")
+                .hasMessageNotContaining("Clawfinger");
     }
 }

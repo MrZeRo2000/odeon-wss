@@ -42,4 +42,9 @@ public class TrackUserImportDTOBuilder extends AbstractClassBuilder<TrackUserImp
         this.instance.setChapters(chapters);
         return this;
     }
+
+    public TrackUserImportDTOBuilder withArtists(List<String> artists) {
+        this.instance.setArtists(artists);
+        return this;
+    }
 }
