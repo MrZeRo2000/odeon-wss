@@ -1,6 +1,9 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.builder.dtobuilder.*;
+import com.romanpulov.odeonwss.builder.dtobuilder.ArtifactDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.IdNameDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.MediaFileDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.TrackUserImportDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
@@ -9,6 +12,7 @@ import com.romanpulov.odeonwss.exception.EmptyParameterException;
 import com.romanpulov.odeonwss.exception.WrongParameterValueException;
 import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.user.TrackUserImportService;
+import jakarta.persistence.EntityManager;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -64,6 +68,9 @@ public class ServiceUserImportTrackTest {
 
     @Autowired
     ArtistRepository artistRepository;
+
+    @Autowired
+    EntityManager em;
 
     private ArtifactType getNonMusicArtifactType() {
         return artifactTypeRepository.getWithDVAnimation();
