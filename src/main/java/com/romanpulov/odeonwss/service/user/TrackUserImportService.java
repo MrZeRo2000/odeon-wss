@@ -70,13 +70,14 @@ public class TrackUserImportService {
             throw new EmptyParameterException("Titles");
         }
 
-        if (List.of(artifactTypeRepository.getWithDVAnimation(), artifactTypeRepository.getWithDVMovies())
-                .contains(artifact.getArtifactType())) {
+        long artifactTypeId = artifact.getArtifactType().getId();
+        if (List.of(artifactTypeRepository.getWithDVAnimation().getId(), artifactTypeRepository.getWithDVMovies().getId())
+                .contains(artifactTypeId)) {
             importNonMusicArtifact(data, artifact, mediaFile, dvType, num, titles, result);
-        } else if (artifact.getArtifactType().equals(artifactTypeRepository.getWithDVMusic())) {
+        } else if (artifactTypeId == artifactTypeRepository.getWithDVMusic().getId()) {
             importMusicArtifact(data, artifact, mediaFile, dvType, num, titles, result);
         } else {
-            throw new WrongParameterValueException("Artifact", "Unsupported artifact type");
+            throw new WrongParameterValueException("Artifact", "Unsupported artifact type:" + artifact.getArtifactType());
         }
 
         return result;
