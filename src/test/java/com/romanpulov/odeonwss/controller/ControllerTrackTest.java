@@ -52,6 +52,9 @@ public class ControllerTrackTest {
     private DVProductRepository dvProductRepository;
 
     @Autowired
+    private TrackRepository trackRepository;
+
+    @Autowired
     private ObjectMapper mapper;
 
     @Test
@@ -211,5 +214,47 @@ public class ControllerTrackTest {
                 .andReturn();
         logger.info("result:" + result.getResponse().getContentAsString());
 
+    }
+
+    @Test
+    @Order(11)
+    void testResetTrackNumbers() throws Exception {
+        var result_before = mockMvc.perform(get("/api/track/table/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].num", Matchers.equalTo(8)))
+                .andExpect(jsonPath("$[1].id", Matchers.equalTo(2)))
+                .andExpect(jsonPath("$[1].num", Matchers.equalTo(13)))
+                .andReturn()
+                ;
+        logger.debug("Get before result:" + result_before.getResponse().getContentAsString());
+
+        // adjust data - remove disk numbers
+        trackRepository.findAll().forEach(t -> {
+            t.setDiskNum(null);
+            trackRepository.save(t);
+        });
+
+        var result = this.mockMvc.perform(
+                        post("/api/track/reset-track-numbers/1").accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        logger.info("result:" + result.getResponse().getContentAsString());
+
+        var result_after = mockMvc.perform(get("/api/track/table/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].num", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[1].id", Matchers.equalTo(2)))
+                .andExpect(jsonPath("$[1].num", Matchers.equalTo(2)))
+                .andReturn()
+                ;
+        logger.debug("Get after result:" + result_after.getResponse().getContentAsString());
     }
 }

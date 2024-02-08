@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.service;
 import com.romanpulov.odeonwss.dto.TrackDTO;
 import com.romanpulov.odeonwss.dto.TrackFlatDTO;
 import com.romanpulov.odeonwss.dto.TrackTransformer;
+import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.entity.Track;
@@ -15,10 +16,7 @@ import com.romanpulov.odeonwss.repository.TrackRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -117,5 +115,24 @@ public class TrackService
     public void insertTracksWithMedia(Iterable<Track> tracks, Iterable<MediaFile> mediaFiles) {
         mediaFileRepository.saveAll(mediaFiles);
         repository.saveAll(tracks);
+    }
+
+    @Transactional
+    public void resetTrackNumbers(long artifactId) throws CommonEntityNotFoundException {
+        Artifact artifact = artifactRepository.findById(artifactId).orElseThrow
+                (() -> new CommonEntityNotFoundException("Artifact", artifactId));
+        List<Track> tracks = repository.findAllByArtifact(artifact)
+                .stream()
+                .filter(t -> t.getDiskNum() == null && t.getNum() != null)
+                .sorted(Comparator.comparingLong(Track::getNum))
+                .toList();
+
+        long num = 1;
+        for (Track track: tracks) {
+            if (track.getNum() != null && track.getNum() != num) {
+                track.setNum(num);
+            }
+            num ++;
+        }
     }
 }

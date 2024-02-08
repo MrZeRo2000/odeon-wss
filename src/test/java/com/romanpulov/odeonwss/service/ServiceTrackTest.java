@@ -17,7 +17,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -278,5 +280,47 @@ public class ServiceTrackTest {
         //TODO orphan deletion procedure
         //Assertions.assertEquals(1, StreamSupport.stream(mediaFileRepository.findAll().spliterator(), false).count());
         Assertions.assertEquals(1, trackRepository.findAllByArtifact(artifactRepository.findById(1L).orElseThrow()).size());
+    }
+
+    @Test
+    @Order(11)
+    void testResetTrackNumbers() throws Exception {
+        var artifact = new EntityArtifactBuilder()
+                .withArtifactType(artifactTypeRepository.getWithDVMovies())
+                .withTitle("Movies Title")
+                .withDuration(54321L)
+                .build();
+        artifactRepository.save(artifact);
+
+        var trackNum = new AtomicLong(3L);
+        var newTracks = Stream.of("Track 01", "Track 02")
+                .map(s ->  new TrackDTOBuilder()
+                        .withArtifactId(artifact.getId())
+                        .withTitle(s)
+                        .withNum(trackNum.getAndIncrement())
+                        .withDuration(12L)
+                        .withDvTypeId(2L)
+                        .build()
+                )
+                .toList();
+        for (var track: newTracks) {
+            trackService.insert(track);
+        }
+
+        var tracksBefore = trackRepository.findAllByArtifact(artifact)
+                .stream()
+                .sorted(Comparator.comparingLong(Track::getNum))
+                .toList();
+        assertThat(tracksBefore.get(0).getNum()).isEqualTo(3L);
+        assertThat(tracksBefore.get(1).getNum()).isEqualTo(4L);
+
+        trackService.resetTrackNumbers(artifact.getId());
+
+        var tracksAfter = trackRepository.findAllByArtifact(artifact)
+                .stream()
+                .sorted(Comparator.comparingLong(Track::getNum))
+                .toList();
+        assertThat(tracksAfter.get(0).getNum()).isEqualTo(1L);
+        assertThat(tracksAfter.get(1).getNum()).isEqualTo(2L);
     }
 }
