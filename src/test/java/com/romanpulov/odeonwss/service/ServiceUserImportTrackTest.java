@@ -402,6 +402,36 @@ public class ServiceUserImportTrackTest {
                         .build());
         assertThat(result.getRowsInserted().size()).isEqualTo(3);
         assertThat(result.getRowsInserted()).containsAll(List.of("Dumb", "Nigger", "Recipe for hate"));
+        var tracks = trackRepository.findAllFlatDTOByArtifactId(artifact.getId());
+        assertThat(tracks.get(0).getNum()).isEqualTo(1L);
+        assertThat(tracks.get(0).getTitle()).isEqualTo("Dumb");
+        assertThat(tracks.get(1).getNum()).isEqualTo(2L);
+        assertThat(tracks.get(1).getTitle()).isEqualTo("Nigger");
+        assertThat(tracks.get(2).getNum()).isEqualTo(3L);
+        assertThat(tracks.get(2).getTitle()).isEqualTo("Recipe for hate");
+
+        var result_between = service.executeImportTracks(
+                new TrackUserImportDTOBuilder()
+                        .withArtifact(new ArtifactDTOBuilder().withId(artifact.getId()).build())
+                        .withDVType(new IdNameDTOBuilder().withId(2L).build())
+                        .withMediaFile(new MediaFileDTOBuilder().withId(mediaFile.getId()).build())
+                        .withTitles(List.of("Pin Me Down", "Nothing Going On"))
+                        .withArtists(List.of())
+                        .withNum(2L)
+                        .build());
+        assertThat(result_between.getRowsInserted().size()).isEqualTo(2);
+
+        var tracks_between = trackRepository.findAllFlatDTOByArtifactId(artifact.getId());
+        assertThat(tracks_between.get(0).getNum()).isEqualTo(1L);
+        assertThat(tracks_between.get(0).getTitle()).isEqualTo("Dumb");
+        assertThat(tracks_between.get(1).getNum()).isEqualTo(2L);
+        assertThat(tracks_between.get(1).getTitle()).isEqualTo("Pin Me Down");
+        assertThat(tracks_between.get(2).getNum()).isEqualTo(3L);
+        assertThat(tracks_between.get(2).getTitle()).isEqualTo("Nothing Going On");
+        assertThat(tracks_between.get(3).getNum()).isEqualTo(4L);
+        assertThat(tracks_between.get(3).getTitle()).isEqualTo("Nigger");
+        assertThat(tracks_between.get(4).getNum()).isEqualTo(5L);
+        assertThat(tracks_between.get(4).getTitle()).isEqualTo("Recipe for hate");
     }
 
     @Test

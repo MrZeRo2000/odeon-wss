@@ -109,6 +109,10 @@ public class TrackUserImportService {
                     "Titles size:%d and chapters duration size:%d mismatch".formatted(titles.size(), durations.size()));
         }
 
+        // shift track numbers
+        shiftTrackNumbers(artifact, num, titles.size());
+
+        // tracks insert
         Iterator<Long> durationsIterator = durations.iterator();
         for (String title: titles) {
             Long duration = durationsIterator.next();
@@ -168,6 +172,9 @@ public class TrackUserImportService {
             }
         }
 
+        // shift track numbers
+        shiftTrackNumbers(artifact, num, titles.size());
+
         // tracks insert
         for (int i = 0; i < titles.size(); i++) {
             String title = titles.get(i);
@@ -188,5 +195,18 @@ public class TrackUserImportService {
 
             result.addRowInserted(title);
         }
+    }
+
+    private void shiftTrackNumbers(Artifact artifact, long num, int size) {
+        List<Track> tracksToShift = trackRepository
+                .findAllByArtifact(artifact)
+                .stream()
+                .filter(t -> Optional.ofNullable(t.getNum()).orElse(0L) >= num)
+                .toList();
+        tracksToShift.forEach(t -> {
+            if (t.getNum() != null) {
+                t.setNum(t.getNum() + size);
+            }
+        });
     }
 }
