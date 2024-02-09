@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RepositoryArtifactTypeTest {
@@ -38,5 +39,14 @@ public class RepositoryArtifactTypeTest {
         assertThat(cache.get("default")).isNull();
         artifactTypeRepository.getWithMP3();
         assertThat(cache.get("default")).isNotNull();
+    }
+
+    @Test
+    void testIsVideo() {
+        assertThat(artifactTypeRepository.isVideo(artifactTypeRepository.getWithMP3().getId())).isFalse();
+        assertThat(artifactTypeRepository.isVideo(artifactTypeRepository.getWithDVMusic().getId())).isTrue();
+
+        assertThatThrownBy(() -> artifactTypeRepository.isVideo(777L))
+                .isInstanceOf(RuntimeException.class);
     }
 }

@@ -5,6 +5,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Transactional(readOnly = true)
 public interface ArtifactTypeRepository extends CrudRepository<ArtifactType, Long> {
     @Cacheable(value = "artifactTypeMP3", key = "'default'")
@@ -40,5 +42,14 @@ public interface ArtifactTypeRepository extends CrudRepository<ArtifactType, Lon
     @Cacheable(value = "artifactTypeDVOther", key = "'default'")
     default ArtifactType getWithDVOther() {
         return findById(205L).orElseThrow();
+    }
+
+    default boolean isVideo(long artifactTypeId) {
+        return Optional.ofNullable(
+                findById(artifactTypeId)
+                        .orElseThrow()
+                        .getParentId())
+                .orElseThrow()
+                .equals(200L);
     }
 }

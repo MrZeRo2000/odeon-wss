@@ -314,7 +314,8 @@ public class ServiceTrackTest {
         assertThat(tracksBefore.get(0).getNum()).isEqualTo(3L);
         assertThat(tracksBefore.get(1).getNum()).isEqualTo(4L);
 
-        trackService.resetTrackNumbers(artifact.getId());
+        var rowsAffected = trackService.resetTrackNumbers(artifact.getId());
+        assertThat(rowsAffected.getRowsAffected()).isEqualTo(2L);
 
         var tracksAfter = trackRepository.findAllByArtifact(artifact)
                 .stream()

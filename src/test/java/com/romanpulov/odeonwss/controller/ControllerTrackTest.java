@@ -242,6 +242,8 @@ public class ControllerTrackTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.aMapWithSize(1)))
+                .andExpect(jsonPath("$.rowsAffected", Matchers.equalTo(2)))
                 .andReturn();
         logger.info("result:" + result.getResponse().getContentAsString());
 

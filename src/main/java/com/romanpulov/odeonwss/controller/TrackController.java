@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.controller;
 
+import com.romanpulov.odeonwss.dto.RowsAffectedDTO;
 import com.romanpulov.odeonwss.dto.TrackDTO;
 import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
@@ -32,8 +33,7 @@ public class TrackController
     }
 
     @PostMapping("/reset-track-numbers/{artifactId}")
-    public ResponseEntity<?> post(@PathVariable Long artifactId) throws CommonEntityNotFoundException {
-        service.resetTrackNumbers(artifactId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<RowsAffectedDTO> post(@PathVariable Long artifactId) throws CommonEntityNotFoundException {
+        return ResponseEntity.ok(service.resetTrackNumbers(artifactId));
     }
 }

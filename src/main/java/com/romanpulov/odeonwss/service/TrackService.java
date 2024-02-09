@@ -1,18 +1,13 @@
 package com.romanpulov.odeonwss.service;
 
+import com.romanpulov.odeonwss.dto.RowsAffectedDTO;
 import com.romanpulov.odeonwss.dto.TrackDTO;
 import com.romanpulov.odeonwss.dto.TrackFlatDTO;
 import com.romanpulov.odeonwss.dto.TrackTransformer;
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.entity.MediaFile;
-import com.romanpulov.odeonwss.entity.Track;
+import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.TrackMapper;
-import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.DVProductRepository;
-import com.romanpulov.odeonwss.repository.MediaFileRepository;
-import com.romanpulov.odeonwss.repository.TrackRepository;
+import com.romanpulov.odeonwss.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -24,14 +19,14 @@ public class TrackService
         extends AbstractEntityService<Track, TrackDTO, TrackRepository>
         implements EditableObjectService<TrackDTO>{
 
+    private final ArtifactTypeRepository artifactTypeRepository;
     private final ArtifactRepository artifactRepository;
-
     private final TrackTransformer transformer;
-
     private final MediaFileRepository mediaFileRepository;
 
     public TrackService(
             ArtifactRepository artifactRepository,
+            ArtifactTypeRepository artifactTypeRepository,
             TrackRepository trackRepository,
             TrackMapper trackMapper,
             TrackTransformer transformer,
@@ -39,6 +34,7 @@ public class TrackService
             DVProductRepository dvProductRepository) {
         super(trackRepository, trackMapper);
         this.artifactRepository = artifactRepository;
+        this.artifactTypeRepository = artifactTypeRepository;
         this.transformer = transformer;
         this.mediaFileRepository = mediaFileRepository;
 
@@ -118,21 +114,27 @@ public class TrackService
     }
 
     @Transactional
-    public void resetTrackNumbers(long artifactId) throws CommonEntityNotFoundException {
+    public RowsAffectedDTO resetTrackNumbers(long artifactId) throws CommonEntityNotFoundException {
         Artifact artifact = artifactRepository.findById(artifactId).orElseThrow
                 (() -> new CommonEntityNotFoundException("Artifact", artifactId));
-        List<Track> tracks = repository.findAllByArtifact(artifact)
-                .stream()
-                .filter(t -> t.getDiskNum() == null && t.getNum() != null)
-                .sorted(Comparator.comparingLong(Track::getNum))
-                .toList();
+        long rowsAffected = 0;
 
-        long num = 1;
-        for (Track track: tracks) {
-            if (track.getNum() != null && track.getNum() != num) {
-                track.setNum(num);
+        if (artifactTypeRepository.isVideo(artifact.getArtifactType().getId())) {
+            List<Track> tracks = repository.findAllByArtifact(artifact)
+                    .stream()
+                    .filter(t -> t.getNum() != null)
+                    .sorted(Comparator.comparingLong(Track::getNum))
+                    .toList();
+
+            long num = 1;
+            for (Track track : tracks) {
+                if (track.getNum() != null && track.getNum() != num) {
+                    track.setNum(num);
+                    rowsAffected ++;
+                }
+                num++;
             }
-            num ++;
         }
+        return RowsAffectedDTO.from(rowsAffected);
     }
 }
