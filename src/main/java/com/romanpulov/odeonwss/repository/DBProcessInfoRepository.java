@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Transactional(readOnly = true)
 public interface DBProcessInfoRepository extends CrudRepository<DBProcessInfo, Long> {
@@ -45,7 +44,7 @@ public interface DBProcessInfoRepository extends CrudRepository<DBProcessInfo, L
     LEFT OUTER JOIN DBProcessDetailAction AS da ON da.dbProcessDetail = pd
     LEFT OUTER JOIN DBProcessDetailItem AS di ON di.dbProcessDetail = pd
     WHERE d.id = :id
-    ORDER BY pd.id, di.value, da.value
+    ORDER BY pd.id, di.id, da.id
     """)
     List<ProcessInfoFlatDTO> findFlatDTOByIdWithDetails(long id);
 }
