@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,6 +67,10 @@ public abstract class AbstractCLIMediaFileParser implements MediaFileParserInter
         } catch (MediaInfoParsingException e) {
             throw new MediaFileInfoException(file.getFileName().toString(), e.getMessage());
         }
+    }
 
+    @Override
+    public List<LocalTime> getMediaFileChapters(Path file) throws MediaFileInfoException {
+        throw new MediaFileInfoException(file.getFileName().toString(), "The feature is not implemented");
     }
 }
