@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.unit;
 
 import com.romanpulov.odeonwss.utils.media.*;
+import com.romanpulov.odeonwss.utils.media.model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,13 +32,13 @@ public class UnitFFMPEGMediaFileParserTest {
 
         MediaFileInfo info = atomicInfo.get();
 
-        Assertions.assertEquals(MediaType.AUDIO, info.getPrimaryMediaType());
+        assertThat(info.getMediaContentInfo().getMediaStreams().get(0)).isInstanceOf(MediaStreamAudioInfo.class);
 
         MediaContentInfo contentInfo = info.getMediaContentInfo();
         Assertions.assertEquals(1, contentInfo.getMediaStreams().size());
 
-        MediaStreamInfo streamInfo = contentInfo.getMediaStreams().get(0);
-        Assertions.assertEquals(MediaType.AUDIO, streamInfo.getMediaType());
+        AbstractMediaStreamInfo streamInfo = contentInfo.getMediaStreams().get(0);
+        assertThat(streamInfo).isInstanceOf(MediaStreamAudioInfo.class);
         Assertions.assertEquals(TEST_MP3_FILE_BITRATE, streamInfo.getBitRate());
         Assertions.assertEquals(TEST_MP3_FILE_DURATION, streamInfo.getDuration());
 
@@ -60,7 +61,7 @@ public class UnitFFMPEGMediaFileParserTest {
 
         MediaFileInfo info = atomicInfo.get();
 
-        Assertions.assertEquals(MediaType.AUDIO, info.getPrimaryMediaType());
+        assertThat(info.getMediaContentInfo().getMediaStreams().get(0)).isInstanceOf(MediaStreamAudioInfo.class);
 
         MediaContentInfo contentInfo = info.getMediaContentInfo();
         Assertions.assertEquals(1, contentInfo.getMediaStreams().size());
@@ -83,6 +84,6 @@ public class UnitFFMPEGMediaFileParserTest {
         );
 
         MediaFileInfo info = atomicInfo.get();
-        assertThat(info.getPrimaryMediaType()).isEqualTo(MediaType.AUDIO);
+        assertThat(info.getMediaContentInfo().getMediaStreams().get(0)).isInstanceOf(MediaStreamAudioInfo.class);
     }
 }

@@ -4,8 +4,8 @@ import com.romanpulov.jutilscore.io.FileUtils;
 import com.romanpulov.odeonwss.dto.MediaFileDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.MediaFile;
-import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
-import com.romanpulov.odeonwss.utils.media.MediaFormatInfo;
+import com.romanpulov.odeonwss.utils.media.model.MediaFileInfo;
+import com.romanpulov.odeonwss.utils.media.model.MediaFormatInfo;
 import org.springframework.stereotype.Component;
 
 @Component

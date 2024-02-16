@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.service.processor.parser;
 
 import com.romanpulov.odeonwss.service.processor.ProcessorException;
-import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
+import com.romanpulov.odeonwss.utils.media.model.MediaFileInfo;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
 import com.romanpulov.odeonwss.utils.media.MediaFileParserInterface;
 import jakarta.validation.constraints.NotNull;

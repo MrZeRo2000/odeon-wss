@@ -6,7 +6,7 @@ import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import com.romanpulov.odeonwss.service.processor.vo.SizeDuration;
-import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
+import com.romanpulov.odeonwss.utils.media.model.MediaFileInfo;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
 
 import java.nio.file.Path;

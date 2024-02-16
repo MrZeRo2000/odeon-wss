@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.utils.media;
 
 import com.romanpulov.odeonwss.utils.EnumUtils;
+import com.romanpulov.odeonwss.utils.media.model.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,8 +48,9 @@ public class FFMPEGMediaFileParser extends AbstractCLIMediaFileParser {
             }
 
             return new MediaContentInfo(
+                    parseMediaFormat(jsonFormatObject),
                     parseMediaStreams(jsonStreamsArray),
-                    parseMediaFormat(jsonFormatObject)
+                    List.of()
             );
 
         } catch (JSONException e) {
@@ -56,8 +58,8 @@ public class FFMPEGMediaFileParser extends AbstractCLIMediaFileParser {
         }
     }
 
-    private List<MediaStreamInfo> parseMediaStreams(JSONArray jsonStreamsArray) throws JSONException {
-        List<MediaStreamInfo> result = new ArrayList<>();
+    private List<AbstractMediaStreamInfo> parseMediaStreams(JSONArray jsonStreamsArray) throws JSONException {
+        List<AbstractMediaStreamInfo> result = new ArrayList<>();
 
         for (int i = 0; i < jsonStreamsArray.length(); i++) {
             JSONObject streamObject = jsonStreamsArray.getJSONObject(i);
@@ -70,7 +72,7 @@ public class FFMPEGMediaFileParser extends AbstractCLIMediaFileParser {
                 long duration = Math.round(streamObject.optDouble("duration", 0));
                 long bitRate = Math.round(streamObject.optInt("bit_rate", 0) / 1000.0);
 
-                result.add(MediaStreamInfo.createUnordered(mediaType, duration, bitRate));
+                result.add(MediaStreamFactory.fromMediaType(mediaType, 0, duration, bitRate, 0, 0));
             }
         }
 

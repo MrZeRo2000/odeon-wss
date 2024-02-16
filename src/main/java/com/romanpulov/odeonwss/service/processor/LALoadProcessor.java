@@ -13,7 +13,7 @@ import com.romanpulov.odeonwss.service.TrackService;
 import com.romanpulov.odeonwss.service.processor.parser.CueParser;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
-import com.romanpulov.odeonwss.utils.media.MediaFileInfo;
+import com.romanpulov.odeonwss.utils.media.model.MediaFileInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;

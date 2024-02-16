@@ -1,4 +1,4 @@
-package com.romanpulov.odeonwss.utils.media;
+package com.romanpulov.odeonwss.utils.media.model;
 
 import java.util.Objects;
 
@@ -9,21 +9,14 @@ public class MediaFileInfo {
         return fileName;
     }
 
-    private final MediaType primaryMediaType;
-
-    public MediaType getPrimaryMediaType() {
-        return primaryMediaType;
-    }
-
     private final MediaContentInfo mediaContentInfo;
 
     public MediaContentInfo getMediaContentInfo() {
         return mediaContentInfo;
     }
 
-    public MediaFileInfo(String fileName, MediaType primaryMediaType, MediaContentInfo mediaContentInfo) {
+    public MediaFileInfo(String fileName, MediaContentInfo mediaContentInfo) {
         this.fileName = fileName;
-        this.primaryMediaType = primaryMediaType;
         this.mediaContentInfo = mediaContentInfo;
     }
 
@@ -32,19 +25,18 @@ public class MediaFileInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MediaFileInfo that = (MediaFileInfo) o;
-        return fileName.equals(that.fileName) && primaryMediaType == that.primaryMediaType && mediaContentInfo.equals(that.mediaContentInfo);
+        return fileName.equals(that.fileName) && mediaContentInfo.equals(that.mediaContentInfo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fileName, primaryMediaType, mediaContentInfo);
+        return Objects.hash(fileName, mediaContentInfo);
     }
 
     @Override
     public String toString() {
         return "MediaFileInfo{" +
                 "fileName='" + fileName + '\'' +
-                ", primaryMediaType=" + primaryMediaType +
                 ", mediaContentInfo=" + mediaContentInfo +
                 '}';
     }

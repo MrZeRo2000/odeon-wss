@@ -1,24 +1,16 @@
 package com.romanpulov.odeonwss.utils.media;
 
+import com.romanpulov.odeonwss.utils.media.model.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class AbstractCLIMediaFileParser implements MediaFileParserInterface {
-
-    private static MediaType getPrimaryMediaTypeFromStreams(List<MediaStreamInfo> mediaStreams)
-            throws MediaInfoParsingException {
-        if (!mediaStreams.isEmpty()) {
-            return mediaStreams.get(0).getMediaType();
-        } else {
-            throw new MediaInfoParsingException("Error obtaining media primary type from streams");
-        }
-    }
 
     protected final String executableFileName;
 
@@ -55,7 +47,6 @@ public abstract class AbstractCLIMediaFileParser implements MediaFileParserInter
                 MediaContentInfo mediaContentInfo = parseOutput(inputStreamText);
                 return new MediaFileInfo(
                         file.getFileName().toString(),
-                        getPrimaryMediaTypeFromStreams(mediaContentInfo.getMediaStreams()),
                         mediaContentInfo
                 );
             } else {
@@ -67,10 +58,5 @@ public abstract class AbstractCLIMediaFileParser implements MediaFileParserInter
         } catch (MediaInfoParsingException e) {
             throw new MediaFileInfoException(file.getFileName().toString(), e.getMessage());
         }
-    }
-
-    @Override
-    public List<LocalTime> getMediaFileChapters(Path file) throws MediaFileInfoException {
-        throw new MediaFileInfoException(file.getFileName().toString(), "The feature is not implemented");
     }
 }

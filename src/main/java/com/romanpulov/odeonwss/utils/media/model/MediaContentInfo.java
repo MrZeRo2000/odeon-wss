@@ -1,24 +1,33 @@
-package com.romanpulov.odeonwss.utils.media;
+package com.romanpulov.odeonwss.utils.media.model;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 
 public class MediaContentInfo {
-    private final List<MediaStreamInfo> mediaStreams;
-
-    public List<MediaStreamInfo> getMediaStreams() {
-        return mediaStreams;
-    }
-
     private final MediaFormatInfo mediaFormatInfo;
+    private final List<AbstractMediaStreamInfo> mediaStreams;
+    private final List<LocalTime> chapters;
 
     public MediaFormatInfo getMediaFormatInfo() {
         return mediaFormatInfo;
     }
 
-    public MediaContentInfo(List<MediaStreamInfo> mediaStreams, MediaFormatInfo mediaFormatInfo) {
+    public List<AbstractMediaStreamInfo> getMediaStreams() {
+        return mediaStreams;
+    }
+
+    public List<LocalTime> getChapters() {
+        return chapters;
+    }
+
+    public MediaContentInfo(
+            MediaFormatInfo mediaFormatInfo,
+            List<AbstractMediaStreamInfo> mediaStreams,
+            List<LocalTime> chapters) {
         this.mediaStreams = mediaStreams;
         this.mediaFormatInfo = mediaFormatInfo;
+        this.chapters = chapters;
     }
 
     @Override
@@ -37,8 +46,9 @@ public class MediaContentInfo {
     @Override
     public String toString() {
         return "MediaContentInfo{" +
-                "mediaStreams=" + mediaStreams +
-                ", mediaFormatInfo=" + mediaFormatInfo +
+                "mediaFormatInfo=" + mediaFormatInfo +
+                ", mediaStreams=" + mediaStreams +
+                ", chapters=" + chapters +
                 '}';
     }
 }

@@ -1,11 +1,10 @@
 package com.romanpulov.odeonwss.utils.media;
 
+import com.romanpulov.odeonwss.utils.media.model.MediaFileInfo;
+
 import java.nio.file.Path;
-import java.time.LocalTime;
-import java.util.List;
 
 public interface MediaFileParserInterface {
     String getExecutableFileName();
     MediaFileInfo parseMediaFile(Path file) throws MediaFileInfoException;
-    List<LocalTime> getMediaFileChapters(Path file) throws MediaFileInfoException;
 }
