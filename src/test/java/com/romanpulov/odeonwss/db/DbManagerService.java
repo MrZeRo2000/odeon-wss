@@ -27,7 +27,7 @@ public class DbManagerService {
                 .toString()
                 .split("/");
         if (location.length > 5) {
-            PROJECT_NAME = location[5];
+            PROJECT_NAME = location[location.length - 5];
         } else {
             PROJECT_NAME = "DEFAULT";
         }
@@ -83,6 +83,7 @@ public class DbManagerService {
         Path sourcePath = Paths.get(getStorageFileName(dbType));
         boolean sourceExists = Files.exists(sourcePath);
         if (sourceExists) {
+            log.info("Loading database from " + getStorageFileName(dbType));
             Files.copy(Paths.get(getStorageFileName(dbType)), Paths.get(this.dbPath), REPLACE_EXISTING);
         }
         return sourceExists;
