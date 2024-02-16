@@ -95,6 +95,9 @@ CREATE TABLE media_files (
     mdfl_size INTEGER NOT NULL,
     mdfl_bitrate INTEGER NULL,
     mdfl_duration INTEGER NULL,
+    mdfl_width INTEGER NULL,
+    mdfl_height INTEGER NULL,
+    mdfl_extra TEXT NULL,
     mdfl_ins_datm INTEGER NOT NULL,
     mdfl_upd_datm INTEGER NOT NULL,
     mdfl_migration_id INTEGER NULL

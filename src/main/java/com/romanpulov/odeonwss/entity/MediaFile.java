@@ -94,6 +94,39 @@ public class MediaFile extends AbstractBaseMigratedEntity {
         this.duration = duration;
     }
 
+    @Column(name = "mdfl_width")
+    private Long width;
+
+    public Long getWidth() {
+        return width;
+    }
+
+    public void setWidth(Long width) {
+        this.width = width;
+    }
+
+    @Column(name = "mdfl_height")
+    private Long height;
+
+    public Long getHeight() {
+        return height;
+    }
+
+    public void setHeight(Long height) {
+        this.height = height;
+    }
+
+    @Column(name = "mdfl_extra")
+    private String extra;
+
+    public Long getExtra() {
+        return height;
+    }
+
+    public void setExtra(String extra) {
+        this.extra = extra;
+    }
+
     public MediaFile() {
     }
 
@@ -127,6 +160,9 @@ public class MediaFile extends AbstractBaseMigratedEntity {
                 ", size=" + size +
                 ", bitrate=" + bitrate +
                 ", duration=" + duration +
+                ", width=" + width +
+                ", height=" + height +
+                ", extra=" + extra +
                 '}';
     }
 }

@@ -1,1 +1,1 @@
-Remove-Item $env:TEMP\odeon-wss-db\*.*
+Remove-Item $env:TEMP\odeon-wss-db\*
