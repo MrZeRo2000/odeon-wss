@@ -232,7 +232,7 @@ public class UnitMediaInfoMediaFileParserTest {
         var contentInfo = testParser.parseOutput(content);
         assertThat(contentInfo.getChapters().size()).isEqualTo(3);
         assertThat(contentInfo.getChapters().get(0)).isEqualTo(LocalTime.of(0, 0, 4));
-        assertThat(contentInfo.getChapters().get(1)).isEqualTo(LocalTime.of(0, 25, 7));
+        assertThat(contentInfo.getChapters().get(1)).isEqualTo(LocalTime.of(0, 26, 0));
         assertThat(contentInfo.getChapters().get(2)).isEqualTo(LocalTime.of(1, 35, 19));
 
         assertThat(contentInfo.getMediaStreams().get(0)).isInstanceOf(MediaStreamVideoInfo.class);

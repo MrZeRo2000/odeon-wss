@@ -137,11 +137,15 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
                     .map(v -> {
                         Matcher matcher = REGEXP_PATTERN_CHAPTER_DURATION.matcher((String) v);
                         if (matcher.find() && (matcher.groupCount() >= 3)) {
+                            int correction =
+                                    ((matcher.groupCount() == 4) && (Integer.parseInt(matcher.group(4)) >= 500)) ?
+                                            1:
+                                            0;
                             return LocalTime.of(
                                     Integer.parseInt(matcher.group(1)),
                                     Integer.parseInt(matcher.group(2)),
                                     Integer.parseInt(matcher.group(3))
-                            );
+                            ).plusSeconds(correction);
                         } else {
                             return LocalTime.MIN;
                         }
