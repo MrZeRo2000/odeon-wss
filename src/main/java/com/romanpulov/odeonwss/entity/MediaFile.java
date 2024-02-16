@@ -119,8 +119,8 @@ public class MediaFile extends AbstractBaseMigratedEntity {
     @Column(name = "mdfl_extra")
     private String extra;
 
-    public Long getExtra() {
-        return height;
+    public String getExtra() {
+        return extra;
     }
 
     public void setExtra(String extra) {
@@ -128,13 +128,6 @@ public class MediaFile extends AbstractBaseMigratedEntity {
     }
 
     public MediaFile() {
-    }
-
-    public static MediaFile fromId(Long id) {
-        MediaFile mediaFile = new MediaFile();
-        mediaFile.setId(id);
-
-        return mediaFile;
     }
 
     @Override

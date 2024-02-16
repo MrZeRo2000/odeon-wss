@@ -40,6 +40,17 @@ public class EntityMediaFileBuilder extends AbstractClassBuilder<MediaFile> {
         return this;
     }
 
+    public EntityMediaFileBuilder withDimensions(long width, long height) {
+        this.instance.setWidth(width);
+        this.instance.setHeight(height);
+        return this;
+    }
+
+    public EntityMediaFileBuilder withExtra(String extra) {
+        this.instance.setExtra(extra);
+        return this;
+    }
+
     public EntityMediaFileBuilder withMigrationId(long migrationId) {
         this.instance.setMigrationId(migrationId);
         return this;

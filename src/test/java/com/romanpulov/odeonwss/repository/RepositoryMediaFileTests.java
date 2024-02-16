@@ -100,6 +100,25 @@ public class RepositoryMediaFileTests {
                 .withBitrate(320L)
                 .build();
         mediaFileRepository.save(mediaFile);
+
+        Artifact movieArtifact = new EntityArtifactBuilder()
+                .withArtifactType(artifactTypeRepository.getWithDVMovies())
+                .withTitle("Movie 1")
+                .withDuration(12346L)
+                .build();
+        artifactRepository.save(movieArtifact);
+
+        mediaFileRepository.save(new EntityMediaFileBuilder()
+                .withArtifact(movieArtifact)
+                        .withName("Scare movie.MKV")
+                        .withFormat("MKV")
+                        .withSize(473453L)
+                        .withDuration(23146L)
+                        .withBitrate(2000L)
+                        .withDimensions(640, 480)
+                        .withExtra("{\"extra\": [\"00:03:44\", \"01:01:22\"]}")
+                .build()
+        );
     }
 
     @Test
@@ -122,6 +141,22 @@ public class RepositoryMediaFileTests {
         List<MediaFileValidationDTO> mediaFileValidation =
                 mediaFileRepository.getTrackMediaFileValidationMusic(ArtistType.ARTIST, artifactTypeRepository.getWithMP3());
         Assertions.assertEquals(1, mediaFileValidation.size());
+    }
+
+    @Test
+    @Order(3)
+    void testMediaAttributes () {
+        MediaFile mediaFile = mediaFileRepository
+                .getMediaFilesByArtifactType(artifactTypeRepository.getWithDVMovies())
+                .get(0);
+        assertThat(mediaFile.getName()).isEqualTo("Scare movie.MKV");
+        assertThat(mediaFile.getFormat()).isEqualTo("MKV");
+        assertThat(mediaFile.getSize()).isEqualTo(473453L);
+        assertThat(mediaFile.getDuration()).isEqualTo(23146L);
+        assertThat(mediaFile.getBitrate()).isEqualTo(2000L);
+        assertThat(mediaFile.getWidth()).isEqualTo(640L);
+        assertThat(mediaFile.getHeight()).isEqualTo(480L);
+        assertThat(mediaFile.getExtra()).contains("extra");
     }
 
     @Test
