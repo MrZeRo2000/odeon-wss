@@ -6,6 +6,8 @@ Write-Host ******** DELETE TEST DB ***********
 & .\del_test_db.ps1
 Write-Host ******** DELETE TEST DB COMPLETED *
 
+$env:MDB_IMPORT = 'Y'
+
 Write-Host ******** TEST RUN *****************
 .\gradlew clean build test
 Write-Host ******** TEST RUN COMPLETED *******

@@ -8,6 +8,7 @@ import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
@@ -20,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@EnabledIfEnvironmentVariable(named = "MDB_IMPORT", matches = "Y")
 public class ServiceProcessMDBImportLAUpdateAttributesTest {
     private static final Logger log = Logger.getLogger(ServiceProcessMDBImportLAUpdateAttributesTest.class.getSimpleName());
 
@@ -59,7 +61,6 @@ public class ServiceProcessMDBImportLAUpdateAttributesTest {
         service.executeProcessor(ProcessorType.LA_LOADER, null);
 
         ProcessInfo pi = service.getProcessInfo();
-        List<ProcessDetail> processDetails = pi.getProcessDetails();
         AssertionsForClassTypes.assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
     }
 
