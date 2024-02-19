@@ -137,4 +137,11 @@ public class TrackService
         }
         return RowsAffectedDTO.from(rowsAffected);
     }
+
+    public RowsAffectedDTO updateDurationsFromMediaFile(long artifactId, long mediaFileId)
+            throws CommonEntityNotFoundException {
+        long rowsAffected = 0;
+
+        return RowsAffectedDTO.from(rowsAffected);
+    }
 }

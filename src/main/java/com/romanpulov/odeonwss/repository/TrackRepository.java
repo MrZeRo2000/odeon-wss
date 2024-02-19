@@ -46,6 +46,7 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
             dvt.name AS dvTypeName,
             c.title AS title,
             c.duration AS duration,
+            m.id AS mediaFileId,
             m.size AS size,
             m.bitrate AS bitRate,
             m.name AS mediaFileName,

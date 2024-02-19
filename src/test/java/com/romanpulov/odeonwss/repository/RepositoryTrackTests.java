@@ -210,6 +210,10 @@ public class RepositoryTrackTests {
 
         track = trackRepository.findById(track.getId()).orElseThrow();
         Assertions.assertEquals(1, track.getMediaFiles().size());
+
+        var trackDTO = trackRepository.findAllFlatDTOByArtifactId(1L).get(0);
+        assertThat(trackDTO.getMediaFileId()).isEqualTo(1L);
+        assertThat(trackDTO.getMediaFileName()).isEqualTo("Track.mp3");
     }
 
     @Test
