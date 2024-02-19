@@ -171,9 +171,20 @@ public class RepositoryMediaFileTests {
     @Test
     @Order(4)
     void testMediaFileDTOById() {
-        MediaFileDTO dto = mediaFileRepository.findDTOById(1L).orElseThrow();
-        assertThat(dto.getId()).isEqualTo(1L);
-        assertThat(dto.getName()).isEqualTo("AAA.mp3");
+        var audioDTO = mediaFileRepository.findDTOById(1L).orElseThrow();
+        assertThat(audioDTO.getId()).isEqualTo(1L);
+        assertThat(audioDTO.getName()).isEqualTo("AAA.mp3");
+
+        var videoDTO = mediaFileRepository.findDTOById(3L).orElseThrow();
+        assertThat(videoDTO.getId()).isEqualTo(3L);
+        assertThat(videoDTO.getName()).isEqualTo("Scare movie.MKV");
+        assertThat(videoDTO.getFormat()).isEqualTo("MKV");
+        assertThat(videoDTO.getSize()).isEqualTo(473453L);
+        assertThat(videoDTO.getDuration()).isEqualTo(23146L);
+        assertThat(videoDTO.getBitrate()).isEqualTo(2000L);
+        assertThat(videoDTO.getWidth()).isEqualTo(640L);
+        assertThat(videoDTO.getHeight()).isEqualTo(480L);
+        assertThat(videoDTO.getExtra()).isEqualTo("{\"extra\": [\"00:03:44\", \"01:01:22\"]}");
     }
 
     @Test
@@ -189,7 +200,7 @@ public class RepositoryMediaFileTests {
         assertThat(videoDTOs.size()).isEqualTo(1);
         assertThat(videoDTOs.get(0).getWidth()).isEqualTo(640L);
         assertThat(videoDTOs.get(0).getHeight()).isEqualTo(480L);
-        assertThat(videoDTOs.get(0).getExtra()).isEqualTo("{\"extra\": [\"00:03:44\", \"01:01:22\"]}");
+        assertThat(videoDTOs.get(0).getExtra()).isNull();
     }
 
     @Test

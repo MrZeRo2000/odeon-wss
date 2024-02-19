@@ -50,8 +50,7 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
         mf.bitrate AS bitrate,
         mf.duration AS duration,
         mf.width AS width,
-        mf.height AS height,
-        mf.extra AS extra
+        mf.height AS height
       FROM MediaFile as mf
       INNER JOIN Artifact as a ON mf.artifact = a
       WHERE a.artifactType = :artifactType
@@ -85,8 +84,7 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
           m.bitrate AS bitrate,
           m.duration AS duration,
           m.width AS width,
-          m.height AS height,
-          m.extra AS extra
+          m.height AS height
         FROM MediaFile m
         WHERE m.artifact.id = :artifactId
         ORDER BY m.name
