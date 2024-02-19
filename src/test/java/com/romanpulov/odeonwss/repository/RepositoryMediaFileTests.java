@@ -165,25 +165,31 @@ public class RepositoryMediaFileTests {
         List<MediaFileValidationDTO> mediaFileValidation =
                 mediaFileRepository.getArtifactMediaFileValidationMusic(
                         ArtistType.ARTIST, artifactTypeRepository.getWithMP3());
-        Assertions.assertEquals(3, mediaFileValidation.size());
+        assertThat(mediaFileValidation.size()).isEqualTo(3);
     }
 
     @Test
     @Order(4)
     void testMediaFileDTOById() {
         MediaFileDTO dto = mediaFileRepository.findDTOById(1L).orElseThrow();
-        Assertions.assertEquals(1L, dto.getId());
-        Assertions.assertEquals("AAA.mp3", dto.getName());
+        assertThat(dto.getId()).isEqualTo(1L);
+        assertThat(dto.getName()).isEqualTo("AAA.mp3");
     }
 
     @Test
     @Order(5)
     void testMediaFileAllDTO() {
-        List<MediaFileDTO> dtoList = mediaFileRepository.findAllDTOByArtifactId(1L);
-        Assertions.assertEquals(3, dtoList.size());
-        Assertions.assertEquals("AAA.mp3", dtoList.get(0).getName());
-        Assertions.assertEquals("BBB.mp3", dtoList.get(1).getName());
-        Assertions.assertEquals("CCC.mp3", dtoList.get(2).getName());
+        var audioDTOs = mediaFileRepository.findAllDTOByArtifactId(1L);
+        assertThat(audioDTOs.size()).isEqualTo(3);
+        assertThat(audioDTOs.get(0).getName()).isEqualTo("AAA.mp3");
+        assertThat(audioDTOs.get(1).getName()).isEqualTo("BBB.mp3");
+        assertThat(audioDTOs.get(2).getName()).isEqualTo("CCC.mp3");
+
+        var videoDTOs = mediaFileRepository.findAllDTOByArtifactId(2L);
+        assertThat(videoDTOs.size()).isEqualTo(1);
+        assertThat(videoDTOs.get(0).getWidth()).isEqualTo(640L);
+        assertThat(videoDTOs.get(0).getHeight()).isEqualTo(480L);
+        assertThat(videoDTOs.get(0).getExtra()).isEqualTo("{\"extra\": [\"00:03:44\", \"01:01:22\"]}");
     }
 
     @Test

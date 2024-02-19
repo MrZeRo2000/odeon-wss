@@ -42,4 +42,15 @@ public class MediaFileDTOBuilder extends AbstractClassBuilder<MediaFileDTOImpl> 
         this.instance.setDuration(duration);
         return this;
     }
+
+    public MediaFileDTOBuilder withDimensions(long width, long height) {
+        this.instance.setWidth(width);
+        this.instance.setHeight(height);
+        return this;
+    }
+
+    public MediaFileDTOBuilder withExtra(String extra) {
+        this.instance.setExtra(extra);
+        return this;
+    }
 }

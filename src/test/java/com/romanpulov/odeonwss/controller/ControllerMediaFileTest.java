@@ -81,6 +81,15 @@ public class ControllerMediaFileTest {
                         .build()
         );
 
+        Artifact artifact3 = artifactRepository.save(
+                new EntityArtifactBuilder()
+                        .withArtist(artist1)
+                        .withArtifactType(artifactTypeRepository.getWithDVMovies())
+                        .withTitle("Movie 2")
+                        .withDuration(54983L)
+                        .build()
+        );
+
         String json11 = mapper.writeValueAsString(
                 new MediaFileDTOBuilder()
                         .withArtifactId(artifact1.getId())
@@ -139,6 +148,28 @@ public class ControllerMediaFileTest {
                 .andExpect(status().isOk())
                 .andReturn();
         logger.info("result 21:" + result21.getResponse().getContentAsString());
+
+        String json31 = mapper.writeValueAsString(
+                new MediaFileDTOBuilder()
+                        .withArtifactId(artifact3.getId())
+                        .withName("Video name 3")
+                        .withFormat("MKV")
+                        .withBitrate(2500L)
+                        .withSize(59872L)
+                        .withDuration(57428L)
+                        .withDimensions(1280, 720)
+                        .withExtra("{\"extra\": [\"00:01:53\", \"01:34:06\"]}")
+                        .build()
+        );
+
+        var result31 = this.mockMvc.perform(
+                        post("/api/media-file").accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json31)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        logger.info("result 31:" + result31.getResponse().getContentAsString());
     }
 
     @Test
@@ -175,6 +206,31 @@ public class ControllerMediaFileTest {
                 .andExpect(jsonPath("$", Matchers.hasSize(1)))
                 .andExpect(jsonPath("$[0].size").exists())
         ;
+    }
+
+
+    @Test
+    @Order(2)
+    void testGetTableArtifact3() throws Exception {
+        var result = this.mockMvc.perform(get("/api/media-file/table/3")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(9)))
+                .andExpect(jsonPath("$[0].id", Matchers.equalTo(4)))
+                .andExpect(jsonPath("$[0].name", Matchers.equalTo("Video name 3")))
+                .andExpect(jsonPath("$[0].format", Matchers.equalTo("MKV")))
+                .andExpect(jsonPath("$[0].bitrate", Matchers.equalTo(2500)))
+                .andExpect(jsonPath("$[0].duration", Matchers.equalTo(57428)))
+                .andExpect(jsonPath("$[0].size", Matchers.equalTo(59872)))
+                .andExpect(jsonPath("$[0].width", Matchers.equalTo(1280)))
+                .andExpect(jsonPath("$[0].height", Matchers.equalTo(720)))
+                .andExpect(jsonPath("$[0].extra", Matchers.equalTo("{\"extra\": [\"00:01:53\", \"01:34:06\"]}")))
+                .andReturn()
+                ;
+        logger.debug("testGetTableArtifact1:" + result.getResponse().getContentAsString());
+
     }
 
     @Test

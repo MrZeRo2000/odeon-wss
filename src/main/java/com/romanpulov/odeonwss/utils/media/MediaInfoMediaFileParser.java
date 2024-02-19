@@ -74,7 +74,7 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
     }
 
     private MediaFormatInfo parseGeneralSection(Map<String, Object> section) {
-        return new MediaFormatInfo(
+        return MediaFormatInfo.fromGeneralAttributes(
                 (String) section.getOrDefault("Format", ""),
                 Math.round(Double.parseDouble((String) section.getOrDefault("Duration", "0"))),
                 Long.parseLong((String) section.getOrDefault("FileSize", "0")),
@@ -192,11 +192,18 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
             throw new MediaInfoParsingException("General media info not found");
         }
 
-        MediaFormatInfo resultMediaFormat = new MediaFormatInfo(
+        MediaStreamVideoInfo mediaStreamVideoInfo =
+                primaryMediaStreamInfo instanceof MediaStreamVideoInfo ?
+                        (MediaStreamVideoInfo)primaryMediaStreamInfo :
+                        null;
+
+        MediaFormatInfo resultMediaFormat = MediaFormatInfo.fromAllAttributes(
                 generalMediaFormat.getFormatName(),
                 Math.max(generalMediaFormat.getDuration(), primaryMediaStreamInfo.getDuration()),
                 generalMediaFormat.getSize(),
-                primaryMediaStreamInfo.getBitRate() == 0 ? generalMediaFormat.getBitRate() : primaryMediaStreamInfo.getBitRate()
+                primaryMediaStreamInfo.getBitRate() == 0 ? generalMediaFormat.getBitRate() : primaryMediaStreamInfo.getBitRate(),
+                mediaStreamVideoInfo == null ? 0 : mediaStreamVideoInfo.getWidth(),
+                mediaStreamVideoInfo == null ? 0 : mediaStreamVideoInfo.getHeight()
         );
 
         List<AbstractMediaStreamInfo> mediaStreams = mediaStreamMap

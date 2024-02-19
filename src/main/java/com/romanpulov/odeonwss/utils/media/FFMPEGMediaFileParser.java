@@ -85,6 +85,6 @@ public class FFMPEGMediaFileParser extends AbstractCLIMediaFileParser {
         long size = jsonFormatObject.getLong("size");
         long bitRate = Math.round(jsonFormatObject.getInt("bit_rate") / 1000.0);
 
-        return new MediaFormatInfo(formatName, duration, size, bitRate);
+        return MediaFormatInfo.fromGeneralAttributes(formatName, duration, size, bitRate);
     }
 }

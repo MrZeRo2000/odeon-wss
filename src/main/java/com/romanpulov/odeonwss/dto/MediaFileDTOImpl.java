@@ -9,6 +9,9 @@ public class MediaFileDTOImpl implements MediaFileDTO {
     private Long size;
     private Long bitrate;
     private Long duration;
+    private Long width;
+    private Long height;
+    private String extra;
 
     @Override
     public Long getId() {
@@ -84,15 +87,46 @@ public class MediaFileDTOImpl implements MediaFileDTO {
     }
 
     @Override
+    public Long getWidth() {
+        return width;
+    }
+
+    public void setWidth(Long width) {
+        this.width = width;
+    }
+
+    @Override
+    public Long getHeight() {
+        return height;
+    }
+
+    public void setHeight(Long height) {
+        this.height = height;
+    }
+
+    @Override
+    public String getExtra() {
+        return extra;
+    }
+
+    public void setExtra(String extra) {
+        this.extra = extra;
+    }
+
+    @Override
     public String toString() {
         return "MediaFileDTOImpl{" +
                 "id=" + id +
                 ", artifactId=" + artifactId +
+                ", artifactTitle='" + artifactTitle + '\'' +
                 ", name='" + name + '\'' +
                 ", format='" + format + '\'' +
                 ", size=" + size +
                 ", bitrate=" + bitrate +
                 ", duration=" + duration +
+                ", width=" + width +
+                ", height=" + height +
+                ", extra='" + extra + '\'' +
                 '}';
     }
 }
