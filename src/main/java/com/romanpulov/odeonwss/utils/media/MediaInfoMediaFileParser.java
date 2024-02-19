@@ -202,8 +202,8 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
                 Math.max(generalMediaFormat.getDuration(), primaryMediaStreamInfo.getDuration()),
                 generalMediaFormat.getSize(),
                 primaryMediaStreamInfo.getBitRate() == 0 ? generalMediaFormat.getBitRate() : primaryMediaStreamInfo.getBitRate(),
-                mediaStreamVideoInfo == null ? 0 : mediaStreamVideoInfo.getWidth(),
-                mediaStreamVideoInfo == null ? 0 : mediaStreamVideoInfo.getHeight()
+                mediaStreamVideoInfo == null ? null : mediaStreamVideoInfo.getWidth(),
+                mediaStreamVideoInfo == null ? null : mediaStreamVideoInfo.getHeight()
         );
 
         List<AbstractMediaStreamInfo> mediaStreams = mediaStreamMap

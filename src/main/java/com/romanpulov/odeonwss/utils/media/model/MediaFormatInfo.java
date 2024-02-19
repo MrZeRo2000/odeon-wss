@@ -7,8 +7,8 @@ public class MediaFormatInfo {
     private final long duration;
     private final long size;
     private final long bitRate;
-    private final long width;
-    private final long height;
+    private final Long width;
+    private final Long height;
 
     public String getFormatName() {
         return formatName;
@@ -26,11 +26,11 @@ public class MediaFormatInfo {
         return bitRate;
     }
 
-    public long getWidth() {
+    public Long getWidth() {
         return width;
     }
 
-    public long getHeight() {
+    public Long getHeight() {
         return height;
     }
 
@@ -39,8 +39,8 @@ public class MediaFormatInfo {
             long duration,
             long size,
             long bitRate,
-            long width,
-            long height) {
+            Long width,
+            Long height) {
         this.formatName = formatName;
         this.duration = duration;
         this.size = size;
@@ -54,7 +54,7 @@ public class MediaFormatInfo {
             long duration,
             long size,
             long bitRate) {
-        return new MediaFormatInfo(formatName, duration, size, bitRate, 0, 0);
+        return new MediaFormatInfo(formatName, duration, size, bitRate, null, null);
     }
 
     public static MediaFormatInfo fromAllAttributes(
@@ -62,8 +62,8 @@ public class MediaFormatInfo {
             long duration,
             long size,
             long bitRate,
-            long width,
-            long height) {
+            Long width,
+            Long height) {
         return new MediaFormatInfo(formatName, duration, size, bitRate, width, height);
     }
 

@@ -142,8 +142,12 @@ public interface ArtifactRepository
         a.title AS title
       FROM MediaFile as mf
       INNER JOIN Artifact as a ON mf.artifact = a
+      INNER JOIN ArtifactType as at ON a.artifactType = at
       WHERE a.artifactType = :artifactType
-        AND (mf.size = 0 OR mf.bitrate = 0 OR mf.bitrate IS NULL OR mf.duration = 0 OR mf.duration is NULL)
+        AND (
+          (mf.size = 0 OR mf.bitrate = 0 OR mf.bitrate IS NULL OR mf.duration = 0 OR mf.duration is NULL) OR
+          (at.parentId = 200 AND (mf.width IS NULL OR mf.width = 0 OR mf.height IS NULL OR mf.height = 0))
+        )
     """)
     Set<IdTitleDTO> findArtifactIdTitleWithIncompleteMediaFilesByArtifactType(ArtifactType artifactType);
 }
