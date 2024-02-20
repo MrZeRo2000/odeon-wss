@@ -1,11 +1,12 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.dto.RowsAffectedDTO;
-import com.romanpulov.odeonwss.dto.TrackDTO;
-import com.romanpulov.odeonwss.dto.TrackFlatDTO;
-import com.romanpulov.odeonwss.dto.TrackTransformer;
-import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.dto.*;
+import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.entity.ArtistType;
+import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
+import com.romanpulov.odeonwss.exception.WrongParameterValueException;
 import com.romanpulov.odeonwss.mapper.TrackMapper;
 import com.romanpulov.odeonwss.repository.*;
 import jakarta.transaction.Transactional;
@@ -123,7 +124,7 @@ public class TrackService
             List<Track> tracks = repository.findAllByArtifact(artifact)
                     .stream()
                     .filter(t -> t.getNum() != null)
-                    .sorted(Comparator.comparingLong(Track::getNum))
+                    .sorted(Comparator.comparingLong(t -> t.getNum() == null ? 0 : t.getNum()))
                     .toList();
 
             long num = 1;
@@ -138,9 +139,74 @@ public class TrackService
         return RowsAffectedDTO.from(rowsAffected);
     }
 
-    public RowsAffectedDTO updateDurationsFromMediaFile(long artifactId, long mediaFileId)
-            throws CommonEntityNotFoundException {
+    @Transactional
+    public RowsAffectedDTO updateDurationsFromMediaFile(long artifactId, long mediaFileId, List<Long> chapterDurations)
+            throws CommonEntityNotFoundException, WrongParameterValueException {
+        if (Objects.isNull(chapterDurations) || chapterDurations.isEmpty()) {
+            throw new WrongParameterValueException("Chapters", "Empty chapters");
+        }
+
         long rowsAffected = 0;
+
+        MediaFileDTO mediaFileDTO = mediaFileRepository.findDTOById(mediaFileId).orElseThrow(
+                () -> new CommonEntityNotFoundException("MediaFile", mediaFileId)
+        );
+
+        List<Long> validChapterDurations = chapterDurations
+                .stream()
+                .filter(c -> !Objects.isNull(c) && (c > 0))
+                .toList();
+
+        if (validChapterDurations.size() != chapterDurations.size()) {
+            throw new WrongParameterValueException("Chapters", "Invalid chapters found");
+        }
+
+        long chaptersTotalDuration = validChapterDurations
+                .stream()
+                .mapToLong(Long::longValue).sum();
+
+        if (chaptersTotalDuration > mediaFileDTO.getDuration()) {
+            throw new WrongParameterValueException("Chapters", "Chapters duration exceeds media file duration");
+        }
+
+        List<Long> trackIds = repository
+                .findAllFlatDTOByArtifactId(artifactId)
+                .stream()
+                .filter(t ->
+                        !Objects.isNull(t) &&
+                        !Objects.isNull(t.getMediaFileId()) &&
+                        t.getMediaFileId().equals(mediaFileId) &&
+                        !Objects.isNull(t.getNum()))
+                .sorted(Comparator.comparingLong(TrackFlatDTO::getNum))
+                .map(TrackFlatDTO::getId)
+                .distinct()
+                .toList();
+
+        if (trackIds.size() != validChapterDurations.size() + 1) {
+            throw new WrongParameterValueException(
+                    "Chapters",
+                    "Number of chapters: %d does not correspond to number of tracks: %d".formatted(
+                            validChapterDurations.size(), trackIds.size())
+            );
+        }
+
+        Iterator<Long> chapterDurationsIterator = validChapterDurations.iterator();
+        long duration;
+
+        for (Long trackId: trackIds) {
+            if (chapterDurationsIterator.hasNext()) {
+                duration = chapterDurationsIterator.next();
+            } else {
+                duration = mediaFileDTO.getDuration() - chaptersTotalDuration;
+            }
+
+            Track track = repository.findById(trackId).orElseThrow(
+                    () -> new CommonEntityNotFoundException("Track", trackId)
+            );
+            track.setDuration(duration);
+            repository.save(track);
+            rowsAffected ++;
+        }
 
         return RowsAffectedDTO.from(rowsAffected);
     }

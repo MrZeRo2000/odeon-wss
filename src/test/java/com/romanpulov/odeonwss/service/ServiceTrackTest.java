@@ -9,6 +9,7 @@ import com.romanpulov.odeonwss.dto.TrackDTO;
 import com.romanpulov.odeonwss.dto.TrackDTOImpl;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
+import com.romanpulov.odeonwss.exception.WrongParameterValueException;
 import com.romanpulov.odeonwss.repository.*;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
@@ -19,12 +20,14 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -293,12 +296,12 @@ public class ServiceTrackTest {
         artifactRepository.save(artifact);
 
         var trackNum = new AtomicLong(3L);
-        var newTracks = Stream.of("Track 01", "Track 02")
+        var newTracks = Stream.of("Track 01", "Track 02", "Track 03")
                 .map(s ->  new TrackDTOBuilder()
                         .withArtifactId(artifact.getId())
                         .withTitle(s)
                         .withNum(trackNum.getAndIncrement())
-                        .withDuration(12L)
+                        .withDuration(12L + Math.round(Math.random() * 100))
                         .withDvTypeId(2L)
                         .build()
                 )
@@ -309,19 +312,72 @@ public class ServiceTrackTest {
 
         var tracksBefore = trackRepository.findAllByArtifact(artifact)
                 .stream()
-                .sorted(Comparator.comparingLong(Track::getNum))
+                .sorted(Comparator.comparingLong(t -> t.getNum() == null ? 0 : t.getNum()))
                 .toList();
         assertThat(tracksBefore.get(0).getNum()).isEqualTo(3L);
         assertThat(tracksBefore.get(1).getNum()).isEqualTo(4L);
+        assertThat(tracksBefore.get(2).getNum()).isEqualTo(5L);
 
         var rowsAffected = trackService.resetTrackNumbers(artifact.getId());
-        assertThat(rowsAffected.getRowsAffected()).isEqualTo(2L);
+        assertThat(rowsAffected.getRowsAffected()).isEqualTo(3L);
 
         var tracksAfter = trackRepository.findAllByArtifact(artifact)
                 .stream()
-                .sorted(Comparator.comparingLong(Track::getNum))
+                .sorted(Comparator.comparingLong(t -> t.getNum() == null ? 0 : t.getNum()))
                 .toList();
         assertThat(tracksAfter.get(0).getNum()).isEqualTo(1L);
         assertThat(tracksAfter.get(1).getNum()).isEqualTo(2L);
+        assertThat(tracksAfter.get(2).getNum()).isEqualTo(3L);
+    }
+
+    @Test
+    @Order(12)
+    void testUpdateDurationsFromMediaFile() throws Exception {
+        var artifact = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMovies()).get(0);
+
+        var mediaFile = new EntityMediaFileBuilder()
+                .withArtifact(artifact)
+                .withName("Movie")
+                .withFormat("MKV")
+                .withDuration(400L)
+                .withSize(12344L)
+                .build();
+        mediaFileRepository.save(mediaFile);
+
+        var tracksBefore = trackRepository.findAllByArtifact(artifact);
+        assertThat(tracksBefore.size()).isEqualTo(3);
+        tracksBefore.get(0).setDuration(0L);
+        tracksBefore.get(1).setDuration(null);
+        tracksBefore.get(2).setDuration(null);
+        tracksBefore.forEach(t -> t.setMediaFiles(Set.of(mediaFile)));
+        trackRepository.saveAll(tracksBefore);
+
+        // action
+        assertThatThrownBy(
+                () -> trackService.updateDurationsFromMediaFile(artifact.getId(), mediaFile.getId(), List.of(61L, -1L, 30L)))
+                .isInstanceOf(WrongParameterValueException.class)
+                .hasMessageContaining("Invalid chapters found");
+
+        assertThatThrownBy(
+                () -> trackService.updateDurationsFromMediaFile(artifact.getId(), mediaFile.getId(), List.of(61L, 788L, 30L)))
+                .isInstanceOf(WrongParameterValueException.class)
+                .hasMessageContaining("Chapters duration exceeds media file duration");
+
+        assertThatThrownBy(
+                () -> trackService.updateDurationsFromMediaFile(artifact.getId(), mediaFile.getId(), List.of(61L)))
+                .isInstanceOf(WrongParameterValueException.class)
+                .hasMessageContaining("does not correspond to number of tracks");
+
+        assertThatThrownBy(
+                () -> trackService.updateDurationsFromMediaFile(artifact.getId(), mediaFile.getId(), List.of(61L, 12L, 4L)))
+                .isInstanceOf(WrongParameterValueException.class)
+                .hasMessageContaining("does not correspond to number of tracks");
+
+        assertThat(trackService.updateDurationsFromMediaFile(artifact.getId(), mediaFile.getId(), List.of(61L, 12L)).getRowsAffected()).isEqualTo(3L);
+
+        var tracksAfter = trackRepository.findAllByArtifact(artifact);
+        assertThat(tracksAfter.get(0).getDuration()).isEqualTo(61L);
+        assertThat(tracksAfter.get(1).getDuration()).isEqualTo(12L);
+        assertThat(tracksAfter.get(2).getDuration()).isEqualTo(400L - 61 - 12);
     }
 }
