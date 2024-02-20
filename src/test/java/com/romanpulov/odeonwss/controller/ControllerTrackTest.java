@@ -5,9 +5,11 @@ import com.romanpulov.odeonwss.builder.dtobuilder.TrackDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVProductBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import com.romanpulov.odeonwss.entity.DVProduct;
+import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.repository.*;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
@@ -23,6 +25,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -53,6 +57,9 @@ public class ControllerTrackTest {
 
     @Autowired
     private TrackRepository trackRepository;
+
+    @Autowired
+    private MediaFileRepository mediaFileRepository;
 
     @Autowired
     private ObjectMapper mapper;
@@ -90,6 +97,16 @@ public class ControllerTrackTest {
         artifactRepository.save(artifact);
         assertThat(artifact.getId()).isGreaterThan(0);
 
+        MediaFile mediaFile = new EntityMediaFileBuilder()
+                .withArtifact(artifact)
+                .withName("Media file")
+                .withFormat("MKV")
+                .withBitrate(2000L)
+                .withSize(484848L)
+                .withDuration(800L)
+                .build();
+        mediaFileRepository.save(mediaFile);
+
         DVProduct dvProduct = dvProductRepository.findById(2L).orElseThrow();
 
         String json = mapper.writeValueAsString(
@@ -101,6 +118,7 @@ public class ControllerTrackTest {
                         .withDuration(6665L)
                         .withDvTypeId(7L)
                         .withDvProductId(dvProduct.getId())
+                        .withMediaFileIds(List.of(mediaFile.getId()))
                         .build()
         );
 
@@ -148,7 +166,7 @@ public class ControllerTrackTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(1)))
-                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(8)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(10)))
                 .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
                 .andExpect(jsonPath("$[0].artifact.id", Matchers.equalTo(1)))
                 .andExpect(jsonPath("$[0].artifact.title", Matchers.equalTo("Title 1")))
@@ -156,9 +174,11 @@ public class ControllerTrackTest {
                 .andExpect(jsonPath("$[0].dvType.name", Matchers.equalTo("AVC")))
                 .andExpect(jsonPath("$[0].title", Matchers.equalTo("Track title")))
                 .andExpect(jsonPath("$[0].duration", Matchers.equalTo(6665)))
+                .andExpect(jsonPath("$[0].size", Matchers.equalTo(484848)))
+                .andExpect(jsonPath("$[0].bitRate", Matchers.equalTo(2000)))
                 .andExpect(jsonPath("$[0].num", Matchers.equalTo(8)))
                 .andExpect(jsonPath("$[0].mediaFiles").isArray())
-                .andExpect(jsonPath("$[0].mediaFiles").isEmpty())
+                .andExpect(jsonPath("$[0].mediaFiles", Matchers.hasSize(1)))
                 .andExpect(jsonPath("$[0].dvProduct.id", Matchers.equalTo(2)))
                 .andExpect(jsonPath("$[0].dvProduct.title", Matchers.equalTo("Big")))
                 .andExpect(jsonPath("$[0].dvProduct.dvCategories").isArray())
@@ -180,7 +200,7 @@ public class ControllerTrackTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(1)))
-                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(8)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(10)))
                 .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
                 .andExpect(jsonPath("$[0].dvType.id", Matchers.equalTo(7)))
                 .andExpect(jsonPath("$[0].dvType.name", Matchers.equalTo("AVC")))
@@ -188,8 +208,10 @@ public class ControllerTrackTest {
                 .andExpect(jsonPath("$[0].duration", Matchers.equalTo(6665)))
                 .andExpect(jsonPath("$[0].diskNum", Matchers.equalTo(1)))
                 .andExpect(jsonPath("$[0].num", Matchers.equalTo(8)))
+                .andExpect(jsonPath("$[0].size", Matchers.equalTo(484848)))
+                .andExpect(jsonPath("$[0].bitRate", Matchers.equalTo(2000)))
                 .andExpect(jsonPath("$[0].mediaFiles").isArray())
-                .andExpect(jsonPath("$[0].mediaFiles").isEmpty())
+                .andExpect(jsonPath("$[0].mediaFiles", Matchers.hasSize(1)))
                 .andExpect(jsonPath("$[0].dvProduct.id", Matchers.equalTo(2)))
                 .andExpect(jsonPath("$[0].dvProduct.title").doesNotExist())
                 .andExpect(jsonPath("$[0].dvProduct.dvCategories").isArray())
@@ -258,5 +280,34 @@ public class ControllerTrackTest {
                 .andReturn()
                 ;
         logger.debug("Get after result:" + result_after.getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(12)
+    void testUpdateTrackDurations() throws Exception {
+        var json = """
+                {"artifact":{"id":1}, "mediaFile": {"id":1}, "chapters":["00:01:55"]}"}
+                """;
+        var result = this.mockMvc.perform(
+                        post("/api/track/update-track-durations").accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.aMapWithSize(1)))
+                .andExpect(jsonPath("$.rowsAffected", Matchers.equalTo(2)))
+                .andReturn();
+        logger.info("testUpdateTrackDurations result:" + result.getResponse().getContentAsString());
+
+        var result_after = mockMvc.perform(get("/api/track/table/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].duration", Matchers.equalTo(60 + 55)))
+                .andExpect(jsonPath("$[1].id", Matchers.equalTo(2)))
+                .andExpect(jsonPath("$[1].duration", Matchers.equalTo(800 - 60 - 55)))
+                .andReturn();
+        logger.info("testUpdateTrackDurations tracks after:" + result_after.getResponse().getContentAsString());
     }
 }
