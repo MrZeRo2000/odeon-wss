@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
@@ -7,11 +8,18 @@ import com.romanpulov.odeonwss.builder.entitybuilder.EntityTrackBuilder;
 import com.romanpulov.odeonwss.dto.MediaFileDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.mapper.MediaFileMapper;
+import com.romanpulov.odeonwss.utils.media.MediaInfoMediaFileParser;
+import com.romanpulov.odeonwss.utils.media.MediaInfoParsingException;
+import com.romanpulov.odeonwss.utils.media.model.MediaContentInfo;
+import com.romanpulov.odeonwss.utils.media.model.MediaFileInfo;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -38,10 +46,27 @@ public class RepositoryMediaFileTests {
     @Autowired
     MediaFileRepository mediaFileRepository;
 
+    @Autowired
+    MediaFileMapper mediaFileMapper;
+
+    @Autowired
+    ObjectMapper mapper;
+
+    static class TestMediaInfoMediaFileParser extends MediaInfoMediaFileParser {
+        public TestMediaInfoMediaFileParser() {
+            super("../MediaInfo");
+        }
+
+        @Override
+        protected MediaContentInfo parseOutput(String text) throws MediaInfoParsingException {
+            return super.parseOutput(text);
+        }
+    }
+
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
-    void testCreateGet() {
+    void testCreateGet() throws Exception {
         Artist artist = new EntityArtistBuilder()
                 .withType(ArtistType.ARTIST)
                 .withName("Artist 1")
@@ -108,17 +133,22 @@ public class RepositoryMediaFileTests {
                 .build();
         artifactRepository.save(movieArtifact);
 
-        mediaFileRepository.save(new EntityMediaFileBuilder()
+        Path path = Path.of("../odeon-test-data/files/mediainfo_output_1280_720_with_chapters.json");
+        String content = Files.readString(path);
+        var parser = new TestMediaInfoMediaFileParser();
+
+        MediaContentInfo mediaContentInfo = parser.parseOutput(content);
+        MediaFileInfo mediaFileInfo = new MediaFileInfo("Scare movie.MKV", mediaContentInfo);
+
+        MediaFile chaptersMediaFile = new EntityMediaFileBuilder()
                 .withArtifact(movieArtifact)
-                        .withName("Scare movie.MKV")
-                        .withFormat("MKV")
-                        .withSize(473453L)
-                        .withDuration(23146L)
-                        .withBitrate(2000L)
-                        .withDimensions(640, 480)
-                        .withExtra("{\"extra\": [\"00:03:44\", \"01:01:22\"]}")
-                .build()
-        );
+                .withName("Scare movie.MKV")
+                .withFormat("MKV")
+                .withSize(473453L)
+                .build();
+
+        mediaFileMapper.updateFromMediaFileInfo(chaptersMediaFile, mediaFileInfo);
+        mediaFileRepository.save(chaptersMediaFile);
     }
 
     @Test
@@ -151,11 +181,11 @@ public class RepositoryMediaFileTests {
                 .get(0);
         assertThat(mediaFile.getName()).isEqualTo("Scare movie.MKV");
         assertThat(mediaFile.getFormat()).isEqualTo("MKV");
-        assertThat(mediaFile.getSize()).isEqualTo(473453L);
-        assertThat(mediaFile.getDuration()).isEqualTo(23146L);
-        assertThat(mediaFile.getBitrate()).isEqualTo(2000L);
-        assertThat(mediaFile.getWidth()).isEqualTo(640L);
-        assertThat(mediaFile.getHeight()).isEqualTo(480L);
+        assertThat(mediaFile.getSize()).isEqualTo(17433330L);
+        assertThat(mediaFile.getDuration()).isEqualTo(28L);
+        assertThat(mediaFile.getBitrate()).isEqualTo(4841L);
+        assertThat(mediaFile.getWidth()).isEqualTo(1280L);
+        assertThat(mediaFile.getHeight()).isEqualTo(720L);
         assertThat(mediaFile.getExtra()).contains("extra");
     }
 
@@ -179,12 +209,16 @@ public class RepositoryMediaFileTests {
         assertThat(videoDTO.getId()).isEqualTo(3L);
         assertThat(videoDTO.getName()).isEqualTo("Scare movie.MKV");
         assertThat(videoDTO.getFormat()).isEqualTo("MKV");
-        assertThat(videoDTO.getSize()).isEqualTo(473453L);
-        assertThat(videoDTO.getDuration()).isEqualTo(23146L);
-        assertThat(videoDTO.getBitrate()).isEqualTo(2000L);
-        assertThat(videoDTO.getWidth()).isEqualTo(640L);
-        assertThat(videoDTO.getHeight()).isEqualTo(480L);
-        assertThat(videoDTO.getExtra()).isEqualTo("{\"extra\": [\"00:03:44\", \"01:01:22\"]}");
+        assertThat(videoDTO.getSize()).isEqualTo(17433330L);
+        assertThat(videoDTO.getDuration()).isEqualTo(28L);
+        assertThat(videoDTO.getBitrate()).isEqualTo(4841L);
+        assertThat(videoDTO.getWidth()).isEqualTo(1280L);
+        assertThat(videoDTO.getHeight()).isEqualTo(720L);
+
+        var chapters = mediaFileMapper.extraToChapters(videoDTO.getExtra());
+        assertThat(chapters.get(0)).isEqualTo("00:00:04");
+        assertThat(chapters.get(1)).isEqualTo("00:26:00");
+        assertThat(chapters.get(2)).isEqualTo("01:35:19");
     }
 
     @Test
@@ -198,8 +232,8 @@ public class RepositoryMediaFileTests {
 
         var videoDTOs = mediaFileRepository.findAllDTOByArtifactId(2L);
         assertThat(videoDTOs.size()).isEqualTo(1);
-        assertThat(videoDTOs.get(0).getWidth()).isEqualTo(640L);
-        assertThat(videoDTOs.get(0).getHeight()).isEqualTo(480L);
+        assertThat(videoDTOs.get(0).getWidth()).isEqualTo(1280L);
+        assertThat(videoDTOs.get(0).getHeight()).isEqualTo(720L);
         assertThat(videoDTOs.get(0).getExtra()).isNull();
     }
 

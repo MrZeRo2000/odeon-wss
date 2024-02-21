@@ -1,7 +1,9 @@
 package com.romanpulov.odeonwss.mapper;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.jutilscore.io.FileUtils;
+import com.romanpulov.odeonwss.dto.ExtraDTO;
 import com.romanpulov.odeonwss.dto.MediaFileDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.MediaFile;
@@ -17,6 +19,7 @@ import java.util.List;
 
 @Component
 public class MediaFileMapper implements EntityDTOMapper<MediaFile, MediaFileDTO> {
+    private final static DateTimeFormatter CHAPTERS_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     private final ObjectMapper mapper;
 
@@ -77,15 +80,39 @@ public class MediaFileMapper implements EntityDTOMapper<MediaFile, MediaFileDTO>
         mediaFile.setDuration(mediaFormatInfo.getDuration());
         mediaFile.setWidth(mediaFormatInfo.getWidth());
         mediaFile.setHeight(mediaFormatInfo.getHeight());
+        mediaFile.setExtra(chaptersToExtra(chapters));
+    }
 
+    public String chaptersToExtra(List<LocalTime> chapters) {
         if ((chapters != null) && !chapters.isEmpty()) {
             final StringWriter sw = new StringWriter();
             try {
-                mapper.writeValue(sw, chapters.stream().map(v -> v.format(DateTimeFormatter.ofPattern("HH:mm:ss"))));
-                mediaFile.setExtra(sw.toString());
+                mapper.writeValue(sw, chapters.stream().map(v -> v.format(CHAPTERS_FORMATTER)));
+                ExtraDTO extraDTO = new ExtraDTO();
+                extraDTO.setExtra(sw.toString());
+                return mapper.writeValueAsString(extraDTO);
             } catch (IOException e) {
-                mediaFile.setExtra(null);
+                return null;
             }
+        } else {
+            return null;
+        }
+    }
+
+    public List<LocalTime> extraToChapters(String extra) {
+        if ((extra != null) && !extra.isEmpty()) {
+            try {
+                ExtraDTO extraDTO = mapper.readValue(extra, ExtraDTO.class);
+                List<String> chapters = mapper.readValue(extraDTO.getExtra(), new TypeReference<>() {});
+                return chapters
+                        .stream()
+                        .map(s -> LocalTime.parse(s, CHAPTERS_FORMATTER))
+                        .toList();
+            } catch (Exception e) {
+                return List.of();
+            }
+        } else {
+            return List.of();
         }
     }
 
