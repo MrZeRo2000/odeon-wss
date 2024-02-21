@@ -19,6 +19,9 @@ import org.springframework.test.context.jdbc.Sql;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -49,12 +52,12 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
         DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_IMPORT, () -> {
             DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_IMPORTED_ARTISTS, () -> {
                 service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
-                Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+                assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
                 log.info("Artist Importer Processing info: " + service.getProcessInfo());
             });
 
             service.executeProcessor(ProcessorType.DV_MUSIC_IMPORTER);
-            Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+            assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
             log.info("DV Music Importer Processing info: " + service.getProcessInfo());
         });
     }
@@ -63,15 +66,44 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
     @Order(2)
     @Rollback(false)
     void testLoadMediaFiles() {
-        int oldCount =  mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(artifactTypeRepository.getWithDVMusic()).size();
+        var oldIds = mediaFileRepository
+                .getMediaFilesWithEmptySizeByArtifactType(artifactTypeRepository.getWithDVMusic())
+                .stream()
+                .map(MediaFile::getId)
+                .collect(Collectors.toSet());
 
         service.executeProcessor(ProcessorType.DV_MUSIC_MEDIA_LOADER);
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+        assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         log.info("Music Media Loader Processing info: " + service.getProcessInfo());
 
-        int newCount =  mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(artifactTypeRepository.getWithDVMusic()).size();
+        var newIds = mediaFileRepository
+                .getMediaFilesWithEmptySizeByArtifactType(artifactTypeRepository.getWithDVMusic())
+                .stream()
+                .map(MediaFile::getId)
+                .collect(Collectors.toSet());
 
-        Assertions.assertTrue(newCount < oldCount);
+        assertThat(newIds.size() < oldIds.size()).isTrue();
+
+        var changedIds = oldIds
+                .stream()
+                .filter(v -> !newIds.contains(v))
+                .toList();
+        assertThat(changedIds.isEmpty()).isFalse();
+        log.info("Changed Ids:" + changedIds);
+
+        var changedMediaFiles = StreamSupport
+                .stream(mediaFileRepository.findAllById(changedIds).spliterator(), false)
+                .toList();
+        var ps = changedMediaFiles
+                .stream()
+                .filter(m -> m.getName().equals("The Cure - Picture Show 1991.mp4"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(ps.getSize()).isEqualTo(44863665L);
+        assertThat(ps.getDuration()).isEqualTo(3 * 60 + 36);
+        assertThat(ps.getBitrate()).isEqualTo(1522L);
+        assertThat(ps.getWidth()).isEqualTo(1280L);
+        assertThat(ps.getHeight()).isEqualTo(720L);
     }
 
     @Test
@@ -80,8 +112,7 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
     void testGetEmptyMediaFiles() {
         List<MediaFile> mediaFiles =
                 mediaFileRepository.getMediaFilesWithEmptySizeByArtifactType(artifactTypeRepository.getWithDVMusic());
-        log.info("Artifacts:" + mediaFiles.stream().map(v -> v.getArtifact().getTitle())
-                .collect(Collectors.toList()));
+        log.info("Artifacts:" + mediaFiles.stream().map(v -> v.getArtifact().getTitle()).toList());
         for (MediaFile mediaFile: mediaFiles) {
             MediaFile getMediaFile = mediaFileRepository.findById(mediaFile.getId()).orElseThrow();
             log.info("Artifact title:" + mediaFile.getArtifact().getTitle());
@@ -94,14 +125,14 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
     @Rollback(false)
     void testEmptyArtifacts() {
         List<Artifact> artifacts = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMusic());
-        Assertions.assertTrue(artifacts.size() > 0);
+        assertThat(artifacts.isEmpty()).isFalse();
 
         List<Artifact> emptyDurationArtifacts = artifacts
                 .stream()
                 .filter(a -> a.getDuration() == null || a.getDuration() == 0)
-                .collect(Collectors.toList());
-        Assertions.assertTrue(emptyDurationArtifacts.size() > 0);
+                .toList();
+        assertThat(!emptyDurationArtifacts.isEmpty()).isTrue();
 
-        Assertions.assertTrue(emptyDurationArtifacts.size() < artifacts.size());
+        assertThat(emptyDurationArtifacts.size() < artifacts.size()).isTrue();
     }
 }

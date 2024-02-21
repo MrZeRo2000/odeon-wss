@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
@@ -18,6 +19,7 @@ public abstract class AbstractDVNonMusicMediaFilesLoadProcessor extends Abstract
             ArtifactRepository artifactRepository,
             TrackRepository trackRepository,
             MediaFileRepository mediaFileRepository,
+            MediaFileMapper mediaFileMapper,
             MediaParser mediaParser,
             Function<ArtifactTypeRepository, ArtifactType> artifactTypeSupplier)
     {
@@ -26,6 +28,7 @@ public abstract class AbstractDVNonMusicMediaFilesLoadProcessor extends Abstract
                 artifactRepository,
                 trackRepository,
                 mediaFileRepository,
+                mediaFileMapper,
                 mediaParser,
                 artifactTypeSupplier
         );

@@ -58,13 +58,20 @@ public class MediaFileMapper implements EntityDTOMapper<MediaFile, MediaFileDTO>
     }
 
     public MediaFile fromMediaFileInfo(MediaFileInfo mediaFileInfo) {
-        MediaFormatInfo mediaFormatInfo = mediaFileInfo.getMediaContentInfo().getMediaFormatInfo();
-        List<LocalTime> chapters = mediaFileInfo.getMediaContentInfo().getChapters();
-
         MediaFile mediaFile = new MediaFile();
 
         mediaFile.setName(mediaFileInfo.getFileName());
         mediaFile.setFormat(FileUtils.getExtension(mediaFileInfo.getFileName()).toUpperCase());
+
+        updateFromMediaFileInfo(mediaFile, mediaFileInfo);
+
+        return mediaFile;
+    }
+
+    public void updateFromMediaFileInfo(MediaFile mediaFile, MediaFileInfo mediaFileInfo) {
+        MediaFormatInfo mediaFormatInfo = mediaFileInfo.getMediaContentInfo().getMediaFormatInfo();
+        List<LocalTime> chapters = mediaFileInfo.getMediaContentInfo().getChapters();
+
         mediaFile.setSize(mediaFormatInfo.getSize());
         mediaFile.setBitrate(mediaFormatInfo.getBitRate());
         mediaFile.setDuration(mediaFormatInfo.getDuration());
@@ -80,8 +87,6 @@ public class MediaFileMapper implements EntityDTOMapper<MediaFile, MediaFileDTO>
                 mediaFile.setExtra(null);
             }
         }
-
-        return mediaFile;
     }
 
 }

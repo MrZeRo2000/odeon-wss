@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
@@ -19,6 +20,7 @@ public class DVMusicMediaFilesLoadProcessor extends AbstractDVMediaFilesLoadProc
             ArtifactRepository artifactRepository,
             TrackRepository trackRepository,
             MediaFileRepository mediaFileRepository,
+            MediaFileMapper mediaFileMapper,
             MediaParser mediaParser
     ) {
         super(
@@ -26,6 +28,7 @@ public class DVMusicMediaFilesLoadProcessor extends AbstractDVMediaFilesLoadProc
                 artifactRepository,
                 trackRepository,
                 mediaFileRepository,
+                mediaFileMapper,
                 mediaParser,
                 ArtifactTypeRepository::getWithDVMusic
         );

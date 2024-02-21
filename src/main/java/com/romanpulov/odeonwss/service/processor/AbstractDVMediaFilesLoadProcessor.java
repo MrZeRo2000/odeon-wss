@@ -6,6 +6,7 @@ import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.entity.Track;
+import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
@@ -31,15 +32,11 @@ import static com.romanpulov.odeonwss.service.processor.ProcessorMessages.INFO_M
 
 public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSystemProcessor {
     private final ArtifactTypeRepository artifactTypeRepository;
-
     private final ArtifactRepository artifactRepository;
-
     private final TrackRepository trackRepository;
-
     private final MediaFileRepository mediaFileRepository;
-
+    private final MediaFileMapper mediaFileMapper;
     private final MediaParser mediaParser;
-
     private final Function<ArtifactTypeRepository, ArtifactType> artifactTypeSupplier;
 
     public AbstractDVMediaFilesLoadProcessor(
@@ -47,6 +44,7 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
             ArtifactRepository artifactRepository,
             TrackRepository trackRepository,
             MediaFileRepository mediaFileRepository,
+            MediaFileMapper mediaFileMapper,
             MediaParser mediaParser,
             Function<ArtifactTypeRepository, ArtifactType> artifactTypeSupplier
     ) {
@@ -54,6 +52,7 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
         this.artifactRepository = artifactRepository;
         this.trackRepository = trackRepository;
         this.mediaFileRepository = mediaFileRepository;
+        this.mediaFileMapper = mediaFileMapper;
         this.mediaParser = mediaParser;
         this.artifactTypeSupplier = artifactTypeSupplier;
     }
@@ -121,9 +120,7 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
                 MediaFile mediaFile = e.getValue();
                 MediaFileInfo mediaFileInfo = parsedMediaFileInfo.get(e.getKey());
 
-                mediaFile.setSize(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
-                mediaFile.setBitrate(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getBitRate());
-                mediaFile.setDuration(mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getDuration());
+                mediaFileMapper.updateFromMediaFileInfo(mediaFile, mediaFileInfo);
 
                 SizeDuration sd = artifactSizeDurationMap.getOrDefault(artifact, new SizeDuration());
                 sd.setSize(sd.getSize() + mediaFileInfo.getMediaContentInfo().getMediaFormatInfo().getSize());
