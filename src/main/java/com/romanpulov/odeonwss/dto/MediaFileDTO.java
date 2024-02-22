@@ -15,5 +15,6 @@ public interface MediaFileDTO extends BaseEntityDTO {
     Long getDuration();
     Long getWidth();
     Long getHeight();
+    Long getHasExtra();
     String getExtra();
 }

@@ -84,7 +84,8 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
           m.bitrate AS bitrate,
           m.duration AS duration,
           m.width AS width,
-          m.height AS height
+          m.height AS height,
+          CASE WHEN m.extra IS NOT NULL THEN 1 END AS hasExtra
         FROM MediaFile m
         WHERE m.artifact.id = :artifactId
         ORDER BY m.name

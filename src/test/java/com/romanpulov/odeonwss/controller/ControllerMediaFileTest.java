@@ -217,7 +217,7 @@ public class ControllerMediaFileTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(1)))
-                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(8)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(9)))
                 .andExpect(jsonPath("$[0].id", Matchers.equalTo(4)))
                 .andExpect(jsonPath("$[0].name", Matchers.equalTo("Video name 3")))
                 .andExpect(jsonPath("$[0].format", Matchers.equalTo("MKV")))
@@ -226,6 +226,7 @@ public class ControllerMediaFileTest {
                 .andExpect(jsonPath("$[0].size", Matchers.equalTo(59872)))
                 .andExpect(jsonPath("$[0].width", Matchers.equalTo(1280)))
                 .andExpect(jsonPath("$[0].height", Matchers.equalTo(720)))
+                .andExpect(jsonPath("$[0].hasExtra", Matchers.equalTo(1)))
                 .andReturn()
                 ;
         logger.debug("testGetTableArtifact1:" + result.getResponse().getContentAsString());

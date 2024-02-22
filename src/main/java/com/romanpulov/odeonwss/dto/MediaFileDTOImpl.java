@@ -11,6 +11,7 @@ public class MediaFileDTOImpl implements MediaFileDTO {
     private Long duration;
     private Long width;
     private Long height;
+    private Long hasExtra;
     private String extra;
 
     @Override
@@ -105,6 +106,15 @@ public class MediaFileDTOImpl implements MediaFileDTO {
     }
 
     @Override
+    public Long getHasExtra() {
+        return hasExtra;
+    }
+
+    public void setHasExtra(Long hasExtra) {
+        this.hasExtra = hasExtra;
+    }
+
+    @Override
     public String getExtra() {
         return extra;
     }
@@ -126,6 +136,7 @@ public class MediaFileDTOImpl implements MediaFileDTO {
                 ", duration=" + duration +
                 ", width=" + width +
                 ", height=" + height +
+                ", hasExtra=" + hasExtra +
                 ", extra='" + extra + '\'' +
                 '}';
     }

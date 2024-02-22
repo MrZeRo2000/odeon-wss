@@ -234,6 +234,7 @@ public class RepositoryMediaFileTests {
         assertThat(videoDTOs.size()).isEqualTo(1);
         assertThat(videoDTOs.get(0).getWidth()).isEqualTo(1280L);
         assertThat(videoDTOs.get(0).getHeight()).isEqualTo(720L);
+        assertThat(videoDTOs.get(0).getHasExtra()).isEqualTo(1L);
         assertThat(videoDTOs.get(0).getExtra()).isNull();
     }
 
