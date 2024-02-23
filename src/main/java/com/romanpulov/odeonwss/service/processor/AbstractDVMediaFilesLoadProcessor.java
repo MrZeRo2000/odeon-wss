@@ -77,6 +77,7 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
                 .parallelStream()
                 .filter(m -> {
                     Path mediaPath = Paths.get(rootMediaPath, m.getArtifactTitle(), m.getName());
+                    synchronizedProcessingEventHandler(ProcessorMessages.PROCESSING_CHECKING_MEDIA_FILE, m.getName());
                     try {
                         return (m.getSize() == null) || (Files.exists(mediaPath) && Files.size(mediaPath) != m.getSize());
                         //return Files.exists(mediaPath) && Files.size(mediaPath)
