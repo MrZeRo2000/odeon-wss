@@ -20,6 +20,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -254,4 +255,37 @@ public class RepositoryMediaFileTests {
         assertThat(idNameDurations.get(2).getName()).isEqualTo("CCC.mp3");
         assertThat(idNameDurations.get(2).getDuration()).isNull();
     }
+
+    @Test
+    @Order(7)
+    void testLastUpdateTime() throws Exception {
+        MediaFile mediaFile = mediaFileRepository.findAll().iterator().next();
+        assertThat(mediaFile.getId()).isNotNull();
+
+        var beforeUpdateDateTime = mediaFile.getUpdateDateTime();
+        assertThat(beforeUpdateDateTime).isNotNull();
+        log.info("beforeUpdateDateTime:" + beforeUpdateDateTime);
+
+        Thread.sleep(1000);
+
+        var currentDateTime = LocalDateTime.now();
+        log.info("currentDateTime:" + currentDateTime);
+
+        Thread.sleep(1000);
+
+        mediaFile.setDuration(mediaFile.getDuration() + 5);
+        mediaFileRepository.save(mediaFile);
+
+        MediaFile afterMediaFile = mediaFileRepository.findById(mediaFile.getId()).orElseThrow();
+
+        var afterUpdateDateTime = afterMediaFile.getUpdateDateTime();
+        log.info("afterUpdateDateTime:" + afterUpdateDateTime);
+
+        assertThat(afterUpdateDateTime).isNotNull();
+        assertThat(afterUpdateDateTime.isAfter(beforeUpdateDateTime)).isTrue();
+        assertThat(afterUpdateDateTime.isAfter(currentDateTime)).isTrue();
+    }
+
+
+
 }

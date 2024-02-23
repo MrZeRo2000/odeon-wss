@@ -46,7 +46,7 @@ public abstract class AbstractBaseModifiableEntity extends AbstractBaseEntity {
     @PreUpdate
     void beforeUpdate() {
         LocalDateTime currentDateTime = LocalDateTime.now();
-        if (this.updateDateTime == null) {
+        if ((this.updateDateTime == null) || currentDateTime.isAfter(this.updateDateTime)) {
             this.updateDateTime = currentDateTime;
         }
     }
