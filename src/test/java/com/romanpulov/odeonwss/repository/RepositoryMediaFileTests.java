@@ -187,6 +187,7 @@ public class RepositoryMediaFileTests {
         assertThat(mediaFile.getWidth()).isEqualTo(1280L);
         assertThat(mediaFile.getHeight()).isEqualTo(720L);
         assertThat(mediaFile.getExtra()).contains("extra");
+        assertThat(mediaFile.getExtra()).isEqualTo("{\"extra\":[\"00:00:04\",\"00:26:00\",\"01:35:19\"]}");
     }
 
     @Test

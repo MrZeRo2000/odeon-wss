@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.mapper;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.jutilscore.io.FileUtils;
 import com.romanpulov.odeonwss.dto.ExtraDTO;
@@ -12,7 +11,6 @@ import com.romanpulov.odeonwss.utils.media.model.MediaFormatInfo;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -85,11 +83,8 @@ public class MediaFileMapper implements EntityDTOMapper<MediaFile, MediaFileDTO>
 
     public String chaptersToExtra(List<LocalTime> chapters) {
         if ((chapters != null) && !chapters.isEmpty()) {
-            final StringWriter sw = new StringWriter();
             try {
-                mapper.writeValue(sw, chapters.stream().map(v -> v.format(CHAPTERS_FORMATTER)));
-                ExtraDTO extraDTO = new ExtraDTO();
-                extraDTO.setExtra(sw.toString());
+                ExtraDTO extraDTO = ExtraDTO.from(chapters.stream().map(v -> v.format(CHAPTERS_FORMATTER)).toList());
                 return mapper.writeValueAsString(extraDTO);
             } catch (IOException e) {
                 return null;
@@ -103,8 +98,7 @@ public class MediaFileMapper implements EntityDTOMapper<MediaFile, MediaFileDTO>
         if ((extra != null) && !extra.isEmpty()) {
             try {
                 ExtraDTO extraDTO = mapper.readValue(extra, ExtraDTO.class);
-                List<String> chapters = mapper.readValue(extraDTO.getExtra(), new TypeReference<>() {});
-                return chapters
+                return extraDTO.getExtra()
                         .stream()
                         .map(s -> LocalTime.parse(s, CHAPTERS_FORMATTER))
                         .toList();
@@ -115,5 +109,4 @@ public class MediaFileMapper implements EntityDTOMapper<MediaFile, MediaFileDTO>
             return List.of();
         }
     }
-
 }
