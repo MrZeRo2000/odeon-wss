@@ -151,7 +151,9 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
             m.format AS mediaFileFormat,
             m.bitrate AS mediaFileBitrate,
             m.size AS mediaFileSize,
-            m.duration AS mediaFileDuration
+            m.duration AS mediaFileDuration,
+            m.width AS mediaFileWidth,
+            m.height AS mediaFileHeight
         FROM Artifact af
         LEFT OUTER JOIN MediaFile m ON m.artifact = af
         WHERE af.artifactType = :artifactType
@@ -171,7 +173,9 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
             m.format AS mediaFileFormat,
             m.bitrate AS mediaFileBitrate,
             m.size AS mediaFileSize,
-            m.duration AS mediaFileDuration
+            m.duration AS mediaFileDuration,
+            m.width AS mediaFileWidth,
+            m.height AS mediaFileHeight
         FROM Artist AS ar
         INNER JOIN Artifact af ON af.artist = ar
         LEFT OUTER JOIN MediaFile m ON m.artifact = af

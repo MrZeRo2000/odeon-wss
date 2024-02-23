@@ -13,4 +13,6 @@ public interface MediaFileValidationDTO {
     Long getMediaFileBitrate();
     Long getMediaFileSize();
     Long getMediaFileDuration();
+    Long getMediaFileWidth();
+    Long getMediaFileHeight();
 }

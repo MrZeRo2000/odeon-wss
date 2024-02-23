@@ -56,6 +56,7 @@ public class ProcessorMessages {
     public static final String ERROR_ARTIFACT_TRACKS_DURATION_MISMATCH = "Artifact duration does not match tracks duration";
     static final String ERROR_MEDIA_FILES_EMPTY_SIZE = "Media files with empty size";
     public static final String ERROR_MEDIA_FILES_EMPTY_BITRATE = "Media files with empty bitrate";
+    public static final String ERROR_MEDIA_FILES_EMPTY_DIMENSIONS = "Media files with empty dimensions";
     static final String ERROR_MEDIA_FILES_SIZE_MISMATCH = "Media files size mismatch";
     static final String ERROR_TRACKS_WITHOUT_PRODUCT = "Tracks without product";
     public static final String ERROR_NO_MONOTONICALLY_INCREASING_TRACK_NUMBERS = "Track numbers for artifact not increasing monotonically";
@@ -69,6 +70,7 @@ public class ProcessorMessages {
     static final String INFO_MEDIA_FILES_SIZE_VALIDATED = "Media files size validated";
     public static final String INFO_MEDIA_FILES_SIZE_MISMATCH_VALIDATED = "Media files size mismatch validated";
     public static final String INFO_MEDIA_FILES_BITRATE_VALIDATED = "Media files bitrate validated";
+    public static final String INFO_MEDIA_FILES_DIMENSIONS_VALIDATED = "Media files dimensions validated";
     static final String INFO_PRODUCTS_FOR_TRACKS_VALIDATED = "Products for tracks validated";
 
     static final String INFO_ARTISTS_LOADED = "Artists loaded";

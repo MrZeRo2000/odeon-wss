@@ -110,6 +110,17 @@ public class MediaFilesValidateUtil {
             processor.infoHandler(ProcessorMessages.INFO_MEDIA_FILES_BITRATE_VALIDATED);
         }
 
+        if (ValueValidator.validateConditionValue(
+                processor,
+                dbArtifactValidation,
+                ProcessorMessages.ERROR_MEDIA_FILES_EMPTY_DIMENSIONS,
+                m ->
+                        Optional.ofNullable(m.getMediaFileWidth()).orElse(0L).equals(0L) ||
+                        Optional.ofNullable(m.getMediaFileHeight()).orElse(0L).equals(0L),
+                m -> MediaFileValidator.DELIMITER_FORMAT.formatted(m.getArtifactTitle(), m.getMediaFileName()))) {
+            processor.infoHandler(ProcessorMessages.INFO_MEDIA_FILES_DIMENSIONS_VALIDATED);
+        }
+
         if (MediaFileValidator.validateMediaFileSize(
                 processor,
                 MediaFileValidator.ARTIFACT_MEDIA_FILE_MAPPER,

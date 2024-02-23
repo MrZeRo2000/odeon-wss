@@ -1,9 +1,22 @@
 package com.romanpulov.odeonwss.dto;
 
 public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
-
     private String artifactTitle;
+    private Long artifactYear;
+    private String artistName;
+    private Long artifactSize;
+    private Long artifactDuration;
+    private Long trackNum;
+    private String trackTitle;
+    private String mediaFileName;
+    private String mediaFileFormat;
+    private Long mediaFileBitrate;
+    private Long mediaFileSize;
+    private Long mediaFileDuration;
+    private Long mediaFileWidth;
+    private Long mediaFileHeight;
 
+    @Override
     public String getArtifactTitle() {
         return artifactTitle;
     }
@@ -12,8 +25,7 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
         this.artifactTitle = artifactTitle;
     }
 
-    private Long artifactYear;
-
+    @Override
     public Long getArtifactYear() {
         return artifactYear;
     }
@@ -22,8 +34,7 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
         this.artifactYear = artifactYear;
     }
 
-    private String artistName;
-
+    @Override
     public String getArtistName() {
         return artistName;
     }
@@ -31,8 +42,6 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
     public void setArtistName(String artistName) {
         this.artistName = artistName;
     }
-
-    private Long artifactSize;
 
     @Override
     public Long getArtifactSize() {
@@ -43,8 +52,6 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
         this.artifactSize = artifactSize;
     }
 
-    private Long artifactDuration;
-
     @Override
     public Long getArtifactDuration() {
         return artifactDuration;
@@ -54,8 +61,7 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
         this.artifactDuration = artifactDuration;
     }
 
-    private Long trackNum;
-
+    @Override
     public Long getTrackNum() {
         return trackNum;
     }
@@ -64,8 +70,7 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
         this.trackNum = trackNum;
     }
 
-    private String trackTitle;
-
+    @Override
     public String getTrackTitle() {
         return trackTitle;
     }
@@ -74,8 +79,7 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
         this.trackTitle = trackTitle;
     }
 
-    private String mediaFileName;
-
+    @Override
     public String getMediaFileName() {
         return mediaFileName;
     }
@@ -84,8 +88,7 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
         this.mediaFileName = mediaFileName;
     }
 
-    private String mediaFileFormat;
-
+    @Override
     public String getMediaFileFormat() {
         return mediaFileFormat;
     }
@@ -93,8 +96,6 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
     public void setMediaFileFormat(String mediaFileFormat) {
         this.mediaFileFormat = mediaFileFormat;
     }
-
-    private Long mediaFileBitrate;
 
     @Override
     public Long getMediaFileBitrate() {
@@ -105,8 +106,6 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
         this.mediaFileBitrate = mediaFileBitrate;
     }
 
-    private Long mediaFileSize;
-
     @Override
     public Long getMediaFileSize() {
         return mediaFileSize;
@@ -116,8 +115,6 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
         this.mediaFileSize = mediaFileSize;
     }
 
-    private Long mediaFileDuration;
-
     @Override
     public Long getMediaFileDuration() {
         return mediaFileDuration;
@@ -125,6 +122,24 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
 
     public void setMediaFileDuration(Long mediaFileDuration) {
         this.mediaFileDuration = mediaFileDuration;
+    }
+
+    @Override
+    public Long getMediaFileWidth() {
+        return mediaFileWidth;
+    }
+
+    public void setMediaFileWidth(Long mediaFileWidth) {
+        this.mediaFileWidth = mediaFileWidth;
+    }
+
+    @Override
+    public Long getMediaFileHeight() {
+        return mediaFileHeight;
+    }
+
+    public void setMediaFileHeight(Long mediaFileHeight) {
+        this.mediaFileHeight = mediaFileHeight;
     }
 
     @Override
@@ -142,6 +157,8 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
                 ", mediaFileBitrate=" + mediaFileBitrate +
                 ", mediaFileSize=" + mediaFileSize +
                 ", mediaFileDuration=" + mediaFileDuration +
+                ", mediaFileWidth=" + mediaFileWidth +
+                ", mediaFileHeight=" + mediaFileHeight +
                 '}';
     }
 }

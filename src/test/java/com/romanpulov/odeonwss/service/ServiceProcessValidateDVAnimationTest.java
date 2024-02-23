@@ -161,7 +161,7 @@ public class ServiceProcessValidateDVAnimationTest {
 
         assertThat(pi.getProcessDetails().get(7)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
+                        ProcessDetailInfo.fromMessage("Media files dimensions validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -169,7 +169,7 @@ public class ServiceProcessValidateDVAnimationTest {
 
         assertThat(pi.getProcessDetails().get(8)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
+                        ProcessDetailInfo.fromMessage("Media files size mismatch validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -177,7 +177,7 @@ public class ServiceProcessValidateDVAnimationTest {
 
         assertThat(pi.getProcessDetails().get(9)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Artifact tracks duration validated"),
+                        ProcessDetailInfo.fromMessage("Monotonically increasing track numbers validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -185,13 +185,21 @@ public class ServiceProcessValidateDVAnimationTest {
 
         assertThat(pi.getProcessDetails().get(10)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Products for tracks validated"),
+                        ProcessDetailInfo.fromMessage("Artifact tracks duration validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
         );
 
         assertThat(pi.getProcessDetails().get(11)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Products for tracks validated"),
+                        ProcessingStatus.INFO,
+                        null,
+                        null)
+        );
+
+        assertThat(pi.getProcessDetails().get(12)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.SUCCESS,
@@ -439,7 +447,7 @@ public class ServiceProcessValidateDVAnimationTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(10)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(11)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Tracks without product",
@@ -473,7 +481,7 @@ public class ServiceProcessValidateDVAnimationTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(8)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(9)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Track numbers for artifact not increasing monotonically",
@@ -508,7 +516,7 @@ public class ServiceProcessValidateDVAnimationTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(8)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Media files size mismatch",
@@ -583,7 +591,6 @@ public class ServiceProcessValidateDVAnimationTest {
         );
     }
 
-
     @Test
     @Order(15)
     @Sql({"/schema.sql", "/data.sql"})
@@ -609,11 +616,104 @@ public class ServiceProcessValidateDVAnimationTest {
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(9)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(10)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifact duration does not match tracks duration",
                                 List.of(artifact.getTitle())),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(16)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testMediaFileMissingBitrateShouldFail() {
+        this.internalPrepare();
+
+        MediaFile mediaFile = mediaFileRepository
+                .getMediaFilesByArtifactType(artifactType)
+                .stream()
+                .findFirst()
+                .orElseThrow();
+        mediaFile.setBitrate(null);
+        mediaFileRepository.save(mediaFile);
+        log.info("Saved media file: " + mediaFile);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(6)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Media files with empty bitrate",
+                                List.of(MediaFileValidator.DELIMITER_FORMAT.formatted(mediaFile.getArtifact().getTitle(), mediaFile.getName()))),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(17)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testMediaFileMissingWidthShouldFail() {
+        this.internalPrepare();
+
+        MediaFile mediaFile = mediaFileRepository
+                .getMediaFilesByArtifactType(artifactType)
+                .stream()
+                .findFirst()
+                .orElseThrow();
+        mediaFile.setWidth(null);
+        mediaFileRepository.save(mediaFile);
+        log.info("Saved media file: " + mediaFile);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Media files with empty dimensions",
+                                List.of(MediaFileValidator.DELIMITER_FORMAT.formatted(mediaFile.getArtifact().getTitle(), mediaFile.getName()))),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(18)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testMediaFileMissingHeightShouldFail() {
+        this.internalPrepare();
+
+        MediaFile mediaFile = mediaFileRepository
+                .getMediaFilesByArtifactType(artifactType)
+                .stream()
+                .findFirst()
+                .orElseThrow();
+        mediaFile.setHeight(null);
+        mediaFileRepository.save(mediaFile);
+        log.info("Saved media file: " + mediaFile);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+        assertThat(pi.getProcessDetails().get(7)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "Media files with empty dimensions",
+                                List.of(MediaFileValidator.DELIMITER_FORMAT.formatted(mediaFile.getArtifact().getTitle(), mediaFile.getName()))),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
