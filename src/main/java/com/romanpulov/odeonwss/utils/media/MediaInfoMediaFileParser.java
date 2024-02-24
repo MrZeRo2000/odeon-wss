@@ -175,7 +175,7 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
             } else {
                 MediaType mediaType = EnumUtils.getEnumFromString(MediaType.class, trackType.toUpperCase());
                 if (mediaType != null) {
-                    mediaStreamMap.put(mediaType, this.parseMediaStreamSection(mediaType, tracksMap));
+                    mediaStreamMap.putIfAbsent(mediaType, this.parseMediaStreamSection(mediaType, tracksMap));
                 }
             }
         }
@@ -209,7 +209,7 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
         List<AbstractMediaStreamInfo> mediaStreams = mediaStreamMap
                 .values()
                 .stream()
-                .sorted(Comparator.comparing(AbstractMediaStreamInfo::getOrder))
+                .sorted(MediaStreamFactory.mediaStreamInfoComparator)
                 .collect(Collectors.toList());
 
         return new MediaContentInfo(resultMediaFormat, mediaStreams, chapters);

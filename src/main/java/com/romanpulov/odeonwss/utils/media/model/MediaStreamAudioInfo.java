@@ -4,6 +4,4 @@ public class MediaStreamAudioInfo extends AbstractMediaStreamInfo {
     public MediaStreamAudioInfo(long order, long duration, long bitRate) {
         super(order, duration, bitRate);
     }
-
-
 }

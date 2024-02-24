@@ -7,6 +7,7 @@ import com.romanpulov.odeonwss.utils.media.model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalTime;
@@ -33,6 +34,11 @@ public class UnitMediaInfoMediaFileParserTest {
     }
 
     TestMediaInfoMediaFileParser testParser = new TestMediaInfoMediaFileParser();
+
+    private String readFileContent(String fileName) throws IOException {
+        Path path = Path.of("../odeon-test-data/files/%s".formatted(fileName));
+        return Files.readString(path);
+    }
 
     @Test
     void testNonMediaFile() {
@@ -190,8 +196,7 @@ public class UnitMediaInfoMediaFileParserTest {
 
     @Test
     void testVBRMediaInfo() throws Exception {
-        Path path = Path.of("../odeon-test-data/files/mediainfo_output_vbr.json");
-        String content = Files.readString(path);
+        String content = readFileContent("mediainfo_output_vbr.json");
 
         var contentInfo = testParser.parseOutput(content);
         assertThat(contentInfo.getMediaFormatInfo().getBitRate()).isGreaterThan(0);
@@ -200,8 +205,7 @@ public class UnitMediaInfoMediaFileParserTest {
 
     @Test
     void testNBRMediaInfo() throws Exception {
-        Path path = Path.of("../odeon-test-data/files/mediainfo_output_nbr.json");
-        String content = Files.readString(path);
+        String content = readFileContent("mediainfo_output_nbr.json");
 
         var contentInfo = testParser.parseOutput(content);
         assertThat(contentInfo.getMediaFormatInfo().getBitRate()).isGreaterThan(0);
@@ -211,8 +215,7 @@ public class UnitMediaInfoMediaFileParserTest {
 
     @Test
     void testNoVideoBitrate() throws Exception {
-        Path path = Path.of("../odeon-test-data/files/mediainfo_output_nbr_mkv.json");
-        String content = Files.readString(path);
+        String content = readFileContent("mediainfo_output_nbr_mkv.json");
 
         var contentInfo = testParser.parseOutput(content);
         assertThat(contentInfo.getMediaFormatInfo().getBitRate()).isGreaterThan(0);
@@ -226,8 +229,7 @@ public class UnitMediaInfoMediaFileParserTest {
 
     @Test
     void testVideoWithChapters() throws Exception {
-        Path path = Path.of("../odeon-test-data/files/mediainfo_output_1280_720_with_chapters.json");
-        String content = Files.readString(path);
+        String content = readFileContent("mediainfo_output_1280_720_with_chapters.json");
 
         var contentInfo = testParser.parseOutput(content);
         assertThat(contentInfo.getChapters().size()).isEqualTo(3);
@@ -239,6 +241,21 @@ public class UnitMediaInfoMediaFileParserTest {
         MediaStreamVideoInfo videoStream = (MediaStreamVideoInfo)contentInfo.getMediaStreams().get(0);
         assertThat(videoStream.getWidth()).isEqualTo(1280);
         assertThat(videoStream.getHeight()).isEqualTo(720);
+    }
+
+    @Test
+    void testVideoWithMultipleStreams() throws Exception {
+        String content = readFileContent("mediainfo_output_multiple_streams_bitrate.json");
+
+        var contentInfo = testParser.parseOutput(content);
+
+        assertThat(contentInfo.getMediaFormatInfo().getBitRate()).isEqualTo(7000L);
+        assertThat(contentInfo.getMediaFormatInfo().getSize()).isEqualTo(8608304859L);
+        assertThat(contentInfo.getMediaFormatInfo().getDuration()).isEqualTo(8001L);
+        assertThat(contentInfo.getMediaStreams().get(0)).isInstanceOf(MediaStreamVideoInfo.class);
+        MediaStreamVideoInfo videoStream = (MediaStreamVideoInfo)contentInfo.getMediaStreams().get(0);
+        assertThat(videoStream.getWidth()).isEqualTo(1280);
+        assertThat(videoStream.getHeight()).isEqualTo(540);
     }
 
 }
