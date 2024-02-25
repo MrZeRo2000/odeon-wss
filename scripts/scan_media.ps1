@@ -30,7 +30,7 @@ function ScanMedia {
     New-Item -ItemType Directory -Force -Path $OutputPath
 
     $files | ForEach-Object -Process {
-        $command = "../MediaInfo/MediaInfo.exe --Output=JSON `"$($_.FullName)`" > `"$OutputPath/$($_.Name).json`""
+        $command = "../../MediaInfo/MediaInfo.exe --Output=JSON `"$($_.FullName)`" > `"$OutputPath/$($_.Name).json`""
         Write-Host $command -ForegroundColor DarkGray
         Invoke-Expression -Command $command
     }
