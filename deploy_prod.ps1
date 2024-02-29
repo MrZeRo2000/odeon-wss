@@ -1,1 +1,1 @@
-./gradlew clean deployProd
+./gradlew.ps1 clean deployProd

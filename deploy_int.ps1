@@ -1,1 +1,1 @@
-./gradlew clean deployInt
+./gradlew.ps1 clean deployInt
