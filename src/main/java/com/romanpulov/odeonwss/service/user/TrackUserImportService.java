@@ -151,9 +151,19 @@ public class TrackUserImportService {
 
         // can be one artist from artifact or artist per title
         List<String> artists = data.getArtists();
+
+        Artist defaultArtist;
+        if (artists != null && artists.size() == 1) {
+            defaultArtist = artistRepository
+                    .findFirstByTypeAndName(ArtistType.ARTIST, artists.get(0))
+                    .orElseThrow(() -> new WrongParameterValueException("Artists", artists.get(0) + " not found"));
+        } else {
+            defaultArtist = null;
+        }
+
         if (artifactArtist == null && (artists == null || artists.isEmpty())) {
             throw new EmptyParameterException("Artists");
-        } else if (artists != null && !artists.isEmpty() && artists.size() != titles.size()) {
+        } else if (artists != null && !artists.isEmpty() && artists.size() != titles.size() && defaultArtist == null) {
             throw new WrongParameterValueException("Artists",
                     "Artists size:%d and titles size:%d mismatch".formatted(artists.size(), titles.size()));
         }
@@ -179,7 +189,16 @@ public class TrackUserImportService {
         // tracks insert
         for (int i = 0; i < titles.size(); i++) {
             String title = titles.get(i);
-            Artist artist = artists != null && !artists.isEmpty() ? artistMap.get(artists.get(i)) : artifactArtist;
+
+            // get needed artist
+            Artist artist;
+            if (defaultArtist != null) {
+                artist = defaultArtist;
+            } else if (artists != null && !artists.isEmpty()) {
+                artist = artistMap.get(artists.get(i));
+            } else {
+                artist = artifactArtist;
+            }
 
             Track track = new Track();
             track.setArtifact(artifact);
