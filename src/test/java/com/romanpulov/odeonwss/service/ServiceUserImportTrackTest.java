@@ -562,4 +562,72 @@ public class ServiceUserImportTrackTest {
         assertThat(tracks.get(1).getMediaFileName()).isEqualTo("Music Collection File Name");
         assertThat(tracks.get(1).getDuration()).isNull();
     }
+
+    @Test
+    @Order(23)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testMusicArtifactOneArtistNoTrackNumberShouldBeOk() throws Exception {
+        internalPrepare();
+
+        var artist = artistRepository.findById(2L).orElseThrow();
+
+        var artifact = new EntityArtifactBuilder()
+                .withArtifactType(artifactTypeRepository.getWithDVMusic())
+                .withArtist(artist)
+                .withTitle("DV music")
+                .withDuration(37654L)
+                .build();
+        artifactRepository.save(artifact);
+
+        var mediaFile = new EntityMediaFileBuilder()
+                .withArtifact(artifact)
+                .withDuration(48394L)
+                .withName("DV Music File Name")
+                .withBitrate(1500L)
+                .withFormat("MKV")
+                .withSize(73495L)
+                .build();
+        mediaFileRepository.save(mediaFile);
+
+        var result = service.executeImportTracks(
+                new TrackUserImportDTOBuilder()
+                        .withArtifact(new ArtifactDTOBuilder().withId(artifact.getId()).build())
+                        .withDVType(new IdNameDTOBuilder().withId(2L).build())
+                        .withMediaFile(new MediaFileDTOBuilder().withId(mediaFile.getId()).build())
+                        .withTitles(List.of("Dumb", "Nigger", "Recipe for hate"))
+                        .withArtists(List.of())
+                        .build());
+        assertThat(result.getRowsInserted().size()).isEqualTo(3);
+        assertThat(result.getRowsInserted()).containsAll(List.of("Dumb", "Nigger", "Recipe for hate"));
+        var tracks = trackRepository.findAllFlatDTOByArtifactId(artifact.getId());
+        assertThat(tracks.get(0).getNum()).isEqualTo(1L);
+        assertThat(tracks.get(0).getTitle()).isEqualTo("Dumb");
+        assertThat(tracks.get(1).getNum()).isEqualTo(2L);
+        assertThat(tracks.get(1).getTitle()).isEqualTo("Nigger");
+        assertThat(tracks.get(2).getNum()).isEqualTo(3L);
+        assertThat(tracks.get(2).getTitle()).isEqualTo("Recipe for hate");
+
+        var result_after = service.executeImportTracks(
+                new TrackUserImportDTOBuilder()
+                        .withArtifact(new ArtifactDTOBuilder().withId(artifact.getId()).build())
+                        .withDVType(new IdNameDTOBuilder().withId(2L).build())
+                        .withMediaFile(new MediaFileDTOBuilder().withId(mediaFile.getId()).build())
+                        .withTitles(List.of("Pin Me Down", "Nothing Going On"))
+                        .withArtists(List.of("Clawfinger"))
+                        .build());
+        assertThat(result_after.getRowsInserted().size()).isEqualTo(2);
+
+        var tracks_after = trackRepository.findAllFlatDTOByArtifactId(artifact.getId());
+        assertThat(tracks_after.get(0).getNum()).isEqualTo(1L);
+        assertThat(tracks_after.get(0).getTitle()).isEqualTo("Dumb");
+        assertThat(tracks_after.get(1).getNum()).isEqualTo(2L);
+        assertThat(tracks_after.get(1).getTitle()).isEqualTo("Nigger");
+        assertThat(tracks_after.get(2).getNum()).isEqualTo(3L);
+        assertThat(tracks_after.get(2).getTitle()).isEqualTo("Recipe for hate");
+        assertThat(tracks_after.get(3).getNum()).isEqualTo(4L);
+        assertThat(tracks_after.get(3).getTitle()).isEqualTo("Pin Me Down");
+        assertThat(tracks_after.get(4).getNum()).isEqualTo(5L);
+        assertThat(tracks_after.get(4).getTitle()).isEqualTo("Nothing Going On");
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.service.user;
 
 import com.romanpulov.odeonwss.dto.IdNameDTO;
+import com.romanpulov.odeonwss.dto.TrackFlatDTO;
 import com.romanpulov.odeonwss.dto.user.TrackUserImportDTO;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
@@ -59,7 +60,7 @@ public class TrackUserImportService {
         DVType dvType = dvTypeRepository
                 .findById(dvTypeDTO.getId())
                 .orElseThrow(() -> new CommonEntityNotFoundException("DVType", dvTypeDTO.getId()));
-        long num = Optional.ofNullable(data.getNum()).orElse(1L);
+        long num = Optional.ofNullable(data.getNum()).orElse(getMaxTrackNumber(artifact));
 
         if (!mediaFile.getArtifact().getId().equals(artifact.getId())) {
             throw new WrongParameterValueException("MediaFile", "Artifact for media file does not match");
@@ -215,6 +216,16 @@ public class TrackUserImportService {
 
             result.addRowInserted(title);
         }
+    }
+
+    private long getMaxTrackNumber(Artifact artifact) {
+        return trackRepository
+                .findAllFlatDTOByArtifactId(artifact.getId())
+                .stream()
+                .filter(t -> t.getDiskNum() == null && t.getNum() != null)
+                .mapToLong(TrackFlatDTO::getNum)
+                .max()
+                .orElse(0) + 1;
     }
 
     private void shiftTrackNumbers(Artifact artifact, long num, int size) {
