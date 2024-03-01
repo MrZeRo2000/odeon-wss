@@ -1,6 +1,15 @@
 """
+Tracks SQL:
+SELECT
+  a.arts_name || ' - ' || t.trck_title AS track
+FROM tracks t
+INNER JOIN artists a ON a.arts_id = t.arts_id
+WHERE t.artf_id = 100
+ORDER BY t.trck_disk_num, t.trck_num;
+
 Sample request:
 You are a music expert. Provide track durations in seconds for below tracks. Each line should contain only duration value in seconds for each track in the same order:
+
 Sample config:
 "{\"target_duration\": \"01:10:36\", \"durations\": [ 223, 303, 240, 237, 328, 215, 253, 308, 313, 209, 279, 216, 221, 246, 294, 315, 298, 201, 318, 252 ]}"
 """
