@@ -1,11 +1,14 @@
 package com.romanpulov.odeonwss.service.processor;
 
+import com.romanpulov.odeonwss.dto.IdNameDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
+import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
@@ -18,11 +21,9 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Component
 public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
@@ -31,10 +32,9 @@ public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
 
     private ArtifactType artifactType;
 
+    private final ArtistRepository artistRepository;
     private final ArtifactTypeRepository artifactTypeRepository;
-
     private final ArtifactRepository artifactRepository;
-
     private final MediaFileRepository mediaFileRepository;
 
     private final MediaFileMapper mediaFileMapper;
@@ -42,11 +42,13 @@ public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
     private final MediaParser mediaParser;
 
     public DVMusicLoadProcessor(
+            ArtistRepository artistRepository,
             ArtifactTypeRepository artifactTypeRepository,
             ArtifactRepository artifactRepository,
             MediaFileRepository mediaFileRepository,
             MediaFileMapper mediaFileMapper,
             MediaParser mediaParser) {
+        this.artistRepository = artistRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.artifactRepository = artifactRepository;
         this.mediaFileRepository = mediaFileRepository;
@@ -60,10 +62,16 @@ public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
 
         this.artifactType = Optional.ofNullable(this.artifactType).orElse(artifactTypeRepository.getWithDVMusic());
 
+        Map<String, Long> artists = artistRepository
+                .getByTypeOrderByName(ArtistType.ARTIST)
+                .stream()
+                .collect(Collectors.toMap(IdNameDTO::getName, IdNameDTO::getId));
+
         infoHandler(ProcessorMessages.INFO_ARTIFACTS_LOADED,
                 PathProcessUtil.processArtifactsPath(
                         this,
                         path,
+                        artists,
                         artifactRepository,
                         artifactType,
                         s -> processingEventHandler(ProcessorMessages.PROCESSING_ARTIFACT, s),

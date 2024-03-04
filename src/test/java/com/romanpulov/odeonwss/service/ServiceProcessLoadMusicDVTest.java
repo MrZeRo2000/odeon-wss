@@ -1,10 +1,11 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.config.DatabaseConfiguration;
-import com.romanpulov.odeonwss.db.DbManagerService;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
+import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.processor.ValueValidator;
 import com.romanpulov.odeonwss.service.processor.model.*;
@@ -16,10 +17,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.sql.DataSource;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
-import static com.romanpulov.odeonwss.db.DbManagerService.DbType.DB_IMPORTED_ARTISTS;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -39,7 +41,7 @@ public class ServiceProcessLoadMusicDVTest {
     ProcessService processService;
 
     @Autowired
-    private DatabaseConfiguration databaseConfiguration;
+    private ArtistRepository artistRepository;
 
     @Autowired
     private ArtifactTypeRepository artifactTypeRepository;
@@ -62,11 +64,15 @@ public class ServiceProcessLoadMusicDVTest {
     void testPrepare() {
         this.artifactType = artifactTypeRepository.getWithDVMusic();
 
-        DbManagerService.loadOrPrepare(databaseConfiguration, DB_IMPORTED_ARTISTS, () -> {
-            processService.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
-            assertThat(processService.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
-            log.info("Artists Importer Processing info: " + processService.getProcessInfo());
-        });
+        Arrays.asList("The Cure", "Tori Amos", "Various Artists").forEach(s ->
+                artistRepository.save(
+                        new EntityArtistBuilder()
+                                .withType(ArtistType.ARTIST)
+                                .withName(s)
+                                .build()
+                ));
+
+        log.info("Created artists");
     }
 
     @Test
@@ -124,6 +130,20 @@ public class ServiceProcessLoadMusicDVTest {
                         null,
                         null)
         );
+
+        var artifacts = artifactRepository.getAllByArtifactType(this.artifactType);
+        assertThat(artifacts.get(0).getTitle()).isEqualTo("Beautiful Voices 1");
+        assertThat(artifacts.get(0).getArtist()).isNull();
+
+        assertThat(artifacts.get(1).getTitle()).isEqualTo("The Cure - Picture Show 1991");
+        assertThat(artifacts.get(1).getArtist()).isNotNull();
+        assertThat(Optional.ofNullable(artifacts.get(1).getArtist()).orElseThrow().getId())
+                .isEqualTo(artistRepository.findFirstByName("The Cure").orElseThrow().getId());
+
+        assertThat(artifacts.get(2).getTitle()).isEqualTo("Tori Amos - Fade to Red 2006");
+        assertThat(artifacts.get(2).getArtist()).isNotNull();
+        assertThat(Optional.ofNullable(artifacts.get(2).getArtist()).orElseThrow().getId())
+                .isEqualTo(artistRepository.findFirstByName("Tori Amos").orElseThrow().getId());
     }
 
     @Test

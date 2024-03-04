@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.service.processor.utils;
 
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.service.processor.AbstractProcessor;
 import com.romanpulov.odeonwss.service.processor.PathReader;
@@ -20,6 +21,7 @@ public class PathProcessUtil {
     public static int processArtifactsPath(
             AbstractProcessor processor,
             Path path,
+            Map<String, Long> artists,
             ArtifactRepository artifactRepository,
             ArtifactType artifactType,
             Consumer<String> processingArtifactCallback,
@@ -49,6 +51,18 @@ public class PathProcessUtil {
 
                         Artifact artifact = new Artifact();
                         artifact.setArtifactType(artifactType);
+
+                        // looking for artist name
+                        if (artists != null) {
+                            for (Map.Entry<String, Long> artistEntry: artists.entrySet()) {
+                                if (artifactName.startsWith(artistEntry.getKey())) {
+                                    Artist artist = new Artist();
+                                    artist.setId(artistEntry.getValue());
+                                    artifact.setArtist(artist);
+                                }
+                            }
+                        }
+
                         artifact.setTitle(artifactName);
                         artifact.setDuration(0L);
 

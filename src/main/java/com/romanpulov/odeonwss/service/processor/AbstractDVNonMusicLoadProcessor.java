@@ -90,6 +90,7 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
                 PathProcessUtil.processArtifactsPath(
                         this,
                         path,
+                        null,
                         artifactRepository,
                         artifactType,
                         s -> processingEventHandler(ProcessorMessages.PROCESSING_ARTIFACT, s),
