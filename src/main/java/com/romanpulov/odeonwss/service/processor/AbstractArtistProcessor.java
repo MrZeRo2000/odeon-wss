@@ -123,8 +123,8 @@ public abstract class AbstractArtistProcessor extends AbstractFileSystemProcesso
             Artifact artifact = new Artifact();
             artifact.setArtifactType(getArtifactType());
             artifact.setArtist(pathArtistPair.getSecond().getFirst());
-            artifact.setTitle(pathArtistPair.getSecond().getSecond().getTitle());
-            artifact.setYear((long) pathArtistPair.getSecond().getSecond().getYear());
+            artifact.setTitle(pathArtistPair.getSecond().getSecond().title());
+            artifact.setYear((long) pathArtistPair.getSecond().getSecond().year());
 
             Optional<Artifact> existingArtifact = artifactRepository.findFirstByArtifactTypeAndArtistAndTitleAndYear(
                     artifact.getArtifactType(),

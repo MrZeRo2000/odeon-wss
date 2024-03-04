@@ -34,16 +34,16 @@ public class UnitNamesParserTest {
 
         yt = NamesParser.parseMusicArtifactTitle("1980 Title");
         Assertions.assertNotNull(yt);
-        Assertions.assertEquals(1980, yt.getYear());
-        Assertions.assertEquals("Title", yt.getTitle());
+        Assertions.assertEquals(1980, yt.year());
+        Assertions.assertEquals("Title", yt.title());
 
         yt = NamesParser.parseMusicArtifactTitle("198r Title");
         Assertions.assertNull(yt);
 
         yt = NamesParser.parseMusicArtifactTitle("2022 Title can be long");
         Assertions.assertNotNull(yt);
-        Assertions.assertEquals(2022, yt.getYear());
-        Assertions.assertEquals("Title can be long", yt.getTitle());
+        Assertions.assertEquals(2022, yt.year());
+        Assertions.assertEquals("Title can be long", yt.title());
     }
 
     @Test
@@ -85,6 +85,24 @@ public class UnitNamesParserTest {
 
         assertThat(NamesParser.parseMusicTrack("01-First day.mp3")).isNull();
         assertThat(NamesParser.parseMusicTrack("0101-Too much.mp3")).isNull();
+    }
+
+    @Test
+    void testMusicVideoTrackParser() {
+        var ntTitle = NamesParser.parseMusicVideoTrack("02 Title with spaces.avi");
+        Assertions.assertNotNull(ntTitle);
+        assertThat(ntTitle.hasArtistName()).isFalse();
+        assertThat(ntTitle.getNumber()).isEqualTo(2);
+        assertThat(ntTitle.getTitle()).isEqualTo("Title with spaces");
+
+        var ntArtistTitle = NamesParser.parseMusicVideoTrack("03 H-Blockx - Time to move.mkv");
+        Assertions.assertNotNull(ntArtistTitle);
+        assertThat(ntArtistTitle.getNumber()).isEqualTo(3);
+        assertThat(ntArtistTitle.hasArtistName()).isTrue();
+        assertThat(ntArtistTitle.getArtistName()).isEqualTo("H-Blockx");
+        assertThat(ntArtistTitle.getTitle()).isEqualTo("Time to move");
+
+        assertThat(NamesParser.parseMusicVideoTrack("0101-Too much.avi")).isNull();
     }
 
     @Test

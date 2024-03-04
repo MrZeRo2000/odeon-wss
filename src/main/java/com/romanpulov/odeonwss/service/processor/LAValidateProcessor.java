@@ -22,7 +22,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class LAValidateProcessor extends AbstractFileSystemProcessor implements PathValidationLoader.ArtistArtifactPathLoader {
@@ -126,7 +125,7 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                     directoryFolderDisksPaths = trackPaths
                             .stream()
                             .filter(p -> NamesParser.getDiskNumFromFolderName(p.getFileName().toString()) > 0)
-                            .collect(Collectors.toList());
+                            .toList();
                 }
 
                 if (directoryFolderDisksPaths != null && !directoryFolderDisksPaths.isEmpty()) {
@@ -153,8 +152,8 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
                             result.add(
                                     new MediaFileValidationDTOBuilder()
                                             .withArtistName(artistPath.getFileName().toString())
-                                            .withArtifactTitle(yt.getTitle())
-                                            .withArtifactYear(yt.getYear())
+                                            .withArtifactTitle(yt.title())
+                                            .withArtifactYear(yt.year())
                                             .withMediaFileName(mediaPath.getFileName().toString())
                                             .withMediaFileSize(mediaFileSize)
                                             .build());
