@@ -1,10 +1,7 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.dto.*;
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.entity.MediaFile;
-import com.romanpulov.odeonwss.entity.Track;
+import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.exception.WrongParameterValueException;
 import com.romanpulov.odeonwss.mapper.TrackMapper;
@@ -22,12 +19,14 @@ public class TrackService
 
     private final ArtifactTypeRepository artifactTypeRepository;
     private final ArtifactRepository artifactRepository;
+    private final DVTypeRepository dvTypeRepository;
     private final TrackTransformer transformer;
     private final MediaFileRepository mediaFileRepository;
 
     public TrackService(
             ArtifactRepository artifactRepository,
             ArtifactTypeRepository artifactTypeRepository,
+            DVTypeRepository dvTypeRepository,
             TrackRepository trackRepository,
             TrackMapper trackMapper,
             TrackTransformer transformer,
@@ -36,6 +35,7 @@ public class TrackService
         super(trackRepository, trackMapper);
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
+        this.dvTypeRepository = dvTypeRepository;
         this.transformer = transformer;
         this.mediaFileRepository = mediaFileRepository;
 
@@ -209,5 +209,27 @@ public class TrackService
         }
 
         return RowsAffectedDTO.from(rowsAffected);
+    }
+
+    @Transactional
+    public RowsAffectedDTO updateVideoTypes(long artifactId, long dvTypeId)
+            throws CommonEntityNotFoundException {
+        Artifact artifact = artifactRepository.findById(artifactId).orElseThrow
+                (() -> new CommonEntityNotFoundException("Artifact", artifactId));
+        DVType dvType = dvTypeRepository.findById(dvTypeId).orElseThrow
+                (() -> new CommonEntityNotFoundException("DVType", dvTypeId));
+
+        List<Track> tracks = repository
+                .findAllByArtifact(artifact)
+                .stream()
+                .filter(t -> t.getDvType() != dvType)
+                .toList();
+        for (Track track: tracks) {
+            track.setDvType(dvType);
+        }
+
+        repository.saveAll(tracks);
+
+        return RowsAffectedDTO.from(tracks.size());
     }
 }
