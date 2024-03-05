@@ -2,11 +2,10 @@ package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entity.ArtifactType;
+import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
-import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
-import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.generator.FileTreeGenerator;
+import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.ValueValidator;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
@@ -15,12 +14,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.util.FileSystemUtils;
 
 import javax.sql.DataSource;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -52,19 +55,78 @@ public class ServiceProcessLoadMusicDVTest {
     @Autowired
     private MediaFileRepository mediaFileRepository;
 
+    @Autowired
+    private TrackRepository trackRepository;
+
     private ProcessInfo executeProcessor() {
         processService.executeProcessor(PROCESSOR_TYPE);
         return processService.getProcessInfo();
     }
 
-    @Test
-    @Order(1)
-    @Sql({"/schema.sql", "/data.sql"})
-    @Rollback(value = false)
-    void testPrepare() {
-        this.artifactType = artifactTypeRepository.getWithDVMusic();
+    private List<Path> tempDirs = new ArrayList<>();
 
-        Arrays.asList("The Cure", "Tori Amos", "Various Artists").forEach(s ->
+    @BeforeAll
+    public void setup() throws Exception {
+        log.info("Before all");
+        tempDirs = Stream
+                .of("WithoutParcelable", "WithTitlesNoArtist", "WithArtistsAndTitle")
+                .map(v -> {
+                    try {
+                        return Files.createTempDirectory(v);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
+
+        var withoutParcelableFolderDefs = new ArrayList<FileTreeGenerator.FolderDef>();
+        withoutParcelableFolderDefs.add(new FileTreeGenerator.FolderDef(
+                "Tori Amos - Fade to Red 2006",
+                Map.of(
+                        "Tori Amos - Fade to Red Disk 1 2006.mkv",
+                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"),
+                        "Tori Amos - Fade to Red Disk 2 2006.mkv",
+                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv")
+                )));
+        FileTreeGenerator.generate(tempDirs.get(0), withoutParcelableFolderDefs);
+
+        var withoutTitlesNoArtist = new ArrayList<FileTreeGenerator.FolderDef>();
+        withoutTitlesNoArtist.add(new FileTreeGenerator.FolderDef(
+                "The Cure - In Orange",
+                Map.of(
+                        "01 Shake dog shake.mkv",
+                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"),
+                        "02 Never Enough.mkv",
+                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv")
+                )));
+        FileTreeGenerator.generate(tempDirs.get(1), withoutTitlesNoArtist);
+
+        var withArtistsAndTitle = new ArrayList<FileTreeGenerator.FolderDef>();
+        withArtistsAndTitle.add(new FileTreeGenerator.FolderDef(
+                "Beautiful Voices",
+                Map.of(
+                        "01 Nightwish - Ghost Love Score.mkv",
+                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"),
+                        "02 Mandragora Scream - Vision They Shared.mkv",
+                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 2 2006.mkv"),
+                        "03 Tapping The Vein - Butterfly.mkv",
+                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 2 2006.mkv")
+                )));
+        FileTreeGenerator.generate(tempDirs.get(2), withArtistsAndTitle);
+    }
+
+    @AfterAll
+    public void teardown() {
+        log.info("After all");
+        tempDirs.forEach(v -> {
+            try {
+                FileSystemUtils.deleteRecursively(v);
+            } catch (IOException ignore) {}
+        });
+    }
+
+    private void prepareArtists() {
+        Arrays.asList("The Cure", "Tori Amos", "Various Artists", "Nightwish", "Mandragora Scream").forEach(s ->
                 artistRepository.save(
                         new EntityArtistBuilder()
                                 .withType(ArtistType.ARTIST)
@@ -73,6 +135,16 @@ public class ServiceProcessLoadMusicDVTest {
                 ));
 
         log.info("Created artists");
+
+    }
+
+    @Test
+    @Order(1)
+    @Sql({"/schema.sql", "/data.sql"})
+    @Rollback(value = false)
+    void testPrepare() {
+        this.artifactType = artifactTypeRepository.getWithDVMusic();
+        prepareArtists();
     }
 
     @Test
@@ -213,4 +285,95 @@ public class ServiceProcessLoadMusicDVTest {
                     assertThat(ValueValidator.isEmpty(artifact.getDuration())).isFalse();
                 });
     }
+
+    @Test
+    @Sql({"/schema.sql", "/data.sql"})
+    @Order(10)
+    @Rollback(value = false)
+    void testWithTracksNoArtists() {
+        prepareArtists();
+
+        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get(1).toString());
+        var pi = processService.getProcessInfo();
+
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+
+        assertThat(pi.getProcessDetails().get(2)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Media files loaded"),
+                        ProcessingStatus.INFO,
+                        2,
+                        null)
+        );
+
+        assertThat(pi.getProcessDetails().get(3)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessage("Tracks loaded"),
+                        ProcessingStatus.INFO,
+                        2,
+                        null)
+        );
+
+        var artifacts = artifactRepository.findAll();
+        assertThat(artifacts.size()).isEqualTo(1);
+        assertThat(Optional.ofNullable(artifacts.get(0).getArtist()).orElseThrow().getId()).isEqualTo(
+                artistRepository.findFirstByName("The Cure").orElseThrow().getId()
+        );
+
+        var tracks = trackRepository.findAllFlatDTOByArtifactId(artifacts.get(0).getId());
+        assertThat(tracks.size()).isEqualTo(2);
+        assertThat(tracks.get(0).getArtistName()).isEqualTo("The Cure");
+        assertThat(tracks.get(0).getNum()).isEqualTo(1L);
+        assertThat(tracks.get(0).getDiskNum()).isNull();
+        assertThat(tracks.get(0).getTitle()).isEqualTo("Shake dog shake");
+        assertThat(tracks.get(0).getMediaFileName()).isEqualTo("01 Shake dog shake.mkv");
+
+        processService.executeProcessor(ProcessorType.DV_MUSIC_VALIDATOR, tempDirs.get(1).toString());
+        var validatePi = processService.getProcessInfo();
+        assertThat(validatePi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+    }
+
+    @Test
+    @Sql({"/schema.sql", "/data.sql"})
+    @Order(11)
+    @Rollback(value = false)
+    void testWithTracksAndArtists() {
+        prepareArtists();
+
+        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get(2).toString());
+        var pi = processService.getProcessInfo();
+
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+
+        var artifacts = artifactRepository.findAll();
+        assertThat(artifacts.size()).isEqualTo(1);
+        assertThat(artifacts.get(0).getTitle()).isEqualTo("Beautiful Voices");
+        assertThat(artifacts.get(0).getArtist()).isNull();
+
+        var tracks = trackRepository.findAllFlatDTOByArtifactId(artifacts.get(0).getId());
+        assertThat(tracks.size()).isEqualTo(3);
+
+        assertThat(tracks.get(0).getNum()).isEqualTo(1L);
+        assertThat(tracks.get(0).getArtistName()).isEqualTo("Nightwish");
+        assertThat(tracks.get(0).getTitle()).isEqualTo("Ghost Love Score");
+
+        assertThat(tracks.get(1).getNum()).isEqualTo(2L);
+        assertThat(tracks.get(1).getArtistName()).isEqualTo("Mandragora Scream");
+        assertThat(tracks.get(1).getTitle()).isEqualTo("Vision They Shared");
+
+        assertThat(tracks.get(2).getNum()).isEqualTo(3L);
+        assertThat(tracks.get(2).getArtistName()).isNull();
+        assertThat(tracks.get(2).getTitle()).isEqualTo("Butterfly");
+
+        // set artist for artifact for validation
+        Artist artist = new Artist();
+        artist.setId(1L);
+        artifacts.get(0).setArtist(artist);
+        artifactRepository.save(artifacts.get(0));
+
+        processService.executeProcessor(ProcessorType.DV_MUSIC_VALIDATOR, tempDirs.get(2).toString());
+        var validatePi = processService.getProcessInfo();
+        assertThat(validatePi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+    }
+
 }
