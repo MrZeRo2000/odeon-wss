@@ -1,7 +1,10 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.romanpulov.odeonwss.builder.dtobuilder.ArtifactDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.IdNameDTOBuilder;
 import com.romanpulov.odeonwss.builder.dtobuilder.TrackDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.TrackDVTypeUserUpdateDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVProductBuilder;
@@ -309,5 +312,93 @@ public class ControllerTrackTest {
                 .andExpect(jsonPath("$[1].duration", Matchers.equalTo(800 - 60 - 55)))
                 .andReturn();
         logger.info("testUpdateTrackDurations tracks after:" + result_after.getResponse().getContentAsString());
+    }
+
+    @Test
+    @Order(13)
+    void testUpdateVideoTypesWrongParams() throws Exception {
+        // wrong id entity not found
+        String json = mapper.writeValueAsString(new TrackDVTypeUserUpdateDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(5).build())
+                .withDVType(new IdNameDTOBuilder().withId(8).build())
+                .build());
+
+        logger.info("testUpdateVideoTypes update object:" + json);
+
+        this.mockMvc.perform(
+            post("/api/track/update-track-video-types").accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isNotFound());
+
+        // wrong id entity not found
+        json = mapper.writeValueAsString(new TrackDVTypeUserUpdateDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(1).build())
+                .withDVType(new IdNameDTOBuilder().withId(83).build())
+                .build());
+
+        logger.info("testUpdateVideoTypes update object:" + json);
+
+        this.mockMvc.perform(
+            post("/api/track/update-track-video-types").accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isNotFound());
+
+        // missing value - bad request
+        json = mapper.writeValueAsString(new TrackDVTypeUserUpdateDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(1).build())
+                .build());
+
+        logger.info("testUpdateVideoTypes update object:" + json);
+
+        this.mockMvc.perform(
+            post("/api/track/update-track-video-types").accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Order(14)
+    void testUpdateVideoTypes() throws Exception {
+        var result_before = mockMvc.perform(get("/api/track/table/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].dvType.id", Matchers.not(8)))
+                .andExpect(jsonPath("$[1].dvType").doesNotExist())
+                .andReturn();
+        logger.info("testUpdateVideoTypes before:" + result_before.getResponse().getContentAsString());
+
+        String json = mapper.writeValueAsString(new TrackDVTypeUserUpdateDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(1).build())
+                .withDVType(new IdNameDTOBuilder().withId(8).build())
+                .build());
+
+        logger.info("testUpdateVideoTypes update object:" + json);
+
+        var result = this.mockMvc.perform(
+                        post("/api/track/update-track-video-types").accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.aMapWithSize(1)))
+                .andExpect(jsonPath("$.rowsAffected", Matchers.equalTo(2)))
+                .andReturn();
+        logger.info("testUpdateVideoTypes result:" + result.getResponse().getContentAsString());
+
+        var result_after = mockMvc.perform(get("/api/track/table/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].dvType.id", Matchers.equalTo(8)))
+                .andExpect(jsonPath("$[1].dvType.id", Matchers.equalTo(8)))
+                .andReturn();
+        logger.info("testUpdateVideoTypes after:" + result_after.getResponse().getContentAsString());
     }
 }

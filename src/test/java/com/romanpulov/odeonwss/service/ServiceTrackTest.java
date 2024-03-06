@@ -20,6 +20,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -379,5 +380,25 @@ public class ServiceTrackTest {
         assertThat(tracksAfter.get(0).getDuration()).isEqualTo(61L);
         assertThat(tracksAfter.get(1).getDuration()).isEqualTo(12L);
         assertThat(tracksAfter.get(2).getDuration()).isEqualTo(400L - 61 - 12);
+    }
+
+    @Test
+    @Order(13)
+    void testUpdateVideoTypes() throws Exception {
+        var artifact = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMovies()).get(0);
+
+        var tracksBefore = trackRepository.findAllByArtifact(artifact);
+        assertThat(tracksBefore.size()).isEqualTo(3);
+        for (Track track: tracksBefore) {
+            assertThat(Optional.ofNullable(track.getDvType()).orElseThrow().getId()).isEqualTo(2L);
+        }
+
+        trackService.updateVideoTypes(artifact.getId(), 8L);
+
+        var tracksAfter = trackRepository.findAllByArtifact(artifact);
+        assertThat(tracksAfter.size()).isEqualTo(3);
+        for (Track track: tracksAfter) {
+            assertThat(Optional.ofNullable(track.getDvType()).orElseThrow().getId()).isEqualTo(8L);
+        }
     }
 }
