@@ -86,11 +86,17 @@ public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
         }
     }
 
-    private Pair<Integer, Integer> processMediaFilesAndTracks(Path path, Map<String, Long> artists) throws ProcessorException {
+    private Pair<Integer, Integer> processMediaFilesAndTracks(Path path, Map<String, Long> artists)
+            throws ProcessorException {
         AtomicInteger counter = new AtomicInteger(0);
         AtomicInteger trackCounter = new AtomicInteger(0);
 
-        for (Artifact a: artifactRepository.getAllByArtifactTypeWithTracks(artifactType)) {
+        List<Artifact> artifacts = this.artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
+                .stream()
+                .filter(a -> a.getTracks().isEmpty())
+                .toList();
+
+        for (Artifact a: artifacts) {
             Path mediaFilesRootPath = Paths.get(path.toAbsolutePath().toString(), a.getTitle());
 
             List<Path> mediaFilesPaths = new ArrayList<>();
