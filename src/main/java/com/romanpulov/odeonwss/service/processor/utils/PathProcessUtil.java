@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class PathProcessUtil {
@@ -24,6 +25,7 @@ public class PathProcessUtil {
             Map<String, Long> artists,
             ArtifactRepository artifactRepository,
             ArtifactType artifactType,
+            Function<String, Long> artifactYearProviderCallback,
             Consumer<String> processingArtifactCallback,
             Consumer<String> processingErrorExpectedDirectoryCallback) throws ProcessorException {
         if (!Files.isDirectory(path)) {
@@ -65,6 +67,9 @@ public class PathProcessUtil {
 
                         artifact.setTitle(artifactName);
                         artifact.setDuration(0L);
+                        if (artifactYearProviderCallback != null) {
+                            artifact.setYear(artifactYearProviderCallback.apply(artifactName));
+                        }
 
                         artifactRepository.save(artifact);
                         counter.getAndIncrement();

@@ -205,14 +205,17 @@ public class ServiceProcessLoadMusicDVTest {
 
         var artifacts = artifactRepository.getAllByArtifactType(this.artifactType);
         assertThat(artifacts.get(0).getTitle()).isEqualTo("Beautiful Voices 1");
+        assertThat(artifacts.get(0).getYear()).isNull();
         assertThat(artifacts.get(0).getArtist()).isNull();
 
         assertThat(artifacts.get(1).getTitle()).isEqualTo("The Cure - Picture Show 1991");
+        assertThat(artifacts.get(1).getYear()).isEqualTo(1991L);
         assertThat(artifacts.get(1).getArtist()).isNotNull();
         assertThat(Optional.ofNullable(artifacts.get(1).getArtist()).orElseThrow().getId())
                 .isEqualTo(artistRepository.findFirstByName("The Cure").orElseThrow().getId());
 
         assertThat(artifacts.get(2).getTitle()).isEqualTo("Tori Amos - Fade to Red 2006");
+        assertThat(artifacts.get(2).getYear()).isEqualTo(2006L);
         assertThat(artifacts.get(2).getArtist()).isNotNull();
         assertThat(Optional.ofNullable(artifacts.get(2).getArtist()).orElseThrow().getId())
                 .isEqualTo(artistRepository.findFirstByName("Tori Amos").orElseThrow().getId());

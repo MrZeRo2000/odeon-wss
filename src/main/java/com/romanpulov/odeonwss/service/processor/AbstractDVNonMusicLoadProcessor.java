@@ -93,6 +93,7 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
                         null,
                         artifactRepository,
                         artifactType,
+                        null,
                         s -> processingEventHandler(ProcessorMessages.PROCESSING_ARTIFACT, s),
                         s -> errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, s)));
 

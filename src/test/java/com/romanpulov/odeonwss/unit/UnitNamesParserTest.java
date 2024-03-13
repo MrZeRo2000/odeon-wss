@@ -47,6 +47,16 @@ public class UnitNamesParserTest {
     }
 
     @Test
+    void testVideoMusicArtifactTitleYearParser() {
+        assertThat(NamesParser.parseVideoMusicArtifactTitleYear("Tori Amos - Fade To Red 2006"))
+                .isEqualTo(2006L);
+        assertThat(NamesParser.parseVideoMusicArtifactTitleYear("Tori Amos 1002 Fade To Red 2006"))
+                .isEqualTo(2006L);
+
+        assertThat(NamesParser.parseVideoMusicArtifactTitleYear("2006 Tori Amos - Fade To Red")).isNull();
+    }
+
+    @Test
     void testMusicTrackValidator() {
         Assertions.assertTrue(NamesParser.validateMusicTrack("02 - Title.mp3"));
         Assertions.assertTrue(NamesParser.validateMusicTrack("21 - Title can be long.flac"));

@@ -73,6 +73,7 @@ public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
                         artists,
                         artifactRepository,
                         artifactType,
+                        NamesParser::parseVideoMusicArtifactTitleYear,
                         s -> processingEventHandler(ProcessorMessages.PROCESSING_ARTIFACT, s),
                         s -> errorHandler(ProcessorMessages.ERROR_EXPECTED_DIRECTORY, s)));
 
