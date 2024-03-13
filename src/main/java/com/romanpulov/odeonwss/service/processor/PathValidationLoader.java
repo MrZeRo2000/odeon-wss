@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class PathValidationLoader {
 
@@ -59,12 +60,17 @@ public class PathValidationLoader {
     public static List<MediaFileValidationDTO> loadFromPathArtistArtifacts(
             AbstractProcessor processor,
             Path path,
-            ArtistArtifactPathLoader loader) throws ProcessorException {
+            ArtistArtifactPathLoader loader,
+            Consumer<String> artistLoadingCallback
+            ) throws ProcessorException {
         List<MediaFileValidationDTO> result = new ArrayList<>();
 
         List<Path> artistPaths = new ArrayList<>();
         if (PathReader.readPathFoldersOnly(processor, path, artistPaths)) {
             for (Path artistPath: artistPaths) {
+                if (artistLoadingCallback != null) {
+                    artistLoadingCallback.accept(artistPath.getFileName().toString());
+                }
                 List<Path> artifactPaths = new ArrayList<>();
                 if (PathReader.readPathFoldersOnly(processor, artistPath, artifactPaths)) {
                     for (Path artifactPath: artifactPaths) {

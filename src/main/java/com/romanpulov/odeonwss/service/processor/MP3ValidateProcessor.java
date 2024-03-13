@@ -55,7 +55,11 @@ public class MP3ValidateProcessor extends AbstractFileSystemProcessor
 
         processingEventHandler(ProcessorMessages.VALIDATING_LOADING_FROM_PATH, path.toAbsolutePath());
         List<MediaFileValidationDTO> pathValidation =
-                PathValidationLoader.loadFromPathArtistArtifacts(this, path, this);
+                PathValidationLoader.loadFromPathArtistArtifacts(
+                        this,
+                        path,
+                        this,
+                        s -> processingEventHandler(ProcessorMessages.VALIDATING_LOADING_ARTIST_ARTIFACTS_FROM_PATH, s));
 
         processingEventHandler(ProcessorMessages.VALIDATING_LOADING_FROM_DB);
         List<MediaFileValidationDTO> dbValidation = mediaFileRepository

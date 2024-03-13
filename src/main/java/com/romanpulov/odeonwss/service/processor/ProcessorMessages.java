@@ -102,6 +102,7 @@ public class ProcessorMessages {
     static final String PROCESSING_SAVING_TRACK_WITH_MEDIA = "Saving track with media: %s";
 
     static final String VALIDATING_LOADING_FROM_PATH = "Loading validation information from path: %s";
+    static final String VALIDATING_LOADING_ARTIST_ARTIFACTS_FROM_PATH = "Loading artifacts for %s";
     static final String VALIDATING_LOADING_FROM_DB = "Loading validation information from database";
     static final String VALIDATING_ARTISTS = "Validating artists";
     static final String VALIDATING_ARTIFACTS = "Validating artifacts";

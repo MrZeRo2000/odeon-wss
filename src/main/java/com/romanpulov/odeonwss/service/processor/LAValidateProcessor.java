@@ -94,7 +94,11 @@ public class LAValidateProcessor extends AbstractFileSystemProcessor implements 
     }
 
     private List<MediaFileValidationDTO> loadFromPath(Path path) throws ProcessorException {
-        return PathValidationLoader.loadFromPathArtistArtifacts(this, path, this);
+        return PathValidationLoader.loadFromPathArtistArtifacts(
+                this,
+                path,
+                this,
+                s -> processingEventHandler(ProcessorMessages.VALIDATING_LOADING_ARTIST_ARTIFACTS_FROM_PATH, s));
     }
 
     @Override
