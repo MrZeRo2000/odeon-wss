@@ -13,10 +13,10 @@ public class NamesParser {
     private final static Logger logger = LoggerFactory.getLogger(NamesParser.class);
 
     private static final Pattern REGEXP_PATTERN_MUSIC_ARTIFACT = Pattern.compile("^((?:19|20)[0-9]{2})\\s(\\S.*)");
-    private static final Pattern REGEXP_PATTERN_VIDEO_MUSIC_ARTIFACT = Pattern.compile("\\d{4}$");
+    private static final Pattern REGEXP_PATTERN_VIDEO_MUSIC_ARTIFACT = Pattern.compile("\\s(\\d{4})$");
     private static final Pattern REGEXP_PATTERN_MUSIC_TRACK = Pattern.compile("^([0-9]{2,3})\\s-\\s(\\S.*)\\.\\S{2,4}$");
     private static final Pattern REGEXP_PATTERN_VIDEO_TRACK = Pattern.compile("^([0-9]{2,3})\\s(\\S.+?\\S)(?:\\s*\\([^)]+\\))*\\.\\S{2,4}$");
-    private static final Pattern REGEXP_PATTERN_MUSIC_VIDEO_TRACK = Pattern.compile("^([0-9]{2,3})\\s(\\S.+?\\S)(?:\\s-\\s(\\S.+?\\S))*\\.\\S{2,4}$");
+    private static final Pattern REGEXP_PATTERN_MUSIC_VIDEO_TRACK = Pattern.compile("^([0-9]{2,3})\\s(\\S.+?\\S)(?:\\s-\\s(\\S.+?\\S))*(?:\\s*\\([^)]+\\))*\\.\\S{2,4}$");
     private static final Pattern REGEXP_PATTERN_FOLDER_NAME_DISK_NUM = Pattern.compile("^CD(\\d+)$");
     private static final Pattern REGEXP_PATTERN_FILE_NAME_DISK_NUM = Pattern.compile("CD(\\d+)\\.");
 
@@ -90,7 +90,7 @@ public class NamesParser {
 
     public static Long parseVideoMusicArtifactTitleYear(String title) {
         Matcher matcher = REGEXP_PATTERN_VIDEO_MUSIC_ARTIFACT.matcher(title);
-        return matcher.find() && matcher.groupCount() == 0 ? Long.parseLong(matcher.group(0)) : null;
+        return matcher.find() && matcher.groupCount() == 1 ? Long.parseLong(matcher.group(1)) : null;
     }
 
     public static String formatMusicArtifact(long year, String title) {

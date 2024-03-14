@@ -52,6 +52,8 @@ public class UnitNamesParserTest {
                 .isEqualTo(2006L);
         assertThat(NamesParser.parseVideoMusicArtifactTitleYear("Tori Amos 1002 Fade To Red 2006"))
                 .isEqualTo(2006L);
+        assertThat(NamesParser.parseVideoMusicArtifactTitleYear("Mariah Carey Videos 1990-2000"))
+                .isNull();
 
         assertThat(NamesParser.parseVideoMusicArtifactTitleYear("2006 Tori Amos - Fade To Red")).isNull();
     }
@@ -105,7 +107,7 @@ public class UnitNamesParserTest {
         assertThat(ntTitle.getNumber()).isEqualTo(2);
         assertThat(ntTitle.getTitle()).isEqualTo("Title with spaces");
 
-        var ntArtistTitle = NamesParser.parseMusicVideoTrack("03 H-Blockx - Time to move.mkv");
+        var ntArtistTitle = NamesParser.parseMusicVideoTrack("03 H-Blockx - Time to move (2003).mkv");
         Assertions.assertNotNull(ntArtistTitle);
         assertThat(ntArtistTitle.getNumber()).isEqualTo(3);
         assertThat(ntArtistTitle.hasArtistName()).isTrue();
