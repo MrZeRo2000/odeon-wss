@@ -16,7 +16,7 @@ public class NamesParser {
     private static final Pattern REGEXP_PATTERN_VIDEO_MUSIC_ARTIFACT = Pattern.compile("\\s(\\d{4})$");
     private static final Pattern REGEXP_PATTERN_MUSIC_TRACK = Pattern.compile("^([0-9]{2,3})\\s-\\s(\\S.*)\\.\\S{2,4}$");
     private static final Pattern REGEXP_PATTERN_VIDEO_TRACK = Pattern.compile("^([0-9]{2,3})\\s(\\S.+?\\S)(?:\\s*\\([^)]+\\))*\\.\\S{2,4}$");
-    private static final Pattern REGEXP_PATTERN_MUSIC_VIDEO_TRACK = Pattern.compile("^([0-9]{2,3})\\s(\\S.+?\\S)(?:\\s-\\s(\\S.+?\\S))*(?:\\s*\\([^)]+\\))*\\.\\S{2,4}$");
+    private static final Pattern REGEXP_PATTERN_MUSIC_VIDEO_TRACK = Pattern.compile("^([0-9]{2,3})\\s(\\S.+?\\S)(?:\\s-\\s(\\S.+?\\S))*(?:\\s*\\([\\d^)]{4}\\))*\\.\\S{2,4}$");
     private static final Pattern REGEXP_PATTERN_FOLDER_NAME_DISK_NUM = Pattern.compile("^CD(\\d+)$");
     private static final Pattern REGEXP_PATTERN_FILE_NAME_DISK_NUM = Pattern.compile("CD(\\d+)\\.");
 

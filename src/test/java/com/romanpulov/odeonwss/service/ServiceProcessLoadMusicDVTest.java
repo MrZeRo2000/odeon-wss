@@ -109,7 +109,7 @@ public class ServiceProcessLoadMusicDVTest {
                         Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"),
                         "02 Mandragora Scream - Vision They Shared.mkv",
                         Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 2 2006.mkv"),
-                        "03 Tapping The Vein - Butterfly (2000).mkv",
+                        "03 Tapping The Vein - Butterfly (Unsensored)(2000).mkv",
                         Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 2 2006.mkv")
                 )));
         FileTreeGenerator.generate(tempDirs.get(2), withArtistsAndTitle);
@@ -366,7 +366,7 @@ public class ServiceProcessLoadMusicDVTest {
 
         assertThat(tracks.get(2).getNum()).isEqualTo(3L);
         assertThat(tracks.get(2).getArtistName()).isNull();
-        assertThat(tracks.get(2).getTitle()).isEqualTo("Butterfly");
+        assertThat(tracks.get(2).getTitle()).isEqualTo("Butterfly (Unsensored)");
 
         // set artist for artifact for validation
         Artist artist = new Artist();

@@ -115,6 +115,26 @@ public class UnitNamesParserTest {
         assertThat(ntArtistTitle.getTitle()).isEqualTo("Time to move");
 
         assertThat(NamesParser.parseMusicVideoTrack("0101-Too much.avi")).isNull();
+
+        var ntBracketsAndYear = NamesParser.parseMusicVideoTrack("03 H-Blockx - Time to move (Special)(2003).mkv");
+        Assertions.assertNotNull(ntBracketsAndYear);
+        assertThat(ntBracketsAndYear.getNumber()).isEqualTo(3);
+        assertThat(ntBracketsAndYear.hasArtistName()).isTrue();
+        assertThat(ntBracketsAndYear.getArtistName()).isEqualTo("H-Blockx");
+        assertThat(ntBracketsAndYear.getTitle()).isEqualTo("Time to move (Special)");
+
+        var ntBracketsNoYear = NamesParser.parseMusicVideoTrack("03 H-Blockx - Time to move (Special).mkv");
+        Assertions.assertNotNull(ntBracketsNoYear);
+        assertThat(ntBracketsNoYear.getNumber()).isEqualTo(3);
+        assertThat(ntBracketsNoYear.hasArtistName()).isTrue();
+        assertThat(ntBracketsNoYear.getArtistName()).isEqualTo("H-Blockx");
+        assertThat(ntBracketsNoYear.getTitle()).isEqualTo("Time to move (Special)");
+
+        var ntIss214 = NamesParser.parseMusicVideoTrack("12 Blow Up The Outside World (Uncensored) (1996).mkv");
+        Assertions.assertNotNull(ntIss214);
+        assertThat(ntIss214.getNumber()).isEqualTo(12);
+        assertThat(ntIss214.hasArtistName()).isFalse();
+        assertThat(ntIss214.getTitle()).isEqualTo("Blow Up The Outside World (Uncensored)");
     }
 
     @Test
