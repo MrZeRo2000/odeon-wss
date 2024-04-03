@@ -15,8 +15,6 @@ import java.util.Optional;
 public interface ArtistRepository extends EntityDTORepository<Artist, ArtistDTO> {
     List<Artist> getAllByType(ArtistType type);
 
-    List<Artist> getAllByTypeOrderByName(ArtistType type);
-
     List<IdNameDTO> getByTypeOrderByName(ArtistType type);
 
     Optional<Artist> findFirstByTypeAndName(ArtistType type, String name);

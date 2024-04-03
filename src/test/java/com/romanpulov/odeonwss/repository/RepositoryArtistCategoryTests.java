@@ -87,7 +87,7 @@ public class RepositoryArtistCategoryTests {
                 new EntityArtistCategoryBuilder().withType(ArtistCategoryType.STYLE).withArtist(artist2).withName("Rap").build()
         );
 
-        List<Artist> artists = artistRepository.getAllByTypeOrderByName(ArtistType.ARTIST);
+        List<Artist> artists = artistRepository.getAllByType(ArtistType.ARTIST);
         Assertions.assertEquals(2, artists.size());
 
         List<ArtistCategory> artistCategories = artistCategoryRepository.findByOrderByArtistNameAsc();
@@ -99,7 +99,7 @@ public class RepositoryArtistCategoryTests {
 
         List<ArtistDTOImpl> acalDTOs = new ArrayList<>();
         acaDTOs.forEach(acaDTO -> {
-            if ((acalDTOs.size() == 0) || (!Objects.equals(acalDTOs.get(acalDTOs.size() - 1).getId(), acaDTO.getId()))) {
+            if ((acalDTOs.isEmpty()) || (!Objects.equals(acalDTOs.get(acalDTOs.size() - 1).getId(), acaDTO.getId()))) {
                 ArtistDTOImpl newArtistDTO = new ArtistDTOImpl();
                 newArtistDTO.setId(acaDTO.getId());
                 newArtistDTO.setArtistName(acaDTO.getArtistName());
