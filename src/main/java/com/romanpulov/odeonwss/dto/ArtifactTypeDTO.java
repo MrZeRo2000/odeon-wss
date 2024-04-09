@@ -7,4 +7,5 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 @JsonDeserialize(as = ArtifactTypeDTOImpl.class)
 public interface ArtifactTypeDTO extends BaseEntityDTO {
     String getName();
+    String getMediaFileFormats();
 }

@@ -21,7 +21,7 @@ public class PathReader {
         }
     }
 
-    private static boolean readPath(
+    public static boolean readPath(
             Path path,
             Predicate<Path> filterPath,
             ReadRule filterRule,

@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.dto;
 public class ArtifactTypeDTOImpl implements ArtifactTypeDTO {
     Long id;
     String name;
+    String mediaFileFormats;
 
     @Override
     public Long getId() {
@@ -24,10 +25,20 @@ public class ArtifactTypeDTOImpl implements ArtifactTypeDTO {
     }
 
     @Override
+    public String getMediaFileFormats() {
+        return mediaFileFormats;
+    }
+
+    public void setMediaFileFormats(String mediaFileFormats) {
+        this.mediaFileFormats = mediaFileFormats;
+    }
+
+    @Override
     public String toString() {
         return "ArtifactTypeDTOImpl{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
+                "id=" + getId() +
+                ", name='" + getName() + '\'' +
+                ", mediaFileFormats='" + getMediaFileFormats() + '\'' +
                 '}';
     }
 }

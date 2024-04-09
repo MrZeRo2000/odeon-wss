@@ -1,7 +1,9 @@
 package com.romanpulov.odeonwss.repository;
 
+import com.romanpulov.odeonwss.dto.ArtifactTypeDTO;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,4 +54,14 @@ public interface ArtifactTypeRepository extends CrudRepository<ArtifactType, Lon
                 .orElseThrow()
                 .equals(200L);
     }
+
+    @Query(value = """
+        SELECT
+          at.id AS id,
+          at.name AS name,
+          at.mediaFileFormats as mediaFileFormats
+        FROM ArtifactType at
+        WHERE at.id = :id
+    """)
+    Optional<ArtifactTypeDTO> findDTOById(long id);
 }

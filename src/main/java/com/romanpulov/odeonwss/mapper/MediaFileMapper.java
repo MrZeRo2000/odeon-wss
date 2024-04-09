@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.jutilscore.io.FileUtils;
 import com.romanpulov.odeonwss.dto.ExtraDTO;
 import com.romanpulov.odeonwss.dto.MediaFileDTO;
+import com.romanpulov.odeonwss.dto.MediaFileDTOImpl;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.utils.media.model.MediaFileInfo;
@@ -108,5 +109,21 @@ public class MediaFileMapper implements EntityDTOMapper<MediaFile, MediaFileDTO>
         } else {
             return List.of();
         }
+    }
+
+    public MediaFileDTO toDTO(MediaFile entity) {
+        MediaFileDTOImpl dto = new MediaFileDTOImpl();
+
+        // attributes only
+        dto.setName(entity.getName());
+        dto.setFormat(entity.getFormat());
+        dto.setSize(entity.getSize());
+        dto.setBitrate(entity.getBitrate());
+        dto.setDuration(entity.getDuration());
+        dto.setWidth(entity.getWidth());
+        dto.setHeight(entity.getHeight());
+        dto.setExtra(entity.getExtra());
+
+        return dto;
     }
 }
