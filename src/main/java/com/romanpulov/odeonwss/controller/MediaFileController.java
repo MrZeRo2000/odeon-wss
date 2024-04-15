@@ -1,8 +1,10 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.dto.MediaFileDTO;
+import com.romanpulov.odeonwss.dto.TextDTO;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
+import com.romanpulov.odeonwss.exception.WrongParameterValueException;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import com.romanpulov.odeonwss.service.MediaFileService;
 import org.springframework.http.MediaType;
@@ -30,5 +32,17 @@ public class MediaFileController
     ResponseEntity<List<MediaFileDTO>> getTableIdNameDuration(@PathVariable Long artifactId)
             throws CommonEntityNotFoundException {
         return ResponseEntity.ok(service.getTableIdNameDuration(artifactId));
+    }
+
+    @GetMapping("/table-files/{artifactId}")
+    ResponseEntity<List<TextDTO>> getTableFiles(@PathVariable Long artifactId) throws CommonEntityNotFoundException {
+        return ResponseEntity.ok(service.getMediaFiles(artifactId));
+    }
+
+    @GetMapping("/file-attributes")
+    ResponseEntity<MediaFileDTO> getMediaFileAttributes(
+            @RequestParam Long artifactId, @RequestParam String mediaFileName)
+            throws CommonEntityNotFoundException, WrongParameterValueException {
+        return ResponseEntity.ok(service.getMediaFileAttributes(artifactId, mediaFileName));
     }
 }

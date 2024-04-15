@@ -170,6 +170,23 @@ public class ControllerMediaFileTest {
                 .andExpect(status().isOk())
                 .andReturn();
         logger.info("result 31:" + result31.getResponse().getContentAsString());
+
+        Artist artist10 = artistRepository.save(
+                new EntityArtistBuilder()
+                        .withType(ArtistType.ARTIST)
+                        .withName("Tori Amos")
+                        .build()
+        );
+
+        artifactRepository.save(
+                new EntityArtifactBuilder()
+                        .withArtist(artist10)
+                        .withArtifactType(artifactTypeRepository.getWithDVMusic())
+                        .withTitle("Tori Amos - Fade to Red 2006")
+                        .withYear(2002L)
+                        .withDuration(12345L)
+                        .build()
+        );
     }
 
     @Test
@@ -255,6 +272,52 @@ public class ControllerMediaFileTest {
                 .andExpect(jsonPath("$[0].name", Matchers.is("Name 11")))
                 .andExpect(jsonPath("$[0].duration", Matchers.is(52345)))
                 .andExpect(jsonPath("$[0].size").doesNotExist())
+        ;
+    }
+
+    @Test
+    @Order(5)
+    void testGetTableFiles() throws Exception {
+        this.mockMvc.perform(get("/api/media-file/table-files/4")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].text", Matchers.is("Tori Amos - Fade to Red Disk 1 2006.mkv")))
+                .andExpect(jsonPath("$[1].text", Matchers.is("Tori Amos - Fade to Red Disk 2 2006.mkv")))
+        ;
+    }
+
+    @Test
+    @Order(5)
+    void testGetMediaFileAttributes() throws Exception {
+        this.mockMvc.perform(get("/api/media-file/file-attributes")
+                        .param("artifactId", "99")
+                        .param("mediaFileName", "Tori Amos - Fade to Red Disk 1 2006.mkv")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+        ;
+
+        this.mockMvc.perform(get("/api/media-file/file-attributes")
+                        .param("artifactId", "4")
+                        .param("mediaFileName", "Tori Amos - Fade to Red Disk 1 2006.mkv1")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+        ;
+
+        this.mockMvc.perform(get("/api/media-file/file-attributes")
+                        .param("artifactId", "4")
+                        .param("mediaFileName", "Tori Amos - Fade to Red Disk 1 2006.mkv")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", Matchers.is("Tori Amos - Fade to Red Disk 1 2006.mkv")))
+                .andExpect(jsonPath("$.format", Matchers.is("MKV")))
+                .andExpect(jsonPath("$.size", Matchers.is(3032593)))
+                .andExpect(jsonPath("$.bitrate", Matchers.is(600)))
+                .andExpect(jsonPath("$.duration", Matchers.is(38)))
+                .andExpect(jsonPath("$.width", Matchers.is(1280)))
+                .andExpect(jsonPath("$.height", Matchers.is(720)))
+                .andExpect(jsonPath("$.extra").doesNotExist())
         ;
     }
 }
