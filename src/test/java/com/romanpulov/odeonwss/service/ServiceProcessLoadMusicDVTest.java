@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -69,7 +70,7 @@ public class ServiceProcessLoadMusicDVTest {
     public void setup() throws Exception {
         log.info("Before all");
         tempDirs = Stream
-                .of("WithoutParcelable", "WithTitlesNoArtist", "WithArtistsAndTitle")
+                .of("WithoutParcelable", "WithTitlesNoArtist", "WithArtistsAndTitle", "WithArtifactArtistVariableLength")
                 .map(v -> {
                     try {
                         return Files.createTempDirectory(v);
@@ -113,6 +114,18 @@ public class ServiceProcessLoadMusicDVTest {
                         Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 2 2006.mkv")
                 )));
         FileTreeGenerator.generate(tempDirs.get(2), withArtistsAndTitle);
+
+        var withArtifactArtistVariableLength = new ArrayList<FileTreeGenerator.FolderDef>();
+        withArtifactArtistVariableLength.add(new FileTreeGenerator.FolderDef(
+                "Black Sabbath - Videos",
+                Map.of(
+                        "01 Paranoid.mkv",
+                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"),
+                        "02 Iron Man.mkv",
+                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv")
+                )
+        ));
+        FileTreeGenerator.generate(tempDirs.get(3), withArtifactArtistVariableLength);
     }
 
     @AfterAll
@@ -126,7 +139,7 @@ public class ServiceProcessLoadMusicDVTest {
     }
 
     private void prepareArtists() {
-        Arrays.asList("The Cure", "Tori Amos", "Various Artists", "Nightwish", "Mandragora Scream").forEach(s ->
+        Arrays.asList("The Cure", "Tori Amos", "Various Artists", "Nightwish", "Mandragora Scream", "Black", "Black Sabbath").forEach(s ->
                 artistRepository.save(
                         new EntityArtistBuilder()
                                 .withType(ArtistType.ARTIST)
@@ -379,4 +392,30 @@ public class ServiceProcessLoadMusicDVTest {
         assertThat(validatePi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
     }
 
+    @Test
+    @Sql({"/schema.sql", "/data.sql"})
+    @Order(12)
+    @Rollback(value = false)
+    void testWithArtifactArtistVariableLength() {
+        prepareArtists();
+
+        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get(3).toString());
+        var pi = processService.getProcessInfo();
+
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+
+        var artists = artistRepository.findAll();
+        var artist = StreamSupport
+                .stream(artists.spliterator(), false)
+                .filter(a -> a.getName().equals("Black Sabbath"))
+                .findFirst()
+                .orElseThrow();
+
+        var artifacts = artifactRepository.findAll();
+        assertThat(artifacts.size()).isEqualTo(1);
+        assertThat(artifacts.get(0).getTitle()).isEqualTo("Black Sabbath - Videos");
+        var artifactArtist = artifacts.get(0).getArtist();
+        assertThat(artifactArtist).isNotNull();
+        assertThat(Optional.ofNullable(artifactArtist).orElseThrow().getId()).isEqualTo(artist.getId());
+    }
 }

@@ -11,6 +11,7 @@ import com.romanpulov.odeonwss.service.processor.ProcessorException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,6 +20,21 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class PathProcessUtil {
+
+    private static Artist getArtistFromArtifactName(String artifactName, Map<String, Long> artists) {
+        return artists
+                .entrySet()
+                .stream()
+                .filter(v -> artifactName.startsWith(v.getKey()))
+                .min(Map.Entry.comparingByKey(Comparator.reverseOrder()))
+                .map(v -> {
+                    Artist result = new Artist();
+                    result.setId(v.getValue());
+                    return result;
+                })
+                .orElse(null);
+    }
+
     public static int processArtifactsPath(
             AbstractProcessor processor,
             Path path,
@@ -54,15 +70,8 @@ public class PathProcessUtil {
                         Artifact artifact = new Artifact();
                         artifact.setArtifactType(artifactType);
 
-                        // looking for artist name
                         if (artists != null) {
-                            for (Map.Entry<String, Long> artistEntry: artists.entrySet()) {
-                                if (artifactName.startsWith(artistEntry.getKey())) {
-                                    Artist artist = new Artist();
-                                    artist.setId(artistEntry.getValue());
-                                    artifact.setArtist(artist);
-                                }
-                            }
+                            artifact.setArtist(PathProcessUtil.getArtistFromArtifactName(artifactName, artists));
                         }
 
                         artifact.setTitle(artifactName);
