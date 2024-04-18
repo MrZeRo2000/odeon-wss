@@ -23,8 +23,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -65,7 +63,7 @@ public class ServiceProcessLoadMusicDVTest {
         return processService.getProcessInfo();
     }
 
-    private Map<String, Path> tempDirs = new HashMap<>();
+    private final Map<String, Path> tempDirs = new HashMap<>();
 
     @BeforeAll
     public void setup() throws Exception {
@@ -122,6 +120,19 @@ public class ServiceProcessLoadMusicDVTest {
         ));
         tempDirs.put("WithArtifactArtistVariableLength", Files.createTempDirectory("WithArtifactArtistVariableLength"));
         FileTreeGenerator.generate(tempDirs.get("WithArtifactArtistVariableLength"), withArtifactArtistVariableLength);
+
+        var withArtifactInvalidPathCharacter = new ArrayList<FileTreeGenerator.FolderDef>();
+        withArtifactInvalidPathCharacter.add(new FileTreeGenerator.FolderDef(
+                "Therapy - Videos",
+                Map.of(
+                        "01 Isolation.mkv",
+                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"),
+                        "02 Happy People Have No Stories.mkv",
+                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv")
+                )
+        ));
+        tempDirs.put("withArtifactInvalidPathCharacter", Files.createTempDirectory("withArtifactInvalidPathCharacter"));
+        FileTreeGenerator.generate(tempDirs.get("withArtifactInvalidPathCharacter"), withArtifactInvalidPathCharacter);
     }
 
     @AfterAll
@@ -135,7 +146,7 @@ public class ServiceProcessLoadMusicDVTest {
     }
 
     private void prepareArtists() {
-        Arrays.asList("The Cure", "Tori Amos", "Various Artists", "Nightwish", "Mandragora Scream", "Black", "Black Sabbath", "Therapy?").forEach(s ->
+        Arrays.asList("The Cure", "Tori Amos", "Various Artists", "Nightwish", "Mandragora Scream", "Black", "Black Sabbath", "Therapy").forEach(s ->
                 artistRepository.save(
                         new EntityArtistBuilder()
                                 .withType(ArtistType.ARTIST)
@@ -410,6 +421,34 @@ public class ServiceProcessLoadMusicDVTest {
         var artifacts = artifactRepository.findAll();
         assertThat(artifacts.size()).isEqualTo(1);
         assertThat(artifacts.get(0).getTitle()).isEqualTo("Black Sabbath - Videos");
+        var artifactArtist = artifacts.get(0).getArtist();
+        assertThat(artifactArtist).isNotNull();
+        assertThat(Optional.ofNullable(artifactArtist).orElseThrow().getId()).isEqualTo(artist.getId());
+    }
+
+    @Test
+    @Sql({"/schema.sql", "/data.sql"})
+    @Order(13)
+    @Rollback(value = false)
+    @Disabled("Postponed because Therapy is written without a question mark")
+    void testWithArtifactInvalidPathCharacter() {
+        prepareArtists();
+
+        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get("withArtifactInvalidPathCharacter").toString());
+        var pi = processService.getProcessInfo();
+
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+
+        var artists = artistRepository.findAll();
+        var artist = StreamSupport
+                .stream(artists.spliterator(), false)
+                .filter(a -> a.getName().equals("Therapy"))
+                .findFirst()
+                .orElseThrow();
+
+        var artifacts = artifactRepository.findAll();
+        assertThat(artifacts.size()).isEqualTo(1);
+        assertThat(artifacts.get(0).getTitle()).isEqualTo("Therapy - Videos");
         var artifactArtist = artifacts.get(0).getArtist();
         assertThat(artifactArtist).isNotNull();
         assertThat(Optional.ofNullable(artifactArtist).orElseThrow().getId()).isEqualTo(artist.getId());
