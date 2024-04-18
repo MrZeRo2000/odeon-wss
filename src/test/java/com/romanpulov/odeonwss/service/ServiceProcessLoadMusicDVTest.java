@@ -70,16 +70,6 @@ public class ServiceProcessLoadMusicDVTest {
     @BeforeAll
     public void setup() throws Exception {
         log.info("Before all");
-        tempDirs = Stream
-                .of("WithoutParcelable", "WithTitlesNoArtist", "WithArtistsAndTitle", "WithArtifactArtistVariableLength")
-                .map(v -> {
-                    try {
-                        return Map.entry(v, Files.createTempDirectory(v));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (x, y) -> y, HashMap::new));
 
         var withoutParcelableFolderDefs = new ArrayList<FileTreeGenerator.FolderDef>();
         withoutParcelableFolderDefs.add(new FileTreeGenerator.FolderDef(
@@ -90,6 +80,7 @@ public class ServiceProcessLoadMusicDVTest {
                         "Tori Amos - Fade to Red Disk 2 2006.mkv",
                         Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv")
                 )));
+        tempDirs.put("WithoutParcelable", Files.createTempDirectory("WithoutParcelable"));
         FileTreeGenerator.generate(tempDirs.get("WithoutParcelable"), withoutParcelableFolderDefs);
 
         var withoutTitlesNoArtist = new ArrayList<FileTreeGenerator.FolderDef>();
@@ -101,6 +92,8 @@ public class ServiceProcessLoadMusicDVTest {
                         "02 Never Enough.mkv",
                         Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv")
                 )));
+
+        tempDirs.put("WithTitlesNoArtist", Files.createTempDirectory("WithTitlesNoArtist"));
         FileTreeGenerator.generate(tempDirs.get("WithTitlesNoArtist"), withoutTitlesNoArtist);
 
         var withArtistsAndTitle = new ArrayList<FileTreeGenerator.FolderDef>();
@@ -114,6 +107,7 @@ public class ServiceProcessLoadMusicDVTest {
                         "03 Tapping The Vein - Butterfly (Unsensored)(2000).mkv",
                         Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 2 2006.mkv")
                 )));
+        tempDirs.put("WithArtistsAndTitle", Files.createTempDirectory("WithArtistsAndTitle"));
         FileTreeGenerator.generate(tempDirs.get("WithArtistsAndTitle"), withArtistsAndTitle);
 
         var withArtifactArtistVariableLength = new ArrayList<FileTreeGenerator.FolderDef>();
@@ -126,6 +120,7 @@ public class ServiceProcessLoadMusicDVTest {
                         Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv")
                 )
         ));
+        tempDirs.put("WithArtifactArtistVariableLength", Files.createTempDirectory("WithArtifactArtistVariableLength"));
         FileTreeGenerator.generate(tempDirs.get("WithArtifactArtistVariableLength"), withArtifactArtistVariableLength);
     }
 
