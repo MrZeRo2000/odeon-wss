@@ -272,4 +272,4 @@ CREATE TABLE artifact_tags(
     atft_upd_datm INTEGER NOT NULL
 );
 
-CREATE INDEX idx_artifact_tags_artf_id ON artifact_tags(artf_id);
+CREATE UNIQUE INDEX idx_artifact_tags_artf_id_atft_name ON artifact_tags(artf_id, atft_name);
