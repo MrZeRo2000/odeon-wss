@@ -91,14 +91,16 @@ public interface ArtifactRepository
           a.year AS year,
           a.duration AS duration,
           a.size AS size,
+          atg.name AS tagName,
           a.insertDateTime AS insertDateTime
         FROM Artifact as a
         INNER JOIN ArtifactType as at ON a.artifactType = at
         LEFT OUTER JOIN Artist as ar ON a.artist = ar
         LEFT OUTER JOIN Artist as par ON a.performerArtist = par
+        LEFT OUTER JOIN ArtifactTag atg ON a = atg.artifact
         WHERE (at.parentId = 200 OR ar.type IS NULL OR ar.type=:artistType)
         AND a.artifactType.id IN (:artifactTypeIds)
-        ORDER BY ar.name, a.year, a.title
+        ORDER BY ar.name, a.year, a.title, atg.name
     """)
     List<ArtifactFlatDTO> findAllFlatDTOByArtistTypeAndArtifactTypeIds(ArtistType artistType, List<Long> artifactTypeIds);
 

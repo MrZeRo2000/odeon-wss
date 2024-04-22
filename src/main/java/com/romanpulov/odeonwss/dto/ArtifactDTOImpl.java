@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ArtifactDTOImpl implements ArtifactDTO {
     Long id;
@@ -11,6 +12,7 @@ public class ArtifactDTOImpl implements ArtifactDTO {
     Long year;
     Long duration;
     Long size;
+    List<String> tags;
     LocalDateTime insertDateTime;
 
     public static ArtifactDTOImpl fromArtifactDTO(ArtifactDTO dto) {
@@ -23,6 +25,7 @@ public class ArtifactDTOImpl implements ArtifactDTO {
         instance.setYear(dto.getYear());
         instance.setDuration(dto.getDuration());
         instance.setSize(dto.getSize());
+        instance.setTags(dto.getTags());
         instance.setInsertDateTime(dto.getInsertDateTime());
 
         return instance;
@@ -102,6 +105,15 @@ public class ArtifactDTOImpl implements ArtifactDTO {
     }
 
     @Override
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    @Override
     public LocalDateTime getInsertDateTime() {
         return insertDateTime;
     }
@@ -113,15 +125,16 @@ public class ArtifactDTOImpl implements ArtifactDTO {
     @Override
     public String toString() {
         return "ArtifactDTOImpl{" +
-                "id=" + id +
-                ", artifactType=" + artifactType +
-                ", artist=" + artist +
-                ", performerArtist=" + performerArtist +
-                ", title='" + title + '\'' +
-                ", year=" + year +
-                ", duration=" + duration +
-                ", size=" + size +
-                ", insertDateTime=" + insertDateTime +
+                "id=" + getId() +
+                ", artifactType=" + getArtifactType() +
+                ", artist=" + getArtist() +
+                ", performerArtist=" + getPerformerArtist() +
+                ", title='" + getTitle() + '\'' +
+                ", year=" + getYear() +
+                ", duration=" + getDuration() +
+                ", size=" + getSize() +
+                ", tags=" + getTags() +
+                ", insertDateTime=" + getInsertDateTime() +
                 '}';
     }
 }

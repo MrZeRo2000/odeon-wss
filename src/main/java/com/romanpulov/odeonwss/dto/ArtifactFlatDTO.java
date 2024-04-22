@@ -23,5 +23,6 @@ public interface ArtifactFlatDTO {
     Long getYear();
     Long getDuration();
     Long getSize();
+    String getTagName();
     LocalDateTime getInsertDateTime();
 }

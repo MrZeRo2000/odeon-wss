@@ -1,9 +1,6 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityTrackBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.dto.ArtifactFlatDTO;
 import com.romanpulov.odeonwss.entity.*;
 import jakarta.transaction.Transactional;
@@ -33,6 +30,9 @@ public class RepositoryArtifactTests {
 
     @Autowired
     ArtifactRepository artifactRepository;
+
+    @Autowired
+    ArtifactTagRepository artifactTagRepository;
 
     @Autowired
     TrackRepository trackRepository;
@@ -307,5 +307,45 @@ public class RepositoryArtifactTests {
                         List.of(ArtistType.ARTIST.getCode()),
                         List.of(artifactTypeRepository.getWithDVMusic().getId()))
                 .size()).isEqualTo(0);
+    }
+
+    @Test
+    @Order(12)
+    void testArtifactTags() {
+        var artifact = artifactRepository.save(
+            new EntityArtifactBuilder()
+                    .withArtifactType(artifactTypeRepository.getWithDVMovies())
+                    .withTitle("Title with tags")
+                    .withDuration(5000L)
+                    .build()
+        );
+
+        var tagRed = artifactTagRepository.save(
+            new EntityArtifactTagBuilder()
+                    .withArtifact(artifact)
+                    .withName("Red")
+                    .build()
+        );
+
+        var tagGreen = artifactTagRepository.save(
+            new EntityArtifactTagBuilder()
+                    .withArtifact(artifact)
+                    .withName("Green")
+                    .build()
+        );
+
+        var att = artifactRepository.findAllFlatDTOByArtistTypeAndArtifactTypeIds(
+                ArtistType.ARTIST,
+                List.of(artifactTypeRepository.getWithDVMovies().getId()))
+                .stream()
+                .filter(a -> a.getId().equals(artifact.getId()))
+                .toList();
+        assertThat(att).isNotNull();
+        assertThat(att.size()).isEqualTo(2);
+        assertThat(att.get(0).getTitle()).isEqualTo("Title with tags");
+        assertThat(att.get(1).getTitle()).isEqualTo("Title with tags");
+
+        assertThat(att.get(0).getTagName()).isEqualTo(tagGreen.getName());
+        assertThat(att.get(1).getTagName()).isEqualTo(tagRed.getName());
     }
 }
