@@ -118,6 +118,17 @@ public class Artifact extends AbstractBaseMigratedEntity {
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "artifact", fetch = FetchType.LAZY)
     private List<MediaFile> mediaFiles;
 
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "artifact", fetch = FetchType.LAZY)
+    private List<ArtifactTag> artifactTags;
+
+    public List<ArtifactTag> getArtifactTags() {
+        return artifactTags;
+    }
+
+    public void setArtifactTags(List<ArtifactTag> artifactTags) {
+        this.artifactTags = artifactTags;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -261,3 +261,15 @@ CREATE TABLE process_detail_actions(
     prda_type TEXT NOT NULL,
     prda_value TEXT NOT NULL
 );
+
+DROP TABLE IF EXISTS artifact_tags;
+
+CREATE TABLE artifact_tags(
+    atft_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    artf_id INTEGER NOT NULL,
+    atft_name TEXT NOT NULL,
+    atft_ins_datm INTEGER NOT NULL,
+    atft_upd_datm INTEGER NOT NULL
+);
+
+CREATE INDEX idx_artifact_tags_artf_id ON artifact_tags(artf_id);
