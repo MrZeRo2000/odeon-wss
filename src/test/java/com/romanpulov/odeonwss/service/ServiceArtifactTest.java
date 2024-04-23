@@ -17,6 +17,8 @@ import org.springframework.test.context.jdbc.Sql;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceArtifactTest {
@@ -85,13 +87,11 @@ public class ServiceArtifactTest {
     @Test
     @Order(3)
     void testInsertWithoutTitleShouldFail() {
-        Assertions.assertThrows(Exception.class, () -> {
-            artifactService.insert(new ArtifactDTOBuilder()
-                    .withArtist(artistRepository.findDTOById(1L).orElseThrow())
-                    .withArtifactTypeId(artifactTypeRepository.getWithMP3().getId())
-                    .build()
-            );
-        });
+        Assertions.assertThrows(Exception.class, () -> artifactService.insert(new ArtifactDTOBuilder()
+                .withArtist(artistRepository.findDTOById(1L).orElseThrow())
+                .withArtifactTypeId(artifactTypeRepository.getWithMP3().getId())
+                .build()
+        ));
     }
 
     @Test
@@ -114,5 +114,28 @@ public class ServiceArtifactTest {
                 .withId(888L)
                 .build();
         Assertions.assertThrows(CommonEntityNotFoundException.class, () -> artifactService.update(aed));
+    }
+
+    @Test
+    @Order(5)
+    void testArtifactWithTags() throws Exception {
+        long artifactTypeId = artifactTypeRepository.getWithDVMovies().getId();
+        var artifact = artifactService.insert(
+            new ArtifactDTOBuilder()
+                    .withArtifactTypeId(artifactTypeId)
+                    .withTitle("Artifact with tags")
+                    .withTags(List.of("Yellow", "Green"))
+                    .build()
+        );
+
+        var dto = artifactService.getTable(ArtistType.ARTIST, List.of(artifactTypeId))
+                .stream()
+                .filter(v -> v.getId().equals(artifact.getId()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(dto.getTags().size()).isEqualTo(2);
+        assertThat(dto.getTags().get(0)).isEqualTo("Green");
+        assertThat(dto.getTags().get(1)).isEqualTo("Yellow");
     }
 }

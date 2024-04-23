@@ -13,9 +13,9 @@ public class ArtistTransformer {
 
         for (ArtistFlatDTO row: rs) {
             Long id = row.getId();
-            ArtistDTOImpl dto = Optional.ofNullable(artistDTOMap.get(id)).orElseGet(() -> {
+            ArtistDTOImpl dto = artistDTOMap.computeIfAbsent(id, new_id -> {
                 ArtistDTOImpl newDTO = new ArtistDTOImpl();
-                newDTO.setId(id);
+                newDTO.setId(new_id);
                 newDTO.setArtistName(row.getArtistName());
                 if (row.getArtistTypeCode() != null) {
                     newDTO.setArtistType(ArtistType.fromCode(row.getArtistTypeCode()));
@@ -26,7 +26,6 @@ public class ArtistTransformer {
                 newDTO.setArtistBiography(row.getArtistBiography());
                 newDTO.setHasLyrics(TransformRules.booleanFromLong(row.getHasLyrics()));
 
-                artistDTOMap.put(id, newDTO);
                 return newDTO;
             });
 

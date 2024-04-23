@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ArtifactDTOImpl implements ArtifactDTO {
@@ -12,7 +13,7 @@ public class ArtifactDTOImpl implements ArtifactDTO {
     Long year;
     Long duration;
     Long size;
-    List<String> tags;
+    List<String> tags = new ArrayList<>();
     LocalDateTime insertDateTime;
 
     public static ArtifactDTOImpl fromArtifactDTO(ArtifactDTO dto) {

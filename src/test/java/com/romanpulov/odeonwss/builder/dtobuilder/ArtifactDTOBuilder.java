@@ -5,6 +5,8 @@ import com.romanpulov.odeonwss.dto.ArtifactDTOImpl;
 import com.romanpulov.odeonwss.dto.ArtifactTypeDTO;
 import com.romanpulov.odeonwss.dto.ArtistDTO;
 
+import java.util.List;
+
 public class ArtifactDTOBuilder extends AbstractClassBuilder<ArtifactDTOImpl> {
 
     public ArtifactDTOBuilder() {
@@ -54,6 +56,11 @@ public class ArtifactDTOBuilder extends AbstractClassBuilder<ArtifactDTOImpl> {
 
     public ArtifactDTOBuilder withSize(long size) {
         instance.setSize(size);
+        return this;
+    }
+
+    public ArtifactDTOBuilder withTags(List<String> tags) {
+        instance.setTags(tags);
         return this;
     }
 }

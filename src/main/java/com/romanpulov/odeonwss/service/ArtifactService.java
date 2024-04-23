@@ -4,10 +4,14 @@ import com.romanpulov.odeonwss.dto.ArtifactDTO;
 import com.romanpulov.odeonwss.dto.ArtifactTransformer;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtistType;
+import com.romanpulov.odeonwss.exception.CommonEntityAlreadyExistsException;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.ArtifactMapper;
+import com.romanpulov.odeonwss.mapper.ArtifactTagMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
+import com.romanpulov.odeonwss.repository.ArtifactTagRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,14 +22,20 @@ public class ArtifactService
         implements EditableObjectService<ArtifactDTO> {
 
     private final ArtifactTransformer artifactTransformer;
+    private final ArtifactTagRepository artifactTagRepository;
+    private final ArtifactTagMapper artifactTagMapper;
 
     public ArtifactService(
             ArtifactRepository artifactRepository,
             ArtifactMapper artifactMapper,
             ArtifactTransformer artifactTransformer,
-            ArtistRepository artistRepository) {
+            ArtistRepository artistRepository,
+            ArtifactTagRepository artifactTagRepository,
+            ArtifactTagMapper artifactTagMapper) {
         super(artifactRepository, artifactMapper);
         this.artifactTransformer = artifactTransformer;
+        this.artifactTagRepository = artifactTagRepository;
+        this.artifactTagMapper = artifactTagMapper;
 
         this.setOnBeforeSaveEntityHandler(entity -> {
             if ((entity.getArtist() != null)
@@ -42,6 +52,18 @@ public class ArtifactService
                 throw new CommonEntityNotFoundException("Artist", entity.getPerformerArtist().getId());
             }
         });
+    }
+
+    @Transactional
+    @Override
+    public ArtifactDTO insert(ArtifactDTO dto) throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException {
+        ArtifactDTO result = super.insert(dto);
+
+        if (dto.getTags() != null && !dto.getTags().isEmpty()) {
+            artifactTagRepository.saveAll(artifactTagMapper.createFromArtifactDTO(repository.findById(result.getId()).orElseThrow(), dto));
+        }
+
+        return result;
     }
 
     @Override

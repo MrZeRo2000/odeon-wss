@@ -334,6 +334,11 @@ public class RepositoryArtifactTests {
                     .build()
         );
 
+        var atg = artifactTagRepository.findAllFlatDTOByArtifactId(artifact.getId());
+        assertThat(atg.size()).isEqualTo(2);
+        assertThat(atg.get(0).getName()).isEqualTo("Green");
+        assertThat(atg.get(1).getName()).isEqualTo("Red");
+
         var att = artifactRepository.findAllFlatDTOByArtistTypeAndArtifactTypeIds(
                 ArtistType.ARTIST,
                 List.of(artifactTypeRepository.getWithDVMovies().getId()))
