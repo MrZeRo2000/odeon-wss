@@ -3,8 +3,10 @@ package com.romanpulov.odeonwss.mapper;
 import com.romanpulov.odeonwss.dto.ArtifactDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtifactTag;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
 
 @Component
@@ -22,4 +24,6 @@ public class ArtifactTagMapper {
                 })
                 .toList();
     }
+
+    //public Pair<Collection<ArtifactTag>, Collection<ArtifactTag>> mergeTags(Artifact entity, ArtifactDTO dto) {}
 }

@@ -1,6 +1,6 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.romanpulov.odeonwss.dto.ArtifactTagDTO;
+import com.romanpulov.odeonwss.dto.ArtifactTagFlatDTO;
 import com.romanpulov.odeonwss.entity.ArtifactTag;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -18,5 +18,5 @@ public interface ArtifactTagRepository extends CrudRepository<ArtifactTag, Long>
         WHERE atg.artifact.id = :artifactId
         ORDER BY atg.name
     """)
-    List<ArtifactTagDTO> findAllFlatDTOByArtifactId(Long artifactId);
+    List<ArtifactTagFlatDTO> findAllFlatDTOByArtifactId(Long artifactId);
 }

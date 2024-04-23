@@ -22,20 +22,14 @@ public class ArtifactService
         implements EditableObjectService<ArtifactDTO> {
 
     private final ArtifactTransformer artifactTransformer;
-    private final ArtifactTagRepository artifactTagRepository;
-    private final ArtifactTagMapper artifactTagMapper;
 
     public ArtifactService(
             ArtifactRepository artifactRepository,
             ArtifactMapper artifactMapper,
             ArtifactTransformer artifactTransformer,
-            ArtistRepository artistRepository,
-            ArtifactTagRepository artifactTagRepository,
-            ArtifactTagMapper artifactTagMapper) {
+            ArtistRepository artistRepository) {
         super(artifactRepository, artifactMapper);
         this.artifactTransformer = artifactTransformer;
-        this.artifactTagRepository = artifactTagRepository;
-        this.artifactTagMapper = artifactTagMapper;
 
         this.setOnBeforeSaveEntityHandler(entity -> {
             if ((entity.getArtist() != null)
@@ -52,18 +46,6 @@ public class ArtifactService
                 throw new CommonEntityNotFoundException("Artist", entity.getPerformerArtist().getId());
             }
         });
-    }
-
-    @Transactional
-    @Override
-    public ArtifactDTO insert(ArtifactDTO dto) throws CommonEntityAlreadyExistsException, CommonEntityNotFoundException {
-        ArtifactDTO result = super.insert(dto);
-
-        if (dto.getTags() != null && !dto.getTags().isEmpty()) {
-            artifactTagRepository.saveAll(artifactTagMapper.createFromArtifactDTO(repository.findById(result.getId()).orElseThrow(), dto));
-        }
-
-        return result;
     }
 
     @Override

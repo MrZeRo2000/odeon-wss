@@ -137,5 +137,18 @@ public class ServiceArtifactTest {
         assertThat(dto.getTags().size()).isEqualTo(2);
         assertThat(dto.getTags().get(0)).isEqualTo("Green");
         assertThat(dto.getTags().get(1)).isEqualTo("Yellow");
+
+        dto.getTags().remove(1);
+        dto.getTags().add("Brown");
+        artifactService.update(dto);
+
+        var updatedDTO = artifactService.getTable(ArtistType.ARTIST, List.of(artifactTypeId))
+                .stream()
+                .filter(v -> v.getId().equals(artifact.getId()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(updatedDTO.getTags().size()).isEqualTo(2);
+        assertThat(updatedDTO.getTags().get(0)).isEqualTo("Brown");
+        assertThat(updatedDTO.getTags().get(1)).isEqualTo("Green");
     }
 }

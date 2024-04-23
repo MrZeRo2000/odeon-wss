@@ -3,11 +3,7 @@ package com.romanpulov.odeonwss.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import java.util.List;
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonDeserialize(as = ArtifactTagDTOImpl.class)
-public interface ArtifactTagDTO {
+public interface ArtifactTagFlatDTO extends BaseEntityDTO {
     Long getArtifactId();
-    List<String> getNames();
+    String getName();
 }
