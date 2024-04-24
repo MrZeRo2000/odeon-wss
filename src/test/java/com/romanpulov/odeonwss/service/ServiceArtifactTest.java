@@ -124,8 +124,14 @@ public class ServiceArtifactTest {
             new ArtifactDTOBuilder()
                     .withArtifactTypeId(artifactTypeId)
                     .withTitle("Artifact with tags")
-                    .withTags(List.of("Yellow", "Green"))
                     .build()
+        );
+
+        var artifactTags = artifactService.updateTags(
+                new ArtifactDTOBuilder()
+                        .withId(artifact.getId())
+                        .withTags(List.of("Green", "Yellow", "Blue"))
+                        .build()
         );
 
         var dto = artifactService.getTable(ArtistType.ARTIST, List.of(artifactTypeId))
@@ -134,21 +140,38 @@ public class ServiceArtifactTest {
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(dto.getTags().size()).isEqualTo(2);
-        assertThat(dto.getTags().get(0)).isEqualTo("Green");
-        assertThat(dto.getTags().get(1)).isEqualTo("Yellow");
+        assertThat(dto.getTags().size()).isEqualTo(3);
+        assertThat(dto.getTags().get(0)).isEqualTo("Blue");
+        assertThat(dto.getTags().get(1)).isEqualTo("Green");
+        assertThat(dto.getTags().get(2)).isEqualTo("Yellow");
 
-        dto.getTags().remove(1);
-        dto.getTags().add("Brown");
-        artifactService.update(dto);
+        artifactTags.getTags().remove(0);
+        artifactTags.getTags().add("Brown");
+        artifactTags = artifactService.updateTags(artifactTags);
+
+        assertThat(artifactTags.getTags().get(0)).isEqualTo("Brown");
+        assertThat(artifactTags.getTags().get(1)).isEqualTo("Green");
+        assertThat(artifactTags.getTags().get(2)).isEqualTo("Yellow");
 
         var updatedDTO = artifactService.getTable(ArtistType.ARTIST, List.of(artifactTypeId))
                 .stream()
                 .filter(v -> v.getId().equals(artifact.getId()))
                 .findFirst()
                 .orElseThrow();
-        assertThat(updatedDTO.getTags().size()).isEqualTo(2);
+        assertThat(updatedDTO.getTags().size()).isEqualTo(3);
         assertThat(updatedDTO.getTags().get(0)).isEqualTo("Brown");
         assertThat(updatedDTO.getTags().get(1)).isEqualTo("Green");
+        assertThat(updatedDTO.getTags().get(2)).isEqualTo("Yellow");
+
+        artifactTags.getTags().clear();
+        artifactTags = artifactService.updateTags(artifactTags);
+        assertThat(artifactTags.getTags().size()).isEqualTo(0);
+
+        var deletedDTO = artifactService.getTable(ArtistType.ARTIST, List.of(artifactTypeId))
+                .stream()
+                .filter(v -> v.getId().equals(artifact.getId()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(deletedDTO.getTags().size()).isEqualTo(0);
     }
 }

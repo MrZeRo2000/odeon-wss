@@ -152,4 +152,15 @@ public interface ArtifactRepository
         )
     """)
     Set<IdTitleDTO> findArtifactIdTitleWithIncompleteMediaFilesByArtifactType(ArtifactType artifactType);
+
+    @Query(value = """
+        SELECT
+            atg.artifact.id AS id,
+            atg.name AS tagName
+        FROM ArtifactTag atg
+        WHERE atg.artifact.id = :artifactId
+        ORDER BY atg.name
+    """)
+    List<ArtifactFlatDTO> findAllFlatDTOTagsByArtifactId(Long artifactId);
+
 }
