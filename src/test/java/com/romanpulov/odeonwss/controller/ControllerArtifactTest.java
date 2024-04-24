@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.romanpulov.odeonwss.builder.dtobuilder.ArtifactDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entity.Artist;
@@ -21,7 +23,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ControllerArtifactTest {
+    @SuppressWarnings("unused")
     final static Logger logger = LoggerFactory.getLogger(ControllerArtifactTest.class);
 
     @Autowired
@@ -42,6 +48,9 @@ public class ControllerArtifactTest {
 
     @Autowired
     private ArtifactRepository artifactRepository;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Test
     @Order(1)
@@ -109,6 +118,12 @@ public class ControllerArtifactTest {
                         .build()
         );
 
+        artifactRepository.save(
+                new EntityArtifactBuilder()
+                        .withArtifactType(artifactTypeRepository.getWithDVMovies())
+                        .withTitle("With tags")
+                        .build()
+        );
     }
 
     @Test
@@ -183,6 +198,71 @@ public class ControllerArtifactTest {
                         .queryParam("artifactTypeCodes", "LA")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    @Order(8)
+    void testUpdateTags() throws Exception {
+        var artifactTagsWrongArtifact = new ArtifactDTOBuilder()
+                .withId(955L)
+                .withTags(List.of("Warm", "Cold", "Wet"))
+                .build();
+        String jsonWrongArtifact = mapper.writeValueAsString(artifactTagsWrongArtifact);
+
+        this.mockMvc.perform(put("/api/artifact/update-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonWrongArtifact)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        var artifactTagsOk = new ArtifactDTOBuilder()
+                .withId(5L)
+                .withTags(List.of("Warm", "Cold", "Wet"))
+                .build();
+        String jsonOk = mapper.writeValueAsString(artifactTagsOk);
+
+        this.mockMvc.perform(put("/api/artifact/update-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonOk)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", Matchers.is(5)))
+                .andExpect(jsonPath("$.tags", Matchers.hasSize(3)))
+                .andExpect(jsonPath("$.tags[0]", Matchers.is("Cold")))
+                .andExpect(jsonPath("$.tags[1]", Matchers.is("Warm")))
+                .andExpect(jsonPath("$.tags[2]", Matchers.is("Wet")))
+        ;
+
+        var artifactDeleteOne = new ArtifactDTOBuilder()
+                .withId(5L)
+                .withTags(List.of("Cold", "Wet"))
+                .build();
+        String jsonDeleteOne = mapper.writeValueAsString(artifactDeleteOne);
+
+        this.mockMvc.perform(put("/api/artifact/update-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonDeleteOne)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", Matchers.is(5)))
+                .andExpect(jsonPath("$.tags", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$.tags[0]", Matchers.is("Cold")))
+                .andExpect(jsonPath("$.tags[1]", Matchers.is("Wet")))
+        ;
+
+        var artifactDeleteAll = new ArtifactDTOBuilder()
+                .withId(5L)
+                .build();
+        String jsonDeleteAll = mapper.writeValueAsString(artifactDeleteAll);
+
+        this.mockMvc.perform(put("/api/artifact/update-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonDeleteAll)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").doesNotExist())
+                .andExpect(jsonPath("$.tags", Matchers.hasSize(0)))
         ;
     }
 }

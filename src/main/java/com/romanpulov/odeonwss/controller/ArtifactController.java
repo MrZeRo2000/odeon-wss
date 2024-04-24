@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.controller;
 import com.romanpulov.odeonwss.dto.ArtifactDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.ArtistType;
+import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.service.ArtifactService;
 import org.springframework.http.MediaType;
@@ -27,5 +28,10 @@ public class ArtifactController
         ArtistType artistType = ArtistType.fromCode(artistTypeCode);
         List<Long> artifactTypeIds = artifactTypeCodes.stream().map(Long::valueOf).collect(Collectors.toList());
         return ResponseEntity.ok(service.getTable(artistType, artifactTypeIds));
+    }
+
+    @PutMapping("/update-tags")
+    ResponseEntity<ArtifactDTO> updateTags(@RequestBody ArtifactDTO dto) throws CommonEntityNotFoundException {
+        return ResponseEntity.ok(service.updateTags(dto));
     }
 }
