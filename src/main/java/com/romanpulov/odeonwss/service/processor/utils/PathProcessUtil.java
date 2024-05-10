@@ -7,6 +7,7 @@ import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.service.processor.AbstractProcessor;
 import com.romanpulov.odeonwss.service.processor.PathReader;
 import com.romanpulov.odeonwss.service.processor.ProcessorException;
+import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -86,5 +87,21 @@ public class PathProcessUtil {
                 });
 
         return counter.get();
+    }
+
+    public static List<Path> readMediaFilePaths(AbstractProcessor processor, Path path, String mediaFormats)
+            throws ProcessorException {
+        List<Path> result = new ArrayList<>();
+        if (PathReader.readPathPredicateFilesOnly(
+                processor,
+                path,
+                p -> NamesParser.validateFileNameMediaFormat(
+                        p.getFileName().toString(),
+                        mediaFormats),
+                result)) {
+            return result;
+        } else {
+           return null;
+        }
     }
 }

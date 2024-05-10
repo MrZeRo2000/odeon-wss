@@ -20,10 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -64,7 +61,7 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
         infoHandler(INFO_MEDIA_FILES_LOADED, processArtifactsPath(path));
     }
 
-    private Set<Long> getArtifactIdsToProcess(Path path) {
+    private Collection<Long> getArtifactIdsToProcess(Path path) {
         Set<IdTitleDTO> incompleteArtifacts = artifactRepository.findArtifactIdTitleWithIncompleteMediaFilesByArtifactType(
                 this.artifactTypeSupplier.apply(this.artifactTypeRepository));
 
@@ -99,7 +96,7 @@ public abstract class AbstractDVMediaFilesLoadProcessor extends AbstractFileSyst
         Map<Artifact, SizeDuration> artifactSizeDurationMap = new HashMap<>();
         String rootMediaPath = path.toAbsolutePath().toString();
 
-        Set<Long> artifactIds = getArtifactIdsToProcess(path);
+        Collection<Long> artifactIds = getArtifactIdsToProcess(path);
         for (long artifactId: artifactIds) {
             List<MediaFile> mediaFiles = mediaFileRepository.findAllByArtifactId(artifactId);
             Artifact artifact = artifactRepository.findById(artifactId).orElseThrow();

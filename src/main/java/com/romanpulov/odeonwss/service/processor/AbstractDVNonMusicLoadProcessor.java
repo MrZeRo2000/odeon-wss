@@ -130,19 +130,14 @@ public class AbstractDVNonMusicLoadProcessor extends AbstractFileSystemProcessor
         Map<Artifact, Collection<Path>> result = new HashMap<>();
 
         for (Artifact artifact : artifacts) {
-            List<Path> paths = new ArrayList<>();
-            if (!PathReader.readPathPredicateFilesOnly(
+            List<Path> paths = PathProcessUtil.readMediaFilePaths(
                     this,
                     Path.of(path.toAbsolutePath().toString(), artifact.getTitle()),
-                    p -> NamesParser.validateFileNameMediaFormat(
-                            p.getFileName().toString(),
-                            artifactType.getMediaFileFormats()),
-                    paths)) {
+                    artifactType.getMediaFileFormats());
+            if (paths == null) {
                 return result;
-            }
-
-            if (!paths.isEmpty()) {
-                result.put(artifact, paths);
+            } else if (!paths.isEmpty()) {
+                    result.put(artifact, paths);
             }
         }
 

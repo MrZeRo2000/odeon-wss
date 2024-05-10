@@ -98,38 +98,35 @@ public class DVMusicLoadProcessor extends AbstractFileSystemProcessor {
                 .toList();
 
         for (Artifact a: artifacts) {
-            Path mediaFilesRootPath = Paths.get(path.toAbsolutePath().toString(), a.getTitle());
-
-            List<Path> mediaFilesPaths = new ArrayList<>();
-            if (!PathReader.readPathPredicateFilesOnly(
+            List<Path> mediaFilesPaths = PathProcessUtil.readMediaFilePaths(
                     this,
-                    mediaFilesRootPath,
-                    p -> NamesParser.validateFileNameMediaFormat(
-                            p.getFileName().toString(),
-                            this.artifactType.getMediaFileFormats()),
-                    mediaFilesPaths)) {
+                    Paths.get(path.toAbsolutePath().toString(), a.getTitle()),
+                    this.artifactType.getMediaFileFormats()
+            );
+
+            if (mediaFilesPaths == null) {
                 return Pair.of(counter.get(), trackCounter.get());
-            }
+            } else {
+                Set<MediaFile> mediaFiles = MediaFilesProcessUtil.loadFromMediaFilesPaths(
+                        mediaFilesPaths,
+                        a,
+                        mediaParser,
+                        mediaFileRepository,
+                        mediaFileMapper,
+                        counter,
+                        p -> processingEventHandler(ProcessorMessages.PROCESSING_PARSING_MEDIA_FILE, p),
+                        p -> errorHandler(ProcessorMessages.ERROR_PARSING_FILE, p));
 
-            Set<MediaFile> mediaFiles = MediaFilesProcessUtil.loadFromMediaFilesPaths(
-                    mediaFilesPaths,
-                    a,
-                    mediaParser,
-                    mediaFileRepository,
-                    mediaFileMapper,
-                    counter,
-                    p -> processingEventHandler(ProcessorMessages.PROCESSING_PARSING_MEDIA_FILE, p),
-                    p -> errorHandler(ProcessorMessages.ERROR_PARSING_FILE, p));
+                trackCounter.addAndGet(processTracks(a, mediaFiles, artists));
 
-            trackCounter.addAndGet(processTracks(a, mediaFiles, artists));
+                SizeDuration sizeDuration = MediaFilesProcessUtil.getMediaFilesSizeDuration(mediaFiles);
 
-            SizeDuration sizeDuration = MediaFilesProcessUtil.getMediaFilesSizeDuration(mediaFiles);
+                if (ValueValidator.isEmpty(a.getSize()) || ValueValidator.isEmpty(a.getDuration())) {
+                    a.setSize(sizeDuration.getSize());
+                    a.setDuration(sizeDuration.getDuration());
 
-            if (ValueValidator.isEmpty(a.getSize()) || ValueValidator.isEmpty(a.getDuration())) {
-                a.setSize(sizeDuration.getSize());
-                a.setDuration(sizeDuration.getDuration());
-
-                artifactRepository.save(a);
+                    artifactRepository.save(a);
+                }
             }
         }
 
