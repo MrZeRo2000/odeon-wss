@@ -10,6 +10,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class FileTreeGenerator {
     public record FolderDef(String folderName, Map<String, Path> files) {}
+    public record FileTreeDef(Map<Path, Collection<FolderDef>> filesTree) {}
 
     public static void generate(Path rootFolder, Collection<FolderDef> folderDefs) throws IOException {
         if (!Files.exists(rootFolder)) {
