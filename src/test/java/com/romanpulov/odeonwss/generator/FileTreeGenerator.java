@@ -52,7 +52,6 @@ public class FileTreeGenerator {
             Object ko = jo.get(key);
             Path keyPath = Path.of(path.toString(), key);
             if (ko instanceof String keyValue) {
-                // log.info("Found string: " + key + ":" + keyValue);
                 Path sourcePath = Path.of(testDataPath, keyValue);
                 if (!Files.exists(sourcePath)) {
                     throw new IOException("Source file not found:" + sourcePath);
@@ -60,7 +59,6 @@ public class FileTreeGenerator {
                     Files.copy(sourcePath, keyPath, REPLACE_EXISTING);
                 }
             } else if (ko instanceof JSONObject) {
-                // log.info("Found JSONObject, key:" + key);
                 Files.createDirectory(keyPath);
                 processJSONKey(keyPath, testDataPath, (JSONObject) ko, null);
             }
