@@ -63,7 +63,15 @@ public class ServiceProcessLoadMusicDVTest {
         return processService.getProcessInfo();
     }
 
-    private final Map<String, Path> tempDirs = new HashMap<>();
+    private final Map<TestFolder, Path> tempDirs = new HashMap<>();
+
+    private enum TestFolder {
+        TF_WITHOUT_PARCELABLE,
+        TF_WITH_TITLES_NO_ARTIST,
+        TF_WITH_ARTISTS_AND_TITLE,
+        TF_WITH_ARTIFACT_ARTIST_VARIABLE_LENGTH,
+        TF_WITH_ARTIFACT_INVALID_PATH_CHARACTER
+    }
 
     @BeforeAll
     public void setup() throws Exception {
@@ -78,8 +86,8 @@ public class ServiceProcessLoadMusicDVTest {
                         "Tori Amos - Fade to Red Disk 2 2006.mkv",
                         Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv")
                 )));
-        tempDirs.put("WithoutParcelable", Files.createTempDirectory("WithoutParcelable"));
-        FileTreeGenerator.generate(tempDirs.get("WithoutParcelable"), withoutParcelableFolderDefs);
+        tempDirs.put(TestFolder.TF_WITHOUT_PARCELABLE, Files.createTempDirectory(String.valueOf(TestFolder.TF_WITHOUT_PARCELABLE)));
+        FileTreeGenerator.generate(tempDirs.get(TestFolder.TF_WITHOUT_PARCELABLE), withoutParcelableFolderDefs);
 
         var withoutTitlesNoArtist = new ArrayList<FileTreeGenerator.FolderDef>();
         withoutTitlesNoArtist.add(new FileTreeGenerator.FolderDef(
@@ -91,8 +99,8 @@ public class ServiceProcessLoadMusicDVTest {
                         Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv")
                 )));
 
-        tempDirs.put("WithTitlesNoArtist", Files.createTempDirectory("WithTitlesNoArtist"));
-        FileTreeGenerator.generate(tempDirs.get("WithTitlesNoArtist"), withoutTitlesNoArtist);
+        tempDirs.put(TestFolder.TF_WITH_TITLES_NO_ARTIST, Files.createTempDirectory(String.valueOf(TestFolder.TF_WITH_TITLES_NO_ARTIST)));
+        FileTreeGenerator.generate(tempDirs.get(TestFolder.TF_WITH_TITLES_NO_ARTIST), withoutTitlesNoArtist);
 
         var withArtistsAndTitle = new ArrayList<FileTreeGenerator.FolderDef>();
         withArtistsAndTitle.add(new FileTreeGenerator.FolderDef(
@@ -105,8 +113,8 @@ public class ServiceProcessLoadMusicDVTest {
                         "03 Tapping The Vein - Butterfly (Unsensored)(2000).mkv",
                         Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 2 2006.mkv")
                 )));
-        tempDirs.put("WithArtistsAndTitle", Files.createTempDirectory("WithArtistsAndTitle"));
-        FileTreeGenerator.generate(tempDirs.get("WithArtistsAndTitle"), withArtistsAndTitle);
+        tempDirs.put(TestFolder.TF_WITH_ARTISTS_AND_TITLE, Files.createTempDirectory(String.valueOf(TestFolder.TF_WITH_ARTISTS_AND_TITLE)));
+        FileTreeGenerator.generate(tempDirs.get(TestFolder.TF_WITH_ARTISTS_AND_TITLE), withArtistsAndTitle);
 
         var withArtifactArtistVariableLength = new ArrayList<FileTreeGenerator.FolderDef>();
         withArtifactArtistVariableLength.add(new FileTreeGenerator.FolderDef(
@@ -118,8 +126,8 @@ public class ServiceProcessLoadMusicDVTest {
                         Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv")
                 )
         ));
-        tempDirs.put("WithArtifactArtistVariableLength", Files.createTempDirectory("WithArtifactArtistVariableLength"));
-        FileTreeGenerator.generate(tempDirs.get("WithArtifactArtistVariableLength"), withArtifactArtistVariableLength);
+        tempDirs.put(TestFolder.TF_WITH_ARTIFACT_ARTIST_VARIABLE_LENGTH, Files.createTempDirectory(String.valueOf(TestFolder.TF_WITH_ARTIFACT_ARTIST_VARIABLE_LENGTH)));
+        FileTreeGenerator.generate(tempDirs.get(TestFolder.TF_WITH_ARTIFACT_ARTIST_VARIABLE_LENGTH), withArtifactArtistVariableLength);
 
         var withArtifactInvalidPathCharacter = new ArrayList<FileTreeGenerator.FolderDef>();
         withArtifactInvalidPathCharacter.add(new FileTreeGenerator.FolderDef(
@@ -131,8 +139,8 @@ public class ServiceProcessLoadMusicDVTest {
                         Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv")
                 )
         ));
-        tempDirs.put("withArtifactInvalidPathCharacter", Files.createTempDirectory("withArtifactInvalidPathCharacter"));
-        FileTreeGenerator.generate(tempDirs.get("withArtifactInvalidPathCharacter"), withArtifactInvalidPathCharacter);
+        tempDirs.put(TestFolder.TF_WITH_ARTIFACT_INVALID_PATH_CHARACTER, Files.createTempDirectory(String.valueOf(TestFolder.TF_WITH_ARTIFACT_INVALID_PATH_CHARACTER)));
+        FileTreeGenerator.generate(tempDirs.get(TestFolder.TF_WITH_ARTIFACT_INVALID_PATH_CHARACTER), withArtifactInvalidPathCharacter);
     }
 
     @AfterAll
@@ -316,7 +324,7 @@ public class ServiceProcessLoadMusicDVTest {
     void testWithTracksNoArtists() {
         prepareArtists();
 
-        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get("WithTitlesNoArtist").toString());
+        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get(TestFolder.TF_WITH_TITLES_NO_ARTIST).toString());
         var pi = processService.getProcessInfo();
 
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
@@ -351,7 +359,7 @@ public class ServiceProcessLoadMusicDVTest {
         assertThat(tracks.get(0).getTitle()).isEqualTo("Shake dog shake");
         assertThat(tracks.get(0).getMediaFileName()).isEqualTo("01 Shake dog shake.mkv");
 
-        processService.executeProcessor(ProcessorType.DV_MUSIC_VALIDATOR, tempDirs.get("WithTitlesNoArtist").toString());
+        processService.executeProcessor(ProcessorType.DV_MUSIC_VALIDATOR, tempDirs.get(TestFolder.TF_WITH_TITLES_NO_ARTIST).toString());
         var validatePi = processService.getProcessInfo();
         assertThat(validatePi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
     }
@@ -363,7 +371,7 @@ public class ServiceProcessLoadMusicDVTest {
     void testWithTracksAndArtists() {
         prepareArtists();
 
-        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get("WithArtistsAndTitle").toString());
+        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get(TestFolder.TF_WITH_ARTISTS_AND_TITLE).toString());
         var pi = processService.getProcessInfo();
 
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
@@ -394,7 +402,7 @@ public class ServiceProcessLoadMusicDVTest {
         artifacts.get(0).setArtist(artist);
         artifactRepository.save(artifacts.get(0));
 
-        processService.executeProcessor(ProcessorType.DV_MUSIC_VALIDATOR, tempDirs.get("WithArtistsAndTitle").toString());
+        processService.executeProcessor(ProcessorType.DV_MUSIC_VALIDATOR, tempDirs.get(TestFolder.TF_WITH_ARTISTS_AND_TITLE).toString());
         var validatePi = processService.getProcessInfo();
         assertThat(validatePi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
     }
@@ -406,7 +414,7 @@ public class ServiceProcessLoadMusicDVTest {
     void testWithArtifactArtistVariableLength() {
         prepareArtists();
 
-        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get("WithArtifactArtistVariableLength").toString());
+        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get(TestFolder.TF_WITH_ARTIFACT_ARTIST_VARIABLE_LENGTH).toString());
         var pi = processService.getProcessInfo();
 
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
@@ -434,7 +442,7 @@ public class ServiceProcessLoadMusicDVTest {
     void testWithArtifactInvalidPathCharacter() {
         prepareArtists();
 
-        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get("withArtifactInvalidPathCharacter").toString());
+        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get(TestFolder.TF_WITH_ARTIFACT_INVALID_PATH_CHARACTER).toString());
         var pi = processService.getProcessInfo();
 
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);

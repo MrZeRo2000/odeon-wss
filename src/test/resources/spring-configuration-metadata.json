@@ -3,6 +3,10 @@
     {
       "name": "dbprocess.logging",
       "type": "java.lang.Boolean"
+    },
+    {
+      "name": "test.data.path",
+      "type": "java.lang.String"
     }
   ]
 }
