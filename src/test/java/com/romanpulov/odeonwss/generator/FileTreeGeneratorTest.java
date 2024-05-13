@@ -78,7 +78,7 @@ public class FileTreeGeneratorTest {
         Path path = Files.createTempDirectory("testGenerateFileTree");
         log.info("Created temp path:" + path.toString());
         try {
-            processJSONKey(path, jo, null);
+            processJSONKey(path, this.testDataPath, jo, null);
         } finally {
             log.info("Deleting temp path:" + path);
             FileSystemUtils.deleteRecursively(path);
@@ -86,11 +86,11 @@ public class FileTreeGeneratorTest {
     }
 
 
-    void processJSONKey(Path path, JSONObject jo, String key) throws Exception {
+    void processJSONKey(Path path, String testDataPath, JSONObject jo, String key) throws Exception {
         if (key == null) {
             jo.keySet().forEach(v -> {
                 try {
-                    processJSONKey(path, jo, v);
+                    processJSONKey(path, testDataPath, jo, v);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -100,7 +100,7 @@ public class FileTreeGeneratorTest {
             Path keyPath = Path.of(path.toString(), key);
             if (ko instanceof String keyValue) {
                 log.info("Found string: " + key + ":" + keyValue);
-                Path sourcePath = Path.of(this.testDataPath, keyValue);
+                Path sourcePath = Path.of(testDataPath, keyValue);
                 if (!Files.exists(sourcePath)) {
                     throw new IOException("Source file not found:" + sourcePath);
                 } else {
@@ -109,7 +109,7 @@ public class FileTreeGeneratorTest {
             } else if (ko instanceof JSONObject) {
                 log.info("Found JSONObject, key:" + key);
                 Files.createDirectory(keyPath);
-                processJSONKey(keyPath, (JSONObject) ko, null);
+                processJSONKey(keyPath, testDataPath, (JSONObject) ko, null);
             }
         }
     }

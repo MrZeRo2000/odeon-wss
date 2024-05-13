@@ -10,19 +10,19 @@ import com.romanpulov.odeonwss.service.processor.ValueValidator;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.util.FileSystemUtils;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -36,6 +36,9 @@ public class ServiceProcessLoadMusicDVTest {
 
     private static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MUSIC_LOADER;
     private ArtifactType artifactType;
+
+    @Value("${test.data.path}")
+    String testDataPath;
 
     @Autowired
     DataSource dataSource;
@@ -63,7 +66,7 @@ public class ServiceProcessLoadMusicDVTest {
         return processService.getProcessInfo();
     }
 
-    private final Map<TestFolder, Path> tempDirs = new HashMap<>();
+    private Map<TestFolder, Path> tempDirs;
 
     private enum TestFolder {
         TF_WITHOUT_PARCELABLE,
@@ -77,80 +80,88 @@ public class ServiceProcessLoadMusicDVTest {
     public void setup() throws Exception {
         log.info("Before all");
 
-        var withoutParcelableFolderDefs = new ArrayList<FileTreeGenerator.FolderDef>();
-        withoutParcelableFolderDefs.add(new FileTreeGenerator.FolderDef(
-                "Tori Amos - Fade to Red 2006",
-                Map.of(
-                        "Tori Amos - Fade to Red Disk 1 2006.mkv",
-                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"),
-                        "Tori Amos - Fade to Red Disk 2 2006.mkv",
-                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv")
-                )));
-        tempDirs.put(TestFolder.TF_WITHOUT_PARCELABLE, Files.createTempDirectory(String.valueOf(TestFolder.TF_WITHOUT_PARCELABLE)));
-        FileTreeGenerator.generate(tempDirs.get(TestFolder.TF_WITHOUT_PARCELABLE), withoutParcelableFolderDefs);
+        tempDirs = EnumSet
+                .allOf(TestFolder.class)
+                .stream()
+                .collect(Collectors.toMap(v -> v, v -> {
+                    try {
+                        return Files.createTempDirectory(String.valueOf(v));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }));
 
-        var withoutTitlesNoArtist = new ArrayList<FileTreeGenerator.FolderDef>();
-        withoutTitlesNoArtist.add(new FileTreeGenerator.FolderDef(
-                "The Cure - In Orange",
-                Map.of(
-                        "01 Shake dog shake.mkv",
-                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"),
-                        "02 Never Enough.mkv",
-                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv")
-                )));
+        FileTreeGenerator.generateFromJSON(
+                tempDirs.get(TestFolder.TF_WITHOUT_PARCELABLE),
+                this.testDataPath,
+                """
+                    {
+                        "Tori Amos - Fade to Red 2006": {
+                            "Tori Amos - Fade to Red Disk 1 2006.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv",
+                            "Tori Amos - Fade to Red Disk 2 2006.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"
+                        }
+                    }
+                """
+        );
 
-        tempDirs.put(TestFolder.TF_WITH_TITLES_NO_ARTIST, Files.createTempDirectory(String.valueOf(TestFolder.TF_WITH_TITLES_NO_ARTIST)));
-        FileTreeGenerator.generate(tempDirs.get(TestFolder.TF_WITH_TITLES_NO_ARTIST), withoutTitlesNoArtist);
+        FileTreeGenerator.generateFromJSON(
+                tempDirs.get(TestFolder.TF_WITH_TITLES_NO_ARTIST),
+                this.testDataPath,
+                """
+                    {
+                        "The Cure - In Orange": {
+                            "01 Shake dog shake.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv",
+                            "02 Never Enough.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"
+                        }
+                    }
+                """
+        );
 
-        var withArtistsAndTitle = new ArrayList<FileTreeGenerator.FolderDef>();
-        withArtistsAndTitle.add(new FileTreeGenerator.FolderDef(
-                "Beautiful Voices",
-                Map.of(
-                        "01 Nightwish - Ghost Love Score.mkv",
-                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"),
-                        "02 Mandragora Scream - Vision They Shared.mkv",
-                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 2 2006.mkv"),
-                        "03 Tapping The Vein - Butterfly (Unsensored)(2000).mkv",
-                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 2 2006.mkv")
-                )));
-        tempDirs.put(TestFolder.TF_WITH_ARTISTS_AND_TITLE, Files.createTempDirectory(String.valueOf(TestFolder.TF_WITH_ARTISTS_AND_TITLE)));
-        FileTreeGenerator.generate(tempDirs.get(TestFolder.TF_WITH_ARTISTS_AND_TITLE), withArtistsAndTitle);
+        FileTreeGenerator.generateFromJSON(
+                tempDirs.get(TestFolder.TF_WITH_ARTISTS_AND_TITLE),
+                this.testDataPath,
+                """
+                    {
+                        "Beautiful Voices": {
+                            "01 Nightwish - Ghost Love Score.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv",
+                            "02 Mandragora Scream - Vision They Shared.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 2 2006.mkv",
+                            "03 Tapping The Vein - Butterfly (Unsensored)(2000).mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 2 2006.mkv"
+                        }
+                    }
+                """
+        );
 
-        var withArtifactArtistVariableLength = new ArrayList<FileTreeGenerator.FolderDef>();
-        withArtifactArtistVariableLength.add(new FileTreeGenerator.FolderDef(
-                "Black Sabbath - Videos",
-                Map.of(
-                        "01 Paranoid.mkv",
-                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"),
-                        "02 Iron Man.mkv",
-                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv")
-                )
-        ));
-        tempDirs.put(TestFolder.TF_WITH_ARTIFACT_ARTIST_VARIABLE_LENGTH, Files.createTempDirectory(String.valueOf(TestFolder.TF_WITH_ARTIFACT_ARTIST_VARIABLE_LENGTH)));
-        FileTreeGenerator.generate(tempDirs.get(TestFolder.TF_WITH_ARTIFACT_ARTIST_VARIABLE_LENGTH), withArtifactArtistVariableLength);
+        FileTreeGenerator.generateFromJSON(
+                tempDirs.get(TestFolder.TF_WITH_ARTIFACT_ARTIST_VARIABLE_LENGTH),
+                this.testDataPath,
+                """
+                    {
+                        "Black Sabbath - Videos": {
+                            "01 Paranoid.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv",
+                            "02 Iron Man.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"
+                        }
+                    }
+                """
+        );
 
-        var withArtifactInvalidPathCharacter = new ArrayList<FileTreeGenerator.FolderDef>();
-        withArtifactInvalidPathCharacter.add(new FileTreeGenerator.FolderDef(
-                "Therapy - Videos",
-                Map.of(
-                        "01 Isolation.mkv",
-                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"),
-                        "02 Happy People Have No Stories.mkv",
-                        Paths.get("../odeon-test-data/dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv")
-                )
-        ));
-        tempDirs.put(TestFolder.TF_WITH_ARTIFACT_INVALID_PATH_CHARACTER, Files.createTempDirectory(String.valueOf(TestFolder.TF_WITH_ARTIFACT_INVALID_PATH_CHARACTER)));
-        FileTreeGenerator.generate(tempDirs.get(TestFolder.TF_WITH_ARTIFACT_INVALID_PATH_CHARACTER), withArtifactInvalidPathCharacter);
+        FileTreeGenerator.generateFromJSON(
+                tempDirs.get(TestFolder.TF_WITH_ARTIFACT_INVALID_PATH_CHARACTER),
+                this.testDataPath,
+                """
+                    {
+                        "Therapy - Videos": {
+                            "01 Isolation.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv",
+                            "02 Happy People Have No Stories.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"
+                        }
+                    }
+                """
+        );
     }
 
     @AfterAll
     public void teardown() {
         log.info("After all");
-        tempDirs.values().forEach(v -> {
-            try {
-                FileSystemUtils.deleteRecursively(v);
-            } catch (IOException ignore) {}
-        });
+        FileTreeGenerator.deleteTempFiles(tempDirs.values());
     }
 
     private void prepareArtists() {
