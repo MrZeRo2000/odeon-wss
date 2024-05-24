@@ -23,7 +23,7 @@ def get_logger(logger_name: str) -> logging.Logger:
     if os.path.exists(log_file_name):
         os.remove(log_file_name)
 
-    fh = logging.FileHandler(log_file_name)
+    fh = logging.FileHandler(log_file_name, encoding='utf-8')
     fh.setLevel(logging.DEBUG)
     fh.setFormatter(formatter)
 
