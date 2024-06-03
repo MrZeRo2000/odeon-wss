@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.dto;
 
 public interface MediaFileValidationDTO {
+    Long getArtifactId();
     String getArtifactTitle();
     Long getArtifactYear();
     String getArtistName();

@@ -7,6 +7,11 @@ public class MediaFileValidationDTOBuilder {
         this.instance = new MediaFileValidationDTOImpl();
     }
 
+    public MediaFileValidationDTOBuilder withArtifactId(long artifactId) {
+        instance.setArtifactId(artifactId);
+        return this;
+    }
+
     public MediaFileValidationDTOBuilder withArtifactTitle(String artifactTitle) {
         instance.setArtifactTitle(artifactTitle);
         return this;

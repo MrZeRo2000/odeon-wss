@@ -373,6 +373,25 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(16)
     @Sql({"/schema.sql", "/data.sql"})
+    void testArtifactWithoutTracksShouldFail() {
+        this.internalPrepareExisting();
+        Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
+                .stream()
+                .filter(a -> a.getTitle().equals("Beautiful Voices 1"))
+                .findFirst().orElseThrow();
+        assertThat(artifact).isNotNull();
+        var tracks = trackRepository.findAllByArtifact(artifact);
+        trackRepository.deleteAll(tracks);
+
+        ProcessInfo pi = executeProcessor();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
+    }
+
+
+    @Test
+    @Order(17)
+    @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInDbShouldFail() {
         this.internalPrepareExisting();
         Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
@@ -408,7 +427,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(17)
+    @Order(18)
     @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInFilesShouldFail() {
         this.internalPrepareExisting();
@@ -458,7 +477,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(18)
+    @Order(19)
     @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInDbShouldFail() {
         this.internalPrepareExisting();
@@ -490,7 +509,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(19)
+    @Order(20)
     @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInFilesShouldFail() {
         this.internalPrepareExisting();
@@ -517,7 +536,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(20)
+    @Order(21)
     @Sql({"/schema.sql", "/data.sql"})
     void testMediaFileEmptyBitrateShouldFail() {
         this.internalPrepareExisting();
@@ -544,7 +563,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(21)
+    @Order(22)
     @Sql({"/schema.sql", "/data.sql"})
     void testMediaFileSizeDifferentShouldFail() {
         this.internalPrepareExisting();
@@ -580,7 +599,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(22)
+    @Order(23)
     @Sql({"/schema.sql", "/data.sql"})
     void testArtifactMediaFileSizeDifferentShouldFail() {
         this.internalPrepareExisting();
@@ -611,7 +630,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(23)
+    @Order(24)
     @Sql({"/schema.sql", "/data.sql"})
     void testArtifactMediaFileDurationDifferentShouldFail() {
         this.internalPrepareExisting();
@@ -643,7 +662,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(24)
+    @Order(25)
     @Sql({"/schema.sql", "/data.sql"})
     void testArtifactTrackDurationDifferentShouldFail() {
         this.internalPrepareExisting();
@@ -679,7 +698,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(25)
+    @Order(26)
     @Sql({"/schema.sql", "/data.sql"})
     void testMediaFileMissingBitrateShouldFail() {
         this.internalPrepareExisting();
@@ -710,7 +729,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(26)
+    @Order(27)
     @Sql({"/schema.sql", "/data.sql"})
     void testMediaFileMissingWidthShouldFail() {
         this.internalPrepareExisting();
@@ -741,7 +760,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(27)
+    @Order(28)
     @Sql({"/schema.sql", "/data.sql"})
     void testMediaFileMissingHeightShouldFail() {
         this.internalPrepareExisting();

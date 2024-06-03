@@ -107,6 +107,7 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
         SELECT
             ar.name AS artistName,
             af.title AS artifactTitle,
+            af.id AS artifactId,
             af.year AS artifactYear,
             c.num AS trackNum,
             c.title AS trackTitle,
@@ -126,6 +127,7 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
 
     @Query(""" 
         SELECT
+            af.id AS artifactId,
             af.title AS artifactTitle,
             af.year AS artifactYear,
             m.name AS mediaFileName,
@@ -143,6 +145,7 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
 
     @Query("""
         SELECT
+            af.id AS artifactId,
             af.title AS artifactTitle,
             af.year AS artifactYear,
             af.size AS artifactSize,
@@ -165,6 +168,7 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
     @Query("""
         SELECT
             ar.name AS artistName,
+            af.id AS artifactId,
             af.title AS artifactTitle,
             af.year AS artifactYear,
             af.size AS artifactSize,

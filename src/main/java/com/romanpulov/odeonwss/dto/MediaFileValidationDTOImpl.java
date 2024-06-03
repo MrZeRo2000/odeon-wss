@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.dto;
 
 public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
+    private Long artifactId;
     private String artifactTitle;
     private Long artifactYear;
     private String artistName;
@@ -15,6 +16,15 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
     private Long mediaFileDuration;
     private Long mediaFileWidth;
     private Long mediaFileHeight;
+
+    @Override
+    public Long getArtifactId() {
+        return artifactId;
+    }
+
+    public void setArtifactId(Long artifactId) {
+        this.artifactId = artifactId;
+    }
 
     @Override
     public String getArtifactTitle() {
@@ -145,20 +155,21 @@ public class MediaFileValidationDTOImpl implements MediaFileValidationDTO {
     @Override
     public String toString() {
         return "MediaFileValidationDTOImpl{" +
-                "artifactTitle='" + artifactTitle + '\'' +
-                ", artifactYear=" + artifactYear +
-                ", artistName='" + artistName + '\'' +
-                ", artifactSize=" + artifactSize +
-                ", artifactDuration=" + artifactDuration +
-                ", trackNum=" + trackNum +
-                ", trackTitle='" + trackTitle + '\'' +
-                ", mediaFileName='" + mediaFileName + '\'' +
-                ", mediaFileFormat='" + mediaFileFormat + '\'' +
-                ", mediaFileBitrate=" + mediaFileBitrate +
-                ", mediaFileSize=" + mediaFileSize +
-                ", mediaFileDuration=" + mediaFileDuration +
-                ", mediaFileWidth=" + mediaFileWidth +
-                ", mediaFileHeight=" + mediaFileHeight +
+                "artifactId=" + getArtifactId() +
+                ", artifactTitle='" + getArtifactTitle() + '\'' +
+                ", artifactYear=" + getArtifactYear() +
+                ", artistName='" + getArtistName() + '\'' +
+                ", artifactSize=" + getArtifactSize() +
+                ", artifactDuration=" + getArtifactDuration() +
+                ", trackNum=" + getTrackNum() +
+                ", trackTitle='" + getTrackTitle() + '\'' +
+                ", mediaFileName='" + getMediaFileName() + '\'' +
+                ", mediaFileFormat='" + getMediaFileFormat() + '\'' +
+                ", mediaFileBitrate=" + getMediaFileBitrate() +
+                ", mediaFileSize=" + getMediaFileSize() +
+                ", mediaFileDuration=" + getMediaFileDuration() +
+                ", mediaFileWidth=" + getMediaFileWidth() +
+                ", mediaFileHeight=" + getMediaFileHeight() +
                 '}';
     }
 }
