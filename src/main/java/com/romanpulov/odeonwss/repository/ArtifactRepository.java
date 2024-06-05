@@ -111,7 +111,16 @@ public interface ArtifactRepository
     )
     List<IdTitleDTO> getArtifactsByArtistType(ArtistType artistType);
 
-    @Query(value ="""
+    @Query(value = """
+        SELECT
+            a.id AS id,
+            a.title AS title
+        FROM Artifact as a
+        WHERE a.artifactType = :artifactType
+    """)
+    List<IdTitleDTO> findAllArtifactsByArtifactType(ArtifactType artifactType);
+
+    @Query(value = """
         SELECT DISTINCT
           artf_id AS id,
           arts_name AS artistName,

@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.service.processor.utils;
 
 import com.romanpulov.odeonwss.dto.ArtifactFlatDTO;
+import com.romanpulov.odeonwss.dto.IdTitleDTO;
 import com.romanpulov.odeonwss.dto.TrackFlatDTO;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.ArtistType;
@@ -9,7 +10,11 @@ import com.romanpulov.odeonwss.service.processor.*;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.romanpulov.odeonwss.service.processor.ValueValidator.nonNullSet;
 
 public class TracksValidateUtil {
     public static void validateMonotonicallyIncreasingTrackNumbers(
@@ -36,6 +41,30 @@ public class TracksValidateUtil {
                         )
                 )) {
             processor.infoHandler(ProcessorMessages.INFO_MONOTONICALLY_INCREASING_TRACK_NUMBER_VALIDATED);
+        }
+    }
+
+    public static boolean validateEmptyTracksArtifacts(
+            AbstractProcessor processor,
+            List<IdTitleDTO> artifacts,
+            Set<Long> artifactIds,
+            List<TrackFlatDTO> tracks
+    ) {
+        Set<Long> artifactIdsDiff = nonNullSet(artifactIds);
+        artifactIdsDiff.removeAll(
+                tracks.stream().map(TrackFlatDTO::getArtifactId).collect(Collectors.toSet()));
+        if (!artifactIdsDiff.isEmpty()) {
+            processor.errorHandler(
+                    ProcessorMessages.ERROR_NO_TRACKS_FOR_ARTIFACT,
+                    artifacts
+                            .stream()
+                            .filter(v -> artifactIdsDiff.contains(v.getId()))
+                            .map(IdTitleDTO::getTitle)
+                            .toList()
+            );
+            return false;
+        } else {
+            return true;
         }
     }
 

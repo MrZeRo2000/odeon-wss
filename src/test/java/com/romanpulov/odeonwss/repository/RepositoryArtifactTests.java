@@ -143,7 +143,7 @@ public class RepositoryArtifactTests {
 
     @Test
     @Order(5)
-    void testArtifactsByType() {
+    void testArtifactsByArtistType() {
         Assertions.assertEquals(1, artifactRepository.getArtifactsByArtistType(ArtistType.ARTIST).size());
         Assertions.assertEquals(0, artifactRepository.getArtifactsByArtistType(ArtistType.CLASSICS).size());
         Assertions.assertEquals("Title 1", artifactRepository.getArtifactsByArtistType(ArtistType.ARTIST).get(0).getTitle());
@@ -202,6 +202,22 @@ public class RepositoryArtifactTests {
 
         Artifact savedArtifact = artifactRepository.findById(artifact.getId()).orElseThrow();
         assertThat(savedArtifact).isNotNull();
+    }
+
+    @Test
+    @Order(8)
+    void testArtifactsByArtifactType() {
+        assertThat(artifactRepository.findAllArtifactsByArtifactType(artifactTypeRepository.getWithLA()).size())
+                .isEqualTo(0L);
+        assertThat(artifactRepository.findAllArtifactsByArtifactType(artifactTypeRepository.getWithDVMusic()).size())
+                .isEqualTo(1L);
+        assertThat(artifactRepository.findAllArtifactsByArtifactType(artifactTypeRepository.getWithDVMovies()).size())
+                .isEqualTo(1L);
+
+        var moviesArtifacts = artifactRepository.findAllArtifactsByArtifactType(artifactTypeRepository.getWithDVMovies());
+        assertThat(moviesArtifacts.size()).isEqualTo(1);
+        assertThat(moviesArtifacts.get(0).getId()).isEqualTo(3L);
+        assertThat(moviesArtifacts.get(0).getTitle()).isEqualTo("Title No Artist");
     }
 
     @Test

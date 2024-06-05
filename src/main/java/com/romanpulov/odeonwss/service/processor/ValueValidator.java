@@ -13,7 +13,7 @@ public class ValueValidator {
         return data.stream().sorted().collect(Collectors.toList());
     }
 
-    private static <T> Set<T> nonNullSet(Set<T> data) {
+    public static <T> Set<T> nonNullSet(Set<T> data) {
         return (new HashSet<>(data)).stream().filter(Objects::nonNull).collect(Collectors.toSet());
     }
 

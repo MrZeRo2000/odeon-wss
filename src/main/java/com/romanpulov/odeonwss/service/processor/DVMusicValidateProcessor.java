@@ -1,5 +1,6 @@
 package com.romanpulov.odeonwss.service.processor;
 
+import com.romanpulov.odeonwss.dto.IdTitleDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.dto.TrackFlatDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -49,6 +51,9 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
 
         this.artifactType = Optional.ofNullable(this.artifactType).orElse(artifactTypeRepository.getWithDVMusic());
 
+        final List<IdTitleDTO> artifacts = artifactRepository.findAllArtifactsByArtifactType(artifactType);
+        final Set<Long> artifactIds = artifacts.stream().map(IdTitleDTO::getId).collect(Collectors.toSet());
+
         final List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getTrackMediaFileValidationMusic(
                 artistType, artifactType
         );
@@ -65,28 +70,35 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
             if (MediaFileValidator.validateArtifacts(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
-                List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
-                        .getArtifactMediaFileValidationMusic(artistType, artifactType);
-
-                MediaFilesValidateUtil.validateMediaFilesVideoAll(
-                        this,
-                        pathValidation,
-                        dbValidation,
-                        dbArtifactValidation);
-
-                TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
-                        this,
-                        artifactRepository,
-                        List.of(ArtistType.ARTIST, ArtistType.CLASSICS),
-                        List.of(artifactType));
-
                 List<TrackFlatDTO> tracks = trackRepository.findAllFlatDTOByArtifactTypeId(
                         artistType, this.artifactType.getId());
 
-                TracksValidateUtil.validateTracksDuration(
+                if (TracksValidateUtil.validateEmptyTracksArtifacts(
                         this,
-                        TrackValidator.ARTIFACT_TITLE_MAPPER,
-                        tracks);
+                        artifacts,
+                        artifactIds,
+                        tracks)) {
+                    List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
+                            .getArtifactMediaFileValidationMusic(artistType, artifactType);
+
+                    MediaFilesValidateUtil.validateMediaFilesVideoAll(
+                            this,
+                            pathValidation,
+                            dbValidation,
+                            dbArtifactValidation);
+
+                    TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
+                            this,
+                            artifactRepository,
+                            List.of(ArtistType.ARTIST, ArtistType.CLASSICS),
+                            List.of(artifactType));
+
+
+                    TracksValidateUtil.validateTracksDuration(
+                            this,
+                            TrackValidator.ARTIFACT_TITLE_MAPPER,
+                            tracks);
+                }
             }
         }
     }

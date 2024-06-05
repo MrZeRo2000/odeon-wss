@@ -385,7 +385,16 @@ public class ServiceProcessValidateDVMusicTest {
 
         ProcessInfo pi = executeProcessor();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
-
+        var pd = pi.getProcessDetails();
+        assertThat(pd.get(3)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "No tracks for artifact",
+                                List.of("Beautiful Voices 1")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
     }
 
 
