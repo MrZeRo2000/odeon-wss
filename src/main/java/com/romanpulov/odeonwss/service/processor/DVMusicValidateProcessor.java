@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.service.processor;
 
 import com.romanpulov.odeonwss.dto.IdTitleDTO;
+import com.romanpulov.odeonwss.dto.MediaFileDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.dto.TrackFlatDTO;
 import com.romanpulov.odeonwss.entity.Artifact;
@@ -57,50 +58,56 @@ public class DVMusicValidateProcessor extends AbstractFileSystemProcessor {
         final List<MediaFileValidationDTO> dbValidation = mediaFileRepository.getTrackMediaFileValidationMusic(
                 artistType, artifactType
         );
+
         final List<MediaFileValidationDTO> pathValidation = PathValidationLoader.loadFromPath(
                 this,
                 path,
                 this.artifactType.getMediaFileFormats());
 
-        if (validateEmptyMediaFiles()) {
-            infoHandler(ProcessorMessages.INFO_MEDIA_FILES_SIZE_VALIDATED);
-        }
-
         if (validateArtifactsWithoutArtists()) {
             if (MediaFileValidator.validateArtifacts(this, pathValidation, dbValidation)) {
                 infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);
 
-                List<TrackFlatDTO> tracks = trackRepository.findAllFlatDTOByArtifactTypeId(
-                        artistType, this.artifactType.getId());
+                final List<MediaFileDTO> mediaFiles = mediaFileRepository.findAllDTOByArtifactType(this.artifactType);
 
-                if (TracksValidateUtil.validateEmptyTracksArtifacts(
-                        this,
-                        artifacts,
-                        artifactIds,
-                        tracks)) {
-                    List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
-                            .getArtifactMediaFileValidationMusic(artistType, artifactType);
+                if (MediaFilesValidateUtil.validateEmptyMediaFilesArtifacts(this, artifacts, artifactIds, mediaFiles)) {
+                    if (validateEmptyMediaFiles()) {
+                        infoHandler(ProcessorMessages.INFO_MEDIA_FILES_SIZE_VALIDATED);
+                    }
 
-                    MediaFilesValidateUtil.validateMediaFilesVideoAll(
+                    List<TrackFlatDTO> tracks = trackRepository.findAllFlatDTOByArtifactTypeId(
+                            artistType, this.artifactType.getId());
+
+                    if (TracksValidateUtil.validateEmptyTracksArtifacts(
                             this,
-                            pathValidation,
-                            dbValidation,
-                            dbArtifactValidation);
+                            artifacts,
+                            artifactIds,
+                            tracks)) {
+                        List<MediaFileValidationDTO> dbArtifactValidation = mediaFileRepository
+                                .getArtifactMediaFileValidationMusic(artistType, artifactType);
 
-                    TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
-                            this,
-                            artifactRepository,
-                            List.of(ArtistType.ARTIST, ArtistType.CLASSICS),
-                            List.of(artifactType));
+                        MediaFilesValidateUtil.validateMediaFilesVideoAll(
+                                this,
+                                pathValidation,
+                                dbValidation,
+                                dbArtifactValidation);
+
+                        TracksValidateUtil.validateMonotonicallyIncreasingTrackNumbers(
+                                this,
+                                artifactRepository,
+                                List.of(ArtistType.ARTIST, ArtistType.CLASSICS),
+                                List.of(artifactType));
 
 
-                    TracksValidateUtil.validateTracksDuration(
-                            this,
-                            TrackValidator.ARTIFACT_TITLE_MAPPER,
-                            tracks);
+                        TracksValidateUtil.validateTracksDuration(
+                                this,
+                                TrackValidator.ARTIFACT_TITLE_MAPPER,
+                                tracks);
+                    }
                 }
             }
         }
+
     }
 
     private boolean validateEmptyMediaFiles() {

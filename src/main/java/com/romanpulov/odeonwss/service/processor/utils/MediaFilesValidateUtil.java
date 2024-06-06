@@ -1,5 +1,7 @@
 package com.romanpulov.odeonwss.service.processor.utils;
 
+import com.romanpulov.odeonwss.dto.IdTitleDTO;
+import com.romanpulov.odeonwss.dto.MediaFileDTO;
 import com.romanpulov.odeonwss.dto.MediaFileValidationDTO;
 import com.romanpulov.odeonwss.service.processor.AbstractProcessor;
 import com.romanpulov.odeonwss.service.processor.MediaFileValidator;
@@ -8,8 +10,35 @@ import com.romanpulov.odeonwss.service.processor.ValueValidator;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.romanpulov.odeonwss.service.processor.ValueValidator.nonNullSet;
 
 public class MediaFilesValidateUtil {
+    public static boolean validateEmptyMediaFilesArtifacts(
+            AbstractProcessor processor,
+            List<IdTitleDTO> artifacts,
+            Set<Long> artifactIds,
+            List<MediaFileDTO> mediaFiles
+    ) {
+        Set<Long> artifactIdsDiff = nonNullSet(artifactIds);
+        artifactIdsDiff.removeAll(
+                mediaFiles.stream().map(MediaFileDTO::getArtifactId).collect(Collectors.toSet()));
+        if (!artifactIdsDiff.isEmpty()) {
+            processor.errorHandler(
+                    ProcessorMessages.ERROR_NO_MEDIA_FILES_FOR_ARTIFACT,
+                    artifacts
+                            .stream()
+                            .filter(v -> artifactIdsDiff.contains(v.getId()))
+                            .map(IdTitleDTO::getTitle)
+                            .toList()
+            );
+            return false;
+        } else {
+            return true;
+        }
+    }
 
     public static void validateMediaFilesMusicAll(
             AbstractProcessor processor,

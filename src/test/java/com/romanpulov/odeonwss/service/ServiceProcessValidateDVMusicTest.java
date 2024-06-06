@@ -124,22 +124,17 @@ public class ServiceProcessValidateDVMusicTest {
                         null)
         );
 
-        assertThat(processDetails.get(1).getInfo().getMessage()).isEqualTo("Media files with empty size");
+        assertThat(processDetails.get(1).getInfo().getMessage()).isEqualTo("Artifacts not in files");
         assertThat(processDetails.get(1).getInfo().getItems())
-                .contains("Beauty In Darkness Vol 5.mkv", "Iron Maiden.mkv");
-
-        assertThat(processDetails.get(2).getInfo().getMessage()).isEqualTo("Artifacts not in files");
-        assertThat(processDetails.get(2).getInfo().getItems())
                 .contains("A-HA - Ending On A High Note The Final Concert 2010", "A-HA - Headlines And Deadlines The Hits Of A-HA 1991");
 
-        assertThat(pi.getProcessDetails().get(3)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(2)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
         );
-
     }
 
     @Test
@@ -159,7 +154,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProcessDetails().get(1)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Media files size validated"),
+                        ProcessDetailInfo.fromMessage("Artifacts validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -167,7 +162,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         assertThat(pi.getProcessDetails().get(2)).isEqualTo(
                 new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Artifacts validated"),
+                        ProcessDetailInfo.fromMessage("Media files size validated"),
                         ProcessingStatus.INFO,
                         null,
                         null)
@@ -273,25 +268,16 @@ public class ServiceProcessValidateDVMusicTest {
                         null)
         );
 
-        assertThat(pi.getProcessDetails().get(2)).isEqualTo(
-                new ProcessDetail(
-                        ProcessDetailInfo.fromMessage("Media files size validated"),
-                        ProcessingStatus.INFO,
-                        null,
-                        null)
-        );
-
-        assertThat(pi.getProcessDetails().get(3).getInfo().getMessage()).isEqualTo(
+        assertThat(pi.getProcessDetails().get(2).getInfo().getMessage()).isEqualTo(
                 "Artifacts not in files");
 
-        assertThat(pi.getProcessDetails().get(4)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(3)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Task status"),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
         );
-
     }
 
     @Test
@@ -308,7 +294,7 @@ public class ServiceProcessValidateDVMusicTest {
         ProcessInfo pi = executeProcessor();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(2)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(1)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifacts without artists",
@@ -337,7 +323,7 @@ public class ServiceProcessValidateDVMusicTest {
         ProcessInfo pi = executeProcessor();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
-        assertThat(pi.getProcessDetails().get(2)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(1)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifacts not in files",
@@ -359,7 +345,7 @@ public class ServiceProcessValidateDVMusicTest {
 
         ProcessInfo pi = executeProcessor();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
-        assertThat(pi.getProcessDetails().get(2)).isEqualTo(
+        assertThat(pi.getProcessDetails().get(1)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifacts not in database",
@@ -397,9 +383,37 @@ public class ServiceProcessValidateDVMusicTest {
         );
     }
 
-
     @Test
     @Order(17)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testArtifactWithoutMediaFilesShouldFail() {
+        this.internalPrepareExisting();
+        Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
+                .stream()
+                .filter(a -> a.getTitle().equals("The Cure - Picture Show 1991"))
+                .findFirst().orElseThrow();
+        assertThat(artifact).isNotNull();
+
+        var mediaFiles = mediaFileRepository.findAllByArtifactId(artifact.getId());
+        assertThat(mediaFiles.isEmpty()).isFalse();
+        mediaFileRepository.deleteAll(mediaFiles);
+
+        ProcessInfo pi = executeProcessor();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+        var pd = pi.getProcessDetails();
+        assertThat(pd.get(2)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "No media files for artifact",
+                                List.of("The Cure - Picture Show 1991")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(18)
     @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInDbShouldFail() {
         this.internalPrepareExisting();
@@ -436,7 +450,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(18)
+    @Order(19)
     @Sql({"/schema.sql", "/data.sql"})
     void testNewFileInFilesShouldFail() {
         this.internalPrepareExisting();
@@ -486,7 +500,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(19)
+    @Order(20)
     @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInDbShouldFail() {
         this.internalPrepareExisting();
@@ -518,13 +532,13 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(20)
+    @Order(21)
     @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactFileInFilesShouldFail() {
         this.internalPrepareExisting();
         MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(artifactType)
                 .stream()
-                .filter(m -> m.getName().equals("The Cure - Picture Show 1991.mp4"))
+                .filter(m -> m.getName().equals("Tori Amos - Fade to Red Disk 1 2006.mkv"))
                 .findFirst()
                 .orElseThrow();
         mediaFile.setArtifact(null);
@@ -537,7 +551,7 @@ public class ServiceProcessValidateDVMusicTest {
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessageItems(
                                 "Artifact media files not in database",
-                                List.of("The Cure - Picture Show 1991.mp4")),
+                                List.of("Tori Amos - Fade to Red Disk 1 2006.mkv")),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -545,7 +559,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(21)
+    @Order(22)
     @Sql({"/schema.sql", "/data.sql"})
     void testMediaFileEmptyBitrateShouldFail() {
         this.internalPrepareExisting();
@@ -572,7 +586,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(22)
+    @Order(23)
     @Sql({"/schema.sql", "/data.sql"})
     void testMediaFileSizeDifferentShouldFail() {
         this.internalPrepareExisting();
@@ -608,7 +622,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(23)
+    @Order(24)
     @Sql({"/schema.sql", "/data.sql"})
     void testArtifactMediaFileSizeDifferentShouldFail() {
         this.internalPrepareExisting();
@@ -639,7 +653,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(24)
+    @Order(25)
     @Sql({"/schema.sql", "/data.sql"})
     void testArtifactMediaFileDurationDifferentShouldFail() {
         this.internalPrepareExisting();
@@ -671,7 +685,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(25)
+    @Order(26)
     @Sql({"/schema.sql", "/data.sql"})
     void testArtifactTrackDurationDifferentShouldFail() {
         this.internalPrepareExisting();
@@ -707,7 +721,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(26)
+    @Order(27)
     @Sql({"/schema.sql", "/data.sql"})
     void testMediaFileMissingBitrateShouldFail() {
         this.internalPrepareExisting();
@@ -738,7 +752,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(27)
+    @Order(28)
     @Sql({"/schema.sql", "/data.sql"})
     void testMediaFileMissingWidthShouldFail() {
         this.internalPrepareExisting();
@@ -769,7 +783,7 @@ public class ServiceProcessValidateDVMusicTest {
     }
 
     @Test
-    @Order(28)
+    @Order(29)
     @Sql({"/schema.sql", "/data.sql"})
     void testMediaFileMissingHeightShouldFail() {
         this.internalPrepareExisting();
