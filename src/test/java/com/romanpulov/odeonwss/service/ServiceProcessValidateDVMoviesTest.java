@@ -420,9 +420,67 @@ public class ServiceProcessValidateDVMoviesTest {
         );
     }
 
-
     @Test
     @Order(10)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testArtifactWithoutTracksShouldFail() {
+        this.internalPrepare();
+        var artifact = artifactRepository.getAllByArtifactType(artifactType)
+                .stream()
+                .filter(v -> v.getTitle().equals("Крепкий орешек"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(artifact).isNotNull();
+        var tracks = trackRepository.findAllByArtifact(artifact);
+        trackRepository.deleteAll(tracks);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+        ProcessInfo pi = service.getProcessInfo();
+        var pd = pi.getProcessDetails();
+        assertThat(pd.get(2)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "No tracks for artifact",
+                                List.of("Крепкий орешек")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(11)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testArtifactWithoutMediaFilesShouldFail() {
+        this.internalPrepare();
+
+        Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
+                .stream()
+                .filter(a -> a.getTitle().equals("Крепкий орешек"))
+                .findFirst().orElseThrow();
+        assertThat(artifact).isNotNull();
+
+        var mediaFiles = mediaFileRepository.findAllByArtifactId(artifact.getId());
+        assertThat(mediaFiles.isEmpty()).isFalse();
+        mediaFileRepository.deleteAll(mediaFiles);
+
+        service.executeProcessor(PROCESSOR_TYPE);
+        ProcessInfo pi = service.getProcessInfo();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+        var pd = pi.getProcessDetails();
+        assertThat(pd.get(2)).isEqualTo(
+                new ProcessDetail(
+                        ProcessDetailInfo.fromMessageItems(
+                                "No media files for artifact",
+                                List.of("Крепкий орешек")),
+                        ProcessingStatus.FAILURE,
+                        null,
+                        null)
+        );
+    }
+
+    @Test
+    @Order(12)
     @Sql({"/schema.sql", "/data.sql"})
     void testMissingProductForTrackShouldFail() {
         this.internalPrepare();
@@ -453,7 +511,7 @@ public class ServiceProcessValidateDVMoviesTest {
     }
 
     @Test
-    @Order(11)
+    @Order(13)
     @Sql({"/schema.sql", "/data.sql"})
     void testMonotonicallyIncreasingTrackNumbersShouldFail() {
         this.internalPrepare();
@@ -487,7 +545,7 @@ public class ServiceProcessValidateDVMoviesTest {
     }
 
     @Test
-    @Order(12)
+    @Order(14)
     @Sql({"/schema.sql", "/data.sql"})
     void testHasZeroBitrateShouldFail() {
         this.internalPrepare();
@@ -517,7 +575,7 @@ public class ServiceProcessValidateDVMoviesTest {
     }
 
     @Test
-    @Order(13)
+    @Order(15)
     @Sql({"/schema.sql", "/data.sql"})
     void testMediaFileSizeDifferentShouldFail() {
         this.internalPrepare();
@@ -553,7 +611,7 @@ public class ServiceProcessValidateDVMoviesTest {
     }
 
     @Test
-    @Order(14)
+    @Order(16)
     @Sql({"/schema.sql", "/data.sql"})
     void testArtifactMediaFileSizeDifferentShouldFail() {
         this.internalPrepare();
@@ -585,7 +643,7 @@ public class ServiceProcessValidateDVMoviesTest {
     }
 
     @Test
-    @Order(15)
+    @Order(17)
     @Sql({"/schema.sql", "/data.sql"})
     void testArtifactMediaFileDurationDifferentShouldFail() {
         this.internalPrepare();
@@ -617,7 +675,7 @@ public class ServiceProcessValidateDVMoviesTest {
     }
 
     @Test
-    @Order(16)
+    @Order(18)
     @Sql({"/schema.sql", "/data.sql"})
     void testArtifactTrackDurationDifferentShouldFail() {
         this.internalPrepare();
@@ -653,7 +711,7 @@ public class ServiceProcessValidateDVMoviesTest {
     }
 
     @Test
-    @Order(17)
+    @Order(19)
     @Sql({"/schema.sql", "/data.sql"})
     void testMediaFileMissingBitrateShouldFail() {
         this.internalPrepare();
@@ -684,7 +742,7 @@ public class ServiceProcessValidateDVMoviesTest {
     }
 
     @Test
-    @Order(18)
+    @Order(20)
     @Sql({"/schema.sql", "/data.sql"})
     void testMediaFileMissingWidthShouldFail() {
         this.internalPrepare();
@@ -715,7 +773,7 @@ public class ServiceProcessValidateDVMoviesTest {
     }
 
     @Test
-    @Order(19)
+    @Order(21)
     @Sql({"/schema.sql", "/data.sql"})
     void testMediaFileMissingHeightShouldFail() {
         this.internalPrepare();
