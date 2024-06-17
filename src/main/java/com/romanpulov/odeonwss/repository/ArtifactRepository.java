@@ -104,6 +104,28 @@ public interface ArtifactRepository
     """)
     List<ArtifactFlatDTO> findAllFlatDTOByArtistTypeAndArtifactTypeIds(ArtistType artistType, List<Long> artifactTypeIds);
 
+    @Query("""
+        SELECT
+          a.id AS id,
+          at.id AS artifactTypeId,
+          at.name AS artifactTypeName,
+          ar.type AS artistType,
+          ar.id AS artistId,
+          ar.name AS artistName,
+          a.title AS title,
+          a.year AS year,
+          a.duration AS duration,
+          atg.name AS tagName
+        FROM Artifact as a
+        INNER JOIN ArtifactType as at ON a.artifactType = at
+        LEFT OUTER JOIN Artist as ar ON a.artist = ar
+        LEFT OUTER JOIN ArtifactTag atg ON a = atg.artifact
+        WHERE (:artifactTypeId IS NULL OR a.artifactType.id = :artifactTypeId)
+        AND (:artistId IS NULL OR a.artist.id = :artistId)
+        ORDER BY ar.name, a.year, a.title, atg.name
+    """)
+    List<ArtifactFlatDTO> findAllFlatDTOByOptional(Long artifactTypeId, Long artistId);
+
     @Query(
             "SELECT a " +
             "FROM Artifact as a " +

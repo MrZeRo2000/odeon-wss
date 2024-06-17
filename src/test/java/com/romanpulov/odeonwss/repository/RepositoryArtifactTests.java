@@ -369,4 +369,17 @@ public class RepositoryArtifactTests {
         assertThat(att.get(0).getTagName()).isEqualTo(tagGreen.getName());
         assertThat(att.get(1).getTagName()).isEqualTo(tagRed.getName());
     }
+
+    @Test
+    @Order(13)
+    void testFindAllByOptional() {
+        var noArgs = artifactRepository.findAllFlatDTOByOptional(null, null);
+
+        assertThat(noArgs.size()).isEqualTo(4);
+
+        assertThat(noArgs.get(0).getArtifactTypeId()).isEqualTo(artifactTypeRepository.getWithDVMovies().getId());
+        assertThat(noArgs.get(0).getArtistId()).isNull();
+        assertThat(noArgs.get(0).getTitle()).isEqualTo("Title No Artist");
+        assertThat(noArgs.get(0).getDuration()).isEqualTo(77743L);
+    }
 }
