@@ -374,12 +374,20 @@ public class RepositoryArtifactTests {
     @Order(13)
     void testFindAllByOptional() {
         var noArgs = artifactRepository.findAllFlatDTOByOptional(null, null);
-
         assertThat(noArgs.size()).isEqualTo(4);
 
         assertThat(noArgs.get(0).getArtifactTypeId()).isEqualTo(artifactTypeRepository.getWithDVMovies().getId());
         assertThat(noArgs.get(0).getArtistId()).isNull();
         assertThat(noArgs.get(0).getTitle()).isEqualTo("Title No Artist");
         assertThat(noArgs.get(0).getDuration()).isEqualTo(77743L);
+
+        var byArtist = artifactRepository.findAllFlatDTOByOptional(null, 1L);
+        assertThat(byArtist.size()).isEqualTo(1);
+
+        var byArtifactType = artifactRepository.findAllFlatDTOByOptional(artifactTypeRepository.getWithDVMovies().getId(), null);
+        assertThat(byArtifactType.size()).isEqualTo(3); //with tags
+
+        var byArtistAndArtifactType = artifactRepository.findAllFlatDTOByOptional(artifactTypeRepository.getWithDVMusic().getId(), 1L);
+        assertThat(byArtistAndArtifactType.size()).isEqualTo(1);
     }
 }
