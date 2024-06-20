@@ -30,6 +30,13 @@ public class ArtifactController
         return ResponseEntity.ok(service.getTable(artistType, artifactTypeIds));
     }
 
+    @GetMapping("/table-by-optional")
+    ResponseEntity<List<ArtifactDTO>> getTableByOptional(
+            @RequestParam(required = false) Long artifactTypeId,
+            @RequestParam(required = false) Long artistId) {
+        return ResponseEntity.ok(service.getTableByOptional(artifactTypeId, artistId));
+    }
+
     @PutMapping("/update-tags")
     ResponseEntity<ArtifactDTO> updateTags(@RequestBody ArtifactDTO dto) throws CommonEntityNotFoundException {
         return ResponseEntity.ok(service.updateTags(dto));

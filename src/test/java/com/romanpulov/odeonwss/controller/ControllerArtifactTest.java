@@ -202,7 +202,7 @@ public class ControllerArtifactTest {
     }
 
     @Test
-    @Order(8)
+    @Order(21)
     void testUpdateTags() throws Exception {
         var artifactTagsWrongArtifact = new ArtifactDTOBuilder()
                 .withId(955L)
@@ -264,5 +264,65 @@ public class ControllerArtifactTest {
                 .andExpect(jsonPath("$.id").doesNotExist())
                 .andExpect(jsonPath("$.tags", Matchers.hasSize(0)))
         ;
+    }
+
+    @Test
+    @Order(31)
+    void testGetTableByOptional() throws Exception {
+        var artifactTagsOk = new ArtifactDTOBuilder()
+                .withId(5L)
+                .withTags(List.of("Red", "Green"))
+                .build();
+        String jsonOk = mapper.writeValueAsString(artifactTagsOk);
+
+        this.mockMvc.perform(put("/api/artifact/update-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonOk)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        var resultNoArgs = this.mockMvc.perform(get("/api/artifact/table-by-optional")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(5)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testGetTableByOptional resultNoArgs:{}", resultNoArgs);
+
+        var resultByArtifactTypeId = this.mockMvc.perform(get("/api/artifact/table-by-optional")
+                        .queryParam("artifactTypeId", "101")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(3)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testGetTableByOptional resultByArtifactTypeId:{}", resultByArtifactTypeId);
+
+        var resultByArtistId = this.mockMvc.perform(get("/api/artifact/table-by-optional")
+                        .queryParam("artistId", "2")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(1)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testGetTableByOptional resultByArtistId:{}", resultByArtistId);
+
+        var resultByArtifactTypeIdAndArtistId = this.mockMvc.perform(get("/api/artifact/table-by-optional")
+                        .queryParam("artifactTypeId", "101")
+                        .queryParam("artistId", "1")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testGetTableByOptional resultByArtifactTypeIdAndArtistId:{}", resultByArtifactTypeIdAndArtistId);
     }
 }

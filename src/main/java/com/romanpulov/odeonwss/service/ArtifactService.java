@@ -69,6 +69,11 @@ public class ArtifactService
                 repository.findAllFlatDTOByArtistTypeAndArtifactTypeIds(artistType, artifactTypeIds));
     }
 
+    public List<ArtifactDTO> getTableByOptional(Long artifactTypeId, Long artistId) {
+        return this.artifactTransformer.transform(
+                repository.findAllFlatDTOByOptional(artifactTypeId, artistId));
+    }
+
     public ArtifactDTO updateTags(ArtifactDTO dto) throws CommonEntityNotFoundException {
         Artifact artifact = repository.findById(dto.getId()).orElseThrow(
                 () -> new CommonEntityNotFoundException("Artifact", dto.getId()));
