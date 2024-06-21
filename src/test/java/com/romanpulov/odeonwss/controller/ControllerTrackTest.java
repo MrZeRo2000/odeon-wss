@@ -131,25 +131,10 @@ public class ControllerTrackTest {
                                 .content(json)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andReturn();
-        logger.info("result:" + result.getResponse().getContentAsString());
-
-
-        /*
-        Track track = new EntityTrackBuilder()
-                .withArtifact(artifact)
-                .withTitle("Track title")
-                .withDiskNum(1L)
-                .withNum(8L)
-                .withDuration(6665L)
-                .withDvType(new EntityDVTypeBuilder().withId(7L).build())
-                .build();
-        track.getDvProducts().add(dvProduct);
-
-        trackRepository.save(track);
-        assertThat(track.getId()).isGreaterThan(0);
-
-         */
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testGenerateTestData result:{}", result);
 
         logger.debug("Data generated");
     }
@@ -161,8 +146,10 @@ public class ControllerTrackTest {
                         .param("dvProductId", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty())
-                .andReturn();
-        logger.debug("Get 1 result:" + result_1.getResponse().getContentAsString());
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.debug("testGetTableByProductId Get 1 result:{}", result_1);
 
         var result_2 = mockMvc.perform(get("/api/track/table")
                         .param("dvProductId", "2"))
@@ -187,8 +174,10 @@ public class ControllerTrackTest {
                 .andExpect(jsonPath("$[0].dvProduct.dvCategories").isArray())
                 .andExpect(jsonPath("$[0].dvProduct.dvCategories").isEmpty())
                 .andReturn()
+                .getResponse()
+                .getContentAsString()
                 ;
-        logger.debug("Get 2 result:" + result_2.getResponse().getContentAsString());
+        logger.debug("testGetTableByProductId Get 2 result:{}", result_2);
     }
 
     @Test
@@ -196,8 +185,10 @@ public class ControllerTrackTest {
     void testGetTableByArtifactId() throws Exception {
         var result_1 = mockMvc.perform(get("/api/track/table/10"))
                 .andExpect(status().isNotFound())
-                .andReturn();
-        logger.debug("Get 1 result:" + result_1.getResponse().getContentAsString());
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.debug("testGetTableByArtifactId Get 1 result:{}", result_1);
 
         var result_2 = mockMvc.perform(get("/api/track/table/1"))
                 .andExpect(status().isOk())
@@ -220,8 +211,10 @@ public class ControllerTrackTest {
                 .andExpect(jsonPath("$[0].dvProduct.dvCategories").isArray())
                 .andExpect(jsonPath("$[0].dvProduct.dvCategories").isEmpty())
                 .andReturn()
+                .getResponse()
+                .getContentAsString()
                 ;
-        logger.debug("Get 2 result:" + result_2.getResponse().getContentAsString());
+        logger.debug("testGetTableByArtifactId Get 2 result:{}", result_2);
     }
 
     @Test
@@ -236,9 +229,10 @@ public class ControllerTrackTest {
                                 .content(json)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andReturn();
-        logger.info("result:" + result.getResponse().getContentAsString());
-
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testUIDataPost result:{}", result);
     }
 
     @Test
@@ -253,8 +247,10 @@ public class ControllerTrackTest {
                 .andExpect(jsonPath("$[1].id", Matchers.equalTo(2)))
                 .andExpect(jsonPath("$[1].num", Matchers.equalTo(13)))
                 .andReturn()
+                .getResponse()
+                .getContentAsString()
                 ;
-        logger.debug("Get before result:" + result_before.getResponse().getContentAsString());
+        logger.debug("testResetTrackNumbers Get before result:{}", result_before);
 
         // adjust data - remove disk numbers
         trackRepository.findAll().forEach(t -> {
@@ -269,8 +265,10 @@ public class ControllerTrackTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.aMapWithSize(1)))
                 .andExpect(jsonPath("$.rowsAffected", Matchers.equalTo(2)))
-                .andReturn();
-        logger.info("result:" + result.getResponse().getContentAsString());
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testResetTrackNumbers result:{}", result);
 
         var result_after = mockMvc.perform(get("/api/track/table/1"))
                 .andExpect(status().isOk())
@@ -281,8 +279,10 @@ public class ControllerTrackTest {
                 .andExpect(jsonPath("$[1].id", Matchers.equalTo(2)))
                 .andExpect(jsonPath("$[1].num", Matchers.equalTo(2)))
                 .andReturn()
+                .getResponse()
+                .getContentAsString()
                 ;
-        logger.debug("Get after result:" + result_after.getResponse().getContentAsString());
+        logger.debug("testResetTrackNumbers Get after result:{}", result_after);
     }
 
     @Test
@@ -299,8 +299,10 @@ public class ControllerTrackTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.aMapWithSize(1)))
                 .andExpect(jsonPath("$.rowsAffected", Matchers.equalTo(2)))
-                .andReturn();
-        logger.info("testUpdateTrackDurations result:" + result.getResponse().getContentAsString());
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testUpdateTrackDurations testUpdateTrackDurations result:{}", result);
 
         var result_after = mockMvc.perform(get("/api/track/table/1"))
                 .andExpect(status().isOk())
@@ -310,8 +312,10 @@ public class ControllerTrackTest {
                 .andExpect(jsonPath("$[0].duration", Matchers.equalTo(60 + 55)))
                 .andExpect(jsonPath("$[1].id", Matchers.equalTo(2)))
                 .andExpect(jsonPath("$[1].duration", Matchers.equalTo(800 - 60 - 55)))
-                .andReturn();
-        logger.info("testUpdateTrackDurations tracks after:" + result_after.getResponse().getContentAsString());
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testUpdateTrackDurations testUpdateTrackDurations tracks after:{}", result_after);
     }
 
     @Test
@@ -322,8 +326,7 @@ public class ControllerTrackTest {
                 .withArtifact(new ArtifactDTOBuilder().withId(5).build())
                 .withDVType(new IdNameDTOBuilder().withId(8).build())
                 .build());
-
-        logger.info("testUpdateVideoTypes update object:" + json);
+        logger.info("testUpdateVideoTypes update object:{}", json);
 
         this.mockMvc.perform(
             post("/api/track/update-track-video-types").accept(MediaType.APPLICATION_JSON)
@@ -337,8 +340,7 @@ public class ControllerTrackTest {
                 .withArtifact(new ArtifactDTOBuilder().withId(1).build())
                 .withDVType(new IdNameDTOBuilder().withId(83).build())
                 .build());
-
-        logger.info("testUpdateVideoTypes update object:" + json);
+        logger.info("testUpdateVideoTypesWrongParams testUpdateVideoTypes update object:{}", json);
 
         this.mockMvc.perform(
             post("/api/track/update-track-video-types").accept(MediaType.APPLICATION_JSON)
@@ -351,8 +353,7 @@ public class ControllerTrackTest {
         json = mapper.writeValueAsString(new TrackDVTypeUserUpdateDTOBuilder()
                 .withArtifact(new ArtifactDTOBuilder().withId(1).build())
                 .build());
-
-        logger.info("testUpdateVideoTypes update object:" + json);
+        logger.info("testUpdateVideoTypesWrongParams testUpdateVideoTypes update object:{}", json);
 
         this.mockMvc.perform(
             post("/api/track/update-track-video-types").accept(MediaType.APPLICATION_JSON)
@@ -371,8 +372,10 @@ public class ControllerTrackTest {
                 .andExpect(jsonPath("$", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$[0].dvType.id", Matchers.not(8)))
                 .andExpect(jsonPath("$[1].dvType").doesNotExist())
-                .andReturn();
-        logger.info("testUpdateVideoTypes before:" + result_before.getResponse().getContentAsString());
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testUpdateVideoTypes testUpdateVideoTypes before:{}", result_before);
 
         String json = mapper.writeValueAsString(new TrackDVTypeUserUpdateDTOBuilder()
                 .withArtifact(new ArtifactDTOBuilder().withId(1).build())
@@ -389,8 +392,10 @@ public class ControllerTrackTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.aMapWithSize(1)))
                 .andExpect(jsonPath("$.rowsAffected", Matchers.equalTo(2)))
-                .andReturn();
-        logger.info("testUpdateVideoTypes result:" + result.getResponse().getContentAsString());
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testUpdateVideoTypes result:{}", result);
 
         var result_after = mockMvc.perform(get("/api/track/table/1"))
                 .andExpect(status().isOk())
@@ -398,8 +403,10 @@ public class ControllerTrackTest {
                 .andExpect(jsonPath("$", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$[0].dvType.id", Matchers.equalTo(8)))
                 .andExpect(jsonPath("$[1].dvType.id", Matchers.equalTo(8)))
-                .andReturn();
-        logger.info("testUpdateVideoTypes after:" + result_after.getResponse().getContentAsString());
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testUpdateVideoTypes after:{}", result_after);
     }
 
     @Test
@@ -422,7 +429,6 @@ public class ControllerTrackTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        logger.debug("Get resultNoArgs:{}", resultNoArgs);
+        logger.debug("testGetTableByOptional Get resultNoArgs:{}", resultNoArgs);
     }
-
 }
