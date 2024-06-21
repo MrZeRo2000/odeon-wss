@@ -40,6 +40,13 @@ public class TrackController
         return ResponseEntity.ok(service.getTableByProductId(dvProductId));
     }
 
+    @GetMapping("/table-by-optional")
+    ResponseEntity<List<TrackDTO>> getTableByOptional(
+            @RequestParam(required = false) Long artifactTypeId,
+            @RequestParam(required = false) Long artistId) {
+        return ResponseEntity.ok(service.getTableByOptional(artifactTypeId, artistId));
+    }
+
     @PostMapping("/reset-track-numbers/{artifactId}")
     public ResponseEntity<RowsAffectedDTO> resetTrackNumbers(@PathVariable Long artifactId) throws CommonEntityNotFoundException {
         return ResponseEntity.ok(service.resetTrackNumbers(artifactId));

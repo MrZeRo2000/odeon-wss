@@ -192,7 +192,7 @@ public class ControllerTrackTest {
     }
 
     @Test
-    @Order(3)
+    @Order(2)
     void testGetTableByArtifactId() throws Exception {
         var result_1 = mockMvc.perform(get("/api/track/table/10"))
                 .andExpect(status().isNotFound())
@@ -229,7 +229,7 @@ public class ControllerTrackTest {
     void testUIDataPost() throws Exception {
         var json = """
             {"artifact":{"id":1},"diskNum":1,"num":13,"artist":{},"performerArtist":{},"dvType":{},"title":"34","duration":11,"mediaFiles":[{"id":1},{"id":2}],"dvProduct":{}}
-                """;
+            """;
         var result = this.mockMvc.perform(
                         post("/api/track").accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -401,4 +401,28 @@ public class ControllerTrackTest {
                 .andReturn();
         logger.info("testUpdateVideoTypes after:" + result_after.getResponse().getContentAsString());
     }
+
+    @Test
+    @Order(20)
+    void testGetTableByOptional() throws Exception {
+        var resultNoArgs = mockMvc.perform(get("/api/track/table-by-optional"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].artifactType.id", Matchers.equalTo(202)))
+                .andExpect(jsonPath("$[0].artifactType.name", Matchers.equalTo("Movies")))
+                .andExpect(jsonPath("$[0].artifact.id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].artifact.title", Matchers.equalTo("Title 1")))
+                .andExpect(jsonPath("$[0].num", Matchers.equalTo(2)))
+                .andExpect(jsonPath("$[0].title", Matchers.equalTo("34")))
+                .andExpect(jsonPath("$[0].duration", Matchers.equalTo(685)))
+                .andExpect(jsonPath("$[1].num", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[1].title", Matchers.equalTo("Track title")))
+                .andExpect(jsonPath("$[1].duration", Matchers.equalTo(115)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.debug("Get resultNoArgs:{}", resultNoArgs);
+    }
+
 }
