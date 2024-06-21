@@ -401,4 +401,26 @@ public class ServiceTrackTest {
             assertThat(Optional.ofNullable(track.getDvType()).orElseThrow().getId()).isEqualTo(8L);
         }
     }
+
+    @Test
+    @Order(14)
+    void testGetTableByOptional() {
+        var noArgs = trackService.getTableByOptional(null, null);
+        assertThat(noArgs.size()).isEqualTo(4);
+        assertThat(noArgs.get(0).getArtifactType().getId()).isEqualTo(artifactTypeRepository.getWithMP3().getId());
+        assertThat(noArgs.get(0).getArtifactType().getName()).isEqualTo(artifactTypeRepository.getWithMP3().getName());
+        assertThat(noArgs.get(0).getArtifact().getTitle()).isEqualTo("Title 1");
+        assertThat(noArgs.get(0).getTitle()).isEqualTo("Comp 1-2");
+
+        var byArtist = trackService.getTableByOptional(null, 1L);
+        assertThat(byArtist.isEmpty()).isTrue();
+
+        var byArtifactTypeMP3 = trackService.getTableByOptional(artifactTypeRepository.getWithMP3().getId(), null);
+        assertThat(byArtifactTypeMP3.size()).isEqualTo(1);
+        assertThat(byArtifactTypeMP3.get(0).getTitle()).isEqualTo("Comp 1-2");
+
+        var byArtifactTypeMovies = trackService.getTableByOptional(artifactTypeRepository.getWithDVMovies().getId(), null);
+        assertThat(byArtifactTypeMovies.size()).isEqualTo(3);
+        assertThat(byArtifactTypeMovies.get(1).getTitle()).isEqualTo("Track 02");
+    }
 }
