@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public interface TrackFlatDTO {
     Long getId();
+    Long getArtifactTypeId();
+    String getArtifactTypeName();
     Long getArtifactId();
     String getArtifactTitle();
     Long getArtifactYear();

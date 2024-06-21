@@ -11,6 +11,11 @@ public class TrackDTOBuilder extends AbstractClassBuilder<TrackDTOImpl> {
         super(TrackDTOImpl.class);
     }
 
+    public TrackDTOBuilder withArtifactTypeId(long artifactTypeId) {
+        instance.setArtifactType(new ArtifactTypeDTOBuilder().withId(artifactTypeId).build());
+        return this;
+    }
+
     public TrackDTOBuilder withArtifactId(long artifactId) {
         instance.setArtifact(new ArtifactDTOBuilder().withId(artifactId).build());
         return this;

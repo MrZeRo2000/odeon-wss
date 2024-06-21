@@ -77,6 +77,10 @@ public class TrackService
         return transformer.transform(repository.findAllFlatDTOByDvProductId(productId));
     }
 
+    public List<TrackDTO> getTableByOptional(Long artifactTypeId, Long artistId) {
+        return transformer.transform(repository.findAllFlatDTOByOptional(artifactTypeId, artistId));
+    }
+
     @Override
     @Transactional
     public TrackDTO getById(Long id) throws CommonEntityNotFoundException {
@@ -231,5 +235,6 @@ public class TrackService
         repository.saveAll(tracks);
 
         return RowsAffectedDTO.from(tracks.size());
+
     }
 }

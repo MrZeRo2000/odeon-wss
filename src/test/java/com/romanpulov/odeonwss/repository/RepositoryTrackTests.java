@@ -11,7 +11,6 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -47,13 +46,6 @@ public class RepositoryTrackTests {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     void testInsertGet() {
-        //ArtifactType
-        ArtifactType artifactType = artifactTypeRepository
-                .findAllById(List.of(artifactTypeRepository.getWithMP3().getId()))
-                .iterator()
-                .next();
-        Assertions.assertNotNull(artifactType);
-
         //Artist
         Artist artist = new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name1").build();
         Artist savedArtist = artistRepository.save(artist);
@@ -67,7 +59,7 @@ public class RepositoryTrackTests {
 
         //Artifact
         Artifact artifact = new EntityArtifactBuilder()
-                .withArtifactType(artifactType)
+                .withArtifactType(artifactTypeRepository.getWithMP3())
                 .withArtist(artist)
                 .withTitle("Title 1")
                 .withYear(1982L)
@@ -81,9 +73,20 @@ public class RepositoryTrackTests {
         //Artifact 2
         artifactRepository.save(
                 new EntityArtifactBuilder()
-                        .withArtifactType(artifactType)
+                        .withArtifactType(artifactTypeRepository.getWithMP3())
                         .withArtist(artist)
                         .withTitle("Title 2")
+                        .withYear(1983L)
+                        .withDuration(73556L)
+                        .withInsertDate(LocalDateTime.now().minusDays(5))
+                        .build()
+        );
+
+        //Artifact 3
+        Artifact artifactMovie = artifactRepository.save(
+                new EntityArtifactBuilder()
+                        .withArtifactType(artifactTypeRepository.getWithDVMovies())
+                        .withTitle("Movie 3")
                         .withYear(1983L)
                         .withDuration(73556L)
                         .withInsertDate(LocalDateTime.now().minusDays(5))
@@ -138,6 +141,15 @@ public class RepositoryTrackTests {
 
         Assertions.assertEquals(2, trackRepository.getTracksByArtifactType(artifactTypeRepository.getWithMP3()).size());
         Assertions.assertEquals(0, trackRepository.getTracksByArtifactType(artifactTypeRepository.getWithDVMovies()).size());
+
+        //Track 3
+        Track track3 = new EntityTrackBuilder()
+                .withArtifact(artifactMovie)
+                .withTitle("Movie 3")
+                .withNum(1L)
+                .withDuration(77457L)
+                .build();
+        trackRepository.save(track3);
     }
 
     @Test
@@ -151,7 +163,7 @@ public class RepositoryTrackTests {
         var flatTracks2 = trackRepository.findAllFlatDTOByArtifactId(artifact2.getId());
         assertThat(flatTracks2.size()).isEqualTo(0);
 
-        assertThatThrownBy(() -> artifactRepository.findById(3L).orElseThrow()).isInstanceOf(NoSuchElementException.class);
+        assertThatThrownBy(() -> artifactRepository.findById(4L).orElseThrow()).isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
@@ -277,7 +289,42 @@ public class RepositoryTrackTests {
 
         Track deletedTrack = trackRepository.findByIdWithProducts(1L).orElseThrow();
         assertThat(deletedTrack.getDvProducts().size()).isEqualTo(0);
+    }
 
+    @Test
+    @Order(9)
+    void testFindAllByOptional() {
+        var noArgs = trackRepository.findAllFlatDTOByOptional(null, null);
+        assertThat(noArgs.size()).isEqualTo(3);
 
+        assertThat(noArgs.get(0).getArtifactTypeId()).isEqualTo(artifactTypeRepository.getWithDVMovies().getId());
+        assertThat(noArgs.get(0).getArtifactTypeName()).isEqualTo(artifactTypeRepository.getWithDVMovies().getName());
+        assertThat(noArgs.get(0).getArtistId()).isNull();
+        assertThat(noArgs.get(0).getTitle()).isEqualTo("Movie 3");
+        assertThat(noArgs.get(0).getDiskNum()).isNull();
+        assertThat(noArgs.get(0).getNum()).isEqualTo(1L);
+        assertThat(noArgs.get(0).getDuration()).isEqualTo(77457L);
+
+        assertThat(noArgs.get(1).getArtifactTypeId()).isEqualTo(artifactTypeRepository.getWithMP3().getId());
+        assertThat(noArgs.get(1).getArtifactTypeName()).isEqualTo(artifactTypeRepository.getWithMP3().getName());
+
+        assertThat(noArgs.get(2).getArtistId()).isEqualTo(1L);
+        assertThat(noArgs.get(2).getArtistName()).isEqualTo("Name1");
+
+        var byArtist = trackRepository.findAllFlatDTOByOptional(null, 1L);
+        assertThat(byArtist.size()).isEqualTo(1);
+        assertThat(byArtist.get(0).getTitle()).isEqualTo("Track title updated");
+        assertThat(byArtist.get(0).getArtistId()).isEqualTo(1L);
+        assertThat(byArtist.get(0).getArtistName()).isEqualTo("Name1");
+
+        var byArtifactTypeMP3 = trackRepository.findAllFlatDTOByOptional(artifactTypeRepository.getWithMP3().getId(), null);
+        assertThat(byArtifactTypeMP3.size()).isEqualTo(2);
+
+        var byArtifactTypeMovies = trackRepository.findAllFlatDTOByOptional(artifactTypeRepository.getWithDVMovies().getId(), null);
+        assertThat(byArtifactTypeMovies.size()).isEqualTo(1);
+        assertThat(byArtifactTypeMovies.get(0).getTitle()).isEqualTo("Movie 3");
+
+        var byArtifactTypeAndArtist = trackRepository.findAllFlatDTOByOptional(artifactTypeRepository.getWithMP3().getId(), 1L);
+        assertThat(byArtifactTypeAndArtist.size()).isEqualTo(1);
     }
 }

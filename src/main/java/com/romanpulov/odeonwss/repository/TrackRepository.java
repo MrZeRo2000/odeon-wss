@@ -123,6 +123,31 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
     @Query("""
         SELECT
             c.id AS id,
+            at.id AS artifactTypeId,
+            at.name AS artifactTypeName,
+            a.id AS artifactId,
+            a.title AS artifactTitle,
+            a.year AS artifactYear,
+            ar.id AS artistId,
+            ar.name AS artistName,
+            c.diskNum AS diskNum,
+            c.num AS num,
+            c.title AS title,
+            c.duration AS duration
+        FROM Track c
+        INNER JOIN Artifact a ON c.artifact = a
+        INNER JOIN ArtifactType at ON a.artifactType = at
+        LEFT OUTER JOIN Artist ar ON c.artist = ar
+        WHERE 1 = 1
+          AND (:artifactTypeId IS NULL OR a.artifactType.id = :artifactTypeId)
+          AND (:artistId IS NULL OR c.artist.id = :artistId)
+        ORDER BY c.title, a.year, a.title
+    """)
+    List<TrackFlatDTO> findAllFlatDTOByOptional(Long artifactTypeId, Long artistId);
+
+    @Query("""
+        SELECT
+            c.id AS id,
             c.num AS num,
             c.diskNum AS diskNum,
             c.artifact.id AS artifactId,

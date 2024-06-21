@@ -6,6 +6,7 @@ import java.util.Objects;
 
 public class TrackDTOImpl implements TrackDTO {
     private Long id;
+    private ArtifactTypeDTO artifactType;
     private ArtifactDTO artifact;
     private ArtistDTO artist;
     private ArtistDTO performerArtist;
@@ -22,6 +23,7 @@ public class TrackDTOImpl implements TrackDTO {
     public static TrackDTOImpl fromTrackDTO(TrackDTO dto) {
         TrackDTOImpl instance = new TrackDTOImpl();
         instance.setId(dto.getId());
+        instance.setArtifactType(dto.getArtifactType());
         instance.setArtifact(dto.getArtifact());
         instance.setArtist(dto.getArtist());
         instance.setPerformerArtist(dto.getPerformerArtist());
@@ -46,6 +48,14 @@ public class TrackDTOImpl implements TrackDTO {
     @Override
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public ArtifactTypeDTO getArtifactType() {
+        return artifactType;
+    }
+
+    public void setArtifactType(ArtifactTypeDTO artifactType) {
+        this.artifactType = artifactType;
     }
 
     @Override
