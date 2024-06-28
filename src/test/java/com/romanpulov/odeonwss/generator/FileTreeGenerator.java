@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -91,5 +92,17 @@ public class FileTreeGenerator {
                 FileSystemUtils.deleteRecursively(v);
             } catch (IOException ignore) {}
         });
+    }
+
+    public static <E extends Enum<E>> Map<E, Path> createTempFolders(Class<E> enumClass) {
+        return EnumSet
+                .allOf(enumClass).stream()
+                .collect(Collectors.toMap(v -> v, v -> {
+                    try {
+                        return Files.createTempDirectory(String.valueOf(v));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }));
     }
 }

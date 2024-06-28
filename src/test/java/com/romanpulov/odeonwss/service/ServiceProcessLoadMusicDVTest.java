@@ -17,12 +17,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -80,16 +77,7 @@ public class ServiceProcessLoadMusicDVTest {
     public void setup() throws Exception {
         log.info("Before all");
 
-        tempDirs = EnumSet
-                .allOf(TestFolder.class)
-                .stream()
-                .collect(Collectors.toMap(v -> v, v -> {
-                    try {
-                        return Files.createTempDirectory(String.valueOf(v));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }));
+        tempDirs = FileTreeGenerator.createTempFolders(TestFolder.class);
 
         FileTreeGenerator.generateFromJSON(
                 tempDirs.get(TestFolder.TF_WITHOUT_PARCELABLE),
