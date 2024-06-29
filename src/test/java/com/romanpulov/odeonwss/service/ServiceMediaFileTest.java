@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.service;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.config.AppConfiguration;
 import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.exception.WrongParameterValueException;
 import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
@@ -24,6 +25,7 @@ import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -145,6 +147,8 @@ public class ServiceMediaFileTest {
     @Test
     @Order(3)
     void testInsertToEmptyMediaFiles() throws Exception {
+        mediaFileRepository.deleteAll();
+
         assertThat(StreamSupport
                         .stream(mediaFileRepository
                         .findAll().spliterator(), false)
@@ -161,5 +165,18 @@ public class ServiceMediaFileTest {
                 .sorted(Comparator.comparing(MediaFile::getName))
                 .toList();
         assertThat(mediaFiles).hasSize(2);
+        assertThat(mediaFiles.get(0).getArtifact().getId()).isEqualTo(1);
+        assertThat(mediaFiles.get(0).getName()).isEqualTo("Scary Movie Part 1.mkv");
+        assertThat(mediaFiles.get(0).getFormat()).isEqualTo("MKV");
+        assertThat(mediaFiles.get(0).getSize()).isEqualTo(17433330L);
+        assertThat(mediaFiles.get(0).getBitrate()).isEqualTo(4841);
+        assertThat(mediaFiles.get(0).getDuration()).isEqualTo(28);
+        assertThat(mediaFiles.get(0).getWidth()).isEqualTo(1280);
+        assertThat(mediaFiles.get(0).getHeight()).isEqualTo(720);
+        assertThat(mediaFiles.get(0).getExtra()).isNotNull();
+
+        assertThatThrownBy(() -> service.insertMediaFiles(1L, List.of("Scary Movie Part 1.mkv")))
+                .isInstanceOf(WrongParameterValueException.class)
+                .hasMessageContaining("already exists");
     }
 }
