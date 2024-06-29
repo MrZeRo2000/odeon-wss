@@ -1,6 +1,7 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.dto.MediaFileDTO;
+import com.romanpulov.odeonwss.dto.RowsAffectedDTO;
 import com.romanpulov.odeonwss.dto.TextDTO;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
@@ -44,5 +45,13 @@ public class MediaFileController
             @RequestParam Long artifactId, @RequestParam String mediaFileName)
             throws CommonEntityNotFoundException, WrongParameterValueException {
         return ResponseEntity.ok(service.getMediaFileAttributes(artifactId, mediaFileName));
+    }
+
+    @PostMapping("/insert-media-files/{artifactId}")
+    ResponseEntity<RowsAffectedDTO> postMediaFiles(
+            @PathVariable Long artifactId,
+            @RequestBody List<String> mediaFileNames)
+            throws CommonEntityNotFoundException, WrongParameterValueException {
+        return ResponseEntity.ok(service.insertMediaFiles(artifactId, mediaFileNames));
     }
 }

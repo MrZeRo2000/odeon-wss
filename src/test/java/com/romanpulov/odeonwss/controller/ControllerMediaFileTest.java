@@ -24,6 +24,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -319,5 +321,40 @@ public class ControllerMediaFileTest {
                 .andExpect(jsonPath("$.height", Matchers.is(720)))
                 .andExpect(jsonPath("$.extra").doesNotExist())
         ;
+    }
+
+    @Test
+    @Order(6)
+    void testPostMediaFiles() throws Exception {
+        this.mockMvc.perform(get("/api/media-file/table-id-name-duration/4")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(0)));
+
+        String json = mapper.writeValueAsString(List.of("Tori Amos - Fade to Red Disk 1 2006.mkv", "Tori Amos - Fade to Red Disk 2 2006.mkv"));
+        logger.info("testPostMediaFiles json:{}", json);
+
+        this.mockMvc.perform(post("/api/media-file/insert-media-files/97")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isNotFound());
+
+        String postResult = this.mockMvc.perform(post("/api/media-file/insert-media-files/4")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.aMapWithSize(1)))
+                .andExpect(jsonPath("$.rowsAffected", Matchers.is(2)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testPostMediaFiles postResult:{}", postResult);
+
+        this.mockMvc.perform(get("/api/media-file/table-id-name-duration/4")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)));
     }
 }
