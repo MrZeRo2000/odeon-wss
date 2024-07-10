@@ -10,10 +10,7 @@ import com.romanpulov.odeonwss.entity.ArtistType;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
@@ -120,11 +117,15 @@ public interface ArtifactRepository
         INNER JOIN ArtifactType as at ON a.artifactType = at
         LEFT OUTER JOIN Artist as ar ON a.artist = ar
         LEFT OUTER JOIN ArtifactTag atg ON a = atg.artifact
-        WHERE (:artifactTypeId IS NULL OR a.artifactType.id = :artifactTypeId)
-        AND (:artistId IS NULL OR a.artist.id = :artistId)
+        WHERE (:artifactTypeIdsSize = 0 OR a.artifactType.id IN :artifactTypeIds)
+        AND (:artistIdsSize = 0 OR a.artist.id IN :artistIds)
         ORDER BY ar.name, a.year, a.title, atg.name
     """)
-    List<ArtifactFlatDTO> findAllFlatDTOByOptional(Long artifactTypeId, Long artistId);
+    List<ArtifactFlatDTO> findAllFlatDTOByOptional(
+            Long artifactTypeIdsSize,
+            Collection<Long> artifactTypeIds,
+            Long artistIdsSize,
+            Collection<Long> artistIds);
 
     @Query(
             "SELECT a " +

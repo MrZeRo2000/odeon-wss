@@ -42,9 +42,9 @@ public class TrackController
 
     @GetMapping("/table-by-optional")
     ResponseEntity<List<TrackDTO>> getTableByOptional(
-            @RequestParam(required = false) Long artifactTypeId,
-            @RequestParam(required = false) Long artistId) {
-        return ResponseEntity.ok(service.getTableByOptional(artifactTypeId, artistId));
+            @RequestParam(required = false) List<Long> artifactTypeIds,
+            @RequestParam(required = false) List<Long> artistIds) {
+        return ResponseEntity.ok(service.getTableByOptional(artifactTypeIds, artistIds));
     }
 
     @PostMapping("/reset-track-numbers/{artifactId}")

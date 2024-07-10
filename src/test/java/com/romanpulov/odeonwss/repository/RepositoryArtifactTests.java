@@ -373,7 +373,10 @@ public class RepositoryArtifactTests {
     @Test
     @Order(13)
     void testFindAllByOptional() {
-        var noArgs = artifactRepository.findAllFlatDTOByOptional(null, null);
+        var noArgs = artifactRepository.findAllFlatDTOByOptional(
+                0L, null,
+                0L, null
+        );
         assertThat(noArgs.size()).isEqualTo(4);
 
         assertThat(noArgs.get(0).getArtifactTypeId()).isEqualTo(artifactTypeRepository.getWithDVMovies().getId());
@@ -381,13 +384,31 @@ public class RepositoryArtifactTests {
         assertThat(noArgs.get(0).getTitle()).isEqualTo("Title No Artist");
         assertThat(noArgs.get(0).getDuration()).isEqualTo(77743L);
 
-        var byArtist = artifactRepository.findAllFlatDTOByOptional(null, 1L);
+        var byArtist = artifactRepository.findAllFlatDTOByOptional(
+                0L,null,
+                2L, List.of(1L, 15L)
+        );
         assertThat(byArtist.size()).isEqualTo(1);
 
-        var byArtifactType = artifactRepository.findAllFlatDTOByOptional(artifactTypeRepository.getWithDVMovies().getId(), null);
+        var byArtifactType = artifactRepository.findAllFlatDTOByOptional(
+                1L, List.of(artifactTypeRepository.getWithDVMovies().getId()),
+                0L, null
+        );
         assertThat(byArtifactType.size()).isEqualTo(3); //with tags
 
-        var byArtistAndArtifactType = artifactRepository.findAllFlatDTOByOptional(artifactTypeRepository.getWithDVMusic().getId(), 1L);
+        var byArtistAndArtifactType = artifactRepository.findAllFlatDTOByOptional(
+                1L,
+                List.of(artifactTypeRepository.getWithDVMusic().getId()),
+                1L, List.of(1L)
+        );
         assertThat(byArtistAndArtifactType.size()).isEqualTo(1);
+
+        var byAllArtifactTypes = artifactRepository.findAllFlatDTOByOptional(
+                2L,
+                List.of(artifactTypeRepository.getWithDVMovies().getId(), artifactTypeRepository.getWithDVMusic().getId()),
+                0L,
+                null
+        );
+        assertThat(byAllArtifactTypes.size()).isEqualTo(4);
     }
 }

@@ -32,9 +32,9 @@ public class ArtifactController
 
     @GetMapping("/table-by-optional")
     ResponseEntity<List<ArtifactDTO>> getTableByOptional(
-            @RequestParam(required = false) Long artifactTypeId,
-            @RequestParam(required = false) Long artistId) {
-        return ResponseEntity.ok(service.getTableByOptional(artifactTypeId, artistId));
+            @RequestParam(required = false) List<Long> artifactTypeIds,
+            @RequestParam(required = false) List<Long> artistIds) {
+        return ResponseEntity.ok(service.getTableByOptional(artifactTypeIds, artistIds));
     }
 
     @PutMapping("/update-tags")

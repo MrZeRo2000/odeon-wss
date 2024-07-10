@@ -412,15 +412,20 @@ public class ServiceTrackTest {
         assertThat(noArgs.get(0).getArtifact().getTitle()).isEqualTo("Title 1");
         assertThat(noArgs.get(0).getTitle()).isEqualTo("Comp 1-2");
 
-        var byArtist = trackService.getTableByOptional(null, 1L);
+        var byArtist = trackService.getTableByOptional(null, List.of(1L));
         assertThat(byArtist.isEmpty()).isTrue();
 
-        var byArtifactTypeMP3 = trackService.getTableByOptional(artifactTypeRepository.getWithMP3().getId(), null);
+        var byArtifactTypeMP3 = trackService.getTableByOptional(List.of(artifactTypeRepository.getWithMP3().getId()), null);
         assertThat(byArtifactTypeMP3.size()).isEqualTo(1);
         assertThat(byArtifactTypeMP3.get(0).getTitle()).isEqualTo("Comp 1-2");
 
-        var byArtifactTypeMovies = trackService.getTableByOptional(artifactTypeRepository.getWithDVMovies().getId(), null);
+        var byArtifactTypeMovies = trackService.getTableByOptional(List.of(artifactTypeRepository.getWithDVMovies().getId()), null);
         assertThat(byArtifactTypeMovies.size()).isEqualTo(3);
         assertThat(byArtifactTypeMovies.get(1).getTitle()).isEqualTo("Track 02");
+
+        var byArtifactTypeMP3Movies = trackService.getTableByOptional(
+                List.of(artifactTypeRepository.getWithMP3().getId(), artifactTypeRepository.getWithDVMovies().getId()),
+                null);
+        assertThat(byArtifactTypeMP3Movies.size()).isEqualTo(4);
     }
 }

@@ -9,6 +9,7 @@ import com.romanpulov.odeonwss.entity.Track;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -139,11 +140,16 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
         INNER JOIN ArtifactType at ON a.artifactType = at
         LEFT OUTER JOIN Artist ar ON c.artist = ar
         WHERE 1 = 1
-          AND (:artifactTypeId IS NULL OR a.artifactType.id = :artifactTypeId)
-          AND (:artistId IS NULL OR c.artist.id = :artistId)
+          AND (:artifactTypeIdsSize = 0 OR a.artifactType.id IN :artifactTypeIds)
+          AND (:artistIdsSize = 0 OR c.artist.id IN :artistIds)
         ORDER BY c.title, a.year, a.title
     """)
-    List<TrackFlatDTO> findAllFlatDTOByOptional(Long artifactTypeId, Long artistId);
+    List<TrackFlatDTO> findAllFlatDTOByOptional(
+            Long artifactTypeIdsSize,
+            Collection<Long> artifactTypeIds,
+            Long artistIdsSize,
+            Collection<Long> artistIds
+    );
 
     @Query("""
         SELECT

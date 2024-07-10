@@ -11,6 +11,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -294,7 +295,10 @@ public class RepositoryTrackTests {
     @Test
     @Order(9)
     void testFindAllByOptional() {
-        var noArgs = trackRepository.findAllFlatDTOByOptional(null, null);
+        var noArgs = trackRepository.findAllFlatDTOByOptional(
+                0L, null,
+                0L, null
+        );
         assertThat(noArgs.size()).isEqualTo(3);
 
         assertThat(noArgs.get(0).getArtifactTypeId()).isEqualTo(artifactTypeRepository.getWithDVMovies().getId());
@@ -311,20 +315,29 @@ public class RepositoryTrackTests {
         assertThat(noArgs.get(2).getArtistId()).isEqualTo(1L);
         assertThat(noArgs.get(2).getArtistName()).isEqualTo("Name1");
 
-        var byArtist = trackRepository.findAllFlatDTOByOptional(null, 1L);
+        var byArtist = trackRepository.findAllFlatDTOByOptional(
+                0L, null,
+                1L, List.of(1L));
         assertThat(byArtist.size()).isEqualTo(1);
         assertThat(byArtist.get(0).getTitle()).isEqualTo("Track title updated");
         assertThat(byArtist.get(0).getArtistId()).isEqualTo(1L);
         assertThat(byArtist.get(0).getArtistName()).isEqualTo("Name1");
 
-        var byArtifactTypeMP3 = trackRepository.findAllFlatDTOByOptional(artifactTypeRepository.getWithMP3().getId(), null);
+        var byArtifactTypeMP3 = trackRepository.findAllFlatDTOByOptional(
+                1L, List.of(artifactTypeRepository.getWithMP3().getId()),
+                0L, null
+        );
         assertThat(byArtifactTypeMP3.size()).isEqualTo(2);
 
-        var byArtifactTypeMovies = trackRepository.findAllFlatDTOByOptional(artifactTypeRepository.getWithDVMovies().getId(), null);
+        var byArtifactTypeMovies = trackRepository.findAllFlatDTOByOptional(
+                1L, List.of(artifactTypeRepository.getWithDVMovies().getId()),
+                0L, null);
         assertThat(byArtifactTypeMovies.size()).isEqualTo(1);
         assertThat(byArtifactTypeMovies.get(0).getTitle()).isEqualTo("Movie 3");
 
-        var byArtifactTypeAndArtist = trackRepository.findAllFlatDTOByOptional(artifactTypeRepository.getWithMP3().getId(), 1L);
+        var byArtifactTypeAndArtist = trackRepository.findAllFlatDTOByOptional(
+                1L, List.of(artifactTypeRepository.getWithMP3().getId()),
+                1L, List.of(1L));
         assertThat(byArtifactTypeAndArtist.size()).isEqualTo(1);
     }
 }

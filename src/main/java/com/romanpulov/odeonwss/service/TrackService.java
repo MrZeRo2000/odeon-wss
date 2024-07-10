@@ -77,8 +77,13 @@ public class TrackService
         return transformer.transform(repository.findAllFlatDTOByDvProductId(productId));
     }
 
-    public List<TrackDTO> getTableByOptional(Long artifactTypeId, Long artistId) {
-        return transformer.transform(repository.findAllFlatDTOByOptional(artifactTypeId, artistId));
+    public List<TrackDTO> getTableByOptional(Collection<Long> artifactTypeIds, Collection<Long> artistIds) {
+        return transformer.transform(repository.findAllFlatDTOByOptional(
+                artifactTypeIds == null ? 0 : (long)artifactTypeIds.size(),
+                artifactTypeIds,
+                artistIds == null ? 0 : (long)artistIds.size(),
+                artistIds
+        ));
     }
 
     @Override

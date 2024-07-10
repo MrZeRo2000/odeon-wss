@@ -292,7 +292,7 @@ public class ControllerArtifactTest {
         logger.info("testGetTableByOptional resultNoArgs:{}", resultNoArgs);
 
         var resultByArtifactTypeId = this.mockMvc.perform(get("/api/artifact/table-by-optional")
-                        .queryParam("artifactTypeId", "101")
+                        .queryParam("artifactTypeIds", "101")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -303,7 +303,7 @@ public class ControllerArtifactTest {
         logger.info("testGetTableByOptional resultByArtifactTypeId:{}", resultByArtifactTypeId);
 
         var resultByArtistId = this.mockMvc.perform(get("/api/artifact/table-by-optional")
-                        .queryParam("artistId", "2")
+                        .queryParam("artistIds", "2")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -314,8 +314,8 @@ public class ControllerArtifactTest {
         logger.info("testGetTableByOptional resultByArtistId:{}", resultByArtistId);
 
         var resultByArtifactTypeIdAndArtistId = this.mockMvc.perform(get("/api/artifact/table-by-optional")
-                        .queryParam("artifactTypeId", "101")
-                        .queryParam("artistId", "1")
+                        .queryParam("artifactTypeIds", "101")
+                        .queryParam("artistIds", "1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -324,5 +324,17 @@ public class ControllerArtifactTest {
                 .getResponse()
                 .getContentAsString();
         logger.info("testGetTableByOptional resultByArtifactTypeIdAndArtistId:{}", resultByArtifactTypeIdAndArtistId);
+
+        var resultByAllArtifactTypeIds = this.mockMvc.perform(get("/api/artifact/table-by-optional")
+                        .queryParam("artifactTypeIds", "101")
+                        .queryParam("artifactTypeIds", "202")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(4)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testGetTableByOptional resultByAllArtifactTypeIds:{}", resultByAllArtifactTypeIds);
     }
 }
