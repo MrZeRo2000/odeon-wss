@@ -5,14 +5,8 @@ import com.romanpulov.odeonwss.builder.dtobuilder.ArtifactDTOBuilder;
 import com.romanpulov.odeonwss.builder.dtobuilder.IdNameDTOBuilder;
 import com.romanpulov.odeonwss.builder.dtobuilder.TrackDTOBuilder;
 import com.romanpulov.odeonwss.builder.dtobuilder.TrackDVTypeUserUpdateDTOBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVOriginBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVProductBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.DVOrigin;
-import com.romanpulov.odeonwss.entity.DVProduct;
-import com.romanpulov.odeonwss.entity.MediaFile;
+import com.romanpulov.odeonwss.builder.entitybuilder.*;
+import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
@@ -45,6 +39,9 @@ public class ControllerTrackTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ArtistRepository artistRepository;
 
     @Autowired
     private ArtifactTypeRepository artifactTypeRepository;
@@ -80,7 +77,6 @@ public class ControllerTrackTest {
                         .withName("Product Origin")
                         .build()
         );
-
 
         dvProductRepository.save(new EntityDVProductBuilder()
                 .withArtifactType(artifactTypeRepository.getWithDVMovies())
@@ -135,6 +131,28 @@ public class ControllerTrackTest {
                 .getResponse()
                 .getContentAsString();
         logger.info("testGenerateTestData result:{}", result);
+
+        var artist = new EntityArtistBuilder()
+                .withType(ArtistType.ARTIST)
+                .withName("Jimmy")
+                .build();
+        artistRepository.save(artist);
+
+        var musicArtifact = new EntityArtifactBuilder()
+                .withArtifactType(artifactTypeRepository.getWithMP3())
+                .withArtist(artist)
+                .withTitle("Music title")
+                .withDuration(65432L)
+                .build();
+        artifactRepository.save(musicArtifact);
+
+        var musicTrack = new EntityTrackBuilder()
+                .withArtifact(musicArtifact)
+                .withArtist(artist)
+                .withTitle("Music track title")
+                .withDuration(5233L)
+                .build();
+        trackRepository.save(musicTrack);
 
         logger.debug("Data generated");
     }
@@ -244,7 +262,7 @@ public class ControllerTrackTest {
                 .andExpect(jsonPath("$", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
                 .andExpect(jsonPath("$[0].num", Matchers.equalTo(8)))
-                .andExpect(jsonPath("$[1].id", Matchers.equalTo(2)))
+                .andExpect(jsonPath("$[1].id", Matchers.equalTo(3)))
                 .andExpect(jsonPath("$[1].num", Matchers.equalTo(13)))
                 .andReturn()
                 .getResponse()
@@ -276,7 +294,7 @@ public class ControllerTrackTest {
                 .andExpect(jsonPath("$", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
                 .andExpect(jsonPath("$[0].num", Matchers.equalTo(1)))
-                .andExpect(jsonPath("$[1].id", Matchers.equalTo(2)))
+                .andExpect(jsonPath("$[1].id", Matchers.equalTo(3)))
                 .andExpect(jsonPath("$[1].num", Matchers.equalTo(2)))
                 .andReturn()
                 .getResponse()
@@ -310,7 +328,7 @@ public class ControllerTrackTest {
                 .andExpect(jsonPath("$", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
                 .andExpect(jsonPath("$[0].duration", Matchers.equalTo(60 + 55)))
-                .andExpect(jsonPath("$[1].id", Matchers.equalTo(2)))
+                .andExpect(jsonPath("$[1].id", Matchers.equalTo(3)))
                 .andExpect(jsonPath("$[1].duration", Matchers.equalTo(800 - 60 - 55)))
                 .andReturn()
                 .getResponse()
@@ -415,7 +433,7 @@ public class ControllerTrackTest {
         var resultNoArgs = mockMvc.perform(get("/api/track/table-by-optional"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$", Matchers.hasSize(3)))
                 .andExpect(jsonPath("$[0].artifactType.id", Matchers.equalTo(202)))
                 .andExpect(jsonPath("$[0].artifactType.name", Matchers.equalTo("Movies")))
                 .andExpect(jsonPath("$[0].artifact.id", Matchers.equalTo(1)))
@@ -423,9 +441,10 @@ public class ControllerTrackTest {
                 .andExpect(jsonPath("$[0].num", Matchers.equalTo(2)))
                 .andExpect(jsonPath("$[0].title", Matchers.equalTo("34")))
                 .andExpect(jsonPath("$[0].duration", Matchers.equalTo(685)))
-                .andExpect(jsonPath("$[1].num", Matchers.equalTo(1)))
-                .andExpect(jsonPath("$[1].title", Matchers.equalTo("Track title")))
-                .andExpect(jsonPath("$[1].duration", Matchers.equalTo(115)))
+                .andExpect(jsonPath("$[1].title", Matchers.equalTo("Music track title")))
+                .andExpect(jsonPath("$[1].duration", Matchers.equalTo(5233)))
+                .andExpect(jsonPath("$[1].artist.id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[1].artist.artistName", Matchers.equalTo("Jimmy")))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
