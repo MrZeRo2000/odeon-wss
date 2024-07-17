@@ -318,10 +318,13 @@ public class RepositoryTrackTests {
         var byArtist = trackRepository.findAllFlatDTOByOptional(
                 0L, null,
                 1L, List.of(1L));
-        assertThat(byArtist.size()).isEqualTo(1);
-        assertThat(byArtist.get(0).getTitle()).isEqualTo("Track title updated");
+        assertThat(byArtist.size()).isEqualTo(2);
+        assertThat(byArtist.get(0).getTitle()).isEqualTo("Track title 2");
         assertThat(byArtist.get(0).getArtistId()).isEqualTo(1L);
         assertThat(byArtist.get(0).getArtistName()).isEqualTo("Name1");
+        assertThat(byArtist.get(1).getTitle()).isEqualTo("Track title updated");
+        assertThat(byArtist.get(1).getArtistId()).isEqualTo(1L);
+        assertThat(byArtist.get(1).getArtistName()).isEqualTo("Name1");
 
         var byArtifactTypeMP3 = trackRepository.findAllFlatDTOByOptional(
                 1L, List.of(artifactTypeRepository.getWithMP3().getId()),
@@ -338,6 +341,6 @@ public class RepositoryTrackTests {
         var byArtifactTypeAndArtist = trackRepository.findAllFlatDTOByOptional(
                 1L, List.of(artifactTypeRepository.getWithMP3().getId()),
                 1L, List.of(1L));
-        assertThat(byArtifactTypeAndArtist.size()).isEqualTo(1);
+        assertThat(byArtifactTypeAndArtist.size()).isEqualTo(2);
     }
 }

@@ -413,7 +413,7 @@ public class ServiceTrackTest {
         assertThat(noArgs.get(0).getTitle()).isEqualTo("Comp 1-2");
 
         var byArtist = trackService.getTableByOptional(null, List.of(1L));
-        assertThat(byArtist.isEmpty()).isTrue();
+        assertThat(byArtist.size()).isEqualTo(1);
 
         var byArtifactTypeMP3 = trackService.getTableByOptional(List.of(artifactTypeRepository.getWithMP3().getId()), null);
         assertThat(byArtifactTypeMP3.size()).isEqualTo(1);
