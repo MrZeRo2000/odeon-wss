@@ -129,8 +129,8 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
             a.id AS artifactId,
             a.title AS artifactTitle,
             a.year AS artifactYear,
-            ar.id AS artistId,
-            ar.name AS artistName,
+            COALESCE(ac.id, aa.id) AS artistId,
+            COALESCE(ac.name, aa.name) AS artistName,
             c.diskNum AS diskNum,
             c.num AS num,
             c.title AS title,
@@ -138,10 +138,11 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
         FROM Track c
         INNER JOIN Artifact a ON c.artifact = a
         INNER JOIN ArtifactType at ON a.artifactType = at
-        LEFT OUTER JOIN Artist ar ON c.artist = ar
+        LEFT OUTER JOIN Artist ac ON c.artist = ac
+        LEFT OUTER JOIN Artist aa ON a.artist = aa
         WHERE 1 = 1
           AND (:artifactTypeIdsSize = 0 OR a.artifactType.id IN :artifactTypeIds)
-          AND (:artistIdsSize = 0 OR c.artist.id IN :artistIds)
+          AND (:artistIdsSize = 0 OR COALESCE(c.artist.id, a.artist.id) IN :artistIds)
         ORDER BY c.title, a.year, a.title
     """)
     List<TrackFlatDTO> findAllFlatDTOByOptional(
