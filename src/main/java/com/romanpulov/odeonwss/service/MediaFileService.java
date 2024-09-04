@@ -9,6 +9,7 @@ import com.romanpulov.odeonwss.mapper.MediaFileMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
+import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.processor.PathReader;
 import com.romanpulov.odeonwss.service.processor.ProcessorException;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
@@ -34,6 +35,7 @@ public class MediaFileService
     private final ArtifactTypeService artifactTypeService;
     private final MediaParser mediaParser;
     private final MediaFileMapper mediaFileMapper;
+    private final TrackRepository trackRepository;
 
     public MediaFileService(
             MediaFileRepository mediaFileRepository,
@@ -41,7 +43,7 @@ public class MediaFileService
             MediaFileMapper mediaFileMapper,
             ArtifactRepository artifactRepository,
             ArtifactTypeRepository artifactTypeRepository,
-            ArtifactTypeService artifactTypeService) {
+            ArtifactTypeService artifactTypeService, TrackRepository trackRepository) {
         super(mediaFileRepository, mediaFileMapper);
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
@@ -54,14 +56,22 @@ public class MediaFileService
         });
         this.mediaParser = mediaParser;
         this.mediaFileMapper = mediaFileMapper;
+        this.trackRepository = trackRepository;
     }
 
     public List<MediaFileDTO> getTable(Long artifactId) throws CommonEntityNotFoundException {
-        Optional<Artifact> existingArtifact = artifactRepository.findById(artifactId);
-        if (existingArtifact.isPresent()) {
+        if (artifactRepository.existsById(artifactId)) {
             return repository.findAllDTOByArtifactId(artifactId);
         } else {
             throw new CommonEntityNotFoundException("Artifact", artifactId);
+        }
+    }
+
+    public List<MediaFileDTO> getTableByTrackId(Long trackId) throws CommonEntityNotFoundException {
+        if (trackRepository.existsById(trackId)) {
+            return repository.findAllDTOByTrackId(trackId);
+        } else {
+            throw new CommonEntityNotFoundException("Track", trackId);
         }
     }
 

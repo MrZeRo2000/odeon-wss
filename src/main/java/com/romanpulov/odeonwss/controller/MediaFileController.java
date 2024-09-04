@@ -29,6 +29,11 @@ public class MediaFileController
         return ResponseEntity.ok(service.getTable(artifactId));
     }
 
+    @GetMapping("/table")
+    ResponseEntity<List<MediaFileDTO>> getTableByTrackId(@RequestParam Long trackId) throws CommonEntityNotFoundException {
+        return ResponseEntity.ok(service.getTableByTrackId(trackId));
+    }
+
     @GetMapping("/table-id-name-duration/{artifactId}")
     ResponseEntity<List<MediaFileDTO>> getTableIdNameDuration(@PathVariable Long artifactId)
             throws CommonEntityNotFoundException {

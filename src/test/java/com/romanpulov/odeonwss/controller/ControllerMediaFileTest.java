@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.odeonwss.builder.dtobuilder.MediaFileDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.TrackDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entity.Artifact;
@@ -112,6 +113,26 @@ public class ControllerMediaFileTest {
                 .andReturn();
         logger.info("result 11:" + result11.getResponse().getContentAsString());
 
+        String json111 = mapper.writeValueAsString(
+                new TrackDTOBuilder()
+                        .withArtifactId(artifact1.getId())
+                        .withTitle("Track title 11")
+                        .withDiskNum(1L)
+                        .withNum(8L)
+                        .withDuration(52345L)
+                        .withMediaFileIds(List.of(1L))
+                        .build()
+        );
+
+        var result111 = this.mockMvc.perform(
+                        post("/api/track").accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json111)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        logger.info("result 111:" + result111.getResponse().getContentAsString());
+
         String json12 = mapper.writeValueAsString(
                 new MediaFileDTOBuilder()
                         .withArtifactId(artifact1.getId())
@@ -212,7 +233,26 @@ public class ControllerMediaFileTest {
                 .andReturn()
         ;
         logger.debug("testGetTableArtifact1:" + result.getResponse().getContentAsString());
+    }
 
+    @Test
+    @Order(2)
+    void testGetTableTrack1() throws Exception {
+        var result = this.mockMvc.perform(get("/api/media-file/table?trackId=1")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(6)))
+                .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].name", Matchers.equalTo("Name 11")))
+                .andExpect(jsonPath("$[0].format", Matchers.equalTo("ape")))
+                .andExpect(jsonPath("$[0].bitrate", Matchers.equalTo(1000)))
+                .andExpect(jsonPath("$[0].duration", Matchers.equalTo(52345)))
+                .andExpect(jsonPath("$[0].size", Matchers.equalTo(3423)))
+                .andReturn()
+        ;
+        logger.debug("testGetTableTrack1:" + result.getResponse().getContentAsString());
     }
 
     @Test

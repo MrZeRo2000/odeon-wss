@@ -90,7 +90,26 @@ public interface MediaFileRepository extends EntityDTORepository<MediaFile, Medi
         WHERE m.artifact.id = :artifactId
         ORDER BY m.name
     """)
+
     List<MediaFileDTO> findAllDTOByArtifactId(long artifactId);
+
+    @Query("""
+        SELECT
+          m.id AS id,
+          m.name AS name,
+          m.format AS format,
+          m.size AS size,
+          m.bitrate AS bitrate,
+          m.duration AS duration,
+          m.width AS width,
+          m.height AS height,
+          CASE WHEN m.extra IS NOT NULL THEN 1 END AS hasExtra
+        FROM MediaFile m
+        LEFT OUTER JOIN TrackMediaFile cm ON cm.mediaFileId = m.id
+        WHERE cm.trackId = :trackId
+        ORDER BY m.name
+    """)
+    List<MediaFileDTO> findAllDTOByTrackId(long trackId);
 
     @Query("""
         SELECT

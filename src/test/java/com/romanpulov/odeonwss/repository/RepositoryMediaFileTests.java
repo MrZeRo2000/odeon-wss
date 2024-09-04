@@ -94,19 +94,21 @@ public class RepositoryMediaFileTests {
                 .withBitrate(320L)
                 .withMigrationId(230L)
                 .build();
+        MediaFile savedMediaFile = mediaFileRepository.save(mediaFile);
 
-        Track track = new EntityTrackBuilder()
+        Track track1 = new EntityTrackBuilder()
                 .withArtifact(artifact)
-                .withTitle("Track title")
+                .withTitle("Track AAA")
                 .withNum(1L)
                 .withDiskNum(1L)
                 .withDuration(123456L)
+                .withMediaFile(mediaFile)
                 .build();
+        trackRepository.save(track1);
 
-        trackRepository.save(track);
-
-        MediaFile savedMediaFile = mediaFileRepository.save(mediaFile);
         Assertions.assertNotNull(savedMediaFile.getId());
+        Assertions.assertNotNull(track1.getId());
+
         Assertions.assertEquals(artifact, mediaFile.getArtifact());
         Assertions.assertEquals(savedMediaFile.getName(), mediaFile.getName());
         Assertions.assertEquals(savedMediaFile.getFormat(), mediaFile.getFormat());
@@ -126,6 +128,16 @@ public class RepositoryMediaFileTests {
                 .withBitrate(320L)
                 .build();
         mediaFileRepository.save(mediaFile);
+
+        Track track2 = new EntityTrackBuilder()
+                .withArtifact(artifact)
+                .withTitle("Track BBB")
+                .withNum(2L)
+                .withDiskNum(1L)
+                .withDuration(7234L)
+                .withMediaFile(mediaFile)
+                .build();
+        trackRepository.save(track2);
 
         Artifact movieArtifact = new EntityArtifactBuilder()
                 .withArtifactType(artifactTypeRepository.getWithDVMovies())
@@ -171,7 +183,7 @@ public class RepositoryMediaFileTests {
     void testTrackValidation() {
         List<MediaFileValidationDTO> mediaFileValidation =
                 mediaFileRepository.getTrackMediaFileValidationMusic(ArtistType.ARTIST, artifactTypeRepository.getWithMP3());
-        Assertions.assertEquals(1, mediaFileValidation.size());
+        Assertions.assertEquals(2, mediaFileValidation.size());
     }
 
     @Test
@@ -225,7 +237,7 @@ public class RepositoryMediaFileTests {
 
     @Test
     @Order(5)
-    void testMediaFileAllDTO() {
+    void testMediaFileAllDTOByArtifactId() {
         var audioDTOs = mediaFileRepository.findAllDTOByArtifactId(1L);
         assertThat(audioDTOs.size()).isEqualTo(3);
         assertThat(audioDTOs.get(0).getName()).isEqualTo("AAA.mp3");
@@ -238,6 +250,18 @@ public class RepositoryMediaFileTests {
         assertThat(videoDTOs.get(0).getHeight()).isEqualTo(720L);
         assertThat(videoDTOs.get(0).getHasExtra()).isEqualTo(1L);
         assertThat(videoDTOs.get(0).getExtra()).isNull();
+    }
+
+    @Test
+    @Order(5)
+    void testMediaFileAllDTOByTrackId() {
+        var track1DTOs = mediaFileRepository.findAllDTOByTrackId(1L);
+        assertThat(track1DTOs.size()).isEqualTo(1);
+        assertThat(track1DTOs.get(0).getName()).isEqualTo("AAA.mp3");
+
+        var track2DTOs = mediaFileRepository.findAllDTOByTrackId(2L);
+        assertThat(track2DTOs.size()).isEqualTo(1);
+        assertThat(track2DTOs.get(0).getName()).isEqualTo("BBB.mp3");
     }
 
     @Test
@@ -285,7 +309,4 @@ public class RepositoryMediaFileTests {
         assertThat(afterUpdateDateTime.isAfter(beforeUpdateDateTime)).isTrue();
         assertThat(afterUpdateDateTime.isAfter(currentDateTime)).isTrue();
     }
-
-
-
 }
