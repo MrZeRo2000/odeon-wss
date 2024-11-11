@@ -18,12 +18,19 @@ from file_utils import validate_file_name_and_path, get_file_lines
 class FileRenamer:
     MEDIA_FILE_EXTENSIONS = "AVI|M4V|MKV|MP4|MPG|VOB|WMV".split("|")
 
-    def __init__(self, file_names: str, folder_name: str, display: bool, logger: logging.Logger):
+    def __init__(self, file_names: str, folder_name: str, display: bool, display_size: int, logger: logging.Logger):
         self.file_names = file_names
         self.folder_name = folder_name
         self.display = display
+        self.display_size = display_size
         self.name_parser = re.compile(r"^\d{2,3}\s\S+")
         self.logger = logger
+
+    def align_text(self, text: str) -> str:
+        if len(text) > self.display_size:
+            return f"{text[:self.display_size - 4]} ..."
+        else:
+            return f"{text}{' '*(self.display_size - len(text))}"
 
     def get_media_file_names(self) -> list[str]:
         return sorted([f for f in os.listdir(self.folder_name)
@@ -48,9 +55,7 @@ class FileRenamer:
             file_name_to = os.path.join(self.folder_name, new_file_name_formatted)
 
             if self.display:
-                self.logger.info(horizontal_delimiter)
-                self.logger.info(f"From: {file_names[idx]}")
-                self.logger.info(f"  To: {new_file_name_formatted} ({rename_mode})")
+                self.logger.info(f"{self.align_text(file_names[idx])}|{self.align_text(new_file_name_formatted)}|{rename_mode}")
             else:
                 self.logger.info(f"Renaming {file_name_from} to {file_name_to}")
                 os.replace(file_name_from, file_name_to)
@@ -90,9 +95,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("file_names", help="File with file names for renaming")
     parser.add_argument("--display", action='store_true', help="Display renamed files, no renaming")
-    # parser.add_argument("folder_name", help="Folder with files to be renamed")    
+    parser.add_argument("--display-size", type=int, default=30,  help="Display size, default 30")
 
     args = parser.parse_args()
 
     args_folder_name = os.path.dirname(args.file_names)
-    FileRenamer(args.file_names, args_folder_name, args.display, get_logger("rename_files"))()
+    FileRenamer(args.file_names, args_folder_name, args.display, args.display_size, get_logger("rename_files"))()
