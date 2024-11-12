@@ -2,6 +2,7 @@ import os
 import pytest
 from random_words import RandomWords
 import random
+import uuid
 
 from src.rename_files import FileRenamer
 from src.logger import get_logger
@@ -63,7 +64,7 @@ def get_output_file_names(data_path: str) -> list[str]:
 
 def test_by_index(generate_data_by_index) -> None:
     data_path = os.path.join(ROOT_DATA_PATH, "rename_files_by_index")
-    FileRenamer(os.path.join(data_path, "names_by_index.txt"), data_path, False, get_logger("test_by_index"))()
+    FileRenamer(os.path.join(data_path, "names_by_index.txt"), data_path, False, False, get_logger("test_by_index"))()
     output_file_names = get_output_file_names(data_path)
 
     for i in range(len(output_file_names)):
@@ -71,9 +72,57 @@ def test_by_index(generate_data_by_index) -> None:
 
 def test_from_file(generate_data_from_file) -> None:
     data_path = os.path.join(ROOT_DATA_PATH, "rename_files_from_file")
-    FileRenamer(os.path.join(data_path, "names_from_file.txt"), data_path, False, get_logger("test_from_file"))()
+    FileRenamer(os.path.join(data_path, "names_from_file.txt"), data_path, False, False, get_logger("test_from_file"))()
     output_file_names = get_output_file_names(data_path)
     data_from_file = sorted(generate_data_from_file[1])
 
     for i in range(len(output_file_names)):
         assert output_file_names[i] == data_from_file[i]
+
+@pytest.mark.parametrize(
+    'rename_from,rename_to,expected_from,expected_to',
+    [
+        (["aaa.mkv", "bbb.mkv", "ccc.mkv"], ["bbb", "ccc", "aaa"],
+         ["bbb.mkv", "ccc.mkv", "aaa.mkv"],
+         ["01 bbb.mkv", "02 ccc.mkv", "03 aaa.mkv"]),
+        (
+            [
+                "Electric 6 - Danger Hight Voltage.mkv",
+                "Garbage - Run Baby Run.mkv",
+                "Muse - Supermassive Black Hole.mkv",
+                "The Killers - Somebody Told Me.mkv",
+                "Wheatus - Teenage Dirtba.mkv"
+            ], [
+                "The Killers - Somebody Told Me",
+                "Electric 6 - Danger! High Voltage",
+                "Wheatus - Teenage Dirtbag",
+                "Garbage - Run Baby Run",
+                "Muse - Supermassive Black Hole"
+            ], [
+                "The Killers - Somebody Told Me.mkv",
+                "Electric 6 - Danger Hight Voltage.mkv",
+                "Wheatus - Teenage Dirtba.mkv",
+                "Garbage - Run Baby Run.mkv",
+                "Muse - Supermassive Black Hole.mkv"
+            ], [
+                "01 The Killers - Somebody Told Me.mkv",
+                "02 Electric 6 - Danger! High Voltage.mkv",
+                "03 Wheatus - Teenage Dirtbag.mkv",
+                "04 Garbage - Run Baby Run.mkv",
+                "05 Muse - Supermassive Black Hole.mkv"
+            ]
+        )
+    ]
+)
+def test_with_levenstein(rename_from,rename_to,expected_from, expected_to) -> None:
+    rn = FileRenamer(
+        "stub",
+        "dummy",
+        True,
+        False,
+        get_logger(f"test_with_levenstein_{uuid.uuid4()}"))
+    value_from = [v[0] for v in rn.get_renaming_list(rename_to, rename_from)]
+    value_to = [v[1] for v in rn.get_renaming_list(rename_to, rename_from)]
+
+    assert value_from == expected_from
+    assert value_to == expected_to
