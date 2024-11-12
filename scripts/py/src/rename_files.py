@@ -122,10 +122,12 @@ class FileRenamer:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("file_names", help="File with file names for renaming")
-    parser.add_argument("--levenstein", default=False, help="Use name similarity for renaming")
+    parser.add_argument("--levenstein",  action='store_true', help="Use name similarity for renaming")
     parser.add_argument("--display", action='store_true', help="Display renamed files, no renaming")
 
     args = parser.parse_args()
+
+    print(f"Starting with args: {str(args)}")
 
     args_folder_name = os.path.dirname(args.file_names)
     FileRenamer(args.file_names, args_folder_name, args.levenstein, args.display, get_logger("rename_files"))()
