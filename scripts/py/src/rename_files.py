@@ -4,7 +4,8 @@
 Description: rename files according to the list
 Arguments:
     file_names: file containing list of file names
-    folder_name: folder to contain generated files
+    levenstein(optional): use file name similarity for renaming (false by default)
+    display(optional): display results only no renaming (false by default)
 """
 
 import argparse
