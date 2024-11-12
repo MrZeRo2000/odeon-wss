@@ -19,7 +19,7 @@ def get_logger(logger_name: str) -> logging.Logger:
     log_path = os.path.join(os.path.dirname(__file__), "../log/")
     if not os.path.exists(log_path):
         os.makedirs(log_path)
-    log_file_name = f"{log_path}log.txt"
+    log_file_name = f"{log_path}{logger_name}.txt"
     if os.path.exists(log_file_name):
         os.remove(log_file_name)
 

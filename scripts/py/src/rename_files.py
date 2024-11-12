@@ -18,29 +18,22 @@ from file_utils import validate_file_name_and_path, get_file_lines
 class FileRenamer:
     MEDIA_FILE_EXTENSIONS = "AVI|M4V|MKV|MP4|MPG|VOB|WMV".split("|")
 
-    def __init__(self, file_names: str, folder_name: str, display: bool, display_size: int, logger: logging.Logger):
+    def __init__(self, file_names: str, folder_name: str, display: bool, logger: logging.Logger):
         self.file_names = file_names
         self.folder_name = folder_name
         self.display = display
-        self.display_size = display_size
         self.name_parser = re.compile(r"^\d{2,3}\s\S+")
         self.logger = logger
-
-    def align_text(self, text: str) -> str:
-        if len(text) > self.display_size:
-            return f"{text[:self.display_size - 4]} ..."
-        else:
-            return f"{text}{' '*(self.display_size - len(text))}"
 
     def get_media_file_names(self) -> list[str]:
         return sorted([f for f in os.listdir(self.folder_name)
                        if os.path.isfile(os.path.join(self.folder_name, f))
                        and f.upper().split(".")[-1] in FileRenamer.MEDIA_FILE_EXTENSIONS])
 
-    def rename_files(self, new_names: list[str], file_names: list[str]):
-        horizontal_delimiter = "".join("*" for _ in range(max([len(f) + 6 for f in file_names])))
+    def get_renaming_list(self, new_names: list[str], file_names: list[str]) -> list[tuple[str, str, str]]:
+        result = []
         for idx, new_name in enumerate(new_names):
-            file_name_from = os.path.join(self.folder_name, file_names[idx])
+            file_name_from = file_names[idx]
 
             # cleanup name
             new_name = new_name.replace("?", "")
@@ -51,17 +44,35 @@ class FileRenamer:
             else:
                 new_name_formatted = new_name
                 rename_mode = "New name from file"
-            new_file_name_formatted = f"{new_name_formatted}.{file_names[idx].split('.')[-1]}" 
-            file_name_to = os.path.join(self.folder_name, new_file_name_formatted)
+            new_file_name_formatted = f"{new_name_formatted}.{file_name_from.split('.')[-1]}"
+            file_name_to = new_file_name_formatted
 
-            if self.display:
-                self.logger.info(f"{self.align_text(file_names[idx])}|{self.align_text(new_file_name_formatted)}|{rename_mode}")
-            else:
-                self.logger.info(f"Renaming {file_name_from} to {file_name_to}")
-                os.replace(file_name_from, file_name_to)
-                self.logger.info(f"{file_name_from} renamed")
-        if self.display:
-            self.logger.info(horizontal_delimiter)
+            result.append((file_name_from, file_name_to, rename_mode))
+
+        return result
+
+    def display_renaming_list(self, rn_list: list[tuple[str, str, str]]) -> None:
+        max_from_len = max(len(v[0]) for v in rn_list)
+        max_to_len = max(len(v[1]) for v in rn_list)
+        max_mode_len = max(len(v[2]) for v in rn_list)
+
+        horizontal_delimiter = '*' * (max_from_len + max_to_len + max_mode_len + 6)
+        self.logger.info(horizontal_delimiter)
+
+
+        for v in rn_list:
+            self.logger.info(f"{v[0]}{' '*(max_from_len - len(v[0]))} | {v[1]}{' '*(max_to_len - len(v[1]))} | {v[2]}")
+
+        self.logger.info(horizontal_delimiter)
+
+    def rename_files(self, rn_list: list[tuple[str, str, str]]) -> None:
+        for v in rn_list:
+            old_path = os.path.join(self.folder_name, v[0])
+            new_path = os.path.join(self.folder_name, v[1])
+
+            self.logger.info(f"Renaming {old_path} to {new_path}")
+            os.replace(old_path, new_path)
+            self.logger.info(f"{old_path} renamed")
 
     def execute(self):
         self.logger.info("Validating params")
@@ -83,9 +94,14 @@ class FileRenamer:
                 f"File names to rename {num_file_names} "
                 f"differs from media file names in folder {num_media_file_names}")
 
-        self.logger.info("Renaming files")
-        self.rename_files(file_names, media_file_names)
-        self.logger.info("Files renamed")
+        renaming_list = self.get_renaming_list(file_names, media_file_names)
+
+        if self.display:
+            self.display_renaming_list(renaming_list)
+        else:
+            self.logger.info("Renaming files")
+            self.rename_files(renaming_list)
+            self.logger.info("Files renamed")
 
     def __call__(self):
         self.execute()
@@ -95,9 +111,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("file_names", help="File with file names for renaming")
     parser.add_argument("--display", action='store_true', help="Display renamed files, no renaming")
-    parser.add_argument("--display-size", type=int, default=30,  help="Display size, default 30")
 
     args = parser.parse_args()
 
     args_folder_name = os.path.dirname(args.file_names)
-    FileRenamer(args.file_names, args_folder_name, args.display, args.display_size, get_logger("rename_files"))()
+    FileRenamer(args.file_names, args_folder_name, args.display, get_logger("rename_files"))()
