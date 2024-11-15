@@ -49,7 +49,7 @@ class FileRenamer:
                 file_name_from = self.find_most_similar(file_names, new_name)
 
             # cleanup name
-            new_name = new_name.replace("?", "")
+            new_name = new_name.replace("?", "").replace(r"/", "-").replace("\\", "-")
 
             if self.name_parser.match(new_name) is None:
                 new_name_formatted = f"{idx + 1:02d} {new_name}" if len(new_names) < 100 else f"{idx + 1:03d} {new_name}"
