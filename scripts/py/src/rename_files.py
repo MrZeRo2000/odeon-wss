@@ -13,6 +13,7 @@ import logging
 import os
 import re
 from collections.abc import Iterable
+from collections import Counter
 
 import Levenshtein
 
@@ -64,6 +65,14 @@ class FileRenamer:
 
         return result
 
+    def validate_renaming_list(self, rn_list: list[tuple[str, str, str]]) -> None:
+        rename_to_counter = Counter([v[0] for v in rn_list])
+        rename_to_duplicates = [s[0] for s in rename_to_counter.most_common() if s[1] > 1]
+        if len(rename_to_duplicates) > 0:
+            self.logger.error("Duplicates in renaming list:")
+            _ = [self.logger.error(f"  {d}") for d in rename_to_duplicates]
+            raise ValueError("Duplicates in renaming list")
+
     def display_renaming_list(self, rn_list: list[tuple[str, str, str]]) -> None:
         max_from_len = max(len(v[0]) for v in rn_list)
         max_to_len = max(len(v[1]) for v in rn_list)
@@ -107,6 +116,8 @@ class FileRenamer:
                 f"differs from media file names in folder {num_media_file_names}")
 
         renaming_list = self.get_renaming_list(file_names, media_file_names)
+
+        self.validate_renaming_list(renaming_list)
 
         if self.display:
             self.display_renaming_list(renaming_list)
