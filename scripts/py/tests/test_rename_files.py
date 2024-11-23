@@ -6,25 +6,10 @@ import uuid
 
 from src.rename_files import FileRenamer
 from src.logger import get_logger
-
-ROOT_DATA_PATH = os.path.join(os.path.dirname(__file__), "../data")
-
-def clear_folder(folder_name: str) -> None:
-    data_path = os.path.join(ROOT_DATA_PATH, folder_name)
-    if os.path.exists(data_path):
-        files = os.listdir(data_path)
-        for file in files:
-            os.remove(os.path.join(data_path, file))
-    os.rmdir(data_path)
+from .utils import ROOT_DATA_PATH, clear_folder, prepare_folder
 
 def generate_data(folder_name: str) -> tuple[list[str], list[str]]:
-    data_path = os.path.join(ROOT_DATA_PATH, folder_name)
-    if os.path.exists(data_path):
-        files = os.listdir(data_path)
-        for file in files:
-            os.remove(os.path.join(data_path, file))
-    else:
-        os.mkdir(data_path)
+    data_path = prepare_folder(folder_name)
 
     rw = RandomWords()
 

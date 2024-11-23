@@ -1,2 +1,2 @@
-$env:Path += ";$env:LOCALAPPDATA\Programs\Python\Python311\"
+$env:Path += ";$env:LOCALAPPDATA\Programs\Python\Python313\"
 echo $env:Path
