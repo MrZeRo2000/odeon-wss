@@ -2,13 +2,13 @@ import os
 import pytest
 import random
 import shutil
+import hashlib
 from random_words import RandomWords
 
 from .utils import prepare_folder, get_path
 
-def generate_sample_files(folder_name: str, num: int) -> list[str]:
+def generate_sample_files(folder_name: str, num: int) -> str:
     data_path = prepare_folder(folder_name)
-    result = []
 
     rw = RandomWords()
     for _ in range(num):
@@ -18,17 +18,15 @@ def generate_sample_files(folder_name: str, num: int) -> list[str]:
             with open(os.path.join(data_path, f2_name), "w") as f2:
                 s1 = ' '.join(rw.random_words(count=random.randint(5, 50), min_letter_count=6))
                 f1.write(s1)
-                result.append(f1_name)
 
                 ls2 = list(s1)
                 random.shuffle(ls2)
                 s2 = ''.join(ls2)
                 f2.write(s2)
-                result.append(f2_name)
 
-    return result
+    return data_path
 
-def create_reference_folder(folder_name: str, sample_folder_name: str) -> None:
+def create_reference_folder(folder_name: str, sample_folder_name: str) -> str:
     data_path = prepare_folder(folder_name)
     sample_path = get_path(sample_folder_name)
 
@@ -60,7 +58,9 @@ def create_reference_folder(folder_name: str, sample_folder_name: str) -> None:
     shutil.copy(os.path.join(sample_path, '08.txt'), os.path.join(found_3_folder_name, '08.txt'))
     shutil.copy(os.path.join(sample_path, '09.txt'), os.path.join(found_3_folder_name, '909.txt'))
 
-def create_source_folder(folder_name: str, sample_folder_name: str) -> None:
+    return data_path
+
+def create_source_folder(folder_name: str, sample_folder_name: str) -> str:
     data_path = prepare_folder(folder_name)
     sample_path = get_path(sample_folder_name)
 
@@ -92,7 +92,45 @@ def create_source_folder(folder_name: str, sample_folder_name: str) -> None:
     shutil.copy(os.path.join(sample_path, '08.txt'), os.path.join(found_3_2_folder_name, '8808.txt'))
     shutil.copy(os.path.join(sample_path, '09.txt'), os.path.join(found_3_2_folder_name, '9909.txt'))
 
-def test_generate_files():
-    generate_sample_files("samples", 10)
-    create_reference_folder("reference", "samples")
-    create_source_folder("source", "samples")
+    return data_path
+
+
+@pytest.fixture(scope="module")
+def generate_files():
+    samples_path = generate_sample_files("samples", 10)
+    reference_path = create_reference_folder("reference", "samples")
+    source_path = create_source_folder("source", "samples")
+    yield
+    '''
+    shutil.rmtree(samples_path)
+    shutil.rmtree(reference_path)
+    shutil.rmtree(source_path)    
+    '''
+
+def test_generate_files(generate_files):
+    pass
+
+
+def test_hash_lib(generate_files):
+    f1_name = os.path.join(get_path("samples"), '01.txt')
+    f2_name = os.path.join(get_path("samples"), '11.txt')
+
+    assert os.path.getsize(f1_name) == os.path.getsize(f2_name)
+
+    with open(f1_name, 'rb') as f1:
+        with open(f2_name, 'rb') as f2:
+            digest_1 = hashlib.file_digest(f1, "sha256").hexdigest()
+            digest_2 = hashlib.file_digest(f2, "sha256").hexdigest()
+
+            print(f"Digest 1: {digest_1}")
+            print(f"Digest 2: {digest_2}")
+            assert digest_1 != digest_2
+
+            f1.seek(0)
+            digest_1_1 = hashlib.file_digest(f1, "sha256").hexdigest()
+            assert digest_1_1 == digest_1
+
+
+    with open(f1_name, 'rb') as f11:
+        digest_11 = hashlib.file_digest(f11, "sha256").hexdigest()
+        assert(digest_11 == digest_1)
