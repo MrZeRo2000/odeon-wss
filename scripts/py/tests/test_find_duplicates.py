@@ -5,15 +5,20 @@ import shutil
 import hashlib
 from random_words import RandomWords
 
-from .utils import prepare_folder, get_path
+from utils import prepare_folder, get_path
+from src.find_duplicates import DuplicateFinder
+from src.logger import get_logger
+
+logger = get_logger(__name__)
+
 
 def generate_sample_files(folder_name: str, num: int) -> str:
     data_path = prepare_folder(folder_name)
 
     rw = RandomWords()
     for _ in range(num):
-        f1_name = f"{_ + 1:02d}.txt"
-        f2_name = f"{_ + 11:02d}.txt"
+        f1_name = f"{_ + 1:02d}.mkv"
+        f2_name = f"{_ + 11:02d}.mkv"
         with open(os.path.join(data_path, f1_name), "w") as f1:
             with open(os.path.join(data_path, f2_name), "w") as f2:
                 s1 = ' '.join(rw.random_words(count=random.randint(5, 50), min_letter_count=6))
@@ -33,30 +38,30 @@ def create_reference_folder(folder_name: str, sample_folder_name: str) -> str:
     # not found
     not_found_folder_name = os.path.join(data_path, "ref_not_found")
     os.makedirs(not_found_folder_name, exist_ok=True)
-    shutil.copy(os.path.join(sample_path, '11.txt'), os.path.join(not_found_folder_name, '01.txt'))
-    shutil.copy(os.path.join(sample_path, '02.txt'), os.path.join(not_found_folder_name, '202.txt'))
+    shutil.copy(os.path.join(sample_path, '11.mkv'), os.path.join(not_found_folder_name, '01.mkv'))
+    shutil.copy(os.path.join(sample_path, '02.mkv'), os.path.join(not_found_folder_name, '202.mkv'))
 
     # found_1
     found_1_folder_name = os.path.join(data_path, "ref_found_1")
     os.makedirs(found_1_folder_name, exist_ok=True)
-    shutil.copy(os.path.join(sample_path, '05.txt'), os.path.join(found_1_folder_name, '505.txt'))
+    shutil.copy(os.path.join(sample_path, '05.mkv'), os.path.join(found_1_folder_name, '505.mkv'))
 
     # found_2
     found_2_folder_name = os.path.join(data_path, "ref_found_2")
     os.makedirs(found_2_folder_name, exist_ok=True)
-    shutil.copy(os.path.join(sample_path, '06.txt'), os.path.join(found_2_folder_name, '606.txt'))
+    shutil.copy(os.path.join(sample_path, '06.mkv'), os.path.join(found_2_folder_name, '606.mkv'))
 
     # self_dup
     self_dup_folder_name = os.path.join(data_path, "self_dup")
     os.makedirs(self_dup_folder_name, exist_ok=True)
-    shutil.copy(os.path.join(sample_path, '06.txt'), os.path.join(self_dup_folder_name, 'sd06.txt'))
+    shutil.copy(os.path.join(sample_path, '06.mkv'), os.path.join(self_dup_folder_name, 'sd06.mkv'))
 
     # found_3
     found_3_folder_name = os.path.join(data_path, "ref_found_3")
     os.makedirs(found_3_folder_name, exist_ok=True)
-    shutil.copy(os.path.join(sample_path, '07.txt'), os.path.join(found_3_folder_name, '707.txt'))
-    shutil.copy(os.path.join(sample_path, '08.txt'), os.path.join(found_3_folder_name, '08.txt'))
-    shutil.copy(os.path.join(sample_path, '09.txt'), os.path.join(found_3_folder_name, '909.txt'))
+    shutil.copy(os.path.join(sample_path, '07.mkv'), os.path.join(found_3_folder_name, '707.mkv'))
+    shutil.copy(os.path.join(sample_path, '08.mkv'), os.path.join(found_3_folder_name, '08.mkv'))
+    shutil.copy(os.path.join(sample_path, '09.mkv'), os.path.join(found_3_folder_name, '909.mkv'))
 
     return data_path
 
@@ -67,30 +72,30 @@ def create_source_folder(folder_name: str, sample_folder_name: str) -> str:
     # not found
     not_found_folder_name = os.path.join(data_path, "not_found")
     os.makedirs(not_found_folder_name, exist_ok=True)
-    shutil.copy(os.path.join(sample_path, '03.txt'), os.path.join(not_found_folder_name, '03.txt'))
-    shutil.copy(os.path.join(sample_path, '04.txt'), os.path.join(not_found_folder_name, '04.txt'))
+    shutil.copy(os.path.join(sample_path, '03.mkv'), os.path.join(not_found_folder_name, '03.mkv'))
+    shutil.copy(os.path.join(sample_path, '04.mkv'), os.path.join(not_found_folder_name, '04.mkv'))
 
     # found_1
-    found_1_folder_name = os.path.join(data_path, "found_1")
+    found_1_folder_name = os.path.join(os.path.join(data_path, "found_1"), "subfolder")
     os.makedirs(found_1_folder_name, exist_ok=True)
-    shutil.copy(os.path.join(sample_path, '05.txt'), os.path.join(found_1_folder_name, '1005.txt'))
+    shutil.copy(os.path.join(sample_path, '05.mkv'), os.path.join(found_1_folder_name, '1005.mkv'))
 
     # found_2
     found_2_folder_name = os.path.join(data_path, "found_2")
     os.makedirs(found_2_folder_name, exist_ok=True)
-    shutil.copy(os.path.join(sample_path, '06.txt'), os.path.join(found_2_folder_name, '1006.txt'))
-    shutil.copy(os.path.join(sample_path, '06.txt'), os.path.join(found_2_folder_name, '6606.txt'))
+    shutil.copy(os.path.join(sample_path, '06.mkv'), os.path.join(found_2_folder_name, '1006.mkv'))
+    shutil.copy(os.path.join(sample_path, '06.mkv'), os.path.join(found_2_folder_name, '6606.mkv'))
 
     # found_3_1
     found_3_1_folder_name = os.path.join(data_path, "found_3_1")
     os.makedirs(found_3_1_folder_name, exist_ok=True)
-    shutil.copy(os.path.join(sample_path, '07.txt'), os.path.join(found_3_1_folder_name, '707.txt'))
+    shutil.copy(os.path.join(sample_path, '07.mkv'), os.path.join(found_3_1_folder_name, '707.mkv'))
 
     # found_3_2
     found_3_2_folder_name = os.path.join(data_path, "found_3_2")
     os.makedirs(found_3_2_folder_name, exist_ok=True)
-    shutil.copy(os.path.join(sample_path, '08.txt'), os.path.join(found_3_2_folder_name, '8808.txt'))
-    shutil.copy(os.path.join(sample_path, '09.txt'), os.path.join(found_3_2_folder_name, '9909.txt'))
+    shutil.copy(os.path.join(sample_path, '08.mkv'), os.path.join(found_3_2_folder_name, '8808.mkv'))
+    shutil.copy(os.path.join(sample_path, '09.mkv'), os.path.join(found_3_2_folder_name, '9909.mkv'))
 
     return data_path
 
@@ -100,7 +105,7 @@ def generate_files():
     samples_path = generate_sample_files("samples", 10)
     reference_path = create_reference_folder("reference", "samples")
     source_path = create_source_folder("source", "samples")
-    yield
+    yield samples_path, reference_path, source_path
     '''
     shutil.rmtree(samples_path)
     shutil.rmtree(reference_path)
@@ -112,8 +117,8 @@ def test_generate_files(generate_files):
 
 
 def test_hash_lib(generate_files):
-    f1_name = os.path.join(get_path("samples"), '01.txt')
-    f2_name = os.path.join(get_path("samples"), '11.txt')
+    f1_name = os.path.join(get_path("samples"), '01.mkv')
+    f2_name = os.path.join(get_path("samples"), '11.mkv')
 
     assert os.path.getsize(f1_name) == os.path.getsize(f2_name)
 
@@ -134,3 +139,26 @@ def test_hash_lib(generate_files):
     with open(f1_name, 'rb') as f11:
         digest_11 = hashlib.file_digest(f11, "sha256").hexdigest()
         assert(digest_11 == digest_1)
+
+def test_find_duplicates_scan_path(generate_files):
+    source_path = generate_files[2]
+    file_summaries = DuplicateFinder.scan_path(source_path)
+    assert len(file_summaries) > 0
+
+    file_summary = file_summaries[0]
+    assert file_summary.name == file_summary.path.split(os.sep)[-1]
+    assert file_summary.size == os.path.getsize(file_summary.path)
+
+def test_find_duplicates_inner_duplicates(generate_files):
+    reference_path = generate_files[1]
+    file_summaries = DuplicateFinder.scan_path(reference_path)
+    assert len(file_summaries) > 0
+
+    file_duplicates = DuplicateFinder.get_inner_duplicates(file_summaries)
+    assert len(file_duplicates) == 2
+    assert file_duplicates[0].name == '606.mkv'
+    assert file_duplicates[1].name == 'sd06.mkv'
+
+    logger.info("get_inner_duplicates_report")
+    report_lines = DuplicateFinder.get_inner_duplicates_report(file_duplicates)
+    logger.info('\n' + '\n'.join(report_lines) + '\n')

@@ -4,7 +4,7 @@ import shutil
 ROOT_DATA_PATH = os.path.join(os.path.dirname(__file__), "../data")
 
 def get_path(folder_name: str) -> str:
-    return os.path.join(ROOT_DATA_PATH, folder_name)
+    return os.path.abspath(os.path.join(ROOT_DATA_PATH, folder_name))
 
 def clear_folder(folder_name: str) -> str:
     data_path = get_path(folder_name)
