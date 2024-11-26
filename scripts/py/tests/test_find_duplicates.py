@@ -160,5 +160,45 @@ def test_find_duplicates_inner_duplicates(generate_files):
     assert file_duplicates[1].name == 'sd06.mkv'
 
     logger.info("get_inner_duplicates_report")
-    report_lines = DuplicateFinder.get_inner_duplicates_report(file_duplicates)
+    report_lines = DuplicateFinder(reference_path, reference_path).get_inner_duplicates_report(file_duplicates)
     logger.info('\n' + '\n'.join(report_lines) + '\n')
+
+def test_find_duplicates_ref_duplicates(generate_files):
+    reference_path = generate_files[1]
+    reference_summaries = DuplicateFinder.scan_path(reference_path)
+
+    source_path = generate_files[2]
+    source_summaries = DuplicateFinder.scan_path(source_path)
+
+    ref_duplicates = DuplicateFinder.get_ref_duplicates(reference_summaries, source_summaries)
+    assert len(ref_duplicates) > 0
+    assert len(ref_duplicates) == 6
+
+    # found_1
+    assert ref_duplicates[0][1].endswith(os.sep.join(("ref_found_1", "505.mkv")))
+    assert ref_duplicates[0][2][0].endswith(os.sep.join(("found_1","subfolder", "1005.mkv")))
+
+    # found_2
+    assert ref_duplicates[1][1].endswith(os.sep.join(("ref_found_2", "606.mkv")))
+    assert ref_duplicates[1][2][0].endswith(os.sep.join(("found_2", "1006.mkv")))
+    assert ref_duplicates[1][2][1].endswith(os.sep.join(("found_2", "6606.mkv")))
+
+    # found_3
+    assert ref_duplicates[2][1].endswith(os.sep.join(("ref_found_3", "08.mkv")))
+    assert ref_duplicates[2][2][0].endswith(os.sep.join(("found_3_2", "8808.mkv")))
+
+    assert ref_duplicates[3][1].endswith(os.sep.join(("ref_found_3", "707.mkv")))
+    assert ref_duplicates[3][2][0].endswith(os.sep.join(("found_3_1", "707.mkv")))
+
+    assert ref_duplicates[4][1].endswith(os.sep.join(("ref_found_3", "909.mkv")))
+    assert ref_duplicates[4][2][0].endswith(os.sep.join(("found_3_2", "9909.mkv")))
+
+    # self duplicate
+    assert ref_duplicates[5][1].endswith(os.sep.join(("self_dup", "sd06.mkv")))
+    assert ref_duplicates[5][2][0].endswith(os.sep.join(("found_2", "1006.mkv")))
+    assert ref_duplicates[5][2][1].endswith(os.sep.join(("found_2", "6606.mkv")))
+
+    logger.info("get_ref_duplicates_report")
+    report_lines = DuplicateFinder(reference_path, source_path).get_ref_duplicates_report(ref_duplicates)
+    logger.info('\n' + '\n'.join(report_lines) + '\n')
+
