@@ -95,10 +95,17 @@ class DuplicateFinder:
     def get_ref_duplicates(ref_summaries: List[FileSummary], src_summaries: List[FileSummary]) -> List[tuple]:
         result = []
 
-        src_dict = {k: sorted([g1.path for g1 in g]) for k,g in groupby(src_summaries, lambda x: x.hash_digest)}
+        ref_sizes = set((f.size for f in ref_summaries))
+        src_sizes = set((f.size for f in src_summaries))
+        joined_sizes = ref_sizes & src_sizes
+
+        ref_summaries_hashed = [f.calc_hash() for f in ref_summaries if f.size in joined_sizes]
+        src_summaries_hashed = [f.calc_hash() for f in src_summaries if f.size in joined_sizes]
+
+        src_dict = {k: sorted([g1.path for g1 in g]) for k,g in groupby(src_summaries_hashed, lambda x: x.hash_digest)}
 
         hash_num = 0
-        for rs in ref_summaries:
+        for rs in ref_summaries_hashed:
             src = src_dict.get(rs.hash_digest)
             if src is not None:
                 hash_num += 1
