@@ -106,11 +106,9 @@ def generate_files():
     reference_path = create_reference_folder("reference", "samples")
     source_path = create_source_folder("source", "samples")
     yield samples_path, reference_path, source_path
-    '''
     shutil.rmtree(samples_path)
     shutil.rmtree(reference_path)
     shutil.rmtree(source_path)    
-    '''
 
 def test_generate_files(generate_files):
     pass

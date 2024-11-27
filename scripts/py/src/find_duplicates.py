@@ -28,6 +28,10 @@ class FileSummary:
     size: int
     hash_digest: str
 
+    def calc_hash(self):
+        self.hash_digest = DuplicateFinder.get_file_hash(self.path)
+        return self
+
 class DuplicateFinder:
     MEDIA_FILE_EXTENSIONS = "AVI|M4V|MKV|MP4|MPG|VOB|WMV".split("|")
 
@@ -45,7 +49,7 @@ class DuplicateFinder:
         result = []
 
         for root, _, files in os.walk(path):
-            files_summary = [FileSummary(full_path, f, os.path.getsize(full_path), DuplicateFinder.get_file_hash(full_path))
+            files_summary = [FileSummary(full_path, f, os.path.getsize(full_path), '')
                              for f in files
                              if f.upper().split(".")[-1] in DuplicateFinder.MEDIA_FILE_EXTENSIONS
                              and (full_path := os.path.abspath(os.path.join(root, f)))]
@@ -61,10 +65,15 @@ class DuplicateFinder:
 
     @staticmethod
     def get_inner_duplicates(file_summaries: List[FileSummary]) -> List[FileSummary]:
-        hash_counts = Counter([f.hash_digest for f in file_summaries])
+        size_counts = Counter([f.size for f in file_summaries])
+        size_duplicates = [c[0] for c in size_counts.items() if c[1] > 1]
+
+        file_summaries_hashed = [f.calc_hash() for f in file_summaries if f.size in size_duplicates]
+        hash_counts = Counter([f.hash_digest for f in file_summaries_hashed])
         hash_duplicates = [c[0] for c in hash_counts.items() if c[1] > 1]
-        return sorted([f for f in file_summaries if f.hash_digest in hash_duplicates],
+        return sorted([f for f in file_summaries_hashed if f.hash_digest in hash_duplicates],
                       key=lambda f: f.hash_digest + f.path)
+
 
     def get_inner_duplicates_report(self, file_summaries: List[FileSummary]) -> List[str]:
         result = []
