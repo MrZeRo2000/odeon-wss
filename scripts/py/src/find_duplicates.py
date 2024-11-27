@@ -68,7 +68,11 @@ class DuplicateFinder:
         size_counts = Counter([f.size for f in file_summaries])
         size_duplicates = [c[0] for c in size_counts.items() if c[1] > 1]
 
-        file_summaries_hashed = [f.calc_hash() for f in file_summaries if f.size in size_duplicates]
+        file_summaries_limited = [f for f in file_summaries if f.size in size_duplicates]
+        logger.info(f"Calculating hashes for inner duplicates in {len(file_summaries_limited)} files")
+        file_summaries_hashed = [f.calc_hash() for f in file_summaries_limited]
+        logger.info("Calculating hashes for inner duplicates completed")
+
         hash_counts = Counter([f.hash_digest for f in file_summaries_hashed])
         hash_duplicates = [c[0] for c in hash_counts.items() if c[1] > 1]
         return sorted([f for f in file_summaries_hashed if f.hash_digest in hash_duplicates],
@@ -99,8 +103,15 @@ class DuplicateFinder:
         src_sizes = set((f.size for f in src_summaries))
         joined_sizes = ref_sizes & src_sizes
 
-        ref_summaries_hashed = [f.calc_hash() for f in ref_summaries if f.size in joined_sizes]
-        src_summaries_hashed = [f.calc_hash() for f in src_summaries if f.size in joined_sizes]
+        ref_summaries_limited = [f for f in ref_summaries if f.size in joined_sizes]
+        logger.info(f"Calculating hashes for reference files in {len(ref_summaries_limited)} files")
+        ref_summaries_hashed = [f.calc_hash() for f in ref_summaries_limited]
+        logger.info(f"Calculating hashes for reference files completed")
+
+        src_summaries_limited = [f for f in src_summaries if f.size in joined_sizes]
+        logger.info(f"Calculating hashes for search files in {len(src_summaries_limited)} files")
+        src_summaries_hashed = [f.calc_hash() for f in src_summaries_limited]
+        logger.info(f"Calculating hashes for search files completed")
 
         src_dict = {k: sorted([g1.path for g1 in g]) for k,g in groupby(src_summaries_hashed, lambda x: x.hash_digest)}
 
