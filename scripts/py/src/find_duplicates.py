@@ -7,6 +7,8 @@ Result is outputted to console
 Arguments:
     reference_folder: reference folder
     search_folder: search folder
+Execution example:
+    .\venv\Scripts\python.exe src/find_duplicates.py L:\Music "L:\Source\Music Video"    
 """
 
 import argparse
@@ -143,6 +145,27 @@ class DuplicateFinder:
             result.append(horizontal_delimiter)
         return result
 
+    def get_ref_duplicates_by_src_report(self, duplicates: List[tuple]) -> List[str]:
+        result = []
+
+        duplicates_by_src = sorted(duplicates, key=lambda x: x[2])
+
+        max_src_len = max([len(v2) for v in duplicates_by_src for v2 in v[2]]) - len(self.search_path) - 1
+        max_ref_len = max([len(v[1]) for v in duplicates_by_src]) - len(self.reference_path) - 1
+        horizontal_delimiter = '-' * (max_ref_len + max_src_len + 3 + 3 + 3)
+        result.append(horizontal_delimiter)
+
+        hash_num = 0
+        for row in duplicates_by_src:
+            hash_num += 1
+            for r in row[2]:
+                v1 = row[1].replace(self.reference_path, '')[1:]
+                v2 = r.replace(self.search_path, '')[1:]
+                result.append(f"{hash_num:3d} | {v2}{' '*(max_src_len - len(v2))} | {v1}{' '*(max_ref_len - len(v1))}")
+
+            result.append(horizontal_delimiter)
+        return result
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -173,5 +196,8 @@ if __name__ == '__main__':
     if len(duplicates) > 0:
         duplicates_report_lines = df.get_ref_duplicates_report(duplicates)
         logger.info('\nDuplicates\n' + '\n'.join(duplicates_report_lines) + '\n')
+
+        duplicates_by_src_report_lines = df.get_ref_duplicates_by_src_report(duplicates)
+        logger.info('\nDuplicates by source\n' + '\n'.join(duplicates_by_src_report_lines) + '\n')
     else:
         logger.info('\nNo duplicates\n')
