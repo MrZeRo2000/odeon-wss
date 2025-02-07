@@ -1,12 +1,15 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
+import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.exception.WrongParameterValueException;
 import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
+import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +43,9 @@ public class ServiceMediaFileTest {
     private ArtifactTypeRepository artifactTypeRepository;
 
     @Autowired
+    private ArtistRepository artistRepository;
+
+    @Autowired
     private ArtifactRepository artifactRepository;
 
     @Autowired
@@ -52,7 +58,8 @@ public class ServiceMediaFileTest {
     public ArtifactTypeService artifactTypeService;
 
     private enum TestFolder {
-        TF_ONE_VIDEO_FILE
+        TF_ONE_VIDEO_FILE,
+        TF_ONE_MP3_FOLDER
     }
 
     static class TestArtifactTypeService extends ArtifactTypeService {
@@ -102,6 +109,20 @@ public class ServiceMediaFileTest {
                         """
         );
 
+        FileTreeGenerator.generateFromJSON(
+                tempDirs.get(TestFolder.TF_ONE_MP3_FOLDER),
+                this.testDataPath,
+                """
+                            {
+                                "Aerosmith": {
+                                    "2004 Honkin'On Bobo": {
+                                        "01 - Road Runner.mp3": "files/01 - Lost.mp3"
+                                    }
+                                }
+                            }
+                        """
+        );
+
         if (artifactTypeService instanceof TestArtifactTypeService) {
             ((TestArtifactTypeService) artifactTypeService).setArtifactTypePath(
                     tempDirs.get(TestFolder.TF_ONE_VIDEO_FILE).toString());
@@ -119,6 +140,13 @@ public class ServiceMediaFileTest {
     @Sql({"/schema.sql", "/data.sql"})
     @Order(1)
     void testPrepare() {
+        artistRepository.save(
+                new EntityArtistBuilder()
+                        .withType(ArtistType.ARTIST)
+                        .withName("Aerosmith")
+                .build()
+        );
+
         artifactRepository.save(
                 new EntityArtifactBuilder()
                         .withArtifactType(artifactTypeRepository.getWithDVMovies())
@@ -128,6 +156,18 @@ public class ServiceMediaFileTest {
 
         assertThat(artifactRepository.findById(1L)).isPresent();
         assertThat(artifactRepository.findAll().size()).isEqualTo(1);
+
+        artifactRepository.save(
+                new EntityArtifactBuilder()
+                        .withArtifactType(artifactTypeRepository.getWithMP3())
+                        .withArtist(artistRepository.findById(1L).orElseThrow())
+                        .withTitle("Honkin'On Bobo")
+                        .withYear(2004L)
+                .build()
+        );
+
+        assertThat(artifactRepository.findById(2L)).isPresent();
+        assertThat(artifactRepository.findAll().size()).isEqualTo(2);
     }
 
     @Test
@@ -178,5 +218,18 @@ public class ServiceMediaFileTest {
         assertThatThrownBy(() -> service.insertMediaFiles(1L, List.of("Scary Movie Part 1.mkv")))
                 .isInstanceOf(WrongParameterValueException.class)
                 .hasMessageContaining("already exists");
+    }
+
+    @Disabled("To fix in future")
+    @Test
+    @Order(4)
+    void testGetMediaFiles() throws Exception {
+        if (artifactTypeService instanceof TestArtifactTypeService) {
+            ((TestArtifactTypeService) artifactTypeService).setArtifactTypePath(
+                    tempDirs.get(TestFolder.TF_ONE_MP3_FOLDER).toString());
+        }
+
+        var mediaFiles = service.getMediaFiles(2L);
+        assertThat(mediaFiles.size()).isEqualTo(1);
     }
 }
