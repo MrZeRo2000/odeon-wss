@@ -220,7 +220,6 @@ public class ServiceMediaFileTest {
                 .hasMessageContaining("already exists");
     }
 
-    @Disabled("To fix in future")
     @Test
     @Order(4)
     void testGetMediaFiles() throws Exception {

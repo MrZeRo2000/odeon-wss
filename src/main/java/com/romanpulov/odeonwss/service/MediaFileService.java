@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.dto.*;
 import com.romanpulov.odeonwss.entity.Artifact;
+import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.exception.WrongParameterValueException;
@@ -14,6 +15,7 @@ import com.romanpulov.odeonwss.service.processor.PathReader;
 import com.romanpulov.odeonwss.service.processor.ProcessorException;
 import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
+import com.romanpulov.odeonwss.utils.PathUtils;
 import com.romanpulov.odeonwss.utils.media.MediaFileInfoException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -88,17 +90,27 @@ public class MediaFileService
                 () -> new CommonEntityNotFoundException("Artifact", artifactId)
         );
 
-        ArtifactTypeDTO artifactType = artifactTypeRepository.findDTOById(artifact.getArtifactTypeId()).orElseThrow(
+        ArtifactType artifactType = artifactTypeRepository.findById(artifact.getArtifactTypeId()).orElseThrow(
                 () -> new CommonEntityNotFoundException("ArtifactType", artifact.getArtifactTypeId())
         );
 
         Path rootPath = Paths.get(artifactTypeService.getArtifactTypePath(artifact.getArtifactTypeId()));
+        Path artifactPath = PathUtils.getArtifactPath(
+                rootPath,
+                artifactType.getParentId(),
+                artifact.getTitle(),
+                artifact.getArtistName(),
+                artifact.getYear());
+
+        if (artifactPath == null) {
+            return Collections.emptyList();
+        }
 
         try {
             List<Path> paths = new ArrayList<>();
 
             boolean result = PathReader.readPath(
-                    Path.of(rootPath.toAbsolutePath().toString(), artifact.getTitle()),
+                    artifactPath,
                     p -> NamesParser.validateFileNameMediaFormat(
                             p.getFileName().toString(),
                             artifactType.getMediaFileFormats()),
@@ -112,11 +124,11 @@ public class MediaFileService
                         .sorted(Comparator.comparing(TextDTOImpl::getText))
                         .collect(Collectors.toList());
             } else {
-                return List.of();
+                return Collections.emptyList();
             }
 
         } catch (ProcessorException e) {
-            return List.of();
+            return Collections.emptyList();
         }
     }
 
@@ -126,14 +138,39 @@ public class MediaFileService
                 () -> new CommonEntityNotFoundException("Artifact", artifactId)
         );
 
+        ArtifactType artifactType = artifactTypeRepository.findById(artifact.getArtifactTypeId()).orElseThrow(
+                () -> new CommonEntityNotFoundException("ArtifactType", artifact.getArtifactTypeId())
+        );
+
         return mediaFileMapper.toDTO(getMediaFileAttributesByArtifact(
-                artifact.getArtifactTypeId(), artifact.getTitle(), mediaFileName));
+                artifact.getArtifactTypeId(),
+                artifactType.getParentId(),
+                artifact.getTitle(),
+                artifact.getArtistName(),
+                artifact.getYear(),
+                mediaFileName));
     }
 
-    private MediaFile getMediaFileAttributesByArtifact(long artifactTypeId, String artifactTitle, String mediaFileName)
+    private MediaFile getMediaFileAttributesByArtifact(
+            long artifactTypeId,
+            Long artifactTypeParentId,
+            String artifactTitle,
+            String artistName,
+            Long year,
+            String mediaFileName)
             throws WrongParameterValueException {
         Path rootPath = Paths.get(artifactTypeService.getArtifactTypePath(artifactTypeId));
-        Path filePath = Path.of(rootPath.toAbsolutePath().toString(), artifactTitle, mediaFileName);
+
+        Path artifactPath = Optional.ofNullable(
+                    PathUtils.getArtifactPath(
+                    rootPath,
+                    artifactTypeParentId,
+                    artifactTitle,
+                    artistName,
+                    year)
+                ).orElseThrow(() -> new WrongParameterValueException("MediaFileName", mediaFileName));
+
+        Path filePath = Path.of(artifactPath.toString(), mediaFileName);
         if (Files.exists(filePath)) {
             try {
                 return mediaFileMapper.fromMediaFileInfo(mediaParser.parseTrack(filePath));
@@ -152,6 +189,14 @@ public class MediaFileService
                 () -> new CommonEntityNotFoundException("Artifact", artifactId)
         );
 
+        ArtifactFlatDTO artifactDTO = artifactRepository.findFlatDTOById(artifactId).orElseThrow(
+                () -> new CommonEntityNotFoundException("Artifact", artifactId)
+        );
+
+        ArtifactType artifactType = artifactTypeRepository.findById(artifact.getArtifactType().getId()).orElseThrow(
+                () -> new CommonEntityNotFoundException("ArtifactType", artifact.getArtifactType().getId())
+        );
+
         Set<String> existingMediaFiles = getTableIdNameDuration(artifactId)
                 .stream()
                 .map(MediaFileDTO::getName)
@@ -165,7 +210,12 @@ public class MediaFileService
                         "MediaFile " + mediaFileName + " already exists");
             } else {
                 MediaFile mediaFile = this.getMediaFileAttributesByArtifact(
-                        artifact.getArtifactType().getId(), artifact.getTitle(), mediaFileName);
+                        artifact.getArtifactType().getId(),
+                        artifactType.getParentId(),
+                        artifact.getTitle(),
+                        artifactDTO.getArtistName(),
+                        artifactDTO.getYear(),
+                        mediaFileName);
                 mediaFile.setArtifact(artifact);
                 newMediaFiles.add(mediaFile);
             }
