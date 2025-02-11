@@ -1,1 +1,1 @@
-./gradlew.ps1 clean deployInt
+Invoke-Expression "$PSScriptRoot\gradlew.ps1 clean deployInt"
