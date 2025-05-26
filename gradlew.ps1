@@ -1,4 +1,6 @@
-Import-Module "$PSScriptRoot\..\common\builder\builder.ps1" -force
+$ErrorActionPreference = "Stop"
+
+Import-Module $PSScriptRoot\..\common\builder\builder.psm1 -force
 
 $classPath = "$PSScriptRoot\gradle\wrapper\gradle-wrapper.jar"
 $appName = Split-Path -Path ($PSScriptRoot) -Leaf
