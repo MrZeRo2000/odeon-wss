@@ -273,3 +273,32 @@ CREATE TABLE artifact_tags(
 );
 
 CREATE UNIQUE INDEX idx_artifact_tags_artf_id_atft_name ON artifact_tags(artf_id, atft_name);
+
+-- TAGS
+
+DROP TABLE IF EXISTS tags;
+
+CREATE TABLE tags(
+    ttag_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ttag_name TEXT NOT NULL,
+    atft_ins_datm INTEGER NOT NULL,
+    atft_upd_datm INTEGER NOT NULL
+);
+
+CREATE UNIQUE INDEX idx_tags_ttag_name ON tags(ttag_name);
+
+DROP TABLE IF EXISTS artifacts_tags;
+
+CREATE TABLE artifacts_tags(
+    artf_id INTEGER NOT NULL,
+    ttag_id INTEGER NOT NULL,
+    PRIMARY KEY (artf_id, ttag_id)
+);
+
+DROP TABLE IF EXISTS tracks_tags;
+
+CREATE TABLE tracks_tags(
+    trck_id INTEGER NOT NULL,
+    ttag_id INTEGER NOT NULL,
+    PRIMARY KEY (trck_id, ttag_id)
+);
