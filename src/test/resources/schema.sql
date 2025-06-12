@@ -281,8 +281,8 @@ DROP TABLE IF EXISTS tags;
 CREATE TABLE tags(
     ttag_id INTEGER PRIMARY KEY AUTOINCREMENT,
     ttag_name TEXT NOT NULL,
-    atft_ins_datm INTEGER NOT NULL,
-    atft_upd_datm INTEGER NOT NULL
+    ttag_ins_datm INTEGER NOT NULL,
+    ttag_upd_datm INTEGER NOT NULL
 );
 
 CREATE UNIQUE INDEX idx_tags_ttag_name ON tags(ttag_name);
