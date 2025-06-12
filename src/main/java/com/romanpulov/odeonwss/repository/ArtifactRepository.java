@@ -94,7 +94,7 @@ public interface ArtifactRepository
         INNER JOIN ArtifactType as at ON a.artifactType = at
         LEFT OUTER JOIN Artist as ar ON a.artist = ar
         LEFT OUTER JOIN Artist as par ON a.performerArtist = par
-        LEFT OUTER JOIN ArtifactTag atg ON a = atg.artifact
+        LEFT OUTER JOIN a.tags as atg
         WHERE (at.parentId = 200 OR ar.type IS NULL OR ar.type=:artistType)
         AND a.artifactType.id IN (:artifactTypeIds)
         ORDER BY ar.name, a.year, a.title, atg.name
@@ -116,7 +116,7 @@ public interface ArtifactRepository
         FROM Artifact as a
         INNER JOIN ArtifactType as at ON a.artifactType = at
         LEFT OUTER JOIN Artist as ar ON a.artist = ar
-        LEFT OUTER JOIN ArtifactTag atg ON a = atg.artifact
+        LEFT OUTER JOIN a.tags as atg
         WHERE (:artifactTypeIdsSize = 0 OR a.artifactType.id IN :artifactTypeIds)
         AND (:artistIdsSize = 0 OR a.artist.id IN :artistIds)
         ORDER BY ar.name, a.year, a.title, atg.name
@@ -187,10 +187,11 @@ public interface ArtifactRepository
 
     @Query(value = """
         SELECT
-            atg.artifact.id AS id,
+            a.id AS id,
             atg.name AS tagName
-        FROM ArtifactTag atg
-        WHERE atg.artifact.id = :artifactId
+        FROM Artifact a
+        LEFT OUTER JOIN a.tags as atg
+        WHERE a.id = :artifactId
         ORDER BY atg.name
     """)
     List<ArtifactFlatDTO> findAllFlatDTOTagsByArtifactId(Long artifactId);

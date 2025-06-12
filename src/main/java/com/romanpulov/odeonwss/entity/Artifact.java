@@ -4,8 +4,11 @@ import org.hibernate.Hibernate;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "artifacts")
@@ -118,15 +121,19 @@ public class Artifact extends AbstractBaseMigratedEntity {
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "artifact", fetch = FetchType.LAZY)
     private List<MediaFile> mediaFiles;
 
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "artifact", fetch = FetchType.LAZY)
-    private List<ArtifactTag> artifactTags;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
+    @JoinTable(name = "artifacts_tags",
+            joinColumns = @JoinColumn(name = "artf_id"),
+            inverseJoinColumns = @JoinColumn(name = "ttag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
 
-    public List<ArtifactTag> getArtifactTags() {
-        return artifactTags;
+    public Set<Tag> getTags() {
+        return tags;
     }
 
-    public void setArtifactTags(List<ArtifactTag> artifactTags) {
-        this.artifactTags = artifactTags;
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
     }
 
     @Override
@@ -155,6 +162,7 @@ public class Artifact extends AbstractBaseMigratedEntity {
                 ", insertDateTime=" + getInsertDateTime() +
                 ", tracks=" + (Hibernate.isInitialized(tracks) ? tracks : "not initialized") +
                 ", mediaFiles=" + (Hibernate.isInitialized(mediaFiles) ? mediaFiles : "not initialized") +
+                ", tags=" + (Hibernate.isInitialized(tags) ? tags : "not initialized") +
                 '}';
     }
 }

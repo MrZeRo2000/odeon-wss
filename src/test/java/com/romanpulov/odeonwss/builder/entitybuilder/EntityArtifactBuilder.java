@@ -1,14 +1,11 @@
 package com.romanpulov.odeonwss.builder.entitybuilder;
 
 import com.romanpulov.odeonwss.builder.AbstractClassBuilder;
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.ArtifactTag;
-import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.Artist;
+import com.romanpulov.odeonwss.entity.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 public class EntityArtifactBuilder extends AbstractClassBuilder<Artifact> {
 
@@ -61,8 +58,8 @@ public class EntityArtifactBuilder extends AbstractClassBuilder<Artifact> {
         return this;
     }
 
-    public EntityArtifactBuilder withTags(Collection<ArtifactTag> tags) {
-        this.instance.setArtifactTags(new ArrayList<>(tags));
+    public EntityArtifactBuilder withTags(Collection<Tag> tags) {
+        this.instance.setTags(new HashSet<>(tags));
         return this;
     }
 }

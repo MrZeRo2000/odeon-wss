@@ -3,6 +3,7 @@ package com.romanpulov.odeonwss.repository;
 import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.dto.ArtifactFlatDTO;
 import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.entity.Tag;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
 
@@ -32,13 +34,13 @@ public class RepositoryArtifactTests {
     ArtifactRepository artifactRepository;
 
     @Autowired
-    ArtifactTagRepository artifactTagRepository;
-
-    @Autowired
     TrackRepository trackRepository;
 
     @Autowired
     MediaFileRepository mediaFileRepository;
+
+    @Autowired
+    TagRepository tagRepository;
 
     @Test
     @Order(1)
@@ -336,19 +338,19 @@ public class RepositoryArtifactTests {
                     .build()
         );
 
-        var tagRed = artifactTagRepository.save(
-            new EntityArtifactTagBuilder()
-                    .withArtifact(artifact)
+        var tagRed = tagRepository.save(
+            new EntityTagBuilder()
                     .withName("Red")
                     .build()
         );
 
-        var tagGreen = artifactTagRepository.save(
-            new EntityArtifactTagBuilder()
-                    .withArtifact(artifact)
+        var tagGreen = tagRepository.save(
+            new EntityTagBuilder()
                     .withName("Green")
                     .build()
         );
+        artifact.setTags(Set.of(tagGreen, tagRed));
+        artifactRepository.save(artifact);
 
         var atg = artifactRepository.findAllFlatDTOTagsByArtifactId(artifact.getId());
         assertThat(atg.size()).isEqualTo(2);
@@ -368,10 +370,49 @@ public class RepositoryArtifactTests {
 
         assertThat(att.get(0).getTagName()).isEqualTo(tagGreen.getName());
         assertThat(att.get(1).getTagName()).isEqualTo(tagRed.getName());
+
+        artifact.setTags(Set.of(tagGreen));
+        artifactRepository.save(artifact);
+
+        var atg2 = artifactRepository.findAllFlatDTOTagsByArtifactId(artifact.getId());
+        assertThat(atg2.size()).isEqualTo(1);
+
+        artifact.setTags(Set.of(tagGreen, tagRed));
+        artifactRepository.save(artifact);
+
+        var atg3 = artifactRepository.findAllFlatDTOTagsByArtifactId(artifact.getId());
+        assertThat(atg3.size()).isEqualTo(2);
     }
 
     @Test
     @Order(13)
+    @Disabled
+    void testTags() {
+        List<Artifact> artifacts = artifactRepository.findAll();
+        assertThat(artifacts.size()).isGreaterThan(1);
+
+        Artifact a1 = artifacts.get(0);
+        Artifact a2 = artifacts.get(1);
+
+        Tag tag1 = new EntityTagBuilder().withName("tag1").build();
+        tagRepository.save(tag1);
+
+        Tag tag2 = new EntityTagBuilder().withName("tag2").build();
+        tagRepository.save(tag2);
+
+        a1.setTags(Set.of(tag1));
+        a2.setTags(Set.of(tag1, tag2));
+
+        artifactRepository.save(a1);
+        artifactRepository.save(a2);
+
+        Artifact a21 = artifactRepository.findById(a1.getId()).orElseThrow();
+        a21.setTags(Set.of());
+        artifactRepository.save(a21);
+    }
+
+    @Test
+    @Order(14)
     void testFindAllByOptional() {
         var noArgs = artifactRepository.findAllFlatDTOByOptional(
                 0L, null,

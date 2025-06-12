@@ -4,19 +4,18 @@ import com.romanpulov.odeonwss.dto.ArtifactDTO;
 import com.romanpulov.odeonwss.dto.ArtifactDTOImpl;
 import com.romanpulov.odeonwss.dto.ArtifactTransformer;
 import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.ArtifactTag;
 import com.romanpulov.odeonwss.entity.ArtistType;
+import com.romanpulov.odeonwss.entity.Tag;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.ArtifactMapper;
-import com.romanpulov.odeonwss.mapper.ArtifactTagMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
-import com.romanpulov.odeonwss.repository.ArtifactTagRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import org.springframework.data.util.Pair;
+import com.romanpulov.odeonwss.repository.TagRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ArtifactService
@@ -24,20 +23,18 @@ public class ArtifactService
         implements EditableObjectService<ArtifactDTO> {
 
     private final ArtifactTransformer artifactTransformer;
-    private final ArtifactTagRepository artifactTagRepository;
-    private final ArtifactTagMapper artifactTagMapper;
+    private final TagRepository tagRepository;
 
     public ArtifactService(
             ArtifactRepository artifactRepository,
             ArtifactMapper artifactMapper,
             ArtifactTransformer artifactTransformer,
             ArtistRepository artistRepository,
-            ArtifactTagRepository artifactTagRepository,
-            ArtifactTagMapper artifactTagMapper) {
+            TagRepository tagRepository) {
         super(artifactRepository, artifactMapper);
         this.artifactTransformer = artifactTransformer;
-        this.artifactTagRepository = artifactTagRepository;
-        this.artifactTagMapper = artifactTagMapper;
+        this.tagRepository = tagRepository;
+
 
         this.setOnBeforeSaveEntityHandler(entity -> {
             if ((entity.getArtist() != null)
@@ -54,6 +51,7 @@ public class ArtifactService
                 throw new CommonEntityNotFoundException("Artist", entity.getPerformerArtist().getId());
             }
         });
+
     }
 
     @Override
@@ -81,17 +79,22 @@ public class ArtifactService
     public ArtifactDTO updateTags(ArtifactDTO dto) throws CommonEntityNotFoundException {
         Artifact artifact = repository.findById(dto.getId()).orElseThrow(
                 () -> new CommonEntityNotFoundException("Artifact", dto.getId()));
-        List<ArtifactTag> oldArtifactTags = artifactTagRepository.findByArtifactId(artifact.getId());
-        List<ArtifactTag> newArtifactTags = artifactTagMapper.createFromArtifactDTO(artifact, dto);
 
-        Pair<Collection<ArtifactTag>, Collection<ArtifactTag>> mergedTags =
-                artifactTagMapper.mergeTags(oldArtifactTags, newArtifactTags);
+        // ensure tags
+        Set<Tag> tags = dto
+                .getTags()
+                .stream()
+                .map(v -> tagRepository.findTagByName(v).orElseGet(() -> {
+                    Tag newTag = new Tag();
+                    newTag.setName(v);
+                    tagRepository.save(newTag);
+                    return newTag;
+                }))
+                .collect(Collectors.toSet());
 
-        // handle deleted
-        artifactTagRepository.deleteAll(mergedTags.getSecond());
-
-        // handle inserted
-        artifactTagRepository.saveAll(mergedTags.getFirst());
+        // perform changes
+        artifact.setTags(tags);
+        repository.save(artifact);
 
         List<ArtifactDTO> result = artifactTransformer.transform(repository.findAllFlatDTOTagsByArtifactId(artifact.getId()));
         return result.isEmpty() ? new ArtifactDTOImpl() : result.get(0);

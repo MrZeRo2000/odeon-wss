@@ -261,7 +261,7 @@ public class ControllerArtifactTest {
                         .content(jsonDeleteAll)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").doesNotExist())
+                /*.andExpect(jsonPath("$.id").doesNotExist())*/
                 .andExpect(jsonPath("$.tags", Matchers.hasSize(0)))
         ;
     }

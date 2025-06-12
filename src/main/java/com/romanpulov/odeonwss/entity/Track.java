@@ -152,6 +152,21 @@ public class Track extends AbstractBaseMigratedEntity {
         this.dvProducts = dvProducts;
     }
 
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
+    @JoinTable(name = "tracks_tags",
+            joinColumns = @JoinColumn(name = "trck_id"),
+            inverseJoinColumns = @JoinColumn(name = "ttag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
+
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -174,6 +189,8 @@ public class Track extends AbstractBaseMigratedEntity {
                 ", duration=" + duration +
                 ", diskNum=" + diskNum +
                 ", num=" + num +
+                ", dvProducts=" + (Hibernate.isInitialized(dvProducts) ? dvProducts : "not initialized") +
+                ", tags=" + (Hibernate.isInitialized(tags) ? tags : "not initialized") +
                 '}';
     }
 }
