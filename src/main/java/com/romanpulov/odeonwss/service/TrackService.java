@@ -22,6 +22,7 @@ public class TrackService
     private final DVTypeRepository dvTypeRepository;
     private final TrackTransformer transformer;
     private final MediaFileRepository mediaFileRepository;
+    private final TagRepository tagRepository;
 
     public TrackService(
             ArtifactRepository artifactRepository,
@@ -31,13 +32,15 @@ public class TrackService
             TrackMapper trackMapper,
             TrackTransformer transformer,
             MediaFileRepository mediaFileRepository,
-            DVProductRepository dvProductRepository) {
+            DVProductRepository dvProductRepository,
+            TagRepository tagRepository) {
         super(trackRepository, trackMapper);
         this.artifactRepository = artifactRepository;
         this.artifactTypeRepository = artifactTypeRepository;
         this.dvTypeRepository = dvTypeRepository;
         this.transformer = transformer;
         this.mediaFileRepository = mediaFileRepository;
+        this.tagRepository = tagRepository;
 
         this.setOnBeforeSaveEntityHandler(entity -> {
             entity.setMediaFiles(
@@ -240,6 +243,30 @@ public class TrackService
         repository.saveAll(tracks);
 
         return RowsAffectedDTO.from(tracks.size());
-
     }
+
+    public TrackDTO updateTags(TrackDTO dto) throws CommonEntityNotFoundException {
+        Track track = repository.findById(dto.getId()).orElseThrow(
+                () -> new CommonEntityNotFoundException("Track", dto.getId()));
+
+        // ensure tags
+        Set<Tag> tags = dto
+                .getTags()
+                .stream()
+                .map(v -> tagRepository.findTagByName(v).orElseGet(() -> {
+                    Tag newTag = new Tag();
+                    newTag.setName(v);
+                    tagRepository.save(newTag);
+                    return newTag;
+                }))
+                .collect(Collectors.toSet());
+
+        // perform changes
+        track.setTags(tags);
+        repository.save(track);
+
+        List<TrackDTO> result = transformer.transform(repository.findAllFlatDTOTagsByTrackId(track.getId()));
+        return result.isEmpty() ? new TrackDTOImpl() : result.get(0);
+    }
+
 }

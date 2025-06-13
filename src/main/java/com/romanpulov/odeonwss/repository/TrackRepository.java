@@ -51,7 +51,8 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
             m.size AS size,
             m.bitrate AS bitRate,
             m.name AS mediaFileName,
-            tp.dvProductId AS dvProductId
+            tp.dvProductId AS dvProductId,
+            atg.name AS tagName
         FROM Track c
         LEFT OUTER JOIN TrackMediaFile cm ON cm.trackId = c.id
         LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId
@@ -59,8 +60,9 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
         LEFT OUTER JOIN Artist par ON par = c.performerArtist
         LEFT OUTER JOIN DVType dvt ON dvt = c.dvType
         LEFT OUTER JOIN TrackDVProduct tp ON tp.trackId = c.id
+        LEFT OUTER JOIN c.tags as atg
         WHERE c.artifact.id = :artifactId
-        ORDER BY c.diskNum, c.num, ar.name, c.title, m.name
+        ORDER BY c.diskNum, c.num, ar.name, c.title, m.name, atg.name
     """            
     )
     List<TrackFlatDTO> findAllFlatDTOByArtifactId (long artifactId);
@@ -80,13 +82,15 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
             c.title AS title,
             c.duration AS duration,
             dvp.id AS dvProductId,
-            dvp.title AS dvProductTitle
+            dvp.title AS dvProductTitle,
+            atg.name AS tagName
         FROM Track c
         INNER JOIN Artifact a ON c.artifact = a
         LEFT OUTER JOIN Artist ar ON ar = a.artist
         LEFT OUTER JOIN DVType dvt ON dvt = c.dvType
         LEFT OUTER JOIN TrackDVProduct tp ON tp.trackId = c.id
         LEFT OUTER JOIN DVProduct dvp ON tp.dvProductId = dvp.id
+        LEFT OUTER JOIN c.tags as atg
         WHERE (ar.type IS NULL OR ar.type = :artistType) AND a.artifactType.id = :artifactTypeId
         ORDER BY a.title, c.num, c.title
     """
@@ -107,7 +111,8 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
             dvp.title AS dvProductTitle,
             m.size AS size,
             m.bitrate AS bitRate,
-            m.name AS mediaFileName
+            m.name AS mediaFileName,
+            atg.name AS tagName
         FROM Track c
         INNER JOIN Artifact a ON c.artifact = a
         INNER JOIN TrackDVProduct tp ON tp.trackId = c.id
@@ -115,8 +120,9 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
         LEFT OUTER JOIN TrackMediaFile cm ON cm.trackId = c.id
         LEFT OUTER JOIN MediaFile m ON m.id = cm.mediaFileId
         LEFT OUTER JOIN DVType dvt ON dvt = c.dvType
+        LEFT OUTER JOIN c.tags as atg
         WHERE dvp.id = :dvProductId
-        ORDER BY a.title, c.num, c.title, m.name
+        ORDER BY a.title, c.num, c.title, m.name, atg.name
     """
     )
     List<TrackFlatDTO> findAllFlatDTOByDvProductId(Long dvProductId);
@@ -134,16 +140,18 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
             c.diskNum AS diskNum,
             c.num AS num,
             c.title AS title,
-            c.duration AS duration
+            c.duration AS duration,
+            atg.name AS tagName
         FROM Track c
         INNER JOIN Artifact a ON c.artifact = a
         INNER JOIN ArtifactType at ON a.artifactType = at
         LEFT OUTER JOIN Artist ac ON c.artist = ac
         LEFT OUTER JOIN Artist aa ON a.artist = aa
+        LEFT OUTER JOIN c.tags as atg
         WHERE 1 = 1
           AND (:artifactTypeIdsSize = 0 OR a.artifactType.id IN :artifactTypeIds)
           AND (:artistIdsSize = 0 OR COALESCE(c.artist.id, a.artist.id) IN :artistIds)
-        ORDER BY c.title, a.year, a.title
+        ORDER BY c.title, a.year, a.title, atg.name
     """)
     List<TrackFlatDTO> findAllFlatDTOByOptional(
             Long artifactTypeIdsSize,
@@ -183,6 +191,17 @@ public interface TrackRepository extends EntityDTORepository<Track, TrackDTO> {
    """
     )    
     List<TrackFlatDTO> findFlatDTOById(long id);
+
+    @Query(value = """
+        SELECT
+            t.id AS id,
+            atg.name AS tagName
+        FROM Track t
+        LEFT OUTER JOIN t.tags as atg
+        WHERE t.id = :id
+        ORDER BY atg.name
+    """)
+    List<TrackFlatDTO> findAllFlatDTOTagsByTrackId(Long id);
 
     Optional<Track> findTrackByArtifactAndTitle(Artifact artifact, String title);
 }
