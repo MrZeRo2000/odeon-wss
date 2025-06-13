@@ -110,6 +110,9 @@ public class TrackTransformer {
                 dto.setBitRate(Optional.ofNullable(dto.getBitRate()).orElse(0L) + row.getBitRate());
             }
 
+            if (row.getTagName() != null && !row.getTagName().isEmpty()) {
+                dto.getTags().add(row.getTagName());
+            }
         }
 
         // calc average bitrate

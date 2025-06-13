@@ -152,7 +152,7 @@ public class Track extends AbstractBaseMigratedEntity {
         this.dvProducts = dvProducts;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(name = "tracks_tags",
             joinColumns = @JoinColumn(name = "trck_id"),
             inverseJoinColumns = @JoinColumn(name = "ttag_id")

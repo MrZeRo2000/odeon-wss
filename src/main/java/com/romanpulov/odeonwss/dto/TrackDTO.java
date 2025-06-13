@@ -21,4 +21,5 @@ public interface TrackDTO extends BaseEntityDTO {
     Long getBitRate();
     List<MediaFileDTO> getMediaFiles();
     DVProductDTO getDvProduct();
+    List<String> getTags();
 }

@@ -19,6 +19,7 @@ public class TrackDTOImpl implements TrackDTO {
     private Long bitRate;
     private List<MediaFileDTO> mediaFiles = new ArrayList<>();
     private DVProductDTO dvProduct;
+    private List<String> tags = new ArrayList<>();
 
     public static TrackDTOImpl fromTrackDTO(TrackDTO dto) {
         TrackDTOImpl instance = new TrackDTOImpl();
@@ -166,6 +167,15 @@ public class TrackDTOImpl implements TrackDTO {
     }
 
     @Override
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -194,6 +204,7 @@ public class TrackDTOImpl implements TrackDTO {
                 ", bitRate=" + bitRate +
                 ", mediaFiles=" + mediaFiles +
                 ", dvProduct=" + dvProduct +
+                ", tags=" + getTags() +
                 '}';
     }
 }

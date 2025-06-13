@@ -29,4 +29,5 @@ public interface TrackFlatDTO {
     String getMediaFileName();
     Long getDvProductId();
     String getDvProductTitle();
+    String getTagName();
 }
