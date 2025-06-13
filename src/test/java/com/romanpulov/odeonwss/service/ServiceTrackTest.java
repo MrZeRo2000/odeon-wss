@@ -404,6 +404,45 @@ public class ServiceTrackTest {
 
     @Test
     @Order(14)
+    void testTrackWithTags() throws Exception {
+        var artifact = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMovies()).get(0);
+        var dto = trackService.getTable(artifact.getId()).get(0);
+        assertThat(dto.getTags().isEmpty()).isTrue();
+
+        var trackTags = new TrackDTOBuilder()
+                .withId(dto.getId())
+                .withTags(List.of("small", "medium", "large"))
+                .build();
+        trackService.updateTags(trackTags);
+
+        var dto1 = trackService.getTable(artifact.getId()).get(0);
+        assertThat(dto1.getTags().size()).isEqualTo(3);
+        assertThat(dto1.getTags().get(0)).isEqualTo("large");
+        assertThat(dto1.getTags().get(1)).isEqualTo("medium");
+        assertThat(dto1.getTags().get(2)).isEqualTo("small");
+
+
+        var trackTags2 = new TrackDTOBuilder()
+                .withId(dto.getId())
+                .withTags(List.of("ugly"))
+                .build();
+        trackService.updateTags(trackTags2);
+
+        var dto2 = trackService.getTable(artifact.getId()).get(0);
+        assertThat(dto2.getTags().size()).isEqualTo(1);
+        assertThat(dto2.getTags().get(0)).isEqualTo("ugly");
+
+        var trackTags3 = new TrackDTOBuilder()
+                .withId(dto.getId())
+                .build();
+        trackService.updateTags(trackTags3);
+
+        var dto3 = trackService.getTable(artifact.getId()).get(0);
+        assertThat(dto3.getTags().size()).isEqualTo(0);
+    }
+
+    @Test
+    @Order(15)
     void testGetTableByOptional() {
         var noArgs = trackService.getTableByOptional(null, null);
         assertThat(noArgs.size()).isEqualTo(4);

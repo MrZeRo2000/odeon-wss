@@ -3,12 +3,18 @@ package com.romanpulov.odeonwss.builder.dtobuilder;
 import com.romanpulov.odeonwss.builder.AbstractClassBuilder;
 import com.romanpulov.odeonwss.dto.TrackDTOImpl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class TrackDTOBuilder extends AbstractClassBuilder<TrackDTOImpl> {
     public TrackDTOBuilder() {
         super(TrackDTOImpl.class);
+    }
+
+    public TrackDTOBuilder withId(long id) {
+        instance.setId(id);
+        return this;
     }
 
     public TrackDTOBuilder withArtifactTypeId(long artifactTypeId) {
@@ -66,6 +72,11 @@ public class TrackDTOBuilder extends AbstractClassBuilder<TrackDTOImpl> {
 
     public TrackDTOBuilder withDvProductId(long dvProductId) {
         instance.setDvProduct(new DVProductDTOBuilder().withId(dvProductId).build());
+        return this;
+    }
+
+    public TrackDTOBuilder withTags(Collection<String> tags) {
+        instance.setTags(new ArrayList<>(tags));
         return this;
     }
 }

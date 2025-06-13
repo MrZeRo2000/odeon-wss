@@ -26,8 +26,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -454,4 +454,91 @@ public class ControllerTrackTest {
                 .getContentAsString();
         logger.debug("testGetTableByOptional Get resultNoArgs:{}", resultNoArgs);
     }
+
+    @Test
+    @Order(21)
+    void testUpdateTags() throws Exception {
+        var trackTagsWrongArtifact = new ArtifactDTOBuilder()
+                .withId(955L)
+                .withTags(List.of("Warm", "Cold", "Wet"))
+                .build();
+        String jsonWrongArtifact = mapper.writeValueAsString(trackTagsWrongArtifact);
+
+        this.mockMvc.perform(put("/api/track/update-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonWrongArtifact)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        var trackTagsOk = new TrackDTOBuilder()
+                .withId(1L)
+                .withTags(List.of("Warm", "Cold", "Wet"))
+                .build();
+        String jsonOk = mapper.writeValueAsString(trackTagsOk);
+
+        this.mockMvc.perform(put("/api/track/update-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonOk)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", Matchers.is(1)))
+                .andExpect(jsonPath("$.tags", Matchers.hasSize(3)))
+                .andExpect(jsonPath("$.tags[0]", Matchers.is("Cold")))
+                .andExpect(jsonPath("$.tags[1]", Matchers.is("Warm")))
+                .andExpect(jsonPath("$.tags[2]", Matchers.is("Wet")))
+        ;
+
+        var trackDeleteOne = new TrackDTOBuilder()
+                .withId(1L)
+                .withTags(List.of("Wet", "Cold"))
+                .build();
+        String jsonDeleteOne = mapper.writeValueAsString(trackDeleteOne);
+
+        this.mockMvc.perform(put("/api/track/update-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonDeleteOne)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", Matchers.is(1)))
+                .andExpect(jsonPath("$.tags", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$.tags[0]", Matchers.is("Cold")))
+                .andExpect(jsonPath("$.tags[1]", Matchers.is("Wet")))
+        ;
+
+        var result_2 = mockMvc.perform(get("/api/track/table")
+                        .param("dvProductId", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[0]", Matchers.aMapWithSize(11)))
+                .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].artifact.id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].artifact.title", Matchers.equalTo("Title 1")))
+                .andExpect(jsonPath("$[0].title", Matchers.equalTo("Track title")))
+                .andExpect(jsonPath("$[0].tags").isArray())
+                .andExpect(jsonPath("$[0].tags", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].tags[0]", Matchers.is("Cold")))
+                .andExpect(jsonPath("$[0].tags[1]", Matchers.is("Wet")))
+                .andReturn()
+                .getResponse()
+                .getContentAsString()
+                ;
+        logger.debug("testGetTableByProductId Get 2 result:{}", result_2);
+
+
+
+        var trackDeleteAll = new TrackDTOBuilder()
+                .withId(1L)
+                .build();
+        String jsonDeleteAll = mapper.writeValueAsString(trackDeleteAll);
+
+        this.mockMvc.perform(put("/api/track/update-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonDeleteAll)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tags", Matchers.hasSize(0)))
+        ;
+    }
+
 }

@@ -88,4 +88,9 @@ public class TrackController
                 dto.getArtifact().getId(),
                 dto.getDvType().getId()));
     }
+
+    @PutMapping("/update-tags")
+    ResponseEntity<TrackDTO> updateTags(@RequestBody TrackDTO dto) throws CommonEntityNotFoundException {
+        return ResponseEntity.ok(service.updateTags(dto));
+    }
 }

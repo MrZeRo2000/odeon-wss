@@ -2,6 +2,7 @@ package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.entity.Tag;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,9 @@ public class RepositoryTrackTests {
 
     @Autowired
     private DVOriginRepository dvOriginRepository;
+
+    @Autowired
+    private TagRepository tagRepository;
 
     @Test
     @Order(1)
@@ -342,5 +346,57 @@ public class RepositoryTrackTests {
                 1L, List.of(artifactTypeRepository.getWithMP3().getId()),
                 1L, List.of(1L));
         assertThat(byArtifactTypeAndArtist.size()).isEqualTo(2);
+    }
+
+    @Test
+    @Order(10)
+    void testTrackTags() {
+        tagRepository.deleteAll();
+
+        Tag tagRed = new EntityTagBuilder().withName("red").build();
+        tagRepository.save(tagRed);
+
+        Tag tagYellow = new EntityTagBuilder().withName("yellow").build();
+        tagRepository.save(tagYellow);
+
+        Tag tagGreen = new EntityTagBuilder().withName("green").build();
+        tagRepository.save(tagGreen);
+
+        Track track1 = trackRepository.findById(1L).orElseThrow();
+        track1.setTags(Set.of(tagRed, tagYellow));
+        trackRepository.save(track1);
+
+        Track track2 = trackRepository.findById(2L).orElseThrow();
+        track2.setTags(Set.of(tagGreen));
+        trackRepository.save(track2);
+
+        var tracks1 = trackRepository.findAllFlatDTOByArtifactId(1L);
+        assertThat(tracks1.size()).isEqualTo(3);
+        assertThat(tracks1.get(0).getId()).isEqualTo(1L);
+        assertThat(tracks1.get(0).getTitle()).isEqualTo("Track title updated");
+        assertThat(tracks1.get(0).getTagName()).isEqualTo("red");
+        assertThat(tracks1.get(1).getTagName()).isEqualTo("yellow");
+
+        var tracks3 = trackRepository.findAllFlatDTOByArtifactId(3L);
+        assertThat(tracks3.size()).isEqualTo(1);
+        assertThat(tracks3.get(0).getTagName()).isNull();
+
+        track1.setTags(Set.of(tagGreen));
+        trackRepository.save(track1);
+
+        var tracks12 = trackRepository.findAllFlatDTOByArtifactId(1L);
+        assertThat(tracks12.size()).isEqualTo(2);
+        assertThat(tracks12.get(0).getId()).isEqualTo(1L);
+        assertThat(tracks12.get(0).getTitle()).isEqualTo("Track title updated");
+        assertThat(tracks12.get(0).getTagName()).isEqualTo("green");
+
+        track1.setTags(Set.of());
+        trackRepository.save(track1);
+
+        var tracks13 = trackRepository.findAllFlatDTOByArtifactId(1L);
+        assertThat(tracks13.size()).isEqualTo(2);
+        assertThat(tracks13.get(0).getId()).isEqualTo(1L);
+        assertThat(tracks13.get(0).getTitle()).isEqualTo("Track title updated");
+        assertThat(tracks13.get(0).getTagName()).isNull();
     }
 }
