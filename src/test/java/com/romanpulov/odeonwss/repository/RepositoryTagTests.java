@@ -7,6 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.jdbc.Sql;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RepositoryTagTests {
@@ -22,20 +24,29 @@ public class RepositoryTagTests {
         var tag2 = new EntityTagBuilder().withName("water").build();
 
         tagRepository.save(tag1);
-        Assertions.assertEquals(1, tagRepository.count());
-        Assertions.assertEquals(1, tag1.getId());
-        Assertions.assertNotNull(tag1.getInsertDateTime());
-        Assertions.assertNotNull(tag1.getUpdateDateTime());
-        Assertions.assertEquals(tag1.getInsertDateTime(), tag1.getUpdateDateTime());
+        assertThat(tagRepository.count()).isEqualTo(1);
+        assertThat(tag1.getId()).isEqualTo(1);
+        assertThat(tag1.getInsertDateTime()).isNotNull();
+        assertThat(tag1.getUpdateDateTime()).isNotNull();
+        assertThat(tag1.getInsertDateTime()).isEqualTo(tag1.getUpdateDateTime());
 
         Assertions.assertThrows(JpaSystemException.class,() -> tagRepository.save(tag11));
-        Assertions.assertEquals(1, tagRepository.count());
+        assertThat(tagRepository.count()).isEqualTo(1);
 
         tagRepository.save(tag2);
-        Assertions.assertEquals(2, tagRepository.count());
+        assertThat(tagRepository.count()).isEqualTo(2);
 
-        Assertions.assertTrue(tagRepository.findTagByName("stone").isPresent());
-        Assertions.assertTrue(tagRepository.findTagByName("water").isPresent());
-        Assertions.assertFalse(tagRepository.findTagByName("wind").isPresent());
+        assertThat(tagRepository.findTagByName("stone")).isPresent();
+        assertThat(tagRepository.findTagByName("water")).isPresent();
+        assertThat(tagRepository.findTagByName("wind")).isNotPresent();
+
+        tagRepository.save(new EntityTagBuilder().withName("paper").build());
+
+        var orderedByName = tagRepository.findAllDTO();
+        assertThat(orderedByName.size()).isEqualTo(3);
+
+        assertThat(orderedByName.get(0).getName()).isEqualTo("paper");
+        assertThat(orderedByName.get(1).getName()).isEqualTo("stone");
+        assertThat(orderedByName.get(2).getName()).isEqualTo("water");
     }
 }
