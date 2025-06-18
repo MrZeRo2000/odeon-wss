@@ -58,7 +58,6 @@ public class RepositoryDVCategoryTests {
         Assertions.assertThrows(JpaSystemException.class, () ->
             dvCategoryRepository.save(
                     new EntityDVCategoryBuilder()
-                            .withId(55)
                             .withName("Category 66")
                             .build()
             )

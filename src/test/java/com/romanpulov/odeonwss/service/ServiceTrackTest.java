@@ -110,7 +110,6 @@ public class ServiceTrackTest {
         // create product
         DVOrigin origin = dvOriginRepository.save(
                 new EntityDVOriginBuilder()
-                        .withId(1)
                         .withName("Origin 1")
                         .build()
         );

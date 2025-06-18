@@ -63,7 +63,6 @@ public class RepositoryDVOriginTests {
         Assertions.assertThrows(JpaSystemException.class, () ->
             dvOriginRepository.save(
                     new EntityDVOriginBuilder()
-                            .withId(55)
                             .withName("Origin 5")
                             .build()
             )

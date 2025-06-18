@@ -48,7 +48,6 @@ public class ControllerDVCategoryTest {
 
         repository.save(
                 new EntityDVCategoryBuilder()
-                        .withId(1)
                         .withName("Second Category")
                         .build()
         );

@@ -43,10 +43,9 @@ public class RepositoryDVProductTests {
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(value = false)
     void testMinimumInsert() {
-        Assertions.assertEquals(0, dvProductRepository.findAll().size());
+        assertThat(dvProductRepository.findAll().size()).isEqualTo(0);
         DVOrigin origin = dvOriginRepository.save(
                 new EntityDVOriginBuilder()
-                        .withId(1)
                         .withName("Origin 1")
                         .build()
         );
@@ -68,8 +67,8 @@ public class RepositoryDVProductTests {
         Map<Long, DVOrigin> origins = dvOriginRepository.findAllMap();
 
         //categories
-        dVCategoryRepository.save(new EntityDVCategoryBuilder().withId(1).withName("Cat 1").build());
-        dVCategoryRepository.save(new EntityDVCategoryBuilder().withId(2).withName("Cat 2").build());
+        dVCategoryRepository.save(new EntityDVCategoryBuilder().withName("Cat 1").build());
+        dVCategoryRepository.save(new EntityDVCategoryBuilder().withName("Cat 2").build());
         Set<DVCategory> categories = new HashSet<>(dVCategoryRepository.findAllMap().values());
 
         DVProduct product = new EntityDVProductBuilder()
@@ -129,7 +128,6 @@ public class RepositoryDVProductTests {
         DVProduct product = dvProductRepository.findById(2L).orElseThrow();
         DVCategory newCategory = dVCategoryRepository.save(
                 new EntityDVCategoryBuilder()
-                        .withId(3)
                         .withName("Cat 3")
                         .build());
 

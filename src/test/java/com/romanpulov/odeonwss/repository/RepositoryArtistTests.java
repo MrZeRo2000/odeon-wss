@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.jdbc.Sql;
 
-import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -18,9 +17,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RepositoryArtistTests {
-
-    @Autowired
-    EntityManager em;
 
     @Autowired
     ArtifactTypeRepository artifactTypeRepository;
@@ -48,24 +44,25 @@ public class RepositoryArtistTests {
         artistRepository.deleteAll(artists);
 
         artists = artistRepository.getAllByType(ArtistType.ARTIST);
-        Assertions.assertEquals(0, artists.size());
+        assertThat(artists.size()).isEqualTo(0);
 
         artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 1").build());
 
         artists = artistRepository.getAllByType(ArtistType.ARTIST);
-        Assertions.assertEquals(1, artists.size());
-        Assertions.assertEquals(1L, artists.get(0).getId());
+        assertThat(artists.size()).isEqualTo(1);
+        assertThat(artists.get(0).getId()).isEqualTo(1L);
 
         Artist artist = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 2").build());
         artists = artistRepository.getAllByType(ArtistType.ARTIST);
-        Assertions.assertEquals(2, artists.size());
-        Assertions.assertEquals(2L, artist.getId());
+        assertThat(artists.size()).isEqualTo(2);
+        assertThat(artist.getId()).isEqualTo(2L);
 
         artistRepository.delete(artist);
         artists = artistRepository.getAllByType(ArtistType.ARTIST);
-        Assertions.assertEquals(1, artists.size());
+        assertThat(artists.size()).isEqualTo(1);
+
         artist = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 3").build());
-        Assertions.assertEquals(3L, artist.getId());
+        assertThat(artist.getId()).isEqualTo(3L);
     }
 
     @Test
@@ -75,8 +72,11 @@ public class RepositoryArtistTests {
         artistRepository.deleteAll();
         Assertions.assertEquals(0, artistRepository.getAllByType(ArtistType.ARTIST).size());
 
-        Artist artist = new Artist(10L, ArtistType.ARTIST, "Name 10");
+        Artist artist = new Artist();
+        artist.setType(ArtistType.ARTIST);
+        artist.setName("Name 10");
         Artist savedArtist = artistRepository.save(artist);
+
         Assertions.assertEquals(4, savedArtist.getId());
     }
 

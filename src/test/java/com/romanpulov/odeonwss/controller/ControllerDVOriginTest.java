@@ -51,7 +51,6 @@ public class ControllerDVOriginTest {
 
         dvOriginRepository.save(
                 new EntityDVOriginBuilder()
-                        .withId(1)
                         .withName("Second origin")
                         .build()
         );

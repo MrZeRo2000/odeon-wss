@@ -73,7 +73,6 @@ public class ControllerTrackTest {
         // create product
         DVOrigin origin = dvOriginRepository.save(
                 new EntityDVOriginBuilder()
-                        .withId(1)
                         .withName("Product Origin")
                         .build()
         );
