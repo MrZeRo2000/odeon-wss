@@ -5,6 +5,7 @@ import com.romanpulov.odeonwss.dto.TrackDTO;
 import com.romanpulov.odeonwss.dto.user.ChapterDurationsTransformer;
 import com.romanpulov.odeonwss.dto.user.TrackDVTypeUserUpdateDTO;
 import com.romanpulov.odeonwss.dto.user.TrackDurationsUserUpdateDTO;
+import com.romanpulov.odeonwss.dto.user.TrackSelectedDVTypeUserUpdateDTO;
 import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.exception.WrongParameterValueException;
@@ -86,6 +87,28 @@ public class TrackController
         }
         return ResponseEntity.ok(service.updateVideoTypes(
                 dto.getArtifact().getId(),
+                dto.getDvType().getId()));
+    }
+
+    @PostMapping("/update-selected-track-video-types")
+    public ResponseEntity<RowsAffectedDTO> updateSelectedTrackVideoTypes(@RequestBody TrackSelectedDVTypeUserUpdateDTO dto)
+        throws CommonEntityNotFoundException, WrongParameterValueException {
+        if (dto.getArtifact() == null || dto.getArtifact().getId() == null) {
+            throw new WrongParameterValueException("Artifact", "Value not found");
+        }
+
+        if (dto.getTrackIds() == null || dto.getTrackIds().isEmpty()) {
+            throw new WrongParameterValueException("TrackIds", "Value not found");
+        }
+
+        if (dto.getDvType() == null || dto.getDvType().getId() == null) {
+            throw new WrongParameterValueException("DVType", "Value not found");
+
+        }
+
+        return ResponseEntity.ok(service.updateSelectedVideoTypes(
+                dto.getArtifact().getId(),
+                dto.getTrackIds(),
                 dto.getDvType().getId()));
     }
 

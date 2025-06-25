@@ -245,6 +245,61 @@ public class TrackService
         return RowsAffectedDTO.from(tracks.size());
     }
 
+    @Transactional
+    public RowsAffectedDTO updateSelectedVideoTypes(
+            long artifactId,
+            List<Long> selectedTrackIds,
+            long dvTypeId)
+            throws CommonEntityNotFoundException {
+        Artifact artifact = artifactRepository.findById(artifactId).orElseThrow
+                (() -> new CommonEntityNotFoundException("Artifact", artifactId));
+        DVType dvType = dvTypeRepository.findById(dvTypeId).orElseThrow
+                (() -> new CommonEntityNotFoundException("DVType", dvTypeId));
+
+        Set<Long> selectedTrackIdSet = new HashSet<>(selectedTrackIds);
+
+        List<Track> tracks = repository
+                .findAllByArtifact(artifact)
+                .stream()
+                .filter(t -> selectedTrackIdSet.contains(t.getId()) && (t.getDvType() != dvType))
+                .toList();
+        for (Track track: tracks) {
+            track.setDvType(dvType);
+        }
+
+        repository.saveAll(tracks);
+
+        return RowsAffectedDTO.from(tracks.size());
+    }
+
+    @Transactional
+    public RowsAffectedDTO updateSelectedTags(
+            long artifactId,
+            List<Long> selectedTrackIds,
+            List<String> tags)
+        throws CommonEntityNotFoundException {
+        artifactRepository.findById(artifactId).orElseThrow
+                (() -> new CommonEntityNotFoundException("Artifact", artifactId));
+
+        Set<Long> selectedTrackIdSet = new HashSet<>(selectedTrackIds);
+
+        List<TrackDTO> tracks = transformer.transform(
+                repository.findAllFlatDTOByArtifactId(artifactId)
+                        .stream()
+                        .filter(t -> selectedTrackIdSet.contains(t.getId()))
+                        .toList());
+
+        for (TrackDTO track: tracks) {
+            TrackDTOImpl newTrack = new TrackDTOImpl();
+            newTrack.setId(track.getId());
+            newTrack.setTags(tags);
+
+            updateTags(newTrack);
+        }
+
+        return RowsAffectedDTO.from(tracks.size());
+    }
+
     public TrackDTO updateTags(TrackDTO dto) throws CommonEntityNotFoundException {
         Track track = repository.findById(dto.getId()).orElseThrow(
                 () -> new CommonEntityNotFoundException("Track", dto.getId()));
