@@ -1,10 +1,7 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.romanpulov.odeonwss.builder.dtobuilder.ArtifactDTOBuilder;
-import com.romanpulov.odeonwss.builder.dtobuilder.IdNameDTOBuilder;
-import com.romanpulov.odeonwss.builder.dtobuilder.TrackDTOBuilder;
-import com.romanpulov.odeonwss.builder.dtobuilder.TrackDVTypeUserUpdateDTOBuilder;
+import com.romanpulov.odeonwss.builder.dtobuilder.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
@@ -428,6 +425,52 @@ public class ControllerTrackTest {
                 .getResponse()
                 .getContentAsString();
         logger.info("testUpdateVideoTypes after:{}", result_after);
+    }
+
+    @Test
+    @Order(15)
+    void testUpdateSelectedVideoTypes() throws Exception {
+        var result_before = mockMvc.perform(get("/api/track/table/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].dvType.id", Matchers.equalTo(8)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testUpdateSelectedVideoTypes before:{}", result_before);
+
+        String json = mapper.writeValueAsString(new TrackSelectedDVTypeUserUpdateDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(1).build())
+                .withTrackIds(List.of(3L))
+                .withDVType(new IdNameDTOBuilder().withId(7).build())
+                .build());
+
+        logger.info("testUpdateSelectedVideoTypes update object:" + json);
+
+        var result = this.mockMvc.perform(
+                        post("/api/track/update-selected-track-video-types").accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", Matchers.aMapWithSize(1)))
+                .andExpect(jsonPath("$.rowsAffected", Matchers.equalTo(1)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testUpdateSelectedVideoTypes result:{}", result);
+
+        var result_after = mockMvc.perform(get("/api/track/table/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].dvType.id", Matchers.equalTo(8)))
+                .andExpect(jsonPath("$[1].dvType.id", Matchers.equalTo(7)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        logger.info("testUpdateSelectedVideoTypes after:{}", result_after);
     }
 
     @Test
