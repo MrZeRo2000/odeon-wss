@@ -403,6 +403,36 @@ public class ServiceTrackTest {
 
     @Test
     @Order(14)
+    void testUpdateSelectedVideoTypes() throws Exception {
+        var artifact = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMovies()).get(0);
+
+        var tracksBefore = trackRepository.findAllByArtifact(artifact)
+                .stream()
+                .sorted(Comparator.comparingLong(t -> t.getId() == null ? 0 : t.getId()))
+                .toList();
+        assertThat(tracksBefore.size()).isEqualTo(3);
+        for (Track track: tracksBefore) {
+            assertThat(Optional.ofNullable(track.getDvType()).orElseThrow().getId()).isEqualTo(8L);
+        }
+
+        trackService.updateSelectedVideoTypes(
+                artifact.getId(),
+                List.of(tracksBefore.get(0).getId(), tracksBefore.get(2).getId()),
+                7L);
+
+        var tracksAfter = trackRepository.findAllByArtifact(artifact)
+                .stream()
+                .sorted(Comparator.comparingLong(t -> t.getId() == null ? 0 : t.getId()))
+                .toList();
+        assertThat(tracksAfter.size()).isEqualTo(3);
+
+        assertThat(Optional.ofNullable(tracksAfter.get(0).getDvType()).orElseThrow().getId()).isEqualTo(7L);
+        assertThat(Optional.ofNullable(tracksAfter.get(1).getDvType()).orElseThrow().getId()).isEqualTo(8L);
+        assertThat(Optional.ofNullable(tracksAfter.get(2).getDvType()).orElseThrow().getId()).isEqualTo(7L);
+    }
+
+    @Test
+    @Order(15)
     void testTrackWithTags() throws Exception {
         var artifact = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMovies()).get(0);
         var dto = trackService.getTable(artifact.getId()).get(0);
