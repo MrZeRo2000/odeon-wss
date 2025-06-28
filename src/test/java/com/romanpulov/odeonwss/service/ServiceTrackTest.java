@@ -201,7 +201,7 @@ public class ServiceTrackTest {
 
         var table = trackService.getTableByProductId(1L);
         assertThat(table.size()).isEqualTo(1);
-        var row = table.get(0);
+        var row = table.getFirst();
         assertThat(row.getArtifact().getId()).isEqualTo(1L);
         assertThat(row.getArtifact().getTitle()).isEqualTo("Title 1");
         assertThat(row.getNum()).isEqualTo(5L);
@@ -333,7 +333,7 @@ public class ServiceTrackTest {
     @Test
     @Order(12)
     void testUpdateDurationsFromMediaFile() throws Exception {
-        var artifact = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMovies()).get(0);
+        var artifact = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMovies()).getFirst();
 
         var mediaFile = new EntityMediaFileBuilder()
                 .withArtifact(artifact)
@@ -384,7 +384,7 @@ public class ServiceTrackTest {
     @Test
     @Order(13)
     void testUpdateVideoTypes() throws Exception {
-        var artifact = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMovies()).get(0);
+        var artifact = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMovies()).getFirst();
 
         var tracksBefore = trackRepository.findAllByArtifact(artifact);
         assertThat(tracksBefore.size()).isEqualTo(3);
@@ -404,7 +404,7 @@ public class ServiceTrackTest {
     @Test
     @Order(14)
     void testUpdateSelectedVideoTypes() throws Exception {
-        var artifact = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMovies()).get(0);
+        var artifact = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMovies()).getFirst();
 
         var tracksBefore = trackRepository.findAllByArtifact(artifact)
                 .stream()
@@ -434,8 +434,8 @@ public class ServiceTrackTest {
     @Test
     @Order(15)
     void testTrackWithTags() throws Exception {
-        var artifact = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMovies()).get(0);
-        var dto = trackService.getTable(artifact.getId()).get(0);
+        var artifact = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMovies()).getFirst();
+        var dto = trackService.getTable(artifact.getId()).getFirst();
         assertThat(dto.getTags().isEmpty()).isTrue();
 
         var trackTags = new TrackDTOBuilder()
@@ -444,7 +444,7 @@ public class ServiceTrackTest {
                 .build();
         trackService.updateTags(trackTags);
 
-        var dto1 = trackService.getTable(artifact.getId()).get(0);
+        var dto1 = trackService.getTable(artifact.getId()).getFirst();
         assertThat(dto1.getTags().size()).isEqualTo(3);
         assertThat(dto1.getTags().get(0)).isEqualTo("large");
         assertThat(dto1.getTags().get(1)).isEqualTo("medium");
@@ -457,35 +457,70 @@ public class ServiceTrackTest {
                 .build();
         trackService.updateTags(trackTags2);
 
-        var dto2 = trackService.getTable(artifact.getId()).get(0);
+        var dto2 = trackService.getTable(artifact.getId()).getFirst();
         assertThat(dto2.getTags().size()).isEqualTo(1);
-        assertThat(dto2.getTags().get(0)).isEqualTo("ugly");
+        assertThat(dto2.getTags().getFirst()).isEqualTo("ugly");
 
         var trackTags3 = new TrackDTOBuilder()
                 .withId(dto.getId())
                 .build();
         trackService.updateTags(trackTags3);
 
-        var dto3 = trackService.getTable(artifact.getId()).get(0);
+        var dto3 = trackService.getTable(artifact.getId()).getFirst();
         assertThat(dto3.getTags().size()).isEqualTo(0);
     }
 
     @Test
-    @Order(15)
+    @Order(16)
+    void testUpdateSelectedTags() throws Exception {
+        var artifact = artifactRepository.getAllByArtifactType(artifactTypeRepository.getWithDVMovies()).getFirst();
+        var tracksBefore = trackService.getTable(artifact.getId());
+        assertThat(tracksBefore.size()).isEqualTo(3);
+
+        var trackIds1 = List.of(tracksBefore.get(0).getId(), tracksBefore.get(2).getId());
+        var trackIds2 = List.of(tracksBefore.get(1).getId());
+
+        assertThat(trackService.updateSelectedTags(
+                artifact.getId(),
+                trackIds1,
+                List.of("Milk", "Sugar")).getRowsAffected()).isEqualTo(2);
+        assertThat(trackService.updateSelectedTags(
+                artifact.getId(),
+                trackIds2,
+                List.of("Cream")).getRowsAffected()).isEqualTo(1);
+
+        var tracksAfter = trackService.getTable(artifact.getId());
+        assertThat(tracksAfter.get(0).getTags()).isEqualTo(List.of("Milk", "Sugar"));
+        assertThat(tracksAfter.get(1).getTags()).isEqualTo(List.of("Cream"));
+        assertThat(tracksAfter.get(2).getTags()).isEqualTo(List.of("Milk", "Sugar"));
+
+        assertThat(trackService.updateSelectedTags(
+                artifact.getId(),
+                trackIds1,
+                List.of()).getRowsAffected()).isEqualTo(2);
+
+        var tracksAfter2 = trackService.getTable(artifact.getId());
+        assertThat(tracksAfter2.get(0).getTags()).isEqualTo(List.of());
+        assertThat(tracksAfter2.get(1).getTags()).isEqualTo(List.of("Cream"));
+        assertThat(tracksAfter2.get(2).getTags()).isEqualTo(List.of());
+    }
+
+    @Test
+    @Order(17)
     void testGetTableByOptional() {
         var noArgs = trackService.getTableByOptional(null, null);
         assertThat(noArgs.size()).isEqualTo(4);
-        assertThat(noArgs.get(0).getArtifactType().getId()).isEqualTo(artifactTypeRepository.getWithMP3().getId());
-        assertThat(noArgs.get(0).getArtifactType().getName()).isEqualTo(artifactTypeRepository.getWithMP3().getName());
-        assertThat(noArgs.get(0).getArtifact().getTitle()).isEqualTo("Title 1");
-        assertThat(noArgs.get(0).getTitle()).isEqualTo("Comp 1-2");
+        assertThat(noArgs.getFirst().getArtifactType().getId()).isEqualTo(artifactTypeRepository.getWithMP3().getId());
+        assertThat(noArgs.getFirst().getArtifactType().getName()).isEqualTo(artifactTypeRepository.getWithMP3().getName());
+        assertThat(noArgs.getFirst().getArtifact().getTitle()).isEqualTo("Title 1");
+        assertThat(noArgs.getFirst().getTitle()).isEqualTo("Comp 1-2");
 
         var byArtist = trackService.getTableByOptional(null, List.of(1L));
         assertThat(byArtist.size()).isEqualTo(1);
 
         var byArtifactTypeMP3 = trackService.getTableByOptional(List.of(artifactTypeRepository.getWithMP3().getId()), null);
         assertThat(byArtifactTypeMP3.size()).isEqualTo(1);
-        assertThat(byArtifactTypeMP3.get(0).getTitle()).isEqualTo("Comp 1-2");
+        assertThat(byArtifactTypeMP3.getFirst().getTitle()).isEqualTo("Comp 1-2");
 
         var byArtifactTypeMovies = trackService.getTableByOptional(List.of(artifactTypeRepository.getWithDVMovies().getId()), null);
         assertThat(byArtifactTypeMovies.size()).isEqualTo(3);
