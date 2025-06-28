@@ -10,12 +10,10 @@ import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.mapper.ArtifactMapper;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import com.romanpulov.odeonwss.repository.TagRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class ArtifactService
@@ -23,17 +21,17 @@ public class ArtifactService
         implements EditableObjectService<ArtifactDTO> {
 
     private final ArtifactTransformer artifactTransformer;
-    private final TagRepository tagRepository;
+    private final TagService tagService;
 
     public ArtifactService(
             ArtifactRepository artifactRepository,
             ArtifactMapper artifactMapper,
             ArtifactTransformer artifactTransformer,
             ArtistRepository artistRepository,
-            TagRepository tagRepository) {
+            TagService tagService) {
         super(artifactRepository, artifactMapper);
         this.artifactTransformer = artifactTransformer;
-        this.tagRepository = tagRepository;
+        this.tagService = tagService;
 
 
         this.setOnBeforeSaveEntityHandler(entity -> {
@@ -81,22 +79,13 @@ public class ArtifactService
                 () -> new CommonEntityNotFoundException("Artifact", dto.getId()));
 
         // ensure tags
-        Set<Tag> tags = dto
-                .getTags()
-                .stream()
-                .map(v -> tagRepository.findTagByName(v).orElseGet(() -> {
-                    Tag newTag = new Tag();
-                    newTag.setName(v);
-                    tagRepository.save(newTag);
-                    return newTag;
-                }))
-                .collect(Collectors.toSet());
+        Set<Tag> tags = tagService.getOrCreateTags(dto.getTags());
 
         // perform changes
         artifact.setTags(tags);
         repository.save(artifact);
 
         List<ArtifactDTO> result = artifactTransformer.transform(repository.findAllFlatDTOTagsByArtifactId(artifact.getId()));
-        return result.isEmpty() ? new ArtifactDTOImpl() : result.get(0);
+        return result.isEmpty() ? new ArtifactDTOImpl() : result.getFirst();
     }
 }
