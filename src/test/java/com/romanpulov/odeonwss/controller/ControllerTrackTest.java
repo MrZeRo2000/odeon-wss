@@ -567,8 +567,6 @@ public class ControllerTrackTest {
                 ;
         logger.debug("testGetTableByProductId Get 2 result:{}", result_2);
 
-
-
         var trackDeleteAll = new TrackDTOBuilder()
                 .withId(1L)
                 .build();
@@ -581,6 +579,131 @@ public class ControllerTrackTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tags", Matchers.hasSize(0)))
         ;
+    }
+
+    @Test
+    @Order(22)
+    void testUpdateSelectedTags() throws Exception {
+        var trackTagsWrongArtifact = new TrackSelectedTagsUserUpdateDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(854L).build())
+                .withTrackIds(List.of(1L, 2L))
+                .withTags(List.of("Warm", "Cold", "Wet"))
+                .build();
+        String jsonWrongArtifact = mapper.writeValueAsString(trackTagsWrongArtifact);
+
+        this.mockMvc.perform(post("/api/track/update-selected-track-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonWrongArtifact)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+      var trackTagsEmptyIds = new TrackSelectedTagsUserUpdateDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(1L).build())
+                .build();
+        String jsonEmptyIds = mapper.writeValueAsString(trackTagsEmptyIds);
+
+        this.mockMvc.perform(post("/api/track/update-selected-track-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonEmptyIds)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+
+        var trackTagsOk = new TrackSelectedTagsUserUpdateDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(1L).build())
+                .withTrackIds(List.of(1L))
+                .withTags(List.of("Violet", "Green"))
+                .build();
+        String jsonOk = mapper.writeValueAsString(trackTagsOk);
+
+        this.mockMvc.perform(post("/api/track/update-selected-track-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonOk)
+                        .accept(MediaType.APPLICATION_JSON))
+                        .andExpect(jsonPath("$", Matchers.aMapWithSize(1)))
+                        .andExpect(jsonPath("$.rowsAffected", Matchers.equalTo(1)))
+        ;
+
+        var result_1 = mockMvc.perform(get("/api/track/table/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].title", Matchers.equalTo("Track title")))
+                .andExpect(jsonPath("$[0].tags").isArray())
+                .andExpect(jsonPath("$[0].tags", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].tags[0]", Matchers.is("Green")))
+                .andExpect(jsonPath("$[0].tags[1]", Matchers.is("Violet")))
+                .andExpect(jsonPath("$[1].tags").isArray())
+                .andExpect(jsonPath("$[1].tags", Matchers.hasSize(0)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString()
+                ;
+        logger.debug("testUpdateSelectedTags Get 1 result:{}", result_1);
+
+        var trackRemoveTagsOk = new TrackSelectedTagsUserUpdateDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(1L).build())
+                .withTrackIds(List.of(1L))
+                .withTags(List.of())
+                .build();
+        String jsonRemoveOk = mapper.writeValueAsString(trackRemoveTagsOk);
+
+        this.mockMvc.perform(post("/api/track/update-selected-track-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRemoveOk)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", Matchers.aMapWithSize(1)))
+                .andExpect(jsonPath("$.rowsAffected", Matchers.equalTo(1)))
+        ;
+
+        var result_2 = mockMvc.perform(get("/api/track/table/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].title", Matchers.equalTo("Track title")))
+                .andExpect(jsonPath("$[0].tags").isArray())
+                .andExpect(jsonPath("$[0].tags", Matchers.hasSize(0)))
+                .andExpect(jsonPath("$[1].tags").isArray())
+                .andExpect(jsonPath("$[1].tags", Matchers.hasSize(0)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString()
+                ;
+        logger.debug("testUpdateSelectedTags Get 2 result:{}", result_2);
+
+        var track3TagsOk = new TrackSelectedTagsUserUpdateDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(1L).build())
+                .withTrackIds(List.of(3L))
+                .withTags(List.of("Fast"))
+                .build();
+        String json3Ok = mapper.writeValueAsString(track3TagsOk);
+
+        this.mockMvc.perform(post("/api/track/update-selected-track-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json3Ok)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", Matchers.aMapWithSize(1)))
+                .andExpect(jsonPath("$.rowsAffected", Matchers.equalTo(1)))
+        ;
+
+        var result_3 = mockMvc.perform(get("/api/track/table/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", Matchers.hasSize(2)))
+                .andExpect(jsonPath("$[0].id", Matchers.equalTo(1)))
+                .andExpect(jsonPath("$[0].title", Matchers.equalTo("Track title")))
+                .andExpect(jsonPath("$[0].tags").isArray())
+                .andExpect(jsonPath("$[0].tags", Matchers.hasSize(0)))
+                .andExpect(jsonPath("$[1].tags").isArray())
+                .andExpect(jsonPath("$[1].tags", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$[1].tags[0]", Matchers.is("Fast")))
+                .andReturn()
+                .getResponse()
+                .getContentAsString()
+                ;
+        logger.debug("testUpdateSelectedTags Get 3 result:{}", result_3);
     }
 
 }

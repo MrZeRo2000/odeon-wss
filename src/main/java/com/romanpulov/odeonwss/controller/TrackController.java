@@ -2,10 +2,7 @@ package com.romanpulov.odeonwss.controller;
 
 import com.romanpulov.odeonwss.dto.RowsAffectedDTO;
 import com.romanpulov.odeonwss.dto.TrackDTO;
-import com.romanpulov.odeonwss.dto.user.ChapterDurationsTransformer;
-import com.romanpulov.odeonwss.dto.user.TrackDVTypeUserUpdateDTO;
-import com.romanpulov.odeonwss.dto.user.TrackDurationsUserUpdateDTO;
-import com.romanpulov.odeonwss.dto.user.TrackSelectedDVTypeUserUpdateDTO;
+import com.romanpulov.odeonwss.dto.user.*;
 import com.romanpulov.odeonwss.entity.Track;
 import com.romanpulov.odeonwss.exception.CommonEntityNotFoundException;
 import com.romanpulov.odeonwss.exception.WrongParameterValueException;
@@ -115,5 +112,27 @@ public class TrackController
     @PutMapping("/update-tags")
     ResponseEntity<TrackDTO> updateTags(@RequestBody TrackDTO dto) throws CommonEntityNotFoundException {
         return ResponseEntity.ok(service.updateTags(dto));
+    }
+
+    @PostMapping("/update-selected-track-tags")
+    public ResponseEntity<RowsAffectedDTO> updateSelectedTrackTags(@RequestBody TrackSelectedTagsUserUpdateDTO dto)
+            throws CommonEntityNotFoundException, WrongParameterValueException {
+        if (dto.getArtifact() == null || dto.getArtifact().getId() == null) {
+            throw new WrongParameterValueException("Artifact", "Value not found");
+        }
+
+        if (dto.getTrackIds() == null || dto.getTrackIds().isEmpty()) {
+            throw new WrongParameterValueException("TrackIds", "Value not found");
+        }
+
+        if (dto.getTags() == null) {
+            throw new WrongParameterValueException("Tags", "Value not found");
+
+        }
+
+        return ResponseEntity.ok(service.updateSelectedTags(
+                dto.getArtifact().getId(),
+                dto.getTrackIds(),
+                dto.getTags()));
     }
 }

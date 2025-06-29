@@ -5,7 +5,8 @@ import com.romanpulov.odeonwss.dto.ArtifactDTO;
 import com.romanpulov.odeonwss.dto.IdNameDTO;
 import com.romanpulov.odeonwss.dto.user.TrackSelectedDVTypeUserUpdateDTO;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class TrackSelectedDVTypeUserUpdateDTOBuilder extends AbstractClassBuilder<TrackSelectedDVTypeUserUpdateDTO> {
     public TrackSelectedDVTypeUserUpdateDTOBuilder() {
@@ -17,8 +18,8 @@ public class TrackSelectedDVTypeUserUpdateDTOBuilder extends AbstractClassBuilde
         return this;
     }
 
-    public TrackSelectedDVTypeUserUpdateDTOBuilder withTrackIds(List<Long> trackIds) {
-        this.instance.setTrackIds(trackIds);
+    public TrackSelectedDVTypeUserUpdateDTOBuilder withTrackIds(Collection<Long> trackIds) {
+        this.instance.setTrackIds(new ArrayList<>(trackIds));
         return this;
     }
 
