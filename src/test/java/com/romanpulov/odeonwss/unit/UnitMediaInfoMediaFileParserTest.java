@@ -36,7 +36,7 @@ public class UnitMediaInfoMediaFileParserTest {
     TestMediaInfoMediaFileParser testParser = new TestMediaInfoMediaFileParser();
 
     private String readFileContent(String fileName) throws IOException {
-        Path path = Path.of("../odeon-test-data/files/%s".formatted(fileName));
+        Path path = Path.of(UnitTestConfiguration.getFullTestFilesPath(fileName));
         return Files.readString(path);
     }
 
@@ -59,12 +59,12 @@ public class UnitMediaInfoMediaFileParserTest {
 
         MediaFileInfo info = atomicInfo.get();
 
-        assertThat(info.getMediaContentInfo().getMediaStreams().get(0)).isInstanceOf(MediaStreamAudioInfo.class);
+        assertThat(info.getMediaContentInfo().getMediaStreams().getFirst()).isInstanceOf(MediaStreamAudioInfo.class);
 
         MediaContentInfo contentInfo = info.getMediaContentInfo();
         Assertions.assertEquals(1, contentInfo.getMediaStreams().size());
 
-        AbstractMediaStreamInfo streamInfo = contentInfo.getMediaStreams().get(0);
+        AbstractMediaStreamInfo streamInfo = contentInfo.getMediaStreams().getFirst();
         assertThat(streamInfo).isInstanceOf(MediaStreamAudioInfo.class);
         Assertions.assertEquals(TEST_MP3_FILE_BITRATE, streamInfo.getBitRate());
         Assertions.assertEquals(TEST_MP3_FILE_DURATION, streamInfo.getDuration());
@@ -88,7 +88,7 @@ public class UnitMediaInfoMediaFileParserTest {
 
         MediaFileInfo info = atomicInfo.get();
 
-        assertThat(info.getMediaContentInfo().getMediaStreams().get(0)).isInstanceOf(MediaStreamAudioInfo.class);
+        assertThat(info.getMediaContentInfo().getMediaStreams().getFirst()).isInstanceOf(MediaStreamAudioInfo.class);
 
         MediaContentInfo contentInfo = info.getMediaContentInfo();
         Assertions.assertEquals(1, contentInfo.getMediaStreams().size());
@@ -111,7 +111,7 @@ public class UnitMediaInfoMediaFileParserTest {
         );
 
         MediaFileInfo info = atomicInfo.get();
-        assertThat(info.getMediaContentInfo().getMediaStreams().get(0)).isInstanceOf(MediaStreamAudioInfo.class);
+        assertThat(info.getMediaContentInfo().getMediaStreams().getFirst()).isInstanceOf(MediaStreamAudioInfo.class);
 
         MediaContentInfo contentInfo = info.getMediaContentInfo();
         Assertions.assertEquals(1, contentInfo.getMediaStreams().size());
@@ -135,7 +135,7 @@ public class UnitMediaInfoMediaFileParserTest {
         );
 
         MediaFileInfo info = atomicInfo.get();
-        assertThat(info.getMediaContentInfo().getMediaStreams().get(0)).isInstanceOf(MediaStreamAudioInfo.class);
+        assertThat(info.getMediaContentInfo().getMediaStreams().getFirst()).isInstanceOf(MediaStreamAudioInfo.class);
 
         MediaContentInfo contentInfo = info.getMediaContentInfo();
         Assertions.assertEquals(1, contentInfo.getMediaStreams().size());
@@ -159,7 +159,7 @@ public class UnitMediaInfoMediaFileParserTest {
         );
 
         MediaFileInfo info = atomicInfo.get();
-        assertThat(info.getMediaContentInfo().getMediaStreams().get(0)).isInstanceOf(MediaStreamAudioInfo.class);
+        assertThat(info.getMediaContentInfo().getMediaStreams().getFirst()).isInstanceOf(MediaStreamAudioInfo.class);
 
         MediaContentInfo contentInfo = info.getMediaContentInfo();
         Assertions.assertEquals(1, contentInfo.getMediaStreams().size());
@@ -184,7 +184,7 @@ public class UnitMediaInfoMediaFileParserTest {
 
         MediaFileInfo info = atomicInfo.get();
         logger.info("Got media info:" + info);
-        assertThat(info.getMediaContentInfo().getMediaStreams().get(0)).isInstanceOf(MediaStreamVideoInfo.class);
+        assertThat(info.getMediaContentInfo().getMediaStreams().getFirst()).isInstanceOf(MediaStreamVideoInfo.class);
 
         MediaContentInfo contentInfo = info.getMediaContentInfo();
         Assertions.assertEquals(2, contentInfo.getMediaStreams().size());
@@ -221,8 +221,8 @@ public class UnitMediaInfoMediaFileParserTest {
         assertThat(contentInfo.getMediaFormatInfo().getBitRate()).isGreaterThan(0);
         assertThat(contentInfo.getMediaFormatInfo().getBitRate()).isEqualTo(796L);
 
-        assertThat(contentInfo.getMediaStreams().get(0)).isInstanceOf(MediaStreamVideoInfo.class);
-        MediaStreamVideoInfo videoStream = (MediaStreamVideoInfo)contentInfo.getMediaStreams().get(0);
+        assertThat(contentInfo.getMediaStreams().getFirst()).isInstanceOf(MediaStreamVideoInfo.class);
+        MediaStreamVideoInfo videoStream = (MediaStreamVideoInfo)contentInfo.getMediaStreams().getFirst();
         assertThat(videoStream.getWidth()).isEqualTo(630);
         assertThat(videoStream.getHeight()).isEqualTo(480);
     }
@@ -237,8 +237,8 @@ public class UnitMediaInfoMediaFileParserTest {
         assertThat(contentInfo.getChapters().get(1)).isEqualTo(LocalTime.of(0, 26, 0));
         assertThat(contentInfo.getChapters().get(2)).isEqualTo(LocalTime.of(1, 35, 19));
 
-        assertThat(contentInfo.getMediaStreams().get(0)).isInstanceOf(MediaStreamVideoInfo.class);
-        MediaStreamVideoInfo videoStream = (MediaStreamVideoInfo)contentInfo.getMediaStreams().get(0);
+        assertThat(contentInfo.getMediaStreams().getFirst()).isInstanceOf(MediaStreamVideoInfo.class);
+        MediaStreamVideoInfo videoStream = (MediaStreamVideoInfo)contentInfo.getMediaStreams().getFirst();
         assertThat(videoStream.getWidth()).isEqualTo(1280);
         assertThat(videoStream.getHeight()).isEqualTo(720);
     }
@@ -252,8 +252,8 @@ public class UnitMediaInfoMediaFileParserTest {
         assertThat(contentInfo.getMediaFormatInfo().getBitRate()).isEqualTo(7000L);
         assertThat(contentInfo.getMediaFormatInfo().getSize()).isEqualTo(8608304859L);
         assertThat(contentInfo.getMediaFormatInfo().getDuration()).isEqualTo(8001L);
-        assertThat(contentInfo.getMediaStreams().get(0)).isInstanceOf(MediaStreamVideoInfo.class);
-        MediaStreamVideoInfo videoStream = (MediaStreamVideoInfo)contentInfo.getMediaStreams().get(0);
+        assertThat(contentInfo.getMediaStreams().getFirst()).isInstanceOf(MediaStreamVideoInfo.class);
+        MediaStreamVideoInfo videoStream = (MediaStreamVideoInfo)contentInfo.getMediaStreams().getFirst();
         assertThat(videoStream.getWidth()).isEqualTo(1280);
         assertThat(videoStream.getHeight()).isEqualTo(540);
     }
