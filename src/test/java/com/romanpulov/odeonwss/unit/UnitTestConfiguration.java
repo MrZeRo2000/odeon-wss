@@ -12,14 +12,11 @@ public class UnitTestConfiguration {
                         .class
                         .getClassLoader()
                         .getResourceAsStream("application.properties")
-                )
-        {
+                ) {
             if (is != null) {
                 try (
                         InputStreamReader reader = new InputStreamReader(is);
-                        BufferedReader br = new BufferedReader(reader)
-
-                ){
+                        BufferedReader br = new BufferedReader(reader)) {
                     String testDataPathLine  = br
                             .lines()
                             .filter(line -> line.startsWith("test.data.path"))
