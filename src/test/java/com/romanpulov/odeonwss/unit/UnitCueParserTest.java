@@ -8,26 +8,25 @@ import org.junit.jupiter.api.Test;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.logging.Logger;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class UnitCueParserTest {
-    Logger logger = Logger.getLogger(getClass().getSimpleName());
 
     @Test
     void testOneFileManyTracks() {
-        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of("../odeon-test-data/ok/Lossless/Tori Amos/1988 Y Kant Tori Read/Tori Amos - Y Kant Tori Read.wv.cue"));
+        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of(
+                UnitTestConfiguration.getFullTestFilesPath("Lossless/Tori Amos/1988 Y Kant Tori Read/Tori Amos - Y Kant Tori Read.wv.cue")));
 
-        Assertions.assertEquals(10, tracks.size());
-
-        Assertions.assertEquals(new CueParser.CueTrack("Tori Amos - Y Kant Tori Read.wv", 10, "Etienne Trilogy (The Highlands - Etienne - Skyeboat Song)", 61), tracks.get(9));
+        assertThat(tracks.size()).isEqualTo(10);
+        assertThat(new CueParser.CueTrack("Tori Amos - Y Kant Tori Read.wv", 10, "Etienne Trilogy (The Highlands - Etienne - Skyeboat Song)", 61))
+                .isEqualTo(tracks.get(9));
     }
 
     @Test
     void testOneFileManyTracksMinutes() {
-        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of("../odeon-test-data/ok/Lossless/Agua De Annique/2007 Air/air.flac.cue"));
+        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of(UnitTestConfiguration.getFullTestFilesPath("air.flac.cue")));
 
         Assertions.assertEquals(13, tracks.size());
 
@@ -48,7 +47,8 @@ public class UnitCueParserTest {
 
     @Test
     void testManyFilesManyTracks() {
-        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of("../odeon-test-data/ok/Lossless/Abigail Williams/2010 In The Absence Of Light/In The Absence Of Light.cue"));
+        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of(
+                UnitTestConfiguration.getFullTestFilesPath("Lossless/Abigail Williams/2010 In The Absence Of Light/In The Absence Of Light.cue")));
 
         Assertions.assertEquals(8, tracks.size());
 
@@ -65,7 +65,8 @@ public class UnitCueParserTest {
 
     @Test
     void testCUEWithoutNames() {
-        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of("../odeon-test-data/files/Celestial Completion.cue"));
+        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of(
+                UnitTestConfiguration.getFullTestFilesPath("Celestial Completion.cue")));
 
         assertThat(tracks.size()).isEqualTo(11);
         assertThat(tracks.get(0)).isEqualTo(new CueParser.CueTrack("01 - The Resonant Frequency of Flesh.flac", 1, "The Resonant Frequency of Flesh", 0));
