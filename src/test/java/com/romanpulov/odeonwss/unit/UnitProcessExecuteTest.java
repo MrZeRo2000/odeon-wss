@@ -2,7 +2,6 @@ package com.romanpulov.odeonwss.unit;
 
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
@@ -18,13 +17,18 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 public class UnitProcessExecuteTest {
-    private static String FFPROBE_PATH = "../ffmpeg/ffprobe.exe";
+    private final static String FFPROBE_PATH = "../ffmpeg/ffprobe.exe";
+
+    private final String TEST_FILE_PATH = UnitTestConfiguration.getTestFilesPath();
 
     @Test
     void test() throws Exception {
         Process process = new ProcessBuilder()
-                .command(FFPROBE_PATH, "-print_format", "json", "-show_format", "-v", "quiet", "../odeon-test-data/ok/MP3 Music/Aerosmith/2004 Honkin'On Bobo/01 - Road Runner.mp3"
+                .command(FFPROBE_PATH, "-print_format", "json", "-show_format", "-v", "quiet",
+                        String.format("%s/sample_mp3_1.mp3", TEST_FILE_PATH)
                 )
                 .start();
 
@@ -39,15 +43,20 @@ public class UnitProcessExecuteTest {
                 .collect(Collectors.joining("\n"));
 
 
+        assertThat(text.isEmpty()).isFalse();
+        assertThat(errorText.isEmpty()).isTrue();
+
         System.out.println("Text:" + text);
         System.out.println("Error Text:" + errorText);
     }
 
     @Test
     void testSequence() throws Exception {
-        Path path = Paths.get("../odeon-test-data/ok/MP3 Music/Aerosmith/2004 Honkin'On Bobo/");
+        Path path = Paths.get(TEST_FILE_PATH);
         try (Stream<Path> stream = Files.list(path)) {
-            List<Path> files = stream.collect(Collectors.toList());
+            List<Path> files = stream.filter(p -> p.toString().endsWith("mp3")).toList();
+            assertThat(files.isEmpty()).isFalse();
+
             for (Path file: files) {
                 Process process = new ProcessBuilder()
                         .command(FFPROBE_PATH, "-print_format", "json", "-show_format", "-v", "quiet", file.toAbsolutePath().toString()
@@ -58,12 +67,13 @@ public class UnitProcessExecuteTest {
                         new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))
                         .lines()
                         .collect(Collectors.joining("\n"));
+                assertThat(text.isEmpty()).isFalse();
 
                 String errorText = new BufferedReader(
                         new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8))
                         .lines()
                         .collect(Collectors.joining("\n"));
-
+                assertThat(errorText.isEmpty()).isTrue();
 
                 System.out.println(file.getFileName().toString() + ":" + text);
                 System.out.println(file.getFileName().toString() + ":" + errorText);
@@ -73,11 +83,10 @@ public class UnitProcessExecuteTest {
 
     @Test
     void testParallel() throws Exception {
-
         List<Callable<String>> callables = new ArrayList<>();
-        Path path = Paths.get("../odeon-test-data/ok/MP3 Music/Aerosmith/2004 Honkin'On Bobo/");
+        Path path = Paths.get(TEST_FILE_PATH);
         try (Stream<Path> stream = Files.list(path)) {
-            List<Path> files = stream.collect(Collectors.toList());
+            List<Path> files = stream.toList();
             for (Path file: files) {
                 Callable<String> callable = () -> {
 
@@ -97,22 +106,16 @@ public class UnitProcessExecuteTest {
                             .collect(Collectors.joining());
 
                     if (!text.isEmpty()) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(text);
-                            JSONArray streamsArray = jsonObject.optJSONArray("streams");
-                            JSONObject formatObject = jsonObject.optJSONObject("format");
-                            if (streamsArray == null) {
-                                throw new JSONException("Streams not found");
-                            }
-                            if (formatObject == null) {
-                                throw new JSONException("Format not found");
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        JSONObject jsonObject = new JSONObject(text);
+                        JSONArray streamsArray = jsonObject.optJSONArray("streams");
+                        JSONObject formatObject = jsonObject.optJSONObject("format");
+                        if (streamsArray == null) {
+                            System.out.println("Streams not found");
                         }
-
+                        if (formatObject == null) {
+                            System.out.println("Format not found");
+                        }
                     }
-
 
                     System.out.println(file.getFileName().toString() + ":" + text);
                     System.out.println(file.getFileName().toString() + ":" + errorText);
@@ -123,20 +126,21 @@ public class UnitProcessExecuteTest {
             }
         }
 
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
-        List<Future<String>> futures = executorService.invokeAll(callables);
+        try (ExecutorService executorService = Executors.newFixedThreadPool(4)) {
+            List<Future<String>> futures = executorService.invokeAll(callables);
 
-        executorService.shutdown();
-        try {
-            if (!executorService.awaitTermination(1000, TimeUnit.MILLISECONDS)) {
+            executorService.shutdown();
+            try {
+                if (!executorService.awaitTermination(1000, TimeUnit.MILLISECONDS)) {
+                    executorService.shutdownNow();
+                }
+            } catch (InterruptedException e) {
                 executorService.shutdownNow();
             }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
-        }
 
-        for (Future<String>f : futures ) {
-            System.out.println("Future:" + f.get());
+            for (Future<String>f : futures ) {
+                System.out.println("Future:" + f.get());
+            }
         }
     }
 }

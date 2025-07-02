@@ -25,11 +25,6 @@ public class FileTreeGeneratorTest {
     String testDataPath;
 
     @Test
-    void testTestDataPath() {
-        assertThat(this.testDataPath).isEqualTo("../odeon-test-data");
-    }
-
-    @Test
     void testDeserializeFolderDef() throws Exception {
         var fd = new FileTreeGenerator.FolderDef("folder1", Map.of("file1", Paths.get("fileSource1")));
         var mapper = new ObjectMapper();
@@ -65,12 +60,12 @@ public class FileTreeGeneratorTest {
 {
   "Pink Floyd": {
     "1977 Animals": {
-      "01 Pigs On The Wing.flac": "files/02 - I Didn’t Change My Number.flac",
-      "02 Dogs.flac": "files/02 - I Didn’t Change My Number.flac"
+      "01 Pigs On The Wing.flac": "sample_flac_1.flac",
+      "02 Dogs.flac": "sample_flac_1.flac"
     }
   },
   "Pink Floyd - The Wall 1979": {
-    "The Wall.mkv": "files/sample_1280x720_with_chapters.mkv"
+    "The Wall.mkv": "sample_1280x720_with_chapters.mkv"
   }
 }
 """;
