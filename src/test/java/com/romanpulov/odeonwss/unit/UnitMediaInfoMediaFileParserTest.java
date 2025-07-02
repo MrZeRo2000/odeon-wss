@@ -192,6 +192,8 @@ public class UnitMediaInfoMediaFileParserTest {
         MediaFormatInfo formatInfo = contentInfo.getMediaFormatInfo();
         assertThat(formatInfo.getDuration()).isEqualTo(TEST_VOB_FILE_DURATION);
         assertThat(formatInfo.getSize()).isEqualTo(TEST_VOB_FILE_SIZE);
+        assertThat(formatInfo.getHeight()).isEqualTo(TEST_VOB_HEIGHT);
+        assertThat(formatInfo.getWidth()).isEqualTo(TEST_VOB_WIDTH);
     }
 
     @Test
