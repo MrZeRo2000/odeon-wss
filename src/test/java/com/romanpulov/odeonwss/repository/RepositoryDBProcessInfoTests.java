@@ -143,8 +143,8 @@ public class RepositoryDBProcessInfoTests {
         assertThat(data_1.getFirst().getId()).isEqualTo(1L);
 
         var data_4 = dbProcessInfoRepository.findFlatDTOByIdWithDetails(4L);
-        assertThat(data_4.getFirst().getId()).isEqualTo(4L);
-        assertThat(data_4.getFirst().getDetailMessage()).isEqualTo("Started LA Loader");
+        assertThat(data_4.get(0).getId()).isEqualTo(4L);
+        assertThat(data_4.get(0).getDetailMessage()).isEqualTo("Started LA Loader");
         assertThat(data_4.get(0).getProcessingActionType()).isNull();
         assertThat(data_4.get(0).getProcessingActionValue()).isNull();
 
