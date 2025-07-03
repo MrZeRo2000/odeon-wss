@@ -50,7 +50,6 @@ public class ControllerProcessTest {
     }
 
     static class TestAppConfiguration extends AppConfiguration {
-
         public TestAppConfiguration(ServletContext context, ProjectConfigurationProperties projectConfigurationProperties) {
             super(context, projectConfigurationProperties);
             this.pathMap.put(PathType.PT_MP3, TEMP_FOLDERS.get(TestFolder.TF_CONTROLLER_PROCESS_TEST_MP3).toString());
@@ -96,6 +95,12 @@ public class ControllerProcessTest {
                             }
                         """
         );
+    }
+
+    @AfterAll
+    public void teardown() {
+        log.info("After all");
+        FileTreeGenerator.deleteTempFiles(TEMP_FOLDERS.values());
     }
 
     @Test
