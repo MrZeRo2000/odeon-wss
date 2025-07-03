@@ -2,34 +2,76 @@ package com.romanpulov.odeonwss.repository;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDBProcessInfoBuilder;
 import com.romanpulov.odeonwss.entity.DBProcessInfo;
+import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.service.ProcessService;
-import com.romanpulov.odeonwss.service.processor.model.ProcessingAction;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingActionType;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RepositoryDBProcessInfoTests {
+    private static final Logger log = Logger.getLogger(RepositoryDBProcessInfoTests.class.getSimpleName());
+
+    @Value("${test.data.path}")
+    String testDataPath;
 
     @Autowired
     DBProcessInfoRepository dbProcessInfoRepository;
 
     @Autowired
     private ProcessService processService;
+
+    private Map<TestFolder, Path> tempDirs;
+
+    private enum TestFolder {
+        TF_REPOSITORY_MEDIA_FILE_TESTS_LA
+    }
+
+    @BeforeAll
+    public void setup() throws Exception {
+        log.info("Before all");
+
+        tempDirs = FileTreeGenerator.createTempFolders(TestFolder.class);
+
+        FileTreeGenerator.generateFromJSON(
+                tempDirs.get(TestFolder.TF_REPOSITORY_MEDIA_FILE_TESTS_LA),
+                this.testDataPath,
+                """
+                            {
+                                "Lossless": {
+                                    "Abigail Williams": {
+                                        "2010 In The Absence Of Light": {
+                                            "In The Absence Of Light.CUE": "Lossless/Abigail Williams/2010 In The Absence Of Light/In The Absence Of Light.CUE",
+                                            "01 Hope The Great Betrayal.flac": "sample_flac_1.flac"
+                                        }
+                                    }
+                                }
+                            }
+                        """
+        );
+    }
+
+    @AfterAll
+    public void teardown() {
+        log.info("After all");
+        FileTreeGenerator.deleteTempFiles(tempDirs.values());
+    }
 
     @Test
     @Order(1)
@@ -54,7 +96,7 @@ public class RepositoryDBProcessInfoTests {
                 .build()
         );
 
-        processService.executeProcessor(ProcessorType.LA_LOADER, null);
+        processService.executeProcessor(ProcessorType.LA_LOADER, tempDirs.get(TestFolder.TF_REPOSITORY_MEDIA_FILE_TESTS_LA).toString());
     }
 
     @Test
@@ -98,11 +140,11 @@ public class RepositoryDBProcessInfoTests {
     @Order(2)
     void testFindByIdWithDetails() {
         var data_1 = dbProcessInfoRepository.findFlatDTOByIdWithDetails(1L);
-        assertThat(data_1.get(0).getId()).isEqualTo(1L);
+        assertThat(data_1.getFirst().getId()).isEqualTo(1L);
 
         var data_4 = dbProcessInfoRepository.findFlatDTOByIdWithDetails(4L);
-        assertThat(data_4.get(0).getId()).isEqualTo(4L);
-        assertThat(data_4.get(0).getDetailMessage()).isEqualTo("Started LA Loader");
+        assertThat(data_4.getFirst().getId()).isEqualTo(4L);
+        assertThat(data_4.getFirst().getDetailMessage()).isEqualTo("Started LA Loader");
         assertThat(data_4.get(0).getProcessingActionType()).isNull();
         assertThat(data_4.get(0).getProcessingActionValue()).isNull();
 

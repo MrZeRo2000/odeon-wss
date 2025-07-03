@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityMediaFileBuilder;
@@ -15,6 +14,7 @@ import com.romanpulov.odeonwss.utils.media.model.MediaContentInfo;
 import com.romanpulov.odeonwss.utils.media.model.MediaFileInfo;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -31,6 +31,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class RepositoryMediaFileTests {
 
     private static final Logger log = Logger.getLogger(RepositoryMediaFileTests.class.getSimpleName());
+
+    @Value("${test.data.path}")
+    String testDataPath;
 
     @Autowired
     ArtifactTypeRepository artifactTypeRepository;
@@ -49,9 +52,6 @@ public class RepositoryMediaFileTests {
 
     @Autowired
     MediaFileMapper mediaFileMapper;
-
-    @Autowired
-    ObjectMapper mapper;
 
     static class TestMediaInfoMediaFileParser extends MediaInfoMediaFileParser {
         public TestMediaInfoMediaFileParser() {
@@ -146,7 +146,7 @@ public class RepositoryMediaFileTests {
                 .build();
         artifactRepository.save(movieArtifact);
 
-        Path path = Path.of("../odeon-test-data/files/mediainfo_output_1280_720_with_chapters.json");
+        Path path = Path.of(testDataPath, "mediainfo_output_1280_720_with_chapters.json");
         String content = Files.readString(path);
         var parser = new TestMediaInfoMediaFileParser();
 
@@ -191,7 +191,7 @@ public class RepositoryMediaFileTests {
     void testMediaAttributes () {
         MediaFile mediaFile = mediaFileRepository
                 .getMediaFilesByArtifactType(artifactTypeRepository.getWithDVMovies())
-                .get(0);
+                .getFirst();
         assertThat(mediaFile.getName()).isEqualTo("Scare movie.MKV");
         assertThat(mediaFile.getFormat()).isEqualTo("MKV");
         assertThat(mediaFile.getSize()).isEqualTo(17433330L);
@@ -246,10 +246,10 @@ public class RepositoryMediaFileTests {
 
         var videoDTOs = mediaFileRepository.findAllDTOByArtifactId(2L);
         assertThat(videoDTOs.size()).isEqualTo(1);
-        assertThat(videoDTOs.get(0).getWidth()).isEqualTo(1280L);
-        assertThat(videoDTOs.get(0).getHeight()).isEqualTo(720L);
-        assertThat(videoDTOs.get(0).getHasExtra()).isEqualTo(1L);
-        assertThat(videoDTOs.get(0).getExtra()).isNull();
+        assertThat(videoDTOs.getFirst().getWidth()).isEqualTo(1280L);
+        assertThat(videoDTOs.getFirst().getHeight()).isEqualTo(720L);
+        assertThat(videoDTOs.getFirst().getHasExtra()).isEqualTo(1L);
+        assertThat(videoDTOs.getFirst().getExtra()).isNull();
     }
 
     @Test
@@ -257,11 +257,11 @@ public class RepositoryMediaFileTests {
     void testMediaFileAllDTOByTrackId() {
         var track1DTOs = mediaFileRepository.findAllDTOByTrackId(1L);
         assertThat(track1DTOs.size()).isEqualTo(1);
-        assertThat(track1DTOs.get(0).getName()).isEqualTo("AAA.mp3");
+        assertThat(track1DTOs.getFirst().getName()).isEqualTo("AAA.mp3");
 
         var track2DTOs = mediaFileRepository.findAllDTOByTrackId(2L);
         assertThat(track2DTOs.size()).isEqualTo(1);
-        assertThat(track2DTOs.get(0).getName()).isEqualTo("BBB.mp3");
+        assertThat(track2DTOs.getFirst().getName()).isEqualTo("BBB.mp3");
     }
 
     @Test
