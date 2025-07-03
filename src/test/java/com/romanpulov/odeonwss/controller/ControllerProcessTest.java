@@ -1,36 +1,102 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.config.ProjectConfigurationProperties;
 import com.romanpulov.odeonwss.dto.ProcessorRequestDTO;
+import com.romanpulov.odeonwss.generator.FileTreeGenerator;
+import jakarta.servlet.ServletContext;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.nio.file.Path;
+import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ControllerProcessTest {
+    final static Logger log = LoggerFactory.getLogger(ControllerProcessTest.class);
 
-    final static Logger logger = LoggerFactory.getLogger(ControllerProcessTest.class);
+    @Value("${test.data.path}")
+    String testDataPath;
 
     final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private MockMvc mockMvc;
+
+    private static final Map<TestFolder, Path> TEMP_FOLDERS = FileTreeGenerator.createTempFolders(TestFolder.class);
+
+    private enum TestFolder {
+        TF_CONTROLLER_PROCESS_TEST_MP3
+    }
+
+    static class TestAppConfiguration extends AppConfiguration {
+
+        public TestAppConfiguration(ServletContext context, ProjectConfigurationProperties projectConfigurationProperties) {
+            super(context, projectConfigurationProperties);
+            this.pathMap.put(PathType.PT_MP3, TEMP_FOLDERS.get(TestFolder.TF_CONTROLLER_PROCESS_TEST_MP3).toString());
+        }
+    }
+
+    @TestConfiguration
+    static class TestAppConfigurationConfig {
+        @Bean
+        @Primary
+        AppConfiguration getAppConfiguration(ServletContext context, ProjectConfigurationProperties projectConfigurationProperties) {
+            return new TestAppConfiguration(context, projectConfigurationProperties);
+        }
+    }
+
+    @BeforeAll
+    public void setup() throws Exception {
+        log.info("Before all");
+
+        FileTreeGenerator.generateFromJSON(
+                TEMP_FOLDERS.get(TestFolder.TF_CONTROLLER_PROCESS_TEST_MP3),
+                this.testDataPath,
+                """
+                            {
+                                "Aerosmith": {
+                                    "2004 Honkin'On Bobo": {
+                                        "01 - Road Runner.mp3": "sample_mp3_1.mp3"
+                                    }
+                                },
+                                "Kosheen": {
+                                    "2004 Kokopelli": {
+                                        "01 - Wasting My Time.mp3": "sample_mp3_1.mp3"
+                                    },
+                                    "2007 Damage": {
+                                        "01 - Damage.mp3": "sample_mp3_2.mp3"
+                                    }
+                                },
+                                "Various Artists": {
+                                    "2000 Rock N' Roll Fantastic": {
+                                        "001 - Simple Minds - Gloria.MP3": "sample_mp3_3.mp3"
+                                    }
+                                }
+                            }
+                        """
+        );
+    }
 
     @Test
     void shouldReturnErrorWrongParameter() throws Exception {
@@ -60,7 +126,7 @@ public class ControllerProcessTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", Matchers.is("Progress data not available")))
                 .andReturn();
-        logger.debug("Get result before execute: " + mvcResult.getResponse().getContentAsString());
+        log.debug("Get result before execute: " + mvcResult.getResponse().getContentAsString());
 
         String json = mapper.writeValueAsString(ProcessorRequestDTO.fromProcessorType("MP3_VALIDATOR"));
 
@@ -91,7 +157,7 @@ public class ControllerProcessTest {
                 .andExpect(jsonPath("$.processDetails").isArray())
                 .andExpect(jsonPath("$.processDetails[0].message", Matchers.is("Started MP3 Validator")))
                 .andReturn();
-        logger.debug("Get result after execute: " + mvcResult.getResponse().getContentAsString());
+        log.debug("Get result after execute: " + mvcResult.getResponse().getContentAsString());
     }
 
     @Test
@@ -120,7 +186,7 @@ public class ControllerProcessTest {
                 .andExpect(jsonPath("$[1].processorType", Matchers.is("MP3_VALIDATOR")))
                 .andExpect(jsonPath("$[1].processingStatus", Matchers.is("FAILURE")))
                 .andReturn();
-        logger.debug("Get result after execute table: " + mvcResult.getResponse().getContentAsString());
+        log.debug("Get result after execute table: " + mvcResult.getResponse().getContentAsString());
     }
 
     @Test
@@ -151,6 +217,6 @@ public class ControllerProcessTest {
 
                 .andReturn();
 
-        logger.debug("Get result after execute getById: " + mvcResult.getResponse().getContentAsString());
+        log.debug("Get result after execute getById: " + mvcResult.getResponse().getContentAsString());
     }
 }

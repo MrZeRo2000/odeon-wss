@@ -33,7 +33,7 @@ public class AppConfiguration {
             PathType.PT_MEDIAINFO, "mediainfo-path"
     );
 
-    private final Map<PathType, String> pathMap = new HashMap<>();
+    protected final Map<PathType, String> pathMap = new HashMap<>();
 
     private final String version;
 

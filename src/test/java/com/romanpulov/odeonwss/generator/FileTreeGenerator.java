@@ -6,6 +6,7 @@ import org.springframework.util.FileSystemUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Map;
@@ -92,6 +93,11 @@ public class FileTreeGenerator {
                 FileSystemUtils.deleteRecursively(v);
             } catch (IOException ignore) {}
         });
+    }
+
+    public static Path getTempFolder(String folderName) {
+        String tempDirPath = System.getProperty("java.io.tmpdir");
+        return Paths.get(tempDirPath, folderName);
     }
 
     public static <E extends Enum<E>> Map<E, Path> createTempFolders(Class<E> enumClass) {
