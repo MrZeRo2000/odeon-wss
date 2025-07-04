@@ -26,7 +26,7 @@ public class UnitCueParserTest {
 
     @Test
     void testOneFileManyTracksMinutes() {
-        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of(UnitTestConfiguration.getFullTestFilesPath("air.flac.cue")));
+        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of(UnitTestConfiguration.getFullTestFilesPath("Lossless/Agua De Annique/2007 Air/air.flac.cue")));
 
         Assertions.assertEquals(13, tracks.size());
 
