@@ -17,7 +17,7 @@ public class UnitCueParserTest {
     @Test
     void testOneFileManyTracks() {
         List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of(
-                UnitTestConfiguration.getFullTestFilesPath("Lossless/Tori Amos/1988 Y Kant Tori Read/Tori Amos - Y Kant Tori Read.wv.cue")));
+                UnitTestConfiguration.getFullTestFilesPath("Y Kant Tori Read.wv.cue")));
 
         assertThat(tracks.size()).isEqualTo(10);
         assertThat(new CueParser.CueTrack("Tori Amos - Y Kant Tori Read.wv", 10, "Etienne Trilogy (The Highlands - Etienne - Skyeboat Song)", 61))
@@ -26,7 +26,7 @@ public class UnitCueParserTest {
 
     @Test
     void testOneFileManyTracksMinutes() {
-        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of(UnitTestConfiguration.getFullTestFilesPath("Lossless/Agua De Annique/2007 Air/air.flac.cue")));
+        List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of(UnitTestConfiguration.getFullTestFilesPath("air.flac.cue")));
 
         Assertions.assertEquals(13, tracks.size());
 
@@ -48,7 +48,7 @@ public class UnitCueParserTest {
     @Test
     void testManyFilesManyTracks() {
         List<CueParser.CueTrack> tracks = CueParser.parseFile(Path.of(
-                UnitTestConfiguration.getFullTestFilesPath("Lossless/Abigail Williams/2010 In The Absence Of Light/In The Absence Of Light.cue")));
+                UnitTestConfiguration.getFullTestFilesPath("In The Absence Of Light.cue")));
 
         Assertions.assertEquals(8, tracks.size());
 
