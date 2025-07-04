@@ -5,27 +5,34 @@ import com.romanpulov.odeonwss.builder.dtobuilder.MediaFileDTOBuilder;
 import com.romanpulov.odeonwss.builder.dtobuilder.TrackDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
+import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.config.ProjectConfigurationProperties;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
+import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
+import jakarta.servlet.ServletContext;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -34,12 +41,59 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ControllerMediaFileTest {
     final static Logger logger = LoggerFactory.getLogger(ControllerMediaFileTest.class);
 
     @Autowired
     private MockMvc mockMvc;
+
+    private enum TestFolder {
+        TF_CONTROLLER_MEDIA_FILE_TEST_DV_MUSIC
+    }
+
+    private static final Map<TestFolder, Path> TEMP_FOLDERS = FileTreeGenerator.createTempFolders(TestFolder.class);
+
+    static class TestAppConfiguration extends AppConfiguration {
+        public TestAppConfiguration(ServletContext context, ProjectConfigurationProperties projectConfigurationProperties) {
+            super(context, projectConfigurationProperties);
+            this.pathMap.put(PathType.PT_DV_MUSIC, TEMP_FOLDERS.get(TestFolder.TF_CONTROLLER_MEDIA_FILE_TEST_DV_MUSIC).toString());
+        }
+    }
+
+    @TestConfiguration
+    static class TestAppConfigurationConfig {
+        @Bean
+        @Primary
+        AppConfiguration getAppConfiguration(ServletContext context, ProjectConfigurationProperties projectConfigurationProperties) {
+            return new TestAppConfiguration(context, projectConfigurationProperties);
+        }
+    }
+
+    @Value("${test.data.path}")
+    String testDataPath;
+
+    @BeforeAll
+    public void setup() throws Exception {
+        FileTreeGenerator.generateFromJSON(
+                TEMP_FOLDERS.get(TestFolder.TF_CONTROLLER_MEDIA_FILE_TEST_DV_MUSIC),
+                this.testDataPath,
+                """
+                            {
+                                "Tori Amos - Fade to Red 2006": {
+                                    "Tori Amos - Fade to Red Disk 1 2006.mkv": "sample_1280x720_600.mkv",
+                                    "Tori Amos - Fade to Red Disk 2 2006.mkv": "sample_1280x720_with_chapters.mkv"
+                                }
+                            }
+                        """
+        );
+    }
+
+    @AfterAll
+    public void teardown() {
+        FileTreeGenerator.deleteTempFiles(TEMP_FOLDERS.values());
+    }
 
     @Autowired
     private ArtifactTypeRepository artifactTypeRepository;
