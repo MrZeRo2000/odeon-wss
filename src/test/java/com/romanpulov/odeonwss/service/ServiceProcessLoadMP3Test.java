@@ -5,6 +5,7 @@ import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entity.Track;
+import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
 import com.romanpulov.odeonwss.repository.MediaFileRepository;
@@ -12,21 +13,171 @@ import com.romanpulov.odeonwss.repository.TrackRepository;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ServiceProcessLoadMP3Test {
 
     private static final Logger log = Logger.getLogger(ServiceProcessLoadMP3Test.class.getSimpleName());
     public static final ProcessorType PROCESSOR_TYPE = ProcessorType.MP3_LOADER;
+
+    @Value("${test.data.path}")
+    String testDataPath;
+
+    private enum TestFolder {
+        TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_OK,
+        TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_WRONG_ARTIFACT_TITLE,
+        TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_WRONG_COMPOSITION_TITLE,
+        TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_WRONG_DUPLICATE_TRACK
+    }
+
+    private  Map<TestFolder, Path> tempFolders;
+
+    @BeforeAll
+    public void setup() throws Exception {
+        this.tempFolders = FileTreeGenerator.createTempFolders(TestFolder.class);
+
+        FileTreeGenerator.generateFromJSON(
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_OK),
+                this.testDataPath,
+                """
+                            {
+                                "Aerosmith": {
+                                    "2004 Honkin'On Bobo": {
+                                        "01 - Road Runner.mp3": "sample_mp3_1.mp3",
+                                        "02 - Shame, Shame, Shame.mp3": "sample_mp3_1.mp3",
+                                        "03 - Eyesight To The Blind.mp3": "sample_mp3_1.mp3",
+                                        "04 - Baby, Please Don't Go.mp3": "sample_mp3_1.mp3",
+                                        "05 - Never Loved A Girl.mp3": "sample_mp3_1.mp3",
+                                        "06 - Back Back Train.mp3": "sample_mp3_1.mp3",
+                                        "07 - You Gotta Move.mp3": "sample_mp3_1.mp3",
+                                        "08 - The Grind.mp3": "sample_mp3_1.mp3",
+                                        "09 - I'm Ready.mp3": "sample_mp3_1.mp3",
+                                        "10 - Temperature.mp3": "sample_mp3_1.mp3",
+                                        "11 - Stop Messin' Around.mp3": "sample_mp3_1.mp3",
+                                        "12 - Jesus Is On The Main Line.mp3": "sample_mp3_1.mp3"
+                                    }
+                                },
+                                "Kosheen": {
+                                    "2004 Kokopelli": {
+                                        "01 - Wasting My Time.mp3": "sample_mp3_1.mp3",
+                                        "02 - All In My Head (Radio Edit).mp3": "sample_mp3_1.mp3",
+                                        "03 - Crawling.mp3": "sample_mp3_1.mp3",
+                                        "04 - Avalanche.mp3": "sample_mp3_1.mp3",
+                                        "05 - Blue Eyed Boy.mp3": "sample_mp3_1.mp3",
+                                        "06 - Suzy May.mp3": "sample_mp3_1.mp3",
+                                        "07 - Swamp.mp3": "sample_mp3_1.mp3",
+                                        "08 - Wish.mp3": "sample_mp3_1.mp3",
+                                        "09 - Coming Home.mp3": "sample_mp3_1.mp3",
+                                        "10 - Ages.mp3": "sample_mp3_1.mp3",
+                                        "11 - Recovery.mp3": "sample_mp3_1.mp3",
+                                        "12 - Little Boy.mp3": "sample_mp3_1.mp3"
+                                    },
+                                    "2007 Damage": {
+                                        "01 - Damage.mp3": "sample_mp3_2.mp3",
+                                        "02 - Overkill.mp3": "sample_mp3_2.mp3",
+                                        "03 - Like A Book.mp3": "sample_mp3_2.mp3",
+                                        "04 - Same Ground Again.mp3": "sample_mp3_2.mp3",
+                                        "05 - Guilty.mp3": "sample_mp3_2.mp3",
+                                        "06 - Chances.mp3": "sample_mp3_2.mp3",
+                                        "07 - Out Of This World.mp3": "sample_mp3_2.mp3",
+                                        "08 - Wish You Were Here.mp3": "sample_mp3_2.mp3",
+                                        "09 - Thief.mp3": "sample_mp3_2.mp3",
+                                        "10 - Under Fire.mp3": "sample_mp3_2.mp3",
+                                        "11 - Not Enough Love.mp3": "sample_mp3_2.mp3",
+                                        "12 - Cruel Heart.mp3": "sample_mp3_2.mp3",
+                                        "13 - Professional Friend.mp3": "sample_mp3_2.mp3",
+                                        "14 - Analogue Street Dub.mp3": "sample_mp3_2.mp3",
+                                        "15 - Marching Orders.mp3": "sample_mp3_2.mp3",
+                                        "16 - Your Life.mp3": "sample_mp3_2.mp3"
+                                    }
+                                },
+                                "Various Artists": {
+                                    "2000 Rock N' Roll Fantastic": {
+                                        "001 - Simple Minds - Gloria.MP3": "sample_mp3_3.mp3",
+                                        "002 - T. Jones - Jailhouse Rock.MP3": "sample_mp3_3.mp3"
+                                    }
+                                }
+                            }
+                        """
+        );
+
+        FileTreeGenerator.generateFromJSON(
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_WRONG_ARTIFACT_TITLE),
+                this.testDataPath,
+                """
+                            {
+                                "Aerosmith": {
+                                    "2004  Honkin'On Bobo": {
+                                        "01 - Road Runner.mp3": "sample_mp3_1.mp3",
+                                        "02 - Shame, Shame, Shame.mp3": "sample_mp3_1.mp3",
+                                        "03 - Eyesight To The Blind.mp3": "sample_mp3_1.mp3",
+                                        "04 - Baby, Please Don't Go.mp3": "sample_mp3_1.mp3",
+                                        "05 - Never Loved A Girl.mp3": "sample_mp3_1.mp3",
+                                        "06 - Back Back Train.mp3": "sample_mp3_1.mp3",
+                                        "07 - You Gotta Move.mp3": "sample_mp3_1.mp3",
+                                        "08 - The Grind.mp3": "sample_mp3_1.mp3",
+                                        "09 - I'm Ready.mp3": "sample_mp3_1.mp3",
+                                        "10 - Temperature.mp3": "sample_mp3_1.mp3",
+                                        "11 - Stop Messin' Around.mp3": "sample_mp3_1.mp3",
+                                        "12 - Jesus Is On The Main Line.mp3": "sample_mp3_1.mp3"
+                                    }
+                                }
+                            }
+                        """
+        );
+
+        FileTreeGenerator.generateFromJSON(
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_WRONG_COMPOSITION_TITLE),
+                this.testDataPath,
+                """
+                            {
+                                "Aerosmith": {
+                                    "2004 Honkin'On Bobo": {
+                                        "01 - Road Runner.mp3": "sample_mp3_1.mp3",
+                                        "02 - Shame, Shame, Shame.mp3": "sample_mp3_1.mp3",
+                                        "03 - Eyesight To The Blind.mp3": "sample_mp3_1.mp3",
+                                        "04-Baby, Please Don't Go.mp3": "sample_mp3_1.mp3"
+                                    }
+                                }
+                            }
+                        """
+        );
+
+        FileTreeGenerator.generateFromJSON(
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_WRONG_DUPLICATE_TRACK),
+                this.testDataPath,
+                """
+                            {
+                                "Aerosmith": {
+                                    "2004 Honkin'On Bobo tracks": {
+                                        "01 - Road Runner.mp3": "sample_mp3_1.mp3",
+                                        "02 - Eyesight To The Blind.mp3": "sample_mp3_1.mp3",
+                                        "02 - Shame, Shame, Shame.mp3": "sample_mp3_1.mp3"
+                                    }
+                                }
+                            }
+                        """
+        );
+    }
+
+    @AfterAll
+    public void teardown() {
+        log.info("After all");
+        FileTreeGenerator.deleteTempFiles(tempFolders.values());
+    }
 
     @Autowired
     ProcessService service;
@@ -57,7 +208,9 @@ public class ServiceProcessLoadMP3Test {
                 ));
 
         log.info("Created artists");
-        Assertions.assertDoesNotThrow(() -> service.executeProcessor(PROCESSOR_TYPE));
+        Assertions.assertDoesNotThrow(() -> service.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_OK).toString()));
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
@@ -106,7 +259,7 @@ public class ServiceProcessLoadMP3Test {
         artistRepository.findFirstByName("Kosheen").orElseThrow();
         artistRepository.findFirstByName("Various Artists").orElseThrow();
 
-        Artifact honkinArtifact = artifactRepository.getArtifactsByArtist(aerosmithArtist).get(0);
+        Artifact honkinArtifact = artifactRepository.getArtifactsByArtist(aerosmithArtist).getFirst();
         Assertions.assertEquals(trackRepository.findAllByArtifact(honkinArtifact).size(),
                 mediaFileRepository.findAllByArtifactId(honkinArtifact.getId()).size());
     }
@@ -115,7 +268,7 @@ public class ServiceProcessLoadMP3Test {
     @Order(2)
     void testLoadMissingTracksOk() {
         Artist artist = artistRepository.findFirstByName("Aerosmith").orElseThrow();
-        Artifact artifact = artifactRepository.getArtifactsByArtist(artist).get(0);
+        Artifact artifact = artifactRepository.getArtifactsByArtist(artist).getFirst();
         List<Track> tracks = trackRepository.findAllByArtifact(artifact);
         assertThat(tracks.size()).isEqualTo(12);
         assertThat(mediaFileRepository.findAllByArtifactId(artifact.getId()).size()).isEqualTo(12);
@@ -128,7 +281,9 @@ public class ServiceProcessLoadMP3Test {
         assertThat(tracks.size()).isEqualTo(0);
         assertThat(mediaFileRepository.findAllByArtifactId(artifact.getId()).size()).isEqualTo(12);
 
-        Assertions.assertDoesNotThrow(() -> service.executeProcessor(PROCESSOR_TYPE));
+        Assertions.assertDoesNotThrow(() -> service.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_OK).toString()));
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
 
@@ -144,7 +299,8 @@ public class ServiceProcessLoadMP3Test {
         List<ProcessDetail> processDetail;
 
         // warnings - no artists exist
-        service.executeProcessor(PROCESSOR_TYPE, null);
+        service.executeProcessor(PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_OK).toString());
 
         ProcessInfo pi = service.getProcessInfo();
         processDetail = pi.getProcessDetails();
@@ -254,7 +410,8 @@ public class ServiceProcessLoadMP3Test {
     void testDirectoryWithFiles() {
         service.executeProcessor(PROCESSOR_TYPE, "");
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
-        Assertions.assertTrue(service.getProcessInfo().getProcessDetails().stream().anyMatch(p -> p.getInfo().getMessage().contains("directory, found:")));
+        Assertions.assertTrue(service.getProcessInfo().getProcessDetails().stream().anyMatch(
+                p -> p.getInfo().getMessage().contains("directory, found:")));
     }
 
     @Test
@@ -266,7 +423,9 @@ public class ServiceProcessLoadMP3Test {
 
         artistRepository.save(artist);
 
-        service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/wrong_artifact_title/");
+        service.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_WRONG_ARTIFACT_TITLE).toString());
         ProcessInfo pi = service.getProcessInfo();
         List<ProcessDetail> processDetail = pi.getProcessDetails();
 
@@ -315,7 +474,9 @@ public class ServiceProcessLoadMP3Test {
     @Test
     @Order(7)
     void testWrongCompositionTitle() {
-        service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/wrong_composition_title/");
+        service.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_WRONG_COMPOSITION_TITLE).toString());
         ProcessInfo pi = service.getProcessInfo();
         List<ProcessDetail> processDetail = pi.getProcessDetails();
 
@@ -356,7 +517,9 @@ public class ServiceProcessLoadMP3Test {
     @Test
     @Order(8)
     void testWrongDuplicateTrack() {
-        service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/wrong_duplicate_track/");
+        service.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_WRONG_DUPLICATE_TRACK).toString());
         ProcessInfo pi = service.getProcessInfo();
         List<ProcessDetail> processDetail = pi.getProcessDetails();
 
@@ -413,7 +576,9 @@ public class ServiceProcessLoadMP3Test {
                         .build()
         );
         log.info("Created artist");
-        Assertions.assertDoesNotThrow(() -> service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/ok/MP3 Music/"));
+        Assertions.assertDoesNotThrow(() -> service.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_OK).toString()));
         Assertions.assertEquals(ProcessingStatus.WARNING, service.getProcessInfo().getProcessingStatus());
     }
 
@@ -423,7 +588,9 @@ public class ServiceProcessLoadMP3Test {
     void testNoArtistResolving() {
         List<ProcessDetail> processDetail;
 
-        service.executeProcessor(PROCESSOR_TYPE, null);
+        service.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_OK).toString());
         processDetail = service.getProcessInfo().getProcessDetails();
         Assertions.assertEquals(6, processDetail.size());
         Assertions.assertEquals(ProcessingStatus.WARNING, service.getProcessInfo().getProcessingStatus());
@@ -436,7 +603,7 @@ public class ServiceProcessLoadMP3Test {
         service.getProcessInfo().resolveAction(processingAction);
         Assertions.assertEquals(5, processDetail.size());
         Assertions.assertEquals(ProcessingStatus.WARNING,
-                service.getProcessInfo().getProcessDetails().get(service.getProcessInfo().getProcessDetails().size() - 1).getStatus());
+                service.getProcessInfo().getProcessDetails().getLast().getStatus());
 
         // find second action
         processingAction = processDetail.get(1).getProcessingAction();
