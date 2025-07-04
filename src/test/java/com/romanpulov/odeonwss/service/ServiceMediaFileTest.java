@@ -101,9 +101,9 @@ public class ServiceMediaFileTest {
                 """
                             {
                                 "Scary Movie": {
-                                    "Scary Movie Part 1.mkv": "files/sample_1280x720_with_chapters.mkv",
-                                    "Scary Movie Part 2.mkv": "files/sample_1280x720_with_chapters.mkv",
-                                    "Scary Movie Part 3.mkv": "files/sample_1280x720_with_chapters.mkv"
+                                    "Scary Movie Part 1.mkv": "sample_1280x720_with_chapters.mkv",
+                                    "Scary Movie Part 2.mkv": "sample_1280x720_with_chapters.mkv",
+                                    "Scary Movie Part 3.mkv": "sample_1280x720_with_chapters.mkv"
                                 }
                             }
                         """
@@ -116,7 +116,7 @@ public class ServiceMediaFileTest {
                             {
                                 "Aerosmith": {
                                     "2004 Honkin'On Bobo": {
-                                        "01 - Road Runner.mp3": "files/01 - Lost.mp3"
+                                        "01 - Road Runner.mp3": "sample_mp3_6.mp3"
                                     }
                                 }
                             }
@@ -205,15 +205,15 @@ public class ServiceMediaFileTest {
                 .sorted(Comparator.comparing(MediaFile::getName))
                 .toList();
         assertThat(mediaFiles).hasSize(2);
-        assertThat(mediaFiles.get(0).getArtifact().getId()).isEqualTo(1);
-        assertThat(mediaFiles.get(0).getName()).isEqualTo("Scary Movie Part 1.mkv");
-        assertThat(mediaFiles.get(0).getFormat()).isEqualTo("MKV");
-        assertThat(mediaFiles.get(0).getSize()).isEqualTo(17433330L);
-        assertThat(mediaFiles.get(0).getBitrate()).isEqualTo(4841);
-        assertThat(mediaFiles.get(0).getDuration()).isEqualTo(28);
-        assertThat(mediaFiles.get(0).getWidth()).isEqualTo(1280);
-        assertThat(mediaFiles.get(0).getHeight()).isEqualTo(720);
-        assertThat(mediaFiles.get(0).getExtra()).isNotNull();
+        assertThat(mediaFiles.getFirst().getArtifact().getId()).isEqualTo(1);
+        assertThat(mediaFiles.getFirst().getName()).isEqualTo("Scary Movie Part 1.mkv");
+        assertThat(mediaFiles.getFirst().getFormat()).isEqualTo("MKV");
+        assertThat(mediaFiles.getFirst().getSize()).isEqualTo(17433330L);
+        assertThat(mediaFiles.getFirst().getBitrate()).isEqualTo(4841);
+        assertThat(mediaFiles.getFirst().getDuration()).isEqualTo(28);
+        assertThat(mediaFiles.getFirst().getWidth()).isEqualTo(1280);
+        assertThat(mediaFiles.getFirst().getHeight()).isEqualTo(720);
+        assertThat(mediaFiles.getFirst().getExtra()).isNotNull();
 
         assertThatThrownBy(() -> service.insertMediaFiles(1L, List.of("Scary Movie Part 1.mkv")))
                 .isInstanceOf(WrongParameterValueException.class)
