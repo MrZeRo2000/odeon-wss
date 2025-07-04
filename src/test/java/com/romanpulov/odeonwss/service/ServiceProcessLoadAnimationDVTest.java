@@ -4,18 +4,21 @@ import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import com.romanpulov.odeonwss.entity.DVProduct;
 import com.romanpulov.odeonwss.entity.Track;
+import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.ValueValidator;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
-import javax.sql.DataSource;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -38,6 +41,54 @@ public class ServiceProcessLoadAnimationDVTest {
     };
 
     private static final Logger log = Logger.getLogger(ServiceProcessLoadAnimationDVTest.class.getSimpleName());
+
+    @Value("${test.data.path}")
+    String testDataPath;
+
+    private enum TestFolder {
+        TF_SERVICE_PROCESS_LOAD_ANIMATION_DV_TEST_OK
+    }
+
+    private Map<TestFolder, Path> tempFolders;
+
+    @BeforeAll
+    public void setup() throws Exception {
+        this.tempFolders = FileTreeGenerator.createTempFolders(TestFolder.class);
+
+        FileTreeGenerator.generateFromJSON(
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_ANIMATION_DV_TEST_OK),
+                this.testDataPath,
+                """
+                        {
+                          "Talespin": {
+                            "01 Plunder and Lightning (part-1).avi": "sample_AVI_480_750kB.avi",
+                            "01 Plunder and Lightning (part-2).avi": "sample_AVI_480_750kB.avi",
+                            "02 From Here to Machinery original.avi": "sample_AVI_480_750kB.avi",
+                            "03 Louie\\u2019s Last Stand.avi": "sample_AVI_480_750kB.avi"
+                          },
+                          "\\u041a\\u0430\\u0437\\u0430\\u043a\\u0438": {
+                            "01 Kak kazaki kulesh varili.m4v": "sample_960x540.m4v",
+                            "02 Kak kazaki v futbol igrali.mkv": "sample_1280x720_600.mkv"
+                          },
+                          "\\u041e\\u0441\\u0442\\u0440\\u043e\\u0432 \\u0441\\u043e\\u043a\\u0440\\u043e\\u0432\\u0438\\u0449": {
+                            "\\u041e\\u0441\\u0442\\u0440\\u043e\\u0432 \\u0421\\u043e\\u043a\\u0440\\u043e\\u0432\\u0438\\u0449 (1988) (1).mp4": "sample_MP4_480_1_5MG.mp4",
+                            "\\u041e\\u0441\\u0442\\u0440\\u043e\\u0432 \\u0421\\u043e\\u043a\\u0440\\u043e\\u0432\\u0438\\u0449 (1988) (2).mp4": "sample_MP4_640_3MG.mp4"
+                          },
+                          "\\u0422\\u043e\\u043c \\u0438 \\u0414\\u0436\\u0435\\u0440\\u0440\\u0438": {
+                            "001 Puss Gets the Boot (1940).avi": "sample_AVI_480_750kB.avi",
+                            "002 The Midnight Snack (1941).avi": "sample_AVI_480_750kB.avi",
+                            "003 Who Killed Who.avi": "sample_AVI_480_750kB.avi"
+                          }
+                        }
+                     """
+        );
+    }
+
+    @AfterAll
+    public void teardown() {
+        log.info("After all");
+        FileTreeGenerator.deleteTempFiles(tempFolders.values());
+    }
 
     private static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_ANIMATION_LOADER;
     private ArtifactType artifactType;
@@ -62,9 +113,6 @@ public class ServiceProcessLoadAnimationDVTest {
 
     @Autowired
     private DVProductRepository dvProductRepository;
-
-    @Autowired
-    DataSource dataSource;
 
     @Test
     @Order(1)
@@ -96,7 +144,9 @@ public class ServiceProcessLoadAnimationDVTest {
     @Order(3)
     @Rollback(value = false)
     void testSuccess() throws Exception {
-        processService.executeProcessor(PROCESSOR_TYPE);
+        processService.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_ANIMATION_DV_TEST_OK).toString());
         ProcessInfo pi = processService.getProcessInfo();
         List<ProcessDetail> processDetails = pi.getProcessDetails();
         log.info("Animation Loader Processing info: " + processService.getProcessInfo());
@@ -154,7 +204,9 @@ public class ServiceProcessLoadAnimationDVTest {
         Assertions.assertTrue(oldMediaFiles > 0);
         Assertions.assertTrue(oldMediaFiles >= oldTracks);
 
-        processService.executeProcessor(PROCESSOR_TYPE);
+        processService.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_ANIMATION_DV_TEST_OK).toString());
 
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
         Assertions.assertEquals(
