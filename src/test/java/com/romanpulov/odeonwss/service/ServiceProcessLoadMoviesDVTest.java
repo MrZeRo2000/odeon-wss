@@ -4,6 +4,7 @@ import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.DVOrigin;
 import com.romanpulov.odeonwss.entity.DVProduct;
 import com.romanpulov.odeonwss.entity.Track;
+import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.ValueValidator;
 import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
@@ -12,12 +13,14 @@ import com.romanpulov.odeonwss.service.processor.model.ProcessingStatus;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
-import javax.sql.DataSource;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -36,6 +39,51 @@ public class ServiceProcessLoadMoviesDVTest {
     };
 
     private static final Logger log = Logger.getLogger(ServiceProcessLoadMoviesDVTest.class.getSimpleName());
+
+    @Value("${test.data.path}")
+    String testDataPath;
+
+    private enum TestFolder {
+        TF_SERVICE_PROCESS_LOAD_MOVIES_DV_TEST_OK
+    }
+
+    private Map<TestFolder, Path> tempFolders;
+
+    @BeforeAll
+    public void setup() throws Exception {
+        this.tempFolders = FileTreeGenerator.createTempFolders(TestFolder.class);
+
+        FileTreeGenerator.generateFromJSON(
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MOVIES_DV_TEST_OK),
+                this.testDataPath,
+                """
+                        {
+                          "\\u041a\\u043e\\u043b\\u043e\\u043c\\u0431\\u043e": {
+                            "01 \\u0420\\u0435\\u0446\\u0435\\u043f\\u0442 \\u0443\\u0431\\u0438\\u0439\\u0441\\u0442\\u0432\\u0430.MKV": "sample_960x540_capital_ext.MKV",
+                            "02 \\u0423\\u0431\\u0438\\u0439\\u0441\\u0442\\u0432\\u043e \\u043f\\u043e \\u043a\\u043d\\u0438\\u0433\\u0435.m4v": "sample_960x540.m4v"
+                          },
+                          "\\u041a\\u0440\\u0435\\u043f\\u043a\\u0438\\u0439 \\u043e\\u0440\\u0435\\u0448\\u0435\\u043a": {
+                            "Die.Hard.1988.BDRip.720p.stimtoo.mkv": "sample_1280x720_with_chapters.mkv",
+                            "readme.txt": "sample.txt"
+                          },
+                          "\\u041b\\u0438\\u0446\\u0435\\u043d\\u0437\\u0438\\u044f \\u043d\\u0430 \\u0443\\u0431\\u0438\\u0439\\u0441\\u0442\\u0432\\u043e": {
+                            "Licence to Kill (HD).m4v": "sample_960x540.m4v"
+                          },
+                          "\\u041e\\u0431\\u044b\\u043a\\u043d\\u043e\\u0432\\u0435\\u043d\\u043d\\u043e\\u0435 \\u0447\\u0443\\u0434\\u043e": {
+                            "Part 1.avi": "sample_AVI_480_750kB.avi",
+                            "Part 2.avi": "sample_AVI_480_750kB.avi"
+                          }
+                        }
+                     """
+        );
+    }
+
+    @AfterAll
+    public void teardown() {
+        log.info("After all");
+        FileTreeGenerator.deleteTempFiles(tempFolders.values());
+    }
+
 
     private static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MOVIES_LOADER;
     private ArtifactType artifactType;
@@ -60,9 +108,6 @@ public class ServiceProcessLoadMoviesDVTest {
 
     @Autowired
     private DVProductRepository dvProductRepository;
-
-    @Autowired
-    DataSource dataSource;
 
     @Test
     @Order(1)
@@ -106,7 +151,9 @@ public class ServiceProcessLoadMoviesDVTest {
     @Order(3)
     @Rollback(value = false)
     void testSuccess() {
-        processService.executeProcessor(PROCESSOR_TYPE);
+        processService.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MOVIES_DV_TEST_OK).toString());
         log.info("Movies Loader Processing info: " + processService.getProcessInfo());
 
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
@@ -146,7 +193,9 @@ public class ServiceProcessLoadMoviesDVTest {
         Assertions.assertTrue(oldMediaFiles > 0);
         Assertions.assertTrue(oldMediaFiles >= oldTracks);
 
-        processService.executeProcessor(PROCESSOR_TYPE);
+        processService.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MOVIES_DV_TEST_OK).toString());
 
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
         Assertions.assertEquals(
@@ -240,7 +289,9 @@ public class ServiceProcessLoadMoviesDVTest {
 
         dvProductRepository.saveAll(dvProductList);
 
-        processService.executeProcessor(PROCESSOR_TYPE);
+        processService.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MOVIES_DV_TEST_OK).toString());
         Assertions.assertEquals(ProcessingStatus.SUCCESS, processService.getProcessInfo().getProcessingStatus());
 
         var resultTracks = trackRepository.getTracksByArtifactType(artifactType);
