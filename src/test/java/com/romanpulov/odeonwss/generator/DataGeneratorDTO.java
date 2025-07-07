@@ -10,8 +10,8 @@ import java.util.List;
 public class DataGeneratorDTO {
     List<ArtistDTO> artists;
     List<ArtifactDTO> artifacts;
-    List<TrackDTO> tracks;
     List<MediaFileDTO> mediaFiles;
+    List<TrackDTO> tracks;
 
     public List<ArtistDTO> getArtists() {
         return artists;
@@ -29,14 +29,6 @@ public class DataGeneratorDTO {
         this.artifacts = artifacts;
     }
 
-    public List<TrackDTO> getTracks() {
-        return tracks;
-    }
-
-    public void setTracks(List<TrackDTO> tracks) {
-        this.tracks = tracks;
-    }
-
     public List<MediaFileDTO> getMediaFiles() {
         return mediaFiles;
     }
@@ -45,13 +37,21 @@ public class DataGeneratorDTO {
         this.mediaFiles = mediaFiles;
     }
 
+    public List<TrackDTO> getTracks() {
+        return tracks;
+    }
+
+    public void setTracks(List<TrackDTO> tracks) {
+        this.tracks = tracks;
+    }
+
     @Override
     public String toString() {
         return "DataGeneratorDTO{" +
                 "artists=" + artists +
                 ", artifacts=" + artifacts +
-                ", tracks=" + tracks +
                 ", mediaFiles=" + mediaFiles +
+                ", tracks=" + tracks +
                 '}';
     }
 }
