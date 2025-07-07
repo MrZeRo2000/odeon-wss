@@ -5,6 +5,8 @@ Description: json from folder structure, substituting files with random samples
 Arguments:
     folder_name: folder name to scan
     sample_folder_name: folder to contain sample files
+Example command line:
+    ./venv/Scripts/python src/folder_to_json.py ../../../odeon-test-data-deleted/ok/Lossless ../../../odeon-test-files
 """
 
 
