@@ -48,7 +48,7 @@ public class ServiceProcessLoadAnimationMediaFilesDVTest {
                             "01 Plunder and Lightning (part-1).avi": "sample_AVI_480_750kB.avi",
                             "01 Plunder and Lightning (part-2).avi": "sample_AVI_480_750kB.avi",
                             "02 From Here to Machinery original.avi": "sample_AVI_480_750kB.avi",
-                            "03 Louie\\u2019s Last Stand.avi": "sample_AVI_480_750kB.avi"
+                            "03 Louie’s Last Stand.avi": "sample_AVI_480_750kB.avi"
                           }
                         }
                      """

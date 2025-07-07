@@ -59,27 +59,27 @@ public class ServiceProcessLoadAnimationDVTest {
                 tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_ANIMATION_DV_TEST_OK),
                 this.testDataPath,
                 """
-                        {
-                          "Talespin": {
-                            "01 Plunder and Lightning (part-1).avi": "sample_AVI_480_750kB.avi",
-                            "01 Plunder and Lightning (part-2).avi": "sample_AVI_480_750kB.avi",
-                            "02 From Here to Machinery original.avi": "sample_AVI_480_750kB.avi",
-                            "03 Louie\\u2019s Last Stand.avi": "sample_AVI_480_750kB.avi"
-                          },
-                          "\\u041a\\u0430\\u0437\\u0430\\u043a\\u0438": {
-                            "01 Kak kazaki kulesh varili.m4v": "sample_960x540.m4v",
-                            "02 Kak kazaki v futbol igrali.mkv": "sample_1280x720_600.mkv"
-                          },
-                          "\\u041e\\u0441\\u0442\\u0440\\u043e\\u0432 \\u0441\\u043e\\u043a\\u0440\\u043e\\u0432\\u0438\\u0449": {
-                            "\\u041e\\u0441\\u0442\\u0440\\u043e\\u0432 \\u0421\\u043e\\u043a\\u0440\\u043e\\u0432\\u0438\\u0449 (1988) (1).mp4": "sample_MP4_480_1_5MG.mp4",
-                            "\\u041e\\u0441\\u0442\\u0440\\u043e\\u0432 \\u0421\\u043e\\u043a\\u0440\\u043e\\u0432\\u0438\\u0449 (1988) (2).mp4": "sample_MP4_640_3MG.mp4"
-                          },
-                          "\\u0422\\u043e\\u043c \\u0438 \\u0414\\u0436\\u0435\\u0440\\u0440\\u0438": {
-                            "001 Puss Gets the Boot (1940).avi": "sample_AVI_480_750kB.avi",
-                            "002 The Midnight Snack (1941).avi": "sample_AVI_480_750kB.avi",
-                            "003 Who Killed Who.avi": "sample_AVI_480_750kB.avi"
-                          }
-                        }
+{
+  "Talespin": {
+    "01 Plunder and Lightning (part-1).avi": "sample_AVI_480_750kB.avi",
+    "01 Plunder and Lightning (part-2).avi": "sample_AVI_480_750kB.avi",
+    "02 From Here to Machinery original.avi": "sample_AVI_480_750kB.avi",
+    "03 Louie’s Last Stand.avi": "sample_AVI_480_750kB.avi"
+  },
+  "Казаки": {
+    "01 Kak kazaki kulesh varili.m4v": "sample_960x540.m4v",
+    "02 Kak kazaki v futbol igrali.mkv": "sample_1280x720_600.mkv"
+  },
+  "Остров сокровищ": {
+    "Остров Сокровищ (1988) (1).mp4": "sample_MP4_480_1_5MG.mp4",
+    "Остров Сокровищ (1988) (2).mp4": "sample_MP4_640_3MG.mp4"
+  },
+  "Том и Джерри": {
+    "001 Puss Gets the Boot (1940).avi": "sample_AVI_480_750kB.avi",
+    "002 The Midnight Snack (1941).avi": "sample_AVI_480_750kB.avi",
+    "003 Who Killed Who.avi": "sample_AVI_480_750kB.avi"
+  }
+}
                      """
         );
     }

@@ -57,24 +57,24 @@ public class ServiceProcessLoadMoviesDVTest {
                 tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MOVIES_DV_TEST_OK),
                 this.testDataPath,
                 """
-                        {
-                          "\\u041a\\u043e\\u043b\\u043e\\u043c\\u0431\\u043e": {
-                            "01 \\u0420\\u0435\\u0446\\u0435\\u043f\\u0442 \\u0443\\u0431\\u0438\\u0439\\u0441\\u0442\\u0432\\u0430.MKV": "sample_960x540_capital_ext.MKV",
-                            "02 \\u0423\\u0431\\u0438\\u0439\\u0441\\u0442\\u0432\\u043e \\u043f\\u043e \\u043a\\u043d\\u0438\\u0433\\u0435.m4v": "sample_960x540.m4v"
-                          },
-                          "\\u041a\\u0440\\u0435\\u043f\\u043a\\u0438\\u0439 \\u043e\\u0440\\u0435\\u0448\\u0435\\u043a": {
-                            "Die.Hard.1988.BDRip.720p.stimtoo.mkv": "sample_1280x720_with_chapters.mkv",
-                            "readme.txt": "sample.txt"
-                          },
-                          "\\u041b\\u0438\\u0446\\u0435\\u043d\\u0437\\u0438\\u044f \\u043d\\u0430 \\u0443\\u0431\\u0438\\u0439\\u0441\\u0442\\u0432\\u043e": {
-                            "Licence to Kill (HD).m4v": "sample_960x540.m4v"
-                          },
-                          "\\u041e\\u0431\\u044b\\u043a\\u043d\\u043e\\u0432\\u0435\\u043d\\u043d\\u043e\\u0435 \\u0447\\u0443\\u0434\\u043e": {
-                            "Part 1.avi": "sample_AVI_480_750kB.avi",
-                            "Part 2.avi": "sample_AVI_480_750kB.avi"
-                          }
-                        }
-                     """
+{
+  "Коломбо": {
+    "01 Рецепт убийства.MKV": "sample_960x540_capital_ext.MKV",
+    "02 Убийство по книге.m4v": "sample_960x540.m4v"
+  },
+  "Крепкий орешек": {
+    "Die.Hard.1988.BDRip.720p.stimtoo.mkv": "sample_1280x720_with_chapters.mkv",
+    "readme.txt": "sample.txt"
+  },
+  "Лицензия на убийство": {
+    "Licence to Kill (HD).m4v": "sample_960x540.m4v"
+  },
+  "Обыкновенное чудо": {
+    "Part 1.avi": "sample_AVI_480_750kB.avi",
+    "Part 2.avi": "sample_AVI_480_750kB.avi"
+  }
+}
+                    """
         );
     }
 

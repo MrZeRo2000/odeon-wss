@@ -176,8 +176,8 @@ public class ServiceProcessLoadLATest {
                               "Scan": {
                                 "Back.jpg": "sample.jpg"
                               },
-                              "\\u041e\\u0442\\u0447\\u0435\\u0442 \\u0415\\u0410\\u0421 1.txt": "sample.txt",
-                              "\\u041e\\u0442\\u0447\\u0435\\u0442 \\u0415\\u0410\\u0421 2.txt": "sample.txt"
+                              "Отчет ЕАС 1.txt": "sample.txt",
+                              "Отчет ЕАС 2.txt": "sample.txt"
                             }
                           },
                           "The Sisters Of Mercy": {
