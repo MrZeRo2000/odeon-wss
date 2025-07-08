@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import javax.sql.DataSource;
@@ -27,7 +26,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ActiveProfiles(value = "test-02")
+//@ActiveProfiles(value = "test-02")
 public class ServiceProcessLoadMusicDVTest {
     private static final Logger log = Logger.getLogger(ServiceProcessLoadMusicDVTest.class.getSimpleName());
 
@@ -58,19 +57,20 @@ public class ServiceProcessLoadMusicDVTest {
     @Autowired
     private TrackRepository trackRepository;
 
-    private ProcessInfo executeProcessor() {
-        processService.executeProcessor(PROCESSOR_TYPE);
+    private ProcessInfo executeProcessor(TestFolder testFolder) {
+        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get(testFolder).toString());
         return processService.getProcessInfo();
     }
 
     private Map<TestFolder, Path> tempDirs;
 
     private enum TestFolder {
-        TF_WITHOUT_PARCELABLE,
-        TF_WITH_TITLES_NO_ARTIST,
-        TF_WITH_ARTISTS_AND_TITLE,
-        TF_WITH_ARTIFACT_ARTIST_VARIABLE_LENGTH,
-        TF_WITH_ARTIFACT_INVALID_PATH_CHARACTER
+        TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_OK,
+        TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITHOUT_PARCELABLE,
+        TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITH_TITLES_NO_ARTIST,
+        TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITH_ARTISTS_AND_TITLE,
+        TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITH_ARTIFACT_ARTIST_VARIABLE_LENGTH,
+        TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITH_ARTIFACT_INVALID_PATH_CHARACTER
     }
 
     @BeforeAll
@@ -80,68 +80,90 @@ public class ServiceProcessLoadMusicDVTest {
         tempDirs = FileTreeGenerator.createTempFolders(TestFolder.class);
 
         FileTreeGenerator.generateFromJSON(
-                tempDirs.get(TestFolder.TF_WITHOUT_PARCELABLE),
+                tempDirs.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_OK),
                 this.testDataPath,
                 """
-                    {
-                        "Tori Amos - Fade to Red 2006": {
-                            "Tori Amos - Fade to Red Disk 1 2006.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv",
-                            "Tori Amos - Fade to Red Disk 2 2006.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"
-                        }
-                    }
+{
+  "Beautiful Voices 1": {
+    "Beautiful Voices 1.mkv": "sample_1280x720_with_chapters.mkv",
+    "tracks.txt": "sample.txt"
+  },
+  "The Cure - Picture Show 1991": {
+    "The Cure - Picture Show 1991.mp4": "sample_MP4_480_1_5MG.mp4"
+  },
+  "Tori Amos - Fade to Red 2006": {
+    "Tori Amos - Fade to Red Disk 1 2006.mkv": "sample_1280x720_with_chapters.mkv",
+    "Tori Amos - Fade to Red Disk 2 2006.mkv": "sample_1280x720_600.mkv"
+  }
+}
+                """
+        );
+
+
+
+        FileTreeGenerator.generateFromJSON(
+                tempDirs.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITHOUT_PARCELABLE),
+                this.testDataPath,
+                """
+{
+    "Tori Amos - Fade to Red 2006": {
+        "Tori Amos - Fade to Red Disk 1 2006.mkv": "sample_1280x720_600.mkv",
+        "Tori Amos - Fade to Red Disk 2 2006.mkv": "sample_1280x720_600.mkv"
+    }
+}
                 """
         );
 
         FileTreeGenerator.generateFromJSON(
-                tempDirs.get(TestFolder.TF_WITH_TITLES_NO_ARTIST),
+                tempDirs.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITH_TITLES_NO_ARTIST),
                 this.testDataPath,
                 """
-                    {
-                        "The Cure - In Orange": {
-                            "01 Shake dog shake.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv",
-                            "02 Never Enough.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"
-                        }
-                    }
+{
+    "The Cure - In Orange": {
+        "01 Shake dog shake.mkv": "sample_1280x720_600.mkv",
+        "02 Never Enough.mkv": "sample_1280x720_600.mkv"
+    }
+}
                 """
         );
 
         FileTreeGenerator.generateFromJSON(
-                tempDirs.get(TestFolder.TF_WITH_ARTISTS_AND_TITLE),
+                tempDirs.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITH_ARTISTS_AND_TITLE),
                 this.testDataPath,
                 """
-                    {
-                        "Beautiful Voices": {
-                            "01 Nightwish - Ghost Love Score.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv",
-                            "02 Mandragora Scream - Vision They Shared.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 2 2006.mkv",
-                            "03 Tapping The Vein - Butterfly (Unsensored)(2000).mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 2 2006.mkv"
-                        }
-                    }
+{
+    "Beautiful Voices": {
+        "01 Nightwish - Ghost Love Score.mkv": "sample_1280x720_600.mkv",
+        "02 Mandragora Scream - Vision They Shared.mkv": "sample_1280x720_600.mkv",
+        "03 Tapping The Vein - Butterfly (Unsensored)(2000).mkv": "sample_1280x720_600.mkv"
+    }
+}
                 """
         );
 
         FileTreeGenerator.generateFromJSON(
-                tempDirs.get(TestFolder.TF_WITH_ARTIFACT_ARTIST_VARIABLE_LENGTH),
+                tempDirs.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITH_ARTIFACT_ARTIST_VARIABLE_LENGTH),
                 this.testDataPath,
                 """
-                    {
-                        "Black Sabbath - Videos": {
-                            "01 Paranoid.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv",
-                            "02 Iron Man.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"
-                        }
-                    }
+{
+    "Black Sabbath - Videos": {
+        "01 Paranoid.mkv": "sample_1280x720_600.mkv",
+        "02 Iron Man.mkv": "sample_1280x720_600.mkv"
+    }
+}
                 """
         );
 
         FileTreeGenerator.generateFromJSON(
-                tempDirs.get(TestFolder.TF_WITH_ARTIFACT_INVALID_PATH_CHARACTER),
+                tempDirs.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITH_ARTIFACT_INVALID_PATH_CHARACTER),
                 this.testDataPath,
                 """
-                    {
-                        "Therapy - Videos": {
-                            "01 Isolation.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv",
-                            "02 Happy People Have No Stories.mkv": "dv_music/Tori Amos - Fade to Red 2006/Tori Amos - Fade to Red Disk 1 2006.mkv"
-                        }
-                    }
+{
+    "Therapy - Videos": {
+        "01 Isolation.mkv": "sample_1280x720_600.mkv",
+        "02 Happy People Have No Stories.mkv": "sample_1280x720_600.mkv"
+    }
+}
                 """
         );
     }
@@ -191,7 +213,7 @@ public class ServiceProcessLoadMusicDVTest {
     @Order(3)
     @Rollback(value = false)
     void testSuccess() {
-        ProcessInfo pi = executeProcessor();
+        ProcessInfo pi = executeProcessor(TestFolder.TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_OK);
         log.info("Music Loader Processing info: " + pi);
         List<ProcessDetail> processDetails = pi.getProcessDetails();
 
@@ -259,7 +281,7 @@ public class ServiceProcessLoadMusicDVTest {
         assertThat(oldMediaFiles).isGreaterThan(0);
         assertThat(oldMediaFiles).isGreaterThanOrEqualTo(oldArtifacts);
 
-        ProcessInfo pi = executeProcessor();
+        ProcessInfo pi = executeProcessor(TestFolder.TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_OK);
         log.info("Music Loader Processing info: " + pi);
         List<ProcessDetail> processDetails = pi.getProcessDetails();
 
@@ -323,7 +345,7 @@ public class ServiceProcessLoadMusicDVTest {
     void testWithTracksNoArtists() {
         prepareArtists();
 
-        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get(TestFolder.TF_WITH_TITLES_NO_ARTIST).toString());
+        executeProcessor(TestFolder.TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITH_TITLES_NO_ARTIST);
         var pi = processService.getProcessInfo();
 
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
@@ -346,19 +368,19 @@ public class ServiceProcessLoadMusicDVTest {
 
         var artifacts = artifactRepository.findAll();
         assertThat(artifacts.size()).isEqualTo(1);
-        assertThat(Optional.ofNullable(artifacts.get(0).getArtist()).orElseThrow().getId()).isEqualTo(
+        assertThat(Optional.ofNullable(artifacts.getFirst().getArtist()).orElseThrow().getId()).isEqualTo(
                 artistRepository.findFirstByName("The Cure").orElseThrow().getId()
         );
 
-        var tracks = trackRepository.findAllFlatDTOByArtifactId(artifacts.get(0).getId());
+        var tracks = trackRepository.findAllFlatDTOByArtifactId(artifacts.getFirst().getId());
         assertThat(tracks.size()).isEqualTo(2);
-        assertThat(tracks.get(0).getArtistName()).isEqualTo("The Cure");
-        assertThat(tracks.get(0).getNum()).isEqualTo(1L);
-        assertThat(tracks.get(0).getDiskNum()).isNull();
-        assertThat(tracks.get(0).getTitle()).isEqualTo("Shake dog shake");
-        assertThat(tracks.get(0).getMediaFileName()).isEqualTo("01 Shake dog shake.mkv");
+        assertThat(tracks.getFirst().getArtistName()).isEqualTo("The Cure");
+        assertThat(tracks.getFirst().getNum()).isEqualTo(1L);
+        assertThat(tracks.getFirst().getDiskNum()).isNull();
+        assertThat(tracks.getFirst().getTitle()).isEqualTo("Shake dog shake");
+        assertThat(tracks.getFirst().getMediaFileName()).isEqualTo("01 Shake dog shake.mkv");
 
-        processService.executeProcessor(ProcessorType.DV_MUSIC_VALIDATOR, tempDirs.get(TestFolder.TF_WITH_TITLES_NO_ARTIST).toString());
+        processService.executeProcessor(ProcessorType.DV_MUSIC_VALIDATOR, tempDirs.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITH_TITLES_NO_ARTIST).toString());
         var validatePi = processService.getProcessInfo();
         assertThat(validatePi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
     }
@@ -370,7 +392,7 @@ public class ServiceProcessLoadMusicDVTest {
     void testWithTracksAndArtists() {
         prepareArtists();
 
-        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get(TestFolder.TF_WITH_ARTISTS_AND_TITLE).toString());
+        executeProcessor(TestFolder.TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITH_ARTISTS_AND_TITLE);
         var pi = processService.getProcessInfo();
 
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
@@ -398,10 +420,10 @@ public class ServiceProcessLoadMusicDVTest {
         // set artist for artifact for validation
         Artist artist = new Artist();
         artist.setId(1L);
-        artifacts.get(0).setArtist(artist);
-        artifactRepository.save(artifacts.get(0));
+        artifacts.getFirst().setArtist(artist);
+        artifactRepository.save(artifacts.getFirst());
 
-        processService.executeProcessor(ProcessorType.DV_MUSIC_VALIDATOR, tempDirs.get(TestFolder.TF_WITH_ARTISTS_AND_TITLE).toString());
+        processService.executeProcessor(ProcessorType.DV_MUSIC_VALIDATOR, tempDirs.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITH_ARTISTS_AND_TITLE).toString());
         var validatePi = processService.getProcessInfo();
         assertThat(validatePi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
     }
@@ -413,7 +435,7 @@ public class ServiceProcessLoadMusicDVTest {
     void testWithArtifactArtistVariableLength() {
         prepareArtists();
 
-        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get(TestFolder.TF_WITH_ARTIFACT_ARTIST_VARIABLE_LENGTH).toString());
+        executeProcessor(TestFolder.TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITH_ARTIFACT_ARTIST_VARIABLE_LENGTH);
         var pi = processService.getProcessInfo();
 
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
@@ -427,8 +449,8 @@ public class ServiceProcessLoadMusicDVTest {
 
         var artifacts = artifactRepository.findAll();
         assertThat(artifacts.size()).isEqualTo(1);
-        assertThat(artifacts.get(0).getTitle()).isEqualTo("Black Sabbath - Videos");
-        var artifactArtist = artifacts.get(0).getArtist();
+        assertThat(artifacts.getFirst().getTitle()).isEqualTo("Black Sabbath - Videos");
+        var artifactArtist = artifacts.getFirst().getArtist();
         assertThat(artifactArtist).isNotNull();
         assertThat(Optional.ofNullable(artifactArtist).orElseThrow().getId()).isEqualTo(artist.getId());
     }
@@ -441,7 +463,7 @@ public class ServiceProcessLoadMusicDVTest {
     void testWithArtifactInvalidPathCharacter() {
         prepareArtists();
 
-        processService.executeProcessor(PROCESSOR_TYPE, tempDirs.get(TestFolder.TF_WITH_ARTIFACT_INVALID_PATH_CHARACTER).toString());
+        executeProcessor(TestFolder.TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITH_ARTIFACT_INVALID_PATH_CHARACTER);
         var pi = processService.getProcessInfo();
 
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
@@ -455,8 +477,8 @@ public class ServiceProcessLoadMusicDVTest {
 
         var artifacts = artifactRepository.findAll();
         assertThat(artifacts.size()).isEqualTo(1);
-        assertThat(artifacts.get(0).getTitle()).isEqualTo("Therapy - Videos");
-        var artifactArtist = artifacts.get(0).getArtist();
+        assertThat(artifacts.getFirst().getTitle()).isEqualTo("Therapy - Videos");
+        var artifactArtist = artifacts.getFirst().getArtist();
         assertThat(artifactArtist).isNotNull();
         assertThat(Optional.ofNullable(artifactArtist).orElseThrow().getId()).isEqualTo(artist.getId());
     }
