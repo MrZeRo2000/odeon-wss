@@ -3,14 +3,8 @@ package com.romanpulov.odeonwss.generator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.jutilscore.io.FileUtils;
-import com.romanpulov.odeonwss.dto.ArtifactDTO;
-import com.romanpulov.odeonwss.dto.ArtistDTO;
-import com.romanpulov.odeonwss.dto.MediaFileDTO;
-import com.romanpulov.odeonwss.dto.TrackDTO;
-import com.romanpulov.odeonwss.entity.Artifact;
-import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.MediaFile;
-import com.romanpulov.odeonwss.entity.Track;
+import com.romanpulov.odeonwss.dto.*;
+import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,7 +52,16 @@ public class DataGenerator {
         }
     }
 
-    private Map<String, Artist> createArtists(Collection<ArtistDTO> artists) {
+    public void createArtistsFromList(Collection<String> artists) {
+        createArtists(artists.stream().map( s -> {
+            ArtistDTOImpl a = new ArtistDTOImpl();
+            a.setArtistType(ArtistType.ARTIST);
+            a.setArtistName(s);
+            return a;
+        }).toList());
+    }
+
+    private Map<String, Artist> createArtists(Collection<? extends ArtistDTO> artists) {
         Map<String, Artist> result = new HashMap<>();
         for (ArtistDTO artist : artists) {
             if ((artist.getArtistName() != null) && !artist.getArtistName().isEmpty()) {

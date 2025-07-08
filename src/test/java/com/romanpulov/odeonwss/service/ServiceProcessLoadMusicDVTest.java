@@ -1,9 +1,8 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entity.ArtifactType;
 import com.romanpulov.odeonwss.entity.Artist;
-import com.romanpulov.odeonwss.entity.ArtistType;
+import com.romanpulov.odeonwss.generator.DataGenerator;
 import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.ValueValidator;
@@ -15,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
-import javax.sql.DataSource;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Logger;
@@ -37,7 +35,7 @@ public class ServiceProcessLoadMusicDVTest {
     String testDataPath;
 
     @Autowired
-    DataSource dataSource;
+    DataGenerator dataGenerator;
 
     @Autowired
     ProcessService processService;
@@ -175,16 +173,16 @@ public class ServiceProcessLoadMusicDVTest {
     }
 
     private void prepareArtists() {
-        Arrays.asList("The Cure", "Tori Amos", "Various Artists", "Nightwish", "Mandragora Scream", "Black", "Black Sabbath", "Therapy").forEach(s ->
-                artistRepository.save(
-                        new EntityArtistBuilder()
-                                .withType(ArtistType.ARTIST)
-                                .withName(s)
-                                .build()
-                ));
-
-        log.info("Created artists");
-
+        dataGenerator.createArtistsFromList(
+                List.of(
+                        "The Cure",
+                        "Tori Amos",
+                        "Various Artists",
+                        "Nightwish",
+                        "Mandragora Scream",
+                        "Black",
+                        "Black Sabbath",
+                        "Therapy"));
     }
 
     @Test
