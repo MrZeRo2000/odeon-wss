@@ -57,7 +57,7 @@ public class RepositoryDBProcessInfoTests {
                                 "Lossless": {
                                     "Abigail Williams": {
                                         "2010 In The Absence Of Light": {
-                                            "In The Absence Of Light.CUE": "Lossless/Abigail Williams/2010 In The Absence Of Light/In The Absence Of Light.CUE",
+                                            "In The Absence Of Light.CUE": "In The Absence Of Light.CUE",
                                             "01 Hope The Great Betrayal.flac": "sample_flac_1.flac"
                                         }
                                     }
