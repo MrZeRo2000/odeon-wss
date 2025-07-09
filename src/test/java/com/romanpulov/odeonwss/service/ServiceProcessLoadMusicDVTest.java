@@ -97,8 +97,6 @@ public class ServiceProcessLoadMusicDVTest {
                 """
         );
 
-
-
         FileTreeGenerator.generateFromJSON(
                 tempDirs.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MUSIC_DV_TEST_WITHOUT_PARCELABLE),
                 this.testDataPath,
