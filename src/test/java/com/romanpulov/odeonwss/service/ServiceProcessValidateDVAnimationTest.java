@@ -42,7 +42,8 @@ public class ServiceProcessValidateDVAnimationTest {
     String testDataPath;
 
     private enum TestFolder {
-        TF_SERVICE_PROCESS_VALIDATE_DV_ANIMATION_TEST_OK
+        TF_SERVICE_PROCESS_VALIDATE_DV_ANIMATION_TEST_OK,
+        TF_SERVICE_PROCESS_VALIDATE_DV_ANIMATION_TEST_WITH_FOLDERS
     }
 
     private Map<TestFolder, Path> tempFolders;
@@ -78,6 +79,36 @@ public class ServiceProcessValidateDVAnimationTest {
 }
                      """
         );
+
+        FileTreeGenerator.generateFromJSON(
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_ANIMATION_TEST_WITH_FOLDERS),
+                this.testDataPath,
+                """
+{
+    "Aerosmith": {
+        "2004 Honkin'On Bobo": {
+            "01 - Road Runner.mp3": "sample_mp3_1.mp3",
+            "02 - Shame, Shame, Shame.mp3": "sample_mp3_1.mp3"
+        }
+    },
+    "Kosheen": {
+        "2004 Kokopelli": {
+            "01 - Wasting My Time.mp3": "sample_mp3_1.mp3"
+        },
+        "2007 Damage": {
+            "01 - Damage.mp3": "sample_mp3_2.mp3",
+            "02 - Overkill.mp3": "sample_mp3_2.mp3"
+        }
+    },
+    "Various Artists": {
+        "2000 Rock N' Roll Fantastic": {
+            "001 - Simple Minds - Gloria.MP3": "sample_mp3_3.mp3"
+        }
+    }
+}
+                        """
+        );
+
     }
 
     @AfterAll
@@ -149,6 +180,12 @@ public class ServiceProcessValidateDVAnimationTest {
          */
     }
 
+    private void executeProcessorOk() {
+        service.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_ANIMATION_TEST_OK).toString());
+    }
+
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
@@ -160,9 +197,7 @@ public class ServiceProcessValidateDVAnimationTest {
     @Test
     @Order(2)
     void testValidateOk() {
-        service.executeProcessor(
-                PROCESSOR_TYPE,
-                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_ANIMATION_TEST_OK).toString());
+        executeProcessorOk();
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         assertThat(pi.getProcessDetails().get(0)).isEqualTo(
@@ -272,7 +307,9 @@ public class ServiceProcessValidateDVAnimationTest {
     @Test
     @Order(3)
     void testContainsFoldersShouldFail() {
-        service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/ok/MP3 Music/");
+        service.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_ANIMATION_TEST_WITH_FOLDERS).toString());
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         assertThat(pi.getProcessDetails().get(0)).isEqualTo(
@@ -285,7 +322,11 @@ public class ServiceProcessValidateDVAnimationTest {
         assertThat(pi.getProcessDetails().get(1)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage(
-                                "Expected file, found: ..\\odeon-test-data\\ok\\MP3 Music\\Aerosmith\\2004 Honkin'On Bobo"),
+                                "Expected file, found: " + Path.of(
+                                        tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_ANIMATION_TEST_WITH_FOLDERS).toString(),
+                                        "Aerosmith",
+                                        "2004 Honkin'On Bobo"
+                                )),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -316,7 +357,7 @@ public class ServiceProcessValidateDVAnimationTest {
                 .withTitle("New Artifact")
                 .build();
         artifactRepository.save(artifact);
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -339,7 +380,7 @@ public class ServiceProcessValidateDVAnimationTest {
         Artifact artifact = artifactRepository.findAll().get(0);
         artifactRepository.delete(artifact);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -377,7 +418,7 @@ public class ServiceProcessValidateDVAnimationTest {
         track.getMediaFiles().add(mediaFile);
         trackRepository.save(track);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -409,7 +450,7 @@ public class ServiceProcessValidateDVAnimationTest {
         track.getMediaFiles().removeIf(m -> m.getName().equals("01 Plunder and Lightning (part-1).avi"));
         trackRepository.save(track);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -423,7 +464,6 @@ public class ServiceProcessValidateDVAnimationTest {
                         null)
         );
     }
-
 
     @Test
     @Order(8)
@@ -443,7 +483,7 @@ public class ServiceProcessValidateDVAnimationTest {
         mediaFile.setArtifact(artifact);
         mediaFileRepository.save(mediaFile);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -471,7 +511,7 @@ public class ServiceProcessValidateDVAnimationTest {
         mediaFile.setArtifact(null);
         mediaFileRepository.save(mediaFile);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -500,7 +540,8 @@ public class ServiceProcessValidateDVAnimationTest {
         var tracks = trackRepository.findAllByArtifact(artifact);
         trackRepository.deleteAll(tracks);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
+
         ProcessInfo pi = service.getProcessInfo();
         var pd = pi.getProcessDetails();
         assertThat(pd.get(2)).isEqualTo(
@@ -530,7 +571,8 @@ public class ServiceProcessValidateDVAnimationTest {
         assertThat(mediaFiles.isEmpty()).isFalse();
         mediaFileRepository.deleteAll(mediaFiles);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
+
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         var pd = pi.getProcessDetails();
@@ -560,7 +602,7 @@ public class ServiceProcessValidateDVAnimationTest {
         track_to_remove.setDvProducts(Set.of());
         trackRepository.save(track_to_remove);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -594,7 +636,7 @@ public class ServiceProcessValidateDVAnimationTest {
         track1.setNum(3L);
         trackRepository.save(track1);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -629,7 +671,7 @@ public class ServiceProcessValidateDVAnimationTest {
         artifact.setSize(Optional.ofNullable(artifact.getSize()).orElse(0L) + 500L);
         artifactRepository.save(artifact);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -661,7 +703,7 @@ public class ServiceProcessValidateDVAnimationTest {
         artifactRepository.save(artifact);
         log.info("Saved artifact: " + artifact);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -693,7 +735,7 @@ public class ServiceProcessValidateDVAnimationTest {
         artifactRepository.save(artifact);
         log.info("Saved artifact: " + artifact);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -729,7 +771,7 @@ public class ServiceProcessValidateDVAnimationTest {
         trackRepository.save(track);
         log.info("Saved track: " + track);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -760,7 +802,7 @@ public class ServiceProcessValidateDVAnimationTest {
         mediaFileRepository.save(mediaFile);
         log.info("Saved media file: " + mediaFile);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -791,7 +833,7 @@ public class ServiceProcessValidateDVAnimationTest {
         mediaFileRepository.save(mediaFile);
         log.info("Saved media file: " + mediaFile);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -822,7 +864,7 @@ public class ServiceProcessValidateDVAnimationTest {
         mediaFileRepository.save(mediaFile);
         log.info("Saved media file: " + mediaFile);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
