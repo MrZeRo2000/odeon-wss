@@ -2,28 +2,29 @@ package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.generator.DataGenerator;
+import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.MediaFileValidator;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.nio.file.Path;
+import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceProcessValidateDVAnimationTest {
-    private final static String[] DV_PRODUCT_NAMES = {
+    private final static List<String> DV_PRODUCT_NAMES = List.of(
             "Plunder and Lightning",
             "Louie’s Last Stand",
             "From Here to Machinery",
@@ -33,10 +34,62 @@ public class ServiceProcessValidateDVAnimationTest {
             "Puss Gets the Boot",
             "The Midnight Snack",
             "Who Killed Who?"
-    };
+    );
 
     private static final Logger log = Logger.getLogger(ServiceProcessValidateDVAnimationTest.class.getSimpleName());
+
+    @Value("${test.data.path}")
+    String testDataPath;
+
+    private enum TestFolder {
+        TF_SERVICE_PROCESS_VALIDATE_DV_ANIMATION_TEST_OK
+    }
+
+    private Map<TestFolder, Path> tempFolders;
+
+    @BeforeAll
+    public void setup() throws Exception {
+        this.tempFolders = FileTreeGenerator.createTempFolders(TestFolder.class);
+
+        FileTreeGenerator.generateFromJSON(
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_ANIMATION_TEST_OK),
+                this.testDataPath,
+                """
+{
+  "Talespin": {
+    "01 Plunder and Lightning (part-1).avi": "sample_AVI_480_750kB.avi",
+    "01 Plunder and Lightning (part-2).avi": "sample_AVI_480_750kB.avi",
+    "02 From Here to Machinery original.avi": "sample_AVI_480_750kB.avi",
+    "03 Louie’s Last Stand.avi": "sample_AVI_480_750kB.avi"
+  },
+  "Казаки": {
+    "01 Kak kazaki kulesh varili.m4v": "sample_960x540.m4v",
+    "02 Kak kazaki v futbol igrali.mkv": "sample_1280x720_600.mkv"
+  },
+  "Остров сокровищ": {
+    "Остров Сокровищ (1988) (1).mp4": "sample_MP4_480_1_5MG.mp4",
+    "Остров Сокровищ (1988) (2).mp4": "sample_MP4_640_3MG.mp4"
+  },
+  "Том и Джерри": {
+    "001 Puss Gets the Boot (1940).avi": "sample_AVI_480_750kB.avi",
+    "002 The Midnight Snack (1941).avi": "sample_AVI_480_750kB.avi",
+    "003 Who Killed Who.avi": "sample_AVI_480_750kB.avi"
+  }
+}
+                     """
+        );
+    }
+
+    @AfterAll
+    public void teardown() {
+        log.info("After all");
+        FileTreeGenerator.deleteTempFiles(tempFolders.values());
+    }
+
     private static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_ANIMATION_VALIDATOR;
+
+    @Autowired
+    DataGenerator dataGenerator;
 
     @Autowired
     ProcessService service;
@@ -53,12 +106,6 @@ public class ServiceProcessValidateDVAnimationTest {
     @Autowired
     private MediaFileRepository mediaFileRepository;
 
-    @Autowired
-    private DVOriginRepository dvOriginRepository;
-
-    @Autowired
-    private DVProductRepository dvProductRepository;
-
     private ArtifactType artifactType;
 
     @BeforeEach
@@ -68,6 +115,15 @@ public class ServiceProcessValidateDVAnimationTest {
 
     private void internalPrepare() {
         // prepare products
+        dataGenerator.createProductsFromList(artifactType, DV_PRODUCT_NAMES);
+
+        service.executeProcessor(
+                ProcessorType.DV_ANIMATION_LOADER,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_ANIMATION_TEST_OK).toString());
+
+        assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+        log.info("Animation loader Processing info: " + service.getProcessInfo());
+        /*
         var dvProductList = Arrays.stream(DV_PRODUCT_NAMES).map(s -> {
             DVProduct dvProduct = new DVProduct();
             dvProduct.setArtifactType(artifactType);
@@ -89,6 +145,8 @@ public class ServiceProcessValidateDVAnimationTest {
         service.executeProcessor(ProcessorType.DV_ANIMATION_LOADER);
         Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
         log.info("Animation loader Processing info: " + service.getProcessInfo());
+
+         */
     }
 
     @Test
@@ -102,7 +160,9 @@ public class ServiceProcessValidateDVAnimationTest {
     @Test
     @Order(2)
     void testValidateOk() {
-        service.executeProcessor(PROCESSOR_TYPE);
+        service.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_ANIMATION_TEST_OK).toString());
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         assertThat(pi.getProcessDetails().get(0)).isEqualTo(

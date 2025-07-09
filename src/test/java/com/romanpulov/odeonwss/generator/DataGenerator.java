@@ -32,6 +32,12 @@ public class DataGenerator {
     @Autowired
     private TrackRepository trackRepository;
 
+    @Autowired
+    private DVOriginRepository dvOriginRepository;
+
+    @Autowired
+    private DVProductRepository dvProductRepository;
+
     public void generateFromJSON(String json) throws JsonProcessingException {
         DataGeneratorDTO data = mapper.readValue(json, DataGeneratorDTO.class);
 
@@ -59,6 +65,28 @@ public class DataGenerator {
             a.setArtistName(s);
             return a;
         }).toList());
+    }
+
+    public void createProductsFromList(
+            ArtifactType artifactType,
+            Collection<String> productNames) {
+        List<DVProduct> dvProductList = productNames.stream().map(s -> {
+            DVProduct dvProduct = new DVProduct();
+            dvProduct.setArtifactType(artifactType);
+            dvProduct.setDvOrigin(dvOriginRepository.findById(1L).orElseGet(() -> {
+                DVOrigin dvOrigin = new DVOrigin();
+                dvOrigin.setName("New Origin");
+                dvOriginRepository.save(dvOrigin);
+
+                return dvOrigin;
+            }));
+            dvProduct.setTitle(s);
+            dvProduct.setOriginalTitle(s + " original");
+
+            return dvProduct;
+        }).collect(Collectors.toList());
+
+        dvProductRepository.saveAll(dvProductList);
     }
 
     private Map<String, Artist> createArtists(Collection<? extends ArtistDTO> artists) {
