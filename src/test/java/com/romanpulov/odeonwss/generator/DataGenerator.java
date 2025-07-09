@@ -135,6 +135,8 @@ public class DataGenerator {
                 newTrack.setArtifact(artifactMap.get(track.getArtifact().getTitle()));
                 newTrack.setTitle(track.getTitle());
                 newTrack.setDuration(track.getDuration());
+                newTrack.setDiskNum(track.getDiskNum());
+                newTrack.setNum(track.getNum());
 
                 if ((track.getMediaFiles() != null) && !track.getMediaFiles().isEmpty()) {
                     Set<MediaFile> mediaFileSet = track
