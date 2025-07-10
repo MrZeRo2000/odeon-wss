@@ -1,9 +1,8 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.entity.ArtifactType;
-import com.romanpulov.odeonwss.entity.DVOrigin;
-import com.romanpulov.odeonwss.entity.DVProduct;
 import com.romanpulov.odeonwss.entity.Track;
+import com.romanpulov.odeonwss.generator.DataGenerator;
 import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.ValueValidator;
@@ -19,10 +18,9 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -30,13 +28,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceProcessLoadMoviesDVTest {
-    private final static String[] DV_PRODUCT_NAMES = {
+    private final static List<String> DV_PRODUCT_NAMES = List.of(
             "Крепкий орешек",
             "Лицензия на убийство",
             "Обыкновенное чудо",
             "Рецепт убийства",
             "Убийство по книге"
-    };
+    );
 
     private static final Logger log = Logger.getLogger(ServiceProcessLoadMoviesDVTest.class.getSimpleName());
 
@@ -84,6 +82,8 @@ public class ServiceProcessLoadMoviesDVTest {
         FileTreeGenerator.deleteTempFiles(tempFolders.values());
     }
 
+    @Autowired
+    DataGenerator dataGenerator;
 
     private static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MOVIES_LOADER;
     private ArtifactType artifactType;
@@ -103,35 +103,13 @@ public class ServiceProcessLoadMoviesDVTest {
     @Autowired
     private MediaFileRepository mediaFileRepository;
 
-    @Autowired
-    private DVOriginRepository dvOriginRepository;
-
-    @Autowired
-    private DVProductRepository dvProductRepository;
-
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(value = false)
     void testPrepare() {
         this.artifactType = artifactTypeRepository.getWithDVMovies();
-
-        var dvProductList = Arrays.stream(DV_PRODUCT_NAMES).map(s -> {
-            DVProduct dvProduct = new DVProduct();
-            dvProduct.setArtifactType(artifactType);
-            dvProduct.setDvOrigin(dvOriginRepository.findById(1L).orElseGet(() -> {
-                DVOrigin dvOrigin = new DVOrigin();
-                dvOrigin.setName("New Origin");
-                dvOriginRepository.save(dvOrigin);
-
-                return dvOrigin;
-            }));
-            dvProduct.setTitle(s);
-
-            return dvProduct;
-        }).collect(Collectors.toList());
-
-        dvProductRepository.saveAll(dvProductList);
+        dataGenerator.createProductsFromList(artifactType, DV_PRODUCT_NAMES);
     }
 
     @Test
@@ -272,22 +250,9 @@ public class ServiceProcessLoadMoviesDVTest {
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(value = false)
     void testLoadWithoutOneProduct() {
-        var dvProductList = Arrays.stream(DV_PRODUCT_NAMES).filter(s -> !s.equals(DV_PRODUCT_NAMES[0])).map(s -> {
-            DVProduct dvProduct = new DVProduct();
-            dvProduct.setArtifactType(artifactType);
-            dvProduct.setDvOrigin(dvOriginRepository.findById(1L).orElseGet(() -> {
-                DVOrigin dvOrigin = new DVOrigin();
-                dvOrigin.setName("New Origin");
-                dvOriginRepository.save(dvOrigin);
-
-                return dvOrigin;
-            }));
-            dvProduct.setTitle(s);
-
-            return dvProduct;
-        }).collect(Collectors.toList());
-
-        dvProductRepository.saveAll(dvProductList);
+        dataGenerator.createProductsFromList(
+                artifactType,
+                DV_PRODUCT_NAMES.stream().filter(s -> !s.equals(DV_PRODUCT_NAMES.getFirst())).toList());
 
         processService.executeProcessor(
                 PROCESSOR_TYPE,

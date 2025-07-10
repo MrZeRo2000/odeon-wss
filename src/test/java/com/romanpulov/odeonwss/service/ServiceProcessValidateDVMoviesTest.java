@@ -2,36 +2,116 @@ package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.generator.DataGenerator;
+import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.MediaFileValidator;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.nio.file.Path;
+import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ServiceProcessValidateDVMoviesTest {
-    private final static String[] DV_PRODUCT_NAMES = {
+    private final static List<String> DV_PRODUCT_NAMES = List.of(
             "Крепкий орешек",
             "Лицензия на убийство",
             "Обыкновенное чудо",
             "Рецепт убийства",
             "Убийство по книге"
-    };
+    );
 
     private static final Logger log = Logger.getLogger(ServiceProcessValidateDVMoviesTest.class.getSimpleName());
+
+    @Value("${test.data.path}")
+    String testDataPath;
+
+    private enum TestFolder {
+        TF_SERVICE_PROCESS_VALIDATE_DV_MOVIES_TEST_OK,
+        TF_SERVICE_PROCESS_VALIDATE_DV_MOVIES_TEST_WITH_FOLDERS
+    }
+
+    private Map<TestFolder, Path> tempFolders;
+
+    @BeforeAll
+    public void setup() throws Exception {
+        this.tempFolders = FileTreeGenerator.createTempFolders(TestFolder.class);
+
+        FileTreeGenerator.generateFromJSON(
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_MOVIES_TEST_OK),
+                this.testDataPath,
+                """
+{
+  "Коломбо": {
+    "01 Рецепт убийства.MKV": "sample_960x540_capital_ext.MKV",
+    "02 Убийство по книге.m4v": "sample_960x540.m4v"
+  },
+  "Крепкий орешек": {
+    "Die.Hard.1988.BDRip.720p.stimtoo.mkv": "sample_1280x720_with_chapters.mkv",
+    "readme.txt": "sample.txt"
+  },
+  "Лицензия на убийство": {
+    "Licence to Kill (HD).m4v": "sample_960x540.m4v"
+  },
+  "Обыкновенное чудо": {
+    "Part 1.avi": "sample_AVI_480_750kB.avi",
+    "Part 2.avi": "sample_AVI_480_750kB.avi"
+  }
+}
+                    """
+        );
+
+        FileTreeGenerator.generateFromJSON(
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_MOVIES_TEST_WITH_FOLDERS),
+                this.testDataPath,
+                """
+{
+    "Aerosmith": {
+        "2004 Honkin'On Bobo": {
+            "01 - Road Runner.mp3": "sample_mp3_1.mp3",
+            "02 - Shame, Shame, Shame.mp3": "sample_mp3_1.mp3"
+        }
+    },
+    "Kosheen": {
+        "2004 Kokopelli": {
+            "01 - Wasting My Time.mp3": "sample_mp3_1.mp3"
+        },
+        "2007 Damage": {
+            "01 - Damage.mp3": "sample_mp3_2.mp3",
+            "02 - Overkill.mp3": "sample_mp3_2.mp3"
+        }
+    },
+    "Various Artists": {
+        "2000 Rock N' Roll Fantastic": {
+            "001 - Simple Minds - Gloria.MP3": "sample_mp3_3.mp3"
+        }
+    }
+}
+                        """
+        );
+    }
+
+    @AfterAll
+    public void teardown() {
+        log.info("After all");
+        FileTreeGenerator.deleteTempFiles(tempFolders.values());
+    }
+
+    @Autowired
+    DataGenerator dataGenerator;
+
+
     private static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MOVIES_VALIDATOR;
 
     @Autowired
@@ -49,12 +129,6 @@ public class ServiceProcessValidateDVMoviesTest {
     @Autowired
     private MediaFileRepository mediaFileRepository;
 
-    @Autowired
-    private DVOriginRepository dvOriginRepository;
-
-    @Autowired
-    private DVProductRepository dvProductRepository;
-
     private ArtifactType artifactType;
 
     @BeforeEach
@@ -62,28 +136,22 @@ public class ServiceProcessValidateDVMoviesTest {
         this.artifactType = artifactTypeRepository.getWithDVMovies();
     }
 
+    void executeProcessorOk() {
+        service.executeProcessor(
+                ProcessorType.DV_MOVIES_VALIDATOR,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_MOVIES_TEST_OK).toString());
+    }
+
     private void internalPrepare() {
         // prepare products
-        var dvProductList = Arrays.stream(DV_PRODUCT_NAMES).map(s -> {
-            DVProduct dvProduct = new DVProduct();
-            dvProduct.setArtifactType(artifactType);
-            dvProduct.setDvOrigin(dvOriginRepository.findById(1L).orElseGet(() -> {
-                DVOrigin dvOrigin = new DVOrigin();
-                dvOrigin.setName("New Origin");
-                dvOriginRepository.save(dvOrigin);
+        dataGenerator.createProductsFromList(artifactType, DV_PRODUCT_NAMES);
 
-                return dvOrigin;
-            }));
-            dvProduct.setTitle(s);
+        service.executeProcessor(
+                ProcessorType.DV_MOVIES_LOADER,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_MOVIES_TEST_OK).toString());
 
-            return dvProduct;
-        }).collect(Collectors.toList());
-
-        dvProductRepository.saveAll(dvProductList);
-
-        service.executeProcessor(ProcessorType.DV_MOVIES_LOADER);
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
-        log.info("Movies Importer Processing info: " + service.getProcessInfo());
+        assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+        log.info("Prepare Processing info: " + service.getProcessInfo());
     }
 
     @Test
@@ -97,9 +165,11 @@ public class ServiceProcessValidateDVMoviesTest {
     @Test
     @Order(2)
     void testValidateOk() {
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
+
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+
         assertThat(pi.getProcessDetails().get(0)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Started Movies Validator"),
@@ -107,6 +177,7 @@ public class ServiceProcessValidateDVMoviesTest {
                         null,
                         null)
         );
+
         assertThat(pi.getProcessDetails().get(1)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artifacts validated"),
@@ -206,9 +277,13 @@ public class ServiceProcessValidateDVMoviesTest {
     @Test
     @Order(3)
     void testContainsFoldersShouldFail() {
-        service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/ok/MP3 Music/");
+        service.executeProcessor(
+                PROCESSOR_TYPE,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_MOVIES_TEST_WITH_FOLDERS).toString());
+
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+
         assertThat(pi.getProcessDetails().get(0)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Started Movies Validator"),
@@ -219,7 +294,11 @@ public class ServiceProcessValidateDVMoviesTest {
         assertThat(pi.getProcessDetails().get(1)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage(
-                                "Expected file, found: ..\\odeon-test-data\\ok\\MP3 Music\\Aerosmith\\2004 Honkin'On Bobo"),
+                                "Expected file, found: " + Path.of(
+                                        tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_MOVIES_TEST_WITH_FOLDERS).toString(),
+                                        "Aerosmith",
+                                        "2004 Honkin'On Bobo"
+                                )),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -250,7 +329,8 @@ public class ServiceProcessValidateDVMoviesTest {
                 .withTitle("New Artifact")
                 .build();
         artifactRepository.save(artifact);
-        service.executeProcessor(PROCESSOR_TYPE);
+
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -270,10 +350,11 @@ public class ServiceProcessValidateDVMoviesTest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactInFilesShouldFail() {
         this.internalPrepare();
-        Artifact artifact = artifactRepository.findAll().get(0);
+
+        Artifact artifact = artifactRepository.findAll().getFirst();
         artifactRepository.delete(artifact);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -298,7 +379,7 @@ public class ServiceProcessValidateDVMoviesTest {
                 .filter(a -> a.getTitle().equals("Крепкий орешек"))
                 .findFirst().orElseThrow();
         Track track = trackRepository
-                .findByIdWithMediaFiles(artifact.getTracks().get(0).getId())
+                .findByIdWithMediaFiles(artifact.getTracks().getFirst().getId())
                 .orElseThrow();
 
         MediaFile mediaFile = new MediaFile();
@@ -311,7 +392,7 @@ public class ServiceProcessValidateDVMoviesTest {
         track.getMediaFiles().add(mediaFile);
         trackRepository.save(track);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -343,7 +424,7 @@ public class ServiceProcessValidateDVMoviesTest {
         track.getMediaFiles().removeIf(m -> m.getName().equals("Part 2.avi"));
         trackRepository.save(track);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -357,7 +438,6 @@ public class ServiceProcessValidateDVMoviesTest {
                         null)
         );
     }
-
 
     @Test
     @Order(8)
@@ -377,7 +457,7 @@ public class ServiceProcessValidateDVMoviesTest {
         mediaFile.setArtifact(artifact);
         mediaFileRepository.save(mediaFile);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -405,7 +485,7 @@ public class ServiceProcessValidateDVMoviesTest {
         mediaFile.setArtifact(null);
         mediaFileRepository.save(mediaFile);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -434,7 +514,8 @@ public class ServiceProcessValidateDVMoviesTest {
         var tracks = trackRepository.findAllByArtifact(artifact);
         trackRepository.deleteAll(tracks);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
+
         ProcessInfo pi = service.getProcessInfo();
         var pd = pi.getProcessDetails();
         assertThat(pd.get(2)).isEqualTo(
@@ -464,7 +545,8 @@ public class ServiceProcessValidateDVMoviesTest {
         assertThat(mediaFiles.isEmpty()).isFalse();
         mediaFileRepository.deleteAll(mediaFiles);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
+
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         var pd = pi.getProcessDetails();
@@ -494,7 +576,7 @@ public class ServiceProcessValidateDVMoviesTest {
         track_to_remove.setDvProducts(Set.of());
         trackRepository.save(track_to_remove);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -527,7 +609,7 @@ public class ServiceProcessValidateDVMoviesTest {
         track1.setNum(3L);
         trackRepository.save(track1);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -558,7 +640,7 @@ public class ServiceProcessValidateDVMoviesTest {
         mediaFile.setBitrate(0L);
         mediaFileRepository.save(mediaFile);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -594,7 +676,7 @@ public class ServiceProcessValidateDVMoviesTest {
         artifact.setSize(Optional.ofNullable(artifact.getSize()).orElse(0L) + 500L);
         artifactRepository.save(artifact);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -626,7 +708,7 @@ public class ServiceProcessValidateDVMoviesTest {
         artifactRepository.save(artifact);
         log.info("Saved artifact: " + artifact);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -658,7 +740,7 @@ public class ServiceProcessValidateDVMoviesTest {
         artifactRepository.save(artifact);
         log.info("Saved artifact: " + artifact);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -694,7 +776,7 @@ public class ServiceProcessValidateDVMoviesTest {
         trackRepository.save(track);
         log.info("Saved track: " + track);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -725,7 +807,7 @@ public class ServiceProcessValidateDVMoviesTest {
         mediaFileRepository.save(mediaFile);
         log.info("Saved media file: " + mediaFile);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -756,7 +838,7 @@ public class ServiceProcessValidateDVMoviesTest {
         mediaFileRepository.save(mediaFile);
         log.info("Saved media file: " + mediaFile);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -787,7 +869,7 @@ public class ServiceProcessValidateDVMoviesTest {
         mediaFileRepository.save(mediaFile);
         log.info("Saved media file: " + mediaFile);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
