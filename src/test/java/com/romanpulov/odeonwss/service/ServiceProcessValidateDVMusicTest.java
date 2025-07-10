@@ -1,22 +1,23 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.config.DatabaseConfiguration;
-import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.generator.DataGenerator;
+import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.MediaFileValidator;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,20 +25,91 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ActiveProfiles(value = "test-05")
+//@ActiveProfiles(value = "test-05")
 public class ServiceProcessValidateDVMusicTest {
     private static final Logger log = Logger.getLogger(ServiceProcessValidateDVMusicTest.class.getSimpleName());
-    private static final Set<String> EXISTING_ARTIFACT_TITLES = Set.of(
-            "Beautiful Voices 1", "The Cure - Picture Show 1991", "Tori Amos - Fade to Red 2006");
     public static final ProcessorType PROCESSOR_TYPE = ProcessorType.DV_MUSIC_VALIDATOR;
+
+    @Value("${test.data.path}")
+    String testDataPath;
+
+    private enum TestFolder {
+        TF_SERVICE_PROCESS_VALIDATE_DV_MUSIC_TEST_OK,
+        TF_SERVICE_PROCESS_VALIDATE_DV_MUSIC_TEST_WITH_FOLDERS
+    }
+
+    private Map<TestFolder, Path> tempDirs;
+
+    @BeforeAll
+    public void setup() throws Exception {
+        log.info("Before all");
+
+        tempDirs = FileTreeGenerator.createTempFolders(TestFolder.class);
+
+        FileTreeGenerator.generateFromJSON(
+                tempDirs.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_MUSIC_TEST_OK),
+                this.testDataPath,
+                """
+{
+  "Beautiful Voices 1": {
+    "Beautiful Voices 1.mkv": "sample_1280x720_with_chapters.mkv",
+    "tracks.txt": "sample.txt"
+  },
+  "The Cure - Picture Show 1991": {
+    "The Cure - Picture Show 1991.mp4": "sample_MP4_480_1_5MG.mp4"
+  },
+  "Tori Amos - Fade to Red 2006": {
+    "Tori Amos - Fade to Red Disk 1 2006.mkv": "sample_1280x720_with_chapters.mkv",
+    "Tori Amos - Fade to Red Disk 2 2006.mkv": "sample_1280x720_600.mkv"
+  }
+}
+                """
+        );
+
+        FileTreeGenerator.generateFromJSON(
+                tempDirs.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_MUSIC_TEST_WITH_FOLDERS),
+                this.testDataPath,
+                """
+{
+    "Aerosmith": {
+        "2004 Honkin'On Bobo": {
+            "01 - Road Runner.mp3": "sample_mp3_1.mp3",
+            "02 - Shame, Shame, Shame.mp3": "sample_mp3_1.mp3"
+        }
+    },
+    "Kosheen": {
+        "2004 Kokopelli": {
+            "01 - Wasting My Time.mp3": "sample_mp3_1.mp3"
+        },
+        "2007 Damage": {
+            "01 - Damage.mp3": "sample_mp3_2.mp3",
+            "02 - Overkill.mp3": "sample_mp3_2.mp3"
+        }
+    },
+    "Various Artists": {
+        "2000 Rock N' Roll Fantastic": {
+            "001 - Simple Minds - Gloria.MP3": "sample_mp3_3.mp3"
+        }
+    }
+}
+                        """
+        );
+
+    }
+
+    @AfterAll
+    public void teardown() {
+        log.info("After all");
+        FileTreeGenerator.deleteTempFiles(tempDirs.values());
+    }
+
+    @Autowired
+    DataGenerator dataGenerator;
 
     private ArtifactType artifactType;
 
     @Autowired
     ProcessService service;
-
-    @Autowired
-    DatabaseConfiguration databaseConfiguration;
 
     @Autowired
     ArtifactTypeRepository artifactTypeRepository;
@@ -54,12 +126,61 @@ public class ServiceProcessValidateDVMusicTest {
     @Autowired
     private MediaFileRepository mediaFileRepository;
 
-    private ProcessInfo executeProcessor() {
-        service.executeProcessor(PROCESSOR_TYPE);
+    private ProcessInfo executeProcessorOk() {
+        service.executeProcessor(
+                PROCESSOR_TYPE,
+                tempDirs.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_MUSIC_TEST_OK).toString());
         return service.getProcessInfo();
     }
 
-    private void internalPrepareImported() {
+    private void internalPrepareImported() throws Exception {
+        String json =
+                """
+{
+    "artists": [
+        {"artistType": "A", "artistName": "The Cure"},
+        {"artistType": "A", "artistName": "Tori Amos"},
+        {"artistType": "A", "artistName": "Various Artists"},
+        {"artistType": "A", "artistName": "A-HA"}
+    ],
+    "artifacts": [
+        {"artifactType": { "id": 201 }, "artist": {"artistName": "The Cure"}, "title": "The Cure - Picture Show 1991", "duration": 0 },
+        {"artifactType": { "id": 201 }, "artist": {"artistName": "Tori Amos"}, "title": "Tori Amos - Fade to Red 2006", "duration": 0 },
+        {"artifactType": { "id": 201 }, "artist": {"artistName": "Various Artists"}, "title": "Beautiful Voices 1", "duration": 0 },
+        {"artifactType": { "id": 201 }, "artist": {"artistName": "A-HA"}, "title": "A-HA - Ending On A High Note The Final Concert 2010", "duration": 0 },
+        {"artifactType": { "id": 201 }, "artist": {"artistName": "A-HA"}, "title": "A-HA - Headlines And Deadlines The Hits Of A-HA 1991", "duration": 0 }
+    ],
+    "mediaFiles": [
+        {"artifactTitle": "The Cure - Picture Show 1991", "name": "The Cure - Picture Show 1991.mp4" },
+        {"artifactTitle": "Tori Amos - Fade to Red 2006", "name": "Tori Amos - Fade to Red Disk 1 2006.mkv" },
+        {"artifactTitle": "Tori Amos - Fade to Red 2006", "name": "Tori Amos - Fade to Red Disk 2 2006.mkv" },
+        {"artifactTitle": "Beautiful Voices 1", "name": "Beautiful Voices 1.mkv"},
+        {"artifactTitle": "A-HA - Ending On A High Note The Final Concert 2010", "name": "A1.mkv"},
+        {"artifactTitle": "A-HA - Headlines And Deadlines The Hits Of A-HA 1991", "name": "A2.mkv"}
+    ],
+    "tracks": [
+        {"artifact": { "title": "Tori Amos - Fade to Red 2006"}, "title": "Tori Amos - Fade To Red 1", "mediaFiles": [
+                {"name": "Tori Amos - Fade to Red Disk 1 2006.mkv"}
+            ]
+        },
+        {"artifact": { "title": "Tori Amos - Fade to Red 2006"}, "title": "Tori Amos - Fade To Red 2", "mediaFiles": [
+                {"name": "Tori Amos - Fade to Red Disk 2 2006.mkv"}
+            ]
+        },
+        { "artifact": {"title": "The Cure - Picture Show 1991"}, "title": "The Cure - Picture Show 1991", "mediaFiles": [
+                {"name": "The Cure - Picture Show 1991.mp4"}
+            ]
+        },
+        { "artifact": {"title": "Beautiful Voices 1"}, "title": "Beautiful Voices 1", "mediaFiles": [
+                {"name": "Beautiful Voices 1.mkv"}
+            ]
+        }
+    ]
+}
+                """;
+
+        dataGenerator.generateFromJSON(json);
+        /*
         DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA, () -> {
             // load artists
             service.executeProcessor(ProcessorType.ARTISTS_IMPORTER);
@@ -76,9 +197,54 @@ public class ServiceProcessValidateDVMusicTest {
             Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
             log.info("Music Media Loader Processing info: " + service.getProcessInfo());
         });
+
+         */
     }
 
-    private void internalPrepareExisting() {
+    private void internalPrepareExisting() throws Exception {
+        String json =
+                """
+{
+    "artists": [
+        {"artistType": "A", "artistName": "The Cure"},
+        {"artistType": "A", "artistName": "Tori Amos"},
+        {"artistType": "A", "artistName": "Various Artists"}
+    ],
+    "artifacts": [
+        {"artifactType": { "id": 201 }, "artist": {"artistName": "The Cure"}, "title": "The Cure - Picture Show 1991", "duration": 0 },
+        {"artifactType": { "id": 201 }, "artist": {"artistName": "Tori Amos"}, "title": "Tori Amos - Fade to Red 2006", "duration": 0 },
+        {"artifactType": { "id": 201 }, "artist": {"artistName": "Various Artists"}, "title": "Beautiful Voices 1", "duration": 0 }
+    ],
+    "mediaFiles": [
+        {"artifactTitle": "The Cure - Picture Show 1991", "name": "The Cure - Picture Show 1991.mp4" },
+        {"artifactTitle": "Tori Amos - Fade to Red 2006", "name": "Tori Amos - Fade to Red Disk 1 2006.mkv" },
+        {"artifactTitle": "Tori Amos - Fade to Red 2006", "name": "Tori Amos - Fade to Red Disk 2 2006.mkv" },
+        {"artifactTitle": "Beautiful Voices 1", "name": "Beautiful Voices 1.mkv"}
+    ],
+    "tracks": [
+        {"artifact": { "title": "Tori Amos - Fade to Red 2006"}, "title": "Tori Amos - Fade To Red 1", "mediaFiles": [
+                {"name": "Tori Amos - Fade to Red Disk 1 2006.mkv"}
+            ]
+        },
+        {"artifact": { "title": "Tori Amos - Fade to Red 2006"}, "title": "Tori Amos - Fade To Red 2", "mediaFiles": [
+                {"name": "Tori Amos - Fade to Red Disk 2 2006.mkv"}
+            ]
+        },
+        { "artifact": {"title": "The Cure - Picture Show 1991"}, "title": "The Cure - Picture Show 1991", "mediaFiles": [
+                {"name": "The Cure - Picture Show 1991.mp4"}
+            ]
+        },
+        { "artifact": {"title": "Beautiful Voices 1"}, "title": "Beautiful Voices 1", "mediaFiles": [
+                {"name": "Beautiful Voices 1.mkv"}
+            ]
+        }
+    ]
+}
+                """;
+
+        dataGenerator.generateFromJSON(json);
+
+        /*
         internalPrepareImported();
         DbManagerService.loadOrPrepare(databaseConfiguration,
                 DbManagerService.DbType.DB_ARTISTS_DV_MUSIC_MEDIA_EXISTING,
@@ -94,13 +260,15 @@ public class ServiceProcessValidateDVMusicTest {
                         }
                     }
                 ));
+
+         */
     }
 
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
-    void testPrepareImported() {
+    void testPrepareImported() throws Exception {
         this.artifactType = artifactTypeRepository.getWithDVMusic();
         internalPrepareExisting();
     }
@@ -109,9 +277,9 @@ public class ServiceProcessValidateDVMusicTest {
     @Order(2)
     @Rollback(false)
     @Sql({"/schema.sql", "/data.sql"})
-    void testValidateImportedShouldFail() {
+    void testValidateImportedShouldFail() throws Exception {
         this.internalPrepareImported();
-        ProcessInfo pi = executeProcessor();
+        ProcessInfo pi = executeProcessorOk();
         List<ProcessDetail> processDetails = pi.getProcessDetails();
         log.info("Processing info: " + service.getProcessInfo());
         Assertions.assertEquals(ProcessingStatus.FAILURE, service.getProcessInfo().getProcessingStatus());
@@ -140,9 +308,9 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(11)
     @Sql({"/schema.sql", "/data.sql"})
-    void validateOk() {
+    void validateOk() throws Exception {
         this.internalPrepareExisting();
-        ProcessInfo pi = executeProcessor();
+        ProcessInfo pi = executeProcessorOk();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         assertThat(pi.getProcessDetails().get(0)).isEqualTo(
                 new ProcessDetail(
@@ -283,7 +451,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(13)
     @Sql({"/schema.sql", "/data.sql"})
-    void testNewArtifactWithoutArtistShouldFail() {
+    void testNewArtifactWithoutArtistShouldFail() throws Exception {
         this.internalPrepareExisting();
         Artifact artifact = (new EntityArtifactBuilder())
                 .withArtifactType(artifactType)
@@ -291,7 +459,7 @@ public class ServiceProcessValidateDVMusicTest {
                 .build();
         artifactRepository.save(artifact);
 
-        ProcessInfo pi = executeProcessor();
+        ProcessInfo pi = executeProcessorOk();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
         assertThat(pi.getProcessDetails().get(1)).isEqualTo(
@@ -308,7 +476,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(14)
     @Sql({"/schema.sql", "/data.sql"})
-    void testNewArtifactInDbShouldFail() {
+    void testNewArtifactInDbShouldFail() throws Exception {
         this.internalPrepareExisting();
         Artist artist = artistRepository.findAll().iterator().next();
         assertThat(artist).isNotNull();
@@ -320,7 +488,7 @@ public class ServiceProcessValidateDVMusicTest {
                 .build();
         artifactRepository.save(artifact);
 
-        ProcessInfo pi = executeProcessor();
+        ProcessInfo pi = executeProcessorOk();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
         assertThat(pi.getProcessDetails().get(1)).isEqualTo(
@@ -338,12 +506,12 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(15)
     @Sql({"/schema.sql", "/data.sql"})
-    void testNewArtifactInFilesShouldFail() {
+    void testNewArtifactInFilesShouldFail() throws Exception {
         this.internalPrepareExisting();
         Artifact artifact = artifactRepository.findAll().get(0);
         artifactRepository.delete(artifact);
 
-        ProcessInfo pi = executeProcessor();
+        ProcessInfo pi = executeProcessorOk();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         assertThat(pi.getProcessDetails().get(1)).isEqualTo(
                 new ProcessDetail(
@@ -359,7 +527,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(16)
     @Sql({"/schema.sql", "/data.sql"})
-    void testArtifactWithoutTracksShouldFail() {
+    void testArtifactWithoutTracksShouldFail() throws Exception {
         this.internalPrepareExisting();
         Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
                 .stream()
@@ -369,7 +537,7 @@ public class ServiceProcessValidateDVMusicTest {
         var tracks = trackRepository.findAllByArtifact(artifact);
         trackRepository.deleteAll(tracks);
 
-        ProcessInfo pi = executeProcessor();
+        ProcessInfo pi = executeProcessorOk();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         var pd = pi.getProcessDetails();
         assertThat(pd.get(3)).isEqualTo(
@@ -386,7 +554,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(17)
     @Sql({"/schema.sql", "/data.sql"})
-    void testArtifactWithoutMediaFilesShouldFail() {
+    void testArtifactWithoutMediaFilesShouldFail() throws Exception {
         this.internalPrepareExisting();
         Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
                 .stream()
@@ -398,7 +566,7 @@ public class ServiceProcessValidateDVMusicTest {
         assertThat(mediaFiles.isEmpty()).isFalse();
         mediaFileRepository.deleteAll(mediaFiles);
 
-        ProcessInfo pi = executeProcessor();
+        ProcessInfo pi = executeProcessorOk();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         var pd = pi.getProcessDetails();
         assertThat(pd.get(2)).isEqualTo(
@@ -415,7 +583,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(18)
     @Sql({"/schema.sql", "/data.sql"})
-    void testNewFileInDbShouldFail() {
+    void testNewFileInDbShouldFail() throws Exception {
         this.internalPrepareExisting();
         Artifact artifact = artifactRepository.getAllByArtifactTypeWithTracks(artifactType)
                 .stream()
@@ -435,7 +603,7 @@ public class ServiceProcessValidateDVMusicTest {
         track.getMediaFiles().add(mediaFile);
         trackRepository.save(track);
 
-        ProcessInfo pi = executeProcessor();
+        ProcessInfo pi = executeProcessorOk();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         assertThat(pi.getProcessDetails().get(3)).isEqualTo(
                 new ProcessDetail(
@@ -452,7 +620,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(19)
     @Sql({"/schema.sql", "/data.sql"})
-    void testNewFileInFilesShouldFail() {
+    void testNewFileInFilesShouldFail() throws Exception {
         this.internalPrepareExisting();
         Artifact artifact = artifactRepository
                 .findAll()
@@ -476,7 +644,7 @@ public class ServiceProcessValidateDVMusicTest {
         mediaFile.setArtifact(null);
         mediaFileRepository.delete(mediaFile);
 
-        ProcessInfo pi = executeProcessor();
+        ProcessInfo pi = executeProcessorOk();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         assertThat(pi.getProcessDetails().get(3)).isEqualTo(
                 new ProcessDetail(
@@ -502,7 +670,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(20)
     @Sql({"/schema.sql", "/data.sql"})
-    void testNewArtifactFileInDbShouldFail() {
+    void testNewArtifactFileInDbShouldFail() throws Exception {
         this.internalPrepareExisting();
         Artifact artifact = artifactRepository.getAllByArtifactType(artifactType)
                 .stream()
@@ -517,7 +685,7 @@ public class ServiceProcessValidateDVMusicTest {
         mediaFile.setArtifact(artifact);
         mediaFileRepository.save(mediaFile);
 
-        ProcessInfo pi = executeProcessor();
+        ProcessInfo pi = executeProcessorOk();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
         assertThat(pi.getProcessDetails().get(4)).isEqualTo(
@@ -534,7 +702,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(21)
     @Sql({"/schema.sql", "/data.sql"})
-    void testNewArtifactFileInFilesShouldFail() {
+    void testNewArtifactFileInFilesShouldFail() throws Exception {
         this.internalPrepareExisting();
         MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(artifactType)
                 .stream()
@@ -544,7 +712,7 @@ public class ServiceProcessValidateDVMusicTest {
         mediaFile.setArtifact(null);
         mediaFileRepository.save(mediaFile);
 
-        ProcessInfo pi = executeProcessor();
+        ProcessInfo pi = executeProcessorOk();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
         assertThat(pi.getProcessDetails().get(4)).isEqualTo(
@@ -561,7 +729,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(22)
     @Sql({"/schema.sql", "/data.sql"})
-    void testMediaFileEmptyBitrateShouldFail() {
+    void testMediaFileEmptyBitrateShouldFail() throws Exception {
         this.internalPrepareExisting();
         MediaFile mediaFile = mediaFileRepository.getMediaFilesByArtifactType(artifactType)
                 .stream()
@@ -571,7 +739,7 @@ public class ServiceProcessValidateDVMusicTest {
         mediaFile.setBitrate(0L);
         mediaFileRepository.save(mediaFile);
 
-        ProcessInfo pi = executeProcessor();
+        ProcessInfo pi = executeProcessorOk();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
         assertThat(pi.getProcessDetails().get(7)).isEqualTo(
@@ -588,7 +756,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(23)
     @Sql({"/schema.sql", "/data.sql"})
-    void testMediaFileSizeDifferentShouldFail() {
+    void testMediaFileSizeDifferentShouldFail() throws Exception {
         this.internalPrepareExisting();
 
         MediaFile mediaFile = mediaFileRepository
@@ -624,7 +792,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(24)
     @Sql({"/schema.sql", "/data.sql"})
-    void testArtifactMediaFileSizeDifferentShouldFail() {
+    void testArtifactMediaFileSizeDifferentShouldFail() throws Exception {
         this.internalPrepareExisting();
 
         Artifact artifact = artifactRepository.getAllByArtifactType(artifactType)
@@ -655,7 +823,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(25)
     @Sql({"/schema.sql", "/data.sql"})
-    void testArtifactMediaFileDurationDifferentShouldFail() {
+    void testArtifactMediaFileDurationDifferentShouldFail() throws Exception {
         this.internalPrepareExisting();
 
         Artifact artifact = artifactRepository
@@ -687,7 +855,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(26)
     @Sql({"/schema.sql", "/data.sql"})
-    void testArtifactTrackDurationDifferentShouldFail() {
+    void testArtifactTrackDurationDifferentShouldFail() throws Exception {
         this.internalPrepareExisting();
 
         Track track = trackRepository
@@ -723,7 +891,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(27)
     @Sql({"/schema.sql", "/data.sql"})
-    void testMediaFileMissingBitrateShouldFail() {
+    void testMediaFileMissingBitrateShouldFail() throws Exception {
         this.internalPrepareExisting();
 
         MediaFile mediaFile = mediaFileRepository
@@ -754,7 +922,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(28)
     @Sql({"/schema.sql", "/data.sql"})
-    void testMediaFileMissingWidthShouldFail() {
+    void testMediaFileMissingWidthShouldFail() throws Exception {
         this.internalPrepareExisting();
 
         MediaFile mediaFile = mediaFileRepository
@@ -785,7 +953,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(29)
     @Sql({"/schema.sql", "/data.sql"})
-    void testMediaFileMissingHeightShouldFail() {
+    void testMediaFileMissingHeightShouldFail() throws Exception {
         this.internalPrepareExisting();
 
         MediaFile mediaFile = mediaFileRepository
