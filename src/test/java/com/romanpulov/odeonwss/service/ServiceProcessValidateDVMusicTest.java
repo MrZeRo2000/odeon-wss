@@ -167,9 +167,9 @@ public class ServiceProcessValidateDVMusicTest {
                 {"name": "Tori Amos - Fade to Red Disk 2 2006.mkv"}
             ]
         },
-        { "artifact": {"title": "The Cure - Picture Show 1991"}, "title": "The Cure - Picture Show 1991", "mediaFiles": [
+        { "artifact": {"title": "The Cure - Picture Show 1991"}, "title": "Close To Me", "mediaFiles": [
                 {"name": "The Cure - Picture Show 1991.mp4"}
-            ]
+            ], "num": 1
         },
         { "artifact": {"title": "Beautiful Voices 1"}, "title": "Beautiful Voices 1", "mediaFiles": [
                 {"name": "Beautiful Voices 1.mkv"}
@@ -211,9 +211,9 @@ public class ServiceProcessValidateDVMusicTest {
         {"artistType": "A", "artistName": "Various Artists"}
     ],
     "artifacts": [
-        {"artifactType": { "id": 201 }, "artist": {"artistName": "The Cure"}, "title": "The Cure - Picture Show 1991", "duration": 0 },
-        {"artifactType": { "id": 201 }, "artist": {"artistName": "Tori Amos"}, "title": "Tori Amos - Fade to Red 2006", "duration": 0 },
-        {"artifactType": { "id": 201 }, "artist": {"artistName": "Various Artists"}, "title": "Beautiful Voices 1", "duration": 0 }
+        {"artifactType": { "id": 201 }, "artist": {"artistName": "The Cure"}, "title": "The Cure - Picture Show 1991", "duration": 31 },
+        {"artifactType": { "id": 201 }, "artist": {"artistName": "Tori Amos"}, "title": "Tori Amos - Fade to Red 2006", "duration": 66 },
+        {"artifactType": { "id": 201 }, "artist": {"artistName": "Various Artists"}, "title": "Beautiful Voices 1", "duration": 28 }
     ],
     "mediaFiles": [
         {"artifactTitle": "The Cure - Picture Show 1991", "name": "The Cure - Picture Show 1991.mp4" },
@@ -224,25 +224,30 @@ public class ServiceProcessValidateDVMusicTest {
     "tracks": [
         {"artifact": { "title": "Tori Amos - Fade to Red 2006"}, "title": "Tori Amos - Fade To Red 1", "mediaFiles": [
                 {"name": "Tori Amos - Fade to Red Disk 1 2006.mkv"}
-            ]
+            ], "duration": 28
         },
         {"artifact": { "title": "Tori Amos - Fade to Red 2006"}, "title": "Tori Amos - Fade To Red 2", "mediaFiles": [
                 {"name": "Tori Amos - Fade to Red Disk 2 2006.mkv"}
-            ]
+            ], "duration": 38
         },
-        { "artifact": {"title": "The Cure - Picture Show 1991"}, "title": "The Cure - Picture Show 1991", "mediaFiles": [
+        { "artifact": {"title": "The Cure - Picture Show 1991"}, "title": "Close To Me", "mediaFiles": [
                 {"name": "The Cure - Picture Show 1991.mp4"}
-            ]
+            ], "duration": 31
         },
         { "artifact": {"title": "Beautiful Voices 1"}, "title": "Beautiful Voices 1", "mediaFiles": [
                 {"name": "Beautiful Voices 1.mkv"}
-            ]
+            ], "duration": 28
         }
     ]
 }
                 """;
 
         dataGenerator.generateFromJSON(json);
+
+        service.executeProcessor(
+                ProcessorType.DV_MUSIC_MEDIA_LOADER,
+                tempDirs.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_MUSIC_TEST_OK).toString()
+        );
 
         /*
         internalPrepareImported();
@@ -422,7 +427,9 @@ public class ServiceProcessValidateDVMusicTest {
     @Test
     @Order(12)
     void testContainsFoldersShouldFail() {
-        service.executeProcessor(PROCESSOR_TYPE, "../odeon-test-data/ok/MP3 Music/");
+        service.executeProcessor(
+                PROCESSOR_TYPE,
+                tempDirs.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_MUSIC_TEST_WITH_FOLDERS).toString());
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
@@ -430,7 +437,11 @@ public class ServiceProcessValidateDVMusicTest {
         assertThat(processDetails.get(1)).isEqualTo(
                 new ProcessDetail(
                         ProcessDetailInfo.fromMessage(
-                                "Expected file, found: ..\\odeon-test-data\\ok\\MP3 Music\\Aerosmith\\2004 Honkin'On Bobo"),
+                                "Expected file, found: " + Path.of(
+                                        tempDirs.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_DV_MUSIC_TEST_WITH_FOLDERS).toString(),
+                                        "Aerosmith",
+                                        "2004 Honkin'On Bobo"
+                                )),
                         ProcessingStatus.FAILURE,
                         null,
                         null)
@@ -508,7 +519,7 @@ public class ServiceProcessValidateDVMusicTest {
     @Sql({"/schema.sql", "/data.sql"})
     void testNewArtifactInFilesShouldFail() throws Exception {
         this.internalPrepareExisting();
-        Artifact artifact = artifactRepository.findAll().get(0);
+        Artifact artifact = artifactRepository.findAll().getFirst();
         artifactRepository.delete(artifact);
 
         ProcessInfo pi = executeProcessorOk();
@@ -590,7 +601,7 @@ public class ServiceProcessValidateDVMusicTest {
                 .filter(a -> a.getTitle().equals("Beautiful Voices 1"))
                 .findFirst().orElseThrow();
         Track track = trackRepository
-                .findByIdWithMediaFiles(artifact.getTracks().get(0).getId())
+                .findByIdWithMediaFiles(artifact.getTracks().getFirst().getId())
                 .orElseThrow();
 
         MediaFile mediaFile = new MediaFile();
@@ -773,7 +784,7 @@ public class ServiceProcessValidateDVMusicTest {
         artifact.setSize(Optional.ofNullable(artifact.getSize()).orElse(0L) + 500L);
         artifactRepository.save(artifact);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -804,7 +815,7 @@ public class ServiceProcessValidateDVMusicTest {
         artifactRepository.save(artifact);
         log.info("Saved artifact: " + artifact);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -836,7 +847,7 @@ public class ServiceProcessValidateDVMusicTest {
         artifactRepository.save(artifact);
         log.info("Saved artifact: " + artifact);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -872,7 +883,7 @@ public class ServiceProcessValidateDVMusicTest {
         trackRepository.save(track);
         log.info("Saved track: " + track);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -903,7 +914,7 @@ public class ServiceProcessValidateDVMusicTest {
         mediaFileRepository.save(mediaFile);
         log.info("Saved media file: " + mediaFile);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -934,7 +945,7 @@ public class ServiceProcessValidateDVMusicTest {
         mediaFileRepository.save(mediaFile);
         log.info("Saved media file: " + mediaFile);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
@@ -965,7 +976,7 @@ public class ServiceProcessValidateDVMusicTest {
         mediaFileRepository.save(mediaFile);
         log.info("Saved media file: " + mediaFile);
 
-        service.executeProcessor(PROCESSOR_TYPE);
+        executeProcessorOk();
 
         ProcessInfo pi = service.getProcessInfo();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
