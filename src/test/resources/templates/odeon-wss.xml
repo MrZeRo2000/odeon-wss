@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context>
+    <Parameter name="db-url" value="jdbc:sqlite:{OneDrive}/Odeon/db/odeon.db"/>
+    <Parameter name="mp3-path" value="J:/ARCHIVE/MP3 Music/"/>
+    <Parameter name="la-path" value="J:/ARCHIVE/Lossless/"/>
+    <Parameter name="ffprobe-path" value="{root}/ffmpeg/"/>
+    <Parameter name="mediainfo-path" value="{root}/MediaInfo/"/>
+    <Parameter name="classics-path" value="J:/ARCHIVE/classics/"/>
+    <Parameter name="dv-music-path" value="L:/Music/"/>
+    <Parameter name="dv-movies-path" value="L:/Movies/"/>
+    <Parameter name="dv-animation-path" value="L:/Animation/"/>
+    <Parameter name="mdb-path" value="{root}/Cat2000/"/>
+</Context>

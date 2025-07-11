@@ -1,0 +1,13 @@
+{
+  "Beautiful Voices 1": {
+    "Beautiful Voices 1.mkv": "sample_1280x720_with_chapters.mkv",
+    "tracks.txt": "sample.txt"
+  },
+  "The Cure - Picture Show 1991": {
+    "The Cure - Picture Show 1991.mp4": "sample_MP4_480_1_5MG.mp4"
+  },
+  "Tori Amos - Fade to Red 2006": {
+    "Tori Amos - Fade to Red Disk 1 2006.mkv": "sample_1280x720_with_chapters.mkv",
+    "Tori Amos - Fade to Red Disk 2 2006.mkv": "sample_1280x720_600.mkv"
+  }
+}

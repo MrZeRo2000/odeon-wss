@@ -1,0 +1,58 @@
+{
+  "Aerosmith": {
+    "2004 Honkin'On Bobo": {
+      "01 - Road Runner.mp3": "sample_mp3_1.mp3",
+      "02 - Shame, Shame, Shame.mp3": "sample_mp3_1.mp3",
+      "03 - Eyesight To The Blind.mp3": "sample_mp3_1.mp3",
+      "04 - Baby, Please Don't Go.mp3": "sample_mp3_1.mp3",
+      "05 - Never Loved A Girl.mp3": "sample_mp3_1.mp3",
+      "06 - Back Back Train.mp3": "sample_mp3_1.mp3",
+      "07 - You Gotta Move.mp3": "sample_mp3_1.mp3",
+      "08 - The Grind.mp3": "sample_mp3_1.mp3",
+      "09 - I'm Ready.mp3": "sample_mp3_1.mp3",
+      "10 - Temperature.mp3": "sample_mp3_1.mp3",
+      "11 - Stop Messin' Around.mp3": "sample_mp3_1.mp3",
+      "12 - Jesus Is On The Main Line.mp3": "sample_mp3_1.mp3"
+    }
+  },
+  "Kosheen": {
+    "2004 Kokopelli": {
+      "01 - Wasting My Time.mp3": "sample_mp3_1.mp3",
+      "02 - All In My Head (Radio Edit).mp3": "sample_mp3_1.mp3",
+      "03 - Crawling.mp3": "sample_mp3_1.mp3",
+      "04 - Avalanche.mp3": "sample_mp3_1.mp3",
+      "05 - Blue Eyed Boy.mp3": "sample_mp3_1.mp3",
+      "06 - Suzy May.mp3": "sample_mp3_1.mp3",
+      "07 - Swamp.mp3": "sample_mp3_1.mp3",
+      "08 - Wish.mp3": "sample_mp3_1.mp3",
+      "09 - Coming Home.mp3": "sample_mp3_1.mp3",
+      "10 - Ages.mp3": "sample_mp3_1.mp3",
+      "11 - Recovery.mp3": "sample_mp3_1.mp3",
+      "12 - Little Boy.mp3": "sample_mp3_1.mp3"
+    },
+    "2007 Damage": {
+      "01 - Damage.mp3": "sample_mp3_2.mp3",
+      "02 - Overkill.mp3": "sample_mp3_2.mp3",
+      "03 - Like A Book.mp3": "sample_mp3_2.mp3",
+      "04 - Same Ground Again.mp3": "sample_mp3_2.mp3",
+      "05 - Guilty.mp3": "sample_mp3_2.mp3",
+      "06 - Chances.mp3": "sample_mp3_2.mp3",
+      "07 - Out Of This World.mp3": "sample_mp3_2.mp3",
+      "08 - Wish You Were Here.mp3": "sample_mp3_2.mp3",
+      "09 - Thief.mp3": "sample_mp3_2.mp3",
+      "10 - Under Fire.mp3": "sample_mp3_2.mp3",
+      "11 - Not Enough Love.mp3": "sample_mp3_2.mp3",
+      "12 - Cruel Heart.mp3": "sample_mp3_2.mp3",
+      "13 - Professional Friend.mp3": "sample_mp3_2.mp3",
+      "14 - Analogue Street Dub.mp3": "sample_mp3_2.mp3",
+      "15 - Marching Orders.mp3": "sample_mp3_2.mp3",
+      "16 - Your Life.mp3": "sample_mp3_2.mp3"
+    }
+  },
+  "Various Artists": {
+    "2000 Rock N' Roll Fantastic": {
+      "001 - Simple Minds - Gloria.MP3": "sample_mp3_3.mp3",
+      "002 - T. Jones - Jailhouse Rock.MP3": "sample_mp3_3.mp3"
+    }
+  }
+}

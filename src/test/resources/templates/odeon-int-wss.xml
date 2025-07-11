@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context>
+    <Parameter name="db-url" value="jdbc:sqlite:{root}/odeon-wss/db/database/odeon-int.db"/>
+    <Parameter name="mp3-path" value="{root}/odeon-wss/test-files/MP3 Music/"/>
+    <Parameter name="la-path" value="{root}/odeon-wss/test-files/Lossless/"/>
+    <Parameter name="ffprobe-path" value="{root}/ffmpeg/"/>
+    <Parameter name="mediainfo-path" value="{root}/MediaInfo/"/>
+    <Parameter name="classics-path" value="{root}/odeon-wss/test-files/classics/"/>
+    <Parameter name="dv-music-path" value="{root}/odeon-wss/test-files/dv_music/"/>
+    <Parameter name="dv-movies-path" value="{root}/odeon-wss/test-files/dv_movies/"/>
+    <Parameter name="dv-animation-path" value="{root}/odeon-wss/test-files/dv_animation/"/>
+    <Parameter name="mdb-path" value="{root}/Cat2000/"/>
+    <Parameter name="spring.profiles.active" value="int"/>
+</Context>

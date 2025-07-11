@@ -61,7 +61,6 @@ public class ServiceProcessValidateClassicsTest {
     "Старинная музыка для органа и трубы" : {
         "01.mp3": "sample_mp3_1.mp3"
     }
-
 }
                 """
         );
