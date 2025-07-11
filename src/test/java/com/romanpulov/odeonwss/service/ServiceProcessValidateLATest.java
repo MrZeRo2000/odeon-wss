@@ -27,7 +27,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-//@ActiveProfiles(value = "test-06")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ServiceProcessValidateLATest {
     private static final List<String> TEST_ARTISTS =

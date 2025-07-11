@@ -24,7 +24,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-//@ActiveProfiles(value = "test-02")
 public class ServiceProcessLoadMusicDVTest {
     private static final Logger log = Logger.getLogger(ServiceProcessLoadMusicDVTest.class.getSimpleName());
 

@@ -26,7 +26,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-//@ActiveProfiles(value = "test-07")
 public class ServiceProcessValidateMP3Test {
     public static final ProcessorType PROCESSOR_TYPE = ProcessorType.MP3_VALIDATOR;
     public static final List<String> ARTIST_NAMES = List.of("Aerosmith", "Kosheen", "Various Artists");
