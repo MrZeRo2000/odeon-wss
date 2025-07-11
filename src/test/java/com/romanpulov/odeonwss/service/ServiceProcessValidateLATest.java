@@ -1,22 +1,24 @@
 package com.romanpulov.odeonwss.service;
 
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
-import com.romanpulov.odeonwss.config.DatabaseConfiguration;
-import com.romanpulov.odeonwss.db.DbManagerService;
 import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.generator.DataGenerator;
+import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.processor.model.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,7 +27,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ActiveProfiles(value = "test-06")
+//@ActiveProfiles(value = "test-06")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ServiceProcessValidateLATest {
     private static final List<String> TEST_ARTISTS =
             List.of(
@@ -37,6 +40,200 @@ public class ServiceProcessValidateLATest {
                     "Agua De Annique",
                     "Christina Aguilera",
                     "The Sisters Of Mercy");
+
+    @Value("${test.data.path}")
+    String testDataPath;
+
+    private enum TestFolder {
+        TF_SERVICE_PROCESS_VALIDATE_LA_TEST_OK
+    }
+
+    private Map<TestFolder, Path> tempFolders;
+
+    @BeforeAll
+    public void setup() throws Exception {
+        this.artifactType = artifactTypeRepository.getWithLA();
+
+        this.tempFolders = FileTreeGenerator.createTempFolders(TestFolder.class);
+
+        FileTreeGenerator.generateFromJSON(
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_LA_TEST_OK),
+                this.testDataPath,
+                """
+{
+  "Abigail Williams": {
+    "2010 In The Absence Of Light": {
+      "01 Hope The Great Betrayal.flac": "sample_flac_1.flac",
+      "02 Final Destiny Of The Gods.flac": "sample_flac_2.flac",
+      "03 The Mysteries That Bind The Flesh.flac": "sample_flac_2.flac",
+      "04 Infernal Divide.flac": "sample_flac_1.flac",
+      "05 In Death Comes The Great Silence.flac": "sample_flac_2.flac",
+      "06 What Hells Await Me.flac": "sample_flac_1.flac",
+      "07 An Echo In Our Legends.flac": "sample_flac_2.flac",
+      "08 Malediction.flac": "sample_flac_1.flac",
+      "Abigail Williams - In The Absence Of Light.log": "sample.log",
+      "Abigail Williams - In The Absence Of Light.m3u": "sample.m3u",
+      "Front.jpg": "sample.jpg",
+      "In The Absence Of Light.CUE": "In The Absence Of Light.CUE"
+    }
+  },
+  "Agua De Annique": {
+    "2007 Air": {
+      "air.flac": "sample_flac_2.flac",
+      "air.flac.cue": "air.flac.cue",
+      "air.wav.cue": "Celestial Completion.cue",
+      "air.wav.log": "sample.log",
+      "air.wav.toc": "sample.toc",
+      "scans": {
+        "back0000.jpg": "sample.jpg",
+        "book0000.jpg": "sample.jpg",
+        "book0001.jpg": "sample.jpg",
+        "book0002.jpg": "sample.jpg",
+        "book0003.jpg": "sample.jpg",
+        "book0004.jpg": "sample.jpg",
+        "book0005.jpg": "sample.jpg",
+        "book0006.jpg": "sample.jpg",
+        "book0007.jpg": "sample.jpg",
+        "cd.jpg": "sample.jpg",
+        "front.jpg": "sample.jpg",
+        "sticker.jpg": "sample.jpg"
+      }
+    }
+  },
+  "Christina Aguilera": {
+    "2006 Back To Basics": {
+      "CD1": {
+        "01 - Intro (Back To Basics).flac": "sample_flac_2.flac",
+        "02 - Makes Me Wanna Pray (feat. Steve Winwood).flac": "sample_flac_1.flac",
+        "03 - Back In The Day.flac": "sample_flac_2.flac",
+        "04 - Ain't No Other Man.flac": "sample_flac_2.flac",
+        "05 - Understand.flac": "sample_flac_1.flac",
+        "06 - Slow Down Baby.flac": "sample_flac_1.flac",
+        "07 - Oh Mother.flac": "sample_flac_1.flac",
+        "08 - F.U.S.S..flac": "sample_flac_1.flac",
+        "09 - On Our Way.flac": "sample_flac_2.flac",
+        "10 - Without You.flac": "sample_flac_2.flac",
+        "11 - Still Dirrty.flac": "sample_flac_1.flac",
+        "12 - Here To Stay.flac": "sample_flac_2.flac",
+        "13 - Thank You (Dedication To Fans...).flac": "sample_flac_2.flac",
+        "Christina Aguilera - Back To Basics (Disc 1).log": "sample.log",
+        "Front.jpg": "sample.jpg"
+      },
+      "CD2": {
+        "01 - Enter The Circus.flac": "sample_flac_1.flac",
+        "02 - Welcome.flac": "sample_flac_1.flac",
+        "03 - Candyman.flac": "sample_flac_2.flac",
+        "04 - Nasty Naughty Boy.flac": "sample_flac_1.flac",
+        "05 - I Got Trouble.flac": "sample_flac_1.flac",
+        "06 - Hurt.flac": "sample_flac_1.flac",
+        "07 - Mercy On Me.flac": "sample_flac_1.flac",
+        "08 - Save Me From Myself.flac": "sample_flac_1.flac",
+        "09 - The Right Man.flac": "sample_flac_1.flac",
+        "Christina Aguilera - Back To Basics (Disc-2).log": "sample.log",
+        "Front.jpg": "sample.jpg"
+      }
+    }
+  },
+  "Evanescence": {
+    "2000 Origin": {
+      "Flac.log": "sample.log",
+      "Origin.cue": "Origin.cue",
+      "Origin.flac": "sample_flac_1.flac",
+      "Origin.log": "sample.log",
+      "scans": {
+        "Back.jpg": "sample.jpg",
+        "Book.jpg": "sample.jpg",
+        "Front2.jpg": "sample.jpg",
+        "Origin.jpg": "sample.jpg"
+      }
+    },
+    "2011 Evanescence": {
+      "01 - What You Want.flac": "sample_flac_2.flac",
+      "02 - Made Of Stone.flac": "sample_flac_2.flac",
+      "03 - The Change.flac": "sample_flac_2.flac",
+      "04 - My Heart Is Broken.flac": "sample_flac_1.flac",
+      "05 - The Other Side.flac": "sample_flac_1.flac",
+      "06 - Erase This.flac": "sample_flac_2.flac",
+      "07 - Lost In Paradise.flac": "sample_flac_1.flac",
+      "08 - Sick.flac": "sample_flac_2.flac",
+      "09 - End Of The Dream.flac": "sample_flac_2.flac",
+      "10 - Oceans.flac": "sample_flac_2.flac",
+      "11 - Never Go Back.flac": "sample_flac_1.flac",
+      "12 - Swimming Home.flac": "sample_flac_1.flac",
+      "13 - New Way To Bleed.flac": "sample_flac_1.flac",
+      "14 - Say You Will.flac": "sample_flac_2.flac",
+      "15 - Disappear.flac": "sample_flac_1.flac",
+      "16 - Secret Door.flac": "sample_flac_2.flac",
+      "Evanescence - Evanescence.log": "sample.log",
+      "folder.jpg": "sample.jpg"
+    }
+  },
+  "Pink Floyd": {
+    "1988 Delicate Sound Of Thunder": {
+      "Pink Floyd - Delicate Sound of Thunder CD1.cue": "Thunder CD1.cue",
+      "Pink Floyd - Delicate Sound of Thunder CD1.flac": "sample_flac_1.flac",
+      "Pink Floyd - Delicate Sound of Thunder CD2.cue": "Thunder CD2.cue",
+      "Pink Floyd - Delicate Sound of Thunder CD2.flac": "sample_flac_2.flac",
+      "Scan": {
+        "Back.jpg": "sample.jpg"
+      },
+      "Отчет ЕАС 1.txt": "sample.txt",
+      "Отчет ЕАС 2.txt": "sample.txt"
+    }
+  },
+  "The Sisters Of Mercy": {
+    "1983 Anaconda 7 Inch Single": {
+      "01 - Anaconda.m4a": "sample.m4a"
+    }
+  },
+  "Therapy": {
+    "1993 Nurse": {
+      "Back.jpg": "sample.jpg",
+      "Front.jpg": "sample.jpg",
+      "log.log": "sample.log",
+      "Nurse.log": "sample.log",
+      "Therapy - Nurse.ape": "sample.ape",
+      "Therapy - Nurse.cue": "Nurse.cue"
+    },
+    "1995 Infernal Love": {
+      "Covers": {
+        "back.jpg": "sample.jpg",
+        "cd.jpg": "sample.jpg",
+        "front.jpg": "sample.jpg",
+        "inlay.jpg": "sample.jpg"
+      },
+      "Infernal Love.ape": "sample.ape",
+      "Infernal Love.cue": "Infernal Love.cue",
+      "Infernal Love.LOG": "sample_capital_ext.LOG"
+    }
+  },
+  "Tori Amos": {
+    "1988 Y Kant Tori Read": {
+      "ReleaseInfo": {
+        "cover_preview_290.jpg": "sample.jpg",
+        "LOG_1988_Y_Kant_Tori_Read.gif": "sample.gif"
+      },
+      "scans": {
+        "cover_preview_290.jpg": "sample.jpg"
+      },
+      "Tori Amos - Y Kant Tori Read.cue": "Celestial Completion.cue",
+      "Tori Amos - Y Kant Tori Read.wv": "sample.wv",
+      "Tori Amos - Y Kant Tori Read.wv.cue": "Y Kant Tori Read.wv.cue",
+      "Y Kant Tori Read.log": "sample.log"
+    }
+  }
+}
+                     """
+        );
+    }
+
+    @AfterAll
+    public void teardown() {
+        FileTreeGenerator.deleteTempFiles(tempFolders.values());
+    }
+
+    @Autowired
+    DataGenerator dataGenerator;
 
     @Autowired
     ArtifactTypeRepository artifactTypeRepository;
@@ -59,17 +256,17 @@ public class ServiceProcessValidateLATest {
     @Autowired
     private ArtifactRepository artifactRepository;
 
-    @Autowired
-    private DatabaseConfiguration databaseConfiguration;
-
     private ArtifactType artifactType;
 
-    @BeforeEach
-    public void beforeEach() {
-        this.artifactType = artifactTypeRepository.getWithLA();
-    }
-
     private void prepareInternal() {
+        dataGenerator.createArtistsFromList(TEST_ARTISTS);
+
+        service.executeProcessor(
+                ProcessorType.LA_LOADER,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_LA_TEST_OK).toString());
+        assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
+
+        /*
         DbManagerService.loadOrPrepare(databaseConfiguration, DbManagerService.DbType.DB_LOADED_LA, () -> {
             TEST_ARTISTS
                     .forEach(s -> artistRepository.save(
@@ -79,10 +276,14 @@ public class ServiceProcessValidateLATest {
             service.executeProcessor(ProcessorType.LA_LOADER, null);
             assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         });
+
+         */
     }
 
     private ProcessInfo executeProcessor() {
-        service.executeProcessor(ProcessorType.LA_VALIDATOR);
+        service.executeProcessor(
+                ProcessorType.LA_VALIDATOR,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_LA_TEST_OK).toString());
         return service.getProcessInfo();
     }
 
@@ -90,13 +291,10 @@ public class ServiceProcessValidateLATest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     void testEmptyShouldFail() {
-        TEST_ARTISTS
-                .forEach(s -> artistRepository.save(
-                        new EntityArtistBuilder().withType(ArtistType.ARTIST).withName(s).build()
-                ));
+        dataGenerator.createArtistsFromList(TEST_ARTISTS);
 
-        service.executeProcessor(ProcessorType.LA_VALIDATOR, null);
-        ProcessInfo pi = service.getProcessInfo();
+        ProcessInfo pi = executeProcessor();
+
         List<ProcessDetail> processDetails = pi.getProcessDetails();
         assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
         assertThat(processDetails.get(0)).isEqualTo(
@@ -127,15 +325,17 @@ public class ServiceProcessValidateLATest {
     @Test
     @Order(2)
     void testLoad() {
-        service.executeProcessor(ProcessorType.LA_LOADER, null);
+        service.executeProcessor(
+                ProcessorType.LA_LOADER,
+                tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_LA_TEST_OK).toString());
         assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
     }
 
     @Test
     @Order(3)
     void testOk() {
-        service.executeProcessor(ProcessorType.LA_VALIDATOR);
-        ProcessInfo pi = service.getProcessInfo();
+        ProcessInfo pi = executeProcessor();
+
         List<ProcessDetail> processDetails = pi.getProcessDetails();
         assertThat(service.getProcessInfo().getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
         int id = 0;
@@ -235,8 +435,9 @@ public class ServiceProcessValidateLATest {
         String errorString = getErrorStringFromTrackId(1L);
 
         em.createNativeQuery("delete from tracks_media_files WHERE trck_id = 1").executeUpdate();
-        service.executeProcessor(ProcessorType.LA_VALIDATOR);
-        ProcessInfo pi = service.getProcessInfo();
+
+        ProcessInfo pi = executeProcessor();
+
         List<ProcessDetail> processDetails = pi.getProcessDetails();
         int id = 0;
         assertThat(processDetails.get(id++)).isEqualTo(
@@ -280,8 +481,9 @@ public class ServiceProcessValidateLATest {
         String errorString = getErrorStringFromTrackId(1L);
 
         em.createNativeQuery("delete from tracks WHERE trck_id = 1").executeUpdate();
-        service.executeProcessor(ProcessorType.LA_VALIDATOR);
-        ProcessInfo pi = service.getProcessInfo();
+
+        ProcessInfo pi = executeProcessor();
+
         List<ProcessDetail> processDetails = pi.getProcessDetails();
         int id = 0;
 
@@ -321,8 +523,8 @@ public class ServiceProcessValidateLATest {
     @Test
     @Order(6)
     void testOkAgain() {
-        service.executeProcessor(ProcessorType.LA_VALIDATOR);
-        Assertions.assertEquals(ProcessingStatus.SUCCESS, service.getProcessInfo().getProcessingStatus());
+        ProcessInfo pi = executeProcessor();
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.SUCCESS);
     }
 
     @Test
@@ -419,7 +621,12 @@ public class ServiceProcessValidateLATest {
     @Sql({"/schema.sql", "/data.sql"})
     void containsFilesShouldFail() {
         this.prepareInternal();
-        service.executeProcessor(ProcessorType.LA_VALIDATOR, "../odeon-test-data/ok/Lossless/Therapy/1993 Nurse");
+        service.executeProcessor(
+                ProcessorType.LA_VALIDATOR,
+                Path.of(
+                        tempFolders.get(TestFolder.TF_SERVICE_PROCESS_VALIDATE_LA_TEST_OK).toString(),
+                        "Therapy",
+                        "1993 Nurse").toString());
         ProcessInfo pi = service.getProcessInfo();
         List<ProcessDetail> processDetails = pi.getProcessDetails();
         assertThat(processDetails.get(1).getInfo().getMessage()).contains("Expected directory, found");
@@ -538,7 +745,7 @@ public class ServiceProcessValidateLATest {
                 .filter(a -> a.getTitle().equals("Evanescence") && !Objects.isNull(a.getYear()) && a.getYear().equals(2011L))
                 .findFirst().orElseThrow();
         Track track = trackRepository
-                .findByIdWithMediaFiles(artifact.getTracks().get(0).getId())
+                .findByIdWithMediaFiles(artifact.getTracks().getFirst().getId())
                 .orElseThrow();
 
         MediaFile mediaFile = new MediaFile();
@@ -733,7 +940,7 @@ public class ServiceProcessValidateLATest {
         artifactRepository.save(artifact);
 
         ProcessInfo pi = executeProcessor();
-        org.assertj.core.api.Assertions.assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
+        assertThat(pi.getProcessingStatus()).isEqualTo(ProcessingStatus.FAILURE);
 
         assertThat(pi.getProcessDetails().get(7)).isEqualTo(
                 new ProcessDetail(
@@ -814,9 +1021,6 @@ public class ServiceProcessValidateLATest {
                 .stream()
                 .filter(t -> t.getTitle().equals("My Immortal"))
                 .findFirst()
-                .orElseThrow();
-        Artifact artifact = artifactRepository
-                .findById(track.getArtifact().getId())
                 .orElseThrow();
 
         track.setDuration(Optional.ofNullable(track.getDuration()).orElse(0L) + 5);

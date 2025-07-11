@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.service;
 
-import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.entity.*;
+import com.romanpulov.odeonwss.generator.DataGenerator;
 import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -31,7 +30,7 @@ public class ServiceProcessLoadLATest {
 
     private static final Logger log = Logger.getLogger(ServiceProcessLoadLATest.class.getSimpleName());
     private static final ProcessorType PROCESSOR_TYPE = ProcessorType.LA_LOADER;
-    private static final String[] ARTIST_LIST = {
+    private static final List<String> ARTIST_LIST = List.of (
             "Evanescence",
             "Pink Floyd",
             "Therapy",
@@ -40,7 +39,7 @@ public class ServiceProcessLoadLATest {
             "Agua De Annique",
             "Christina Aguilera",
             "The Sisters Of Mercy"
-    };
+    );
 
     @Value("${test.data.path}")
     String testDataPath;
@@ -232,6 +231,8 @@ public class ServiceProcessLoadLATest {
         FileTreeGenerator.deleteTempFiles(tempFolders.values());
     }
 
+    @Autowired
+    DataGenerator dataGenerator;
 
     @Autowired
     private ProcessService processService;
@@ -263,7 +264,7 @@ public class ServiceProcessLoadLATest {
         Assertions.assertEquals(11, processDetail.size());
         Assertions.assertEquals(ProcessingStatus.WARNING, processService.getProcessInfo().getProcessingStatus());
 
-        List<ProcessDetail> expectedProcessDetails = Stream.of(ARTIST_LIST)
+        List<ProcessDetail> expectedProcessDetails = ARTIST_LIST.stream()
                 .map(v -> new ProcessDetail(
                         ProcessDetailInfo.fromMessage("Artist " + v + " not found"),
                         ProcessingStatus.WARNING,
@@ -352,10 +353,7 @@ public class ServiceProcessLoadLATest {
     @Order(2)
     @Sql({"/schema.sql", "/data.sql"})
     void testOk() {
-        List.of(ARTIST_LIST)
-                .forEach(s -> artistRepository.save(
-                        new EntityArtistBuilder().withType(ArtistType.ARTIST).withName(s).build()
-                ));
+        dataGenerator.createArtistsFromList(ARTIST_LIST);
 
         processService.executeProcessor(
                 PROCESSOR_TYPE,
