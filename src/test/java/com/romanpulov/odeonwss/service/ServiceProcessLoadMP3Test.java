@@ -5,6 +5,7 @@ import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.Artist;
 import com.romanpulov.odeonwss.entity.ArtistType;
 import com.romanpulov.odeonwss.entity.Track;
+import com.romanpulov.odeonwss.generator.DataGenerator;
 import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
@@ -18,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -180,6 +180,9 @@ public class ServiceProcessLoadMP3Test {
     }
 
     @Autowired
+    DataGenerator dataGenerator;
+
+    @Autowired
     ProcessService service;
 
     @Autowired
@@ -199,15 +202,9 @@ public class ServiceProcessLoadMP3Test {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     void testOk() {
-        Arrays.asList("Aerosmith", "Kosheen", "Various Artists").forEach(s ->
-                artistRepository.save(
-                        new EntityArtistBuilder()
-                                .withType(ArtistType.ARTIST)
-                                .withName(s)
-                                .build()
-                ));
-
+        dataGenerator.createArtistsFromList(List.of("Aerosmith", "Kosheen", "Various Artists"));
         log.info("Created artists");
+
         Assertions.assertDoesNotThrow(() -> service.executeProcessor(
                 PROCESSOR_TYPE,
                 tempFolders.get(TestFolder.TF_SERVICE_PROCESS_LOAD_MP3_TEST_MP3_OK).toString()));
