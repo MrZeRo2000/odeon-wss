@@ -25,7 +25,7 @@ bootWar {
 }
 
 group = 'com.romanpulov'
-version = '0.14.15'
+version = '0.14.16'
 
 repositories {
 	mavenCentral()
@@ -57,7 +57,7 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
 
 	//jutils
-	implementation 'com.romanpulov:jutils-core:0.4.3'
+	implementation 'com.romanpulov:jutils-core:0.4.4'
 
 	// https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
@@ -67,6 +67,11 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
 		exclude group: "com.vaadin.external.google", module:"android-json"
 	}
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks.named('test') {
