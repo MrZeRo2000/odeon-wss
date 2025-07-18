@@ -25,7 +25,7 @@ bootWar {
 }
 
 group = 'com.romanpulov'
-version = '0.14.16'
+version = '0.14.17'
 
 repositories {
 	mavenCentral()
@@ -44,9 +44,6 @@ dependencies {
 	//sqlite
 	implementation 'org.xerial:sqlite-jdbc:3.50.1.0'
 
-	//ms access
-	implementation 'com.healthmarketscience.jackcess:jackcess:4.0.6'
-
 	//json
 	implementation 'org.json:json:20231013'
 
@@ -54,7 +51,7 @@ dependencies {
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 	//api doc
-	implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.8.0'
 
 	//jutils
 	implementation 'com.romanpulov:jutils-core:0.4.4'
@@ -92,15 +89,4 @@ tasks.register('deployProd', Copy) {
 	into tomcat_webapps
 	include file_name_build
 	rename file_name_build, file_name_prod
-}
-
-tasks.register("testFull") {
-	group = "application"
-	description = "Runs the Spring Boot application with the full-tests profile"
-	doFirst {
-		tasks.test.configure {
-			systemProperty("spring.profiles.active", "full-tests")
-		}
-	}
-	finalizedBy("test")
 }
