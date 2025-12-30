@@ -10,6 +10,10 @@ public class ArtistTypeDeserializer extends StdDeserializer<ArtistType> {
         super(vc);
     }
 
+    public ArtistTypeDeserializer() {
+        super(ArtistType.class);
+    }
+
     @Override
     public ArtistType deserialize(JsonParser p, DeserializationContext ctxt) {
         return ArtistType.fromCode(p.readValueAs(String.class));
