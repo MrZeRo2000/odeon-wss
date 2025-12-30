@@ -307,7 +307,7 @@ public class ControllerTrackTest {
     @Order(12)
     void testUpdateTrackDurations() throws Exception {
         var json = """
-                {"artifact":{"id":1}, "mediaFile": {"id":1}, "chapters":["00:01:55"]}"}
+                {"artifact":{"id":1}, "mediaFile":{"id":1}, "chapters":["00:01:55"]}
                 """;
         var result = this.mockMvc.perform(
                         post("/api/track/update-track-durations").accept(MediaType.APPLICATION_JSON)

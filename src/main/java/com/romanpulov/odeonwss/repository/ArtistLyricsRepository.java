@@ -15,11 +15,12 @@ import java.util.Set;
 public interface ArtistLyricsRepository extends EntityDTORepository<ArtistLyrics, ArtistLyricsDTO> {
     @Query("SELECT " +
             "al.id AS id, " +
-            "al.artist.id AS artistId, " +
-            "al.artist.name AS artistName, " +
+            "ar.id AS artistId, " +
+            "ar.name AS artistName, " +
             "al.title AS title, " +
             "al.text AS text " +
             "FROM ArtistLyrics al " +
+            "INNER JOIN Artist ar ON al.artist = ar " +
             "WHERE al.id = :id")
     Optional<ArtistLyricsDTO> findDTOById(long id);
 

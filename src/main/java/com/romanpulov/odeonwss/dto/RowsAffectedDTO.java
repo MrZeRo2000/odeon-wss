@@ -4,14 +4,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RowsAffectedDTO {
-    private long RowsAffected;
+    private long rowsAffected;
 
     public long getRowsAffected() {
-        return RowsAffected;
+        return rowsAffected;
     }
 
     public void setRowsAffected(long rowsAffected) {
-        RowsAffected = rowsAffected;
+        this.rowsAffected = rowsAffected;
     }
 
     private RowsAffectedDTO() {
