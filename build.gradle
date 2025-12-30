@@ -60,9 +60,9 @@ dependencies {
 	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
 	//test
-	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+	testRuntimeOnly 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 java {

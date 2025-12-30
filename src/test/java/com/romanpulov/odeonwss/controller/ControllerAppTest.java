@@ -12,18 +12,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest
 @AutoConfigureMockMvc
 public class ControllerAppTest {
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @Autowired
     ProjectConfigurationProperties projectConfigurationProperties;
 
     @Test
-    void testVersion() throws Exception {
+    void testVersion(@Autowired MockMvc mockMvc) throws Exception {
         mockMvc.perform(get("/api/app/info").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.version", Matchers.is(projectConfigurationProperties.getVersion())));
