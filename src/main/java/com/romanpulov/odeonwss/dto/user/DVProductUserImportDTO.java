@@ -30,7 +30,7 @@ public class DVProductUserImportDTO {
         this.dvOriginId = dvOriginId;
     }
 
-    public List<DVProductUserImportDetailDTO> getDVProductDetails() {
+    public List<DVProductUserImportDetailDTO> getDvProductDetails() {
         return dvProductDetails;
     }
 
@@ -62,7 +62,7 @@ public class DVProductUserImportDTO {
                 ", dvProductDetails=" + dvProductDetails +
                 ", frontInfo='" + frontInfo + '\'' +
                 ", dvCategories=" + dvCategories +
-                ", DVProductDetails=" + getDVProductDetails() +
+                ", DVProductDetails=" + getDvProductDetails() +
                 '}';
     }
 }

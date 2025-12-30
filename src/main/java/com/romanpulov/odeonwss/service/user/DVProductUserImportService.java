@@ -99,7 +99,7 @@ public class DVProductUserImportService {
         // dvCategories check
         getDvCategories(data.getDvCategories());
 
-        for (DVProductUserImportDetailDTO det: data.getDVProductDetails()) {
+        for (DVProductUserImportDetailDTO det: data.getDvProductDetails()) {
             if (det.getTitle() == null) {
                 throw new EmptyParameterException("Title");
             }
@@ -120,7 +120,7 @@ public class DVProductUserImportService {
         DVOrigin dvOrigin = getDvOrigin(data.getDvOriginId());
         Set<DVCategory> dvCategories = getDvCategories(data.getDvCategories());
 
-        for (DVProductUserImportDetailDTO det: data.getDVProductDetails()) {
+        for (DVProductUserImportDetailDTO det: data.getDvProductDetails()) {
             if (det.getTitle() == null) {
                 throw new EmptyParameterException("Title");
             }
