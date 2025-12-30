@@ -2,7 +2,6 @@ package com.romanpulov.odeonwss.utils.media;
 
 import com.romanpulov.odeonwss.utils.EnumUtils;
 import com.romanpulov.odeonwss.utils.media.model.*;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,7 +48,7 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
             try {
                 jsonObject = new JSONObject(text);
             } catch (JSONException e) {
-                logger.debug(ExceptionUtils.getStackTrace(e));
+                logger.debug("parseOutput error", e);
             }
 
             if (jsonObject == null) {
@@ -101,7 +100,7 @@ public class MediaInfoMediaFileParser extends AbstractCLIMediaFileParser {
                                 bitRate.set(newBitRate);
                             }
                         } catch (NumberFormatException e) {
-                            logger.debug(ExceptionUtils.getStackTrace(e));
+                            logger.debug("Number format exception", e);
                         }
                     });
         }

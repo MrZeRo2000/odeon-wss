@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.service.processor.parser;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,7 +162,7 @@ public class NamesParser {
                             Pattern.CASE_INSENSITIVE));
             return pattern.matcher(fileName).find();
         } catch (IllegalArgumentException e) {
-            logger.debug(ExceptionUtils.getStackTrace(e));
+            logger.debug("Error validating file name media format", e);
             return false;
         }
     }

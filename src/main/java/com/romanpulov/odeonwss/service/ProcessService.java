@@ -14,7 +14,6 @@ import com.romanpulov.odeonwss.service.processor.model.ProcessDetail;
 import com.romanpulov.odeonwss.service.processor.model.ProcessInfo;
 import com.romanpulov.odeonwss.service.processor.model.ProcessingEvent;
 import com.romanpulov.odeonwss.service.processor.model.ProcessorType;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -121,7 +120,7 @@ public class ProcessService implements ProgressHandler {
                 currentProcessor.get().execute();
 
             } catch (Exception e) {
-                logger.debug("Error executing: " + processorType + ": " + ExceptionUtils.getStackTrace(e));
+                logger.debug("Error executing: " + processorType, e);
                 processInfo.addProcessDetails(ProcessDetail.fromException(e));
             } finally {
                 // final status
@@ -148,7 +147,7 @@ public class ProcessService implements ProgressHandler {
                 logger.debug("Saved processing info");
             } catch (Exception e) {
                 logger.error("Error saving processing info: " + e.getMessage());
-                logger.debug(ExceptionUtils.getStackTrace(e));
+                logger.debug("Error saving processing info", e);
             }
         }
     }

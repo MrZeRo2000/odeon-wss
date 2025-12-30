@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.service.processor.parser;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +12,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class CueParser {
     private final static Logger logger = LoggerFactory.getLogger(CueParser.class);
@@ -141,12 +139,12 @@ public class CueParser {
         //read lines
         List<String> lines;
         try (BufferedReader reader = Files.newBufferedReader(file)) {
-            lines = reader.lines().collect(Collectors.toList());
+            lines = reader.lines().toList();
         } catch (IOException e) {
-            logger.debug(ExceptionUtils.getStackTrace(e));
+            logger.debug("Error reading file", e);
             throw new UncheckedIOException("Error reading file:" + file.toAbsolutePath() + ": " + e.getMessage(), e);
         } catch (UncheckedIOException e) {
-            logger.debug(ExceptionUtils.getStackTrace(e));
+            logger.debug("Error reading file(unchecked)", e);
             throw new UncheckedIOException(
                     "Error reading file:" + file.toAbsolutePath() + ": possibly UTF-8 decoding failure: " + e.getMessage(),
                     e.getCause());

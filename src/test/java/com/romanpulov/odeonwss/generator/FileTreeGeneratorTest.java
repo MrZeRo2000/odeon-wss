@@ -1,11 +1,12 @@
 package com.romanpulov.odeonwss.generator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.FileSystemUtils;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,10 +25,12 @@ public class FileTreeGeneratorTest {
     @Value("${test.data.path}")
     String testDataPath;
 
+    @Autowired
+    private JsonMapper mapper;
+
     @Test
     void testDeserializeFolderDef() throws Exception {
         var fd = new FileTreeGenerator.FolderDef("folder1", Map.of("file1", Paths.get("fileSource1")));
-        var mapper = new ObjectMapper();
         String fdString = mapper.writeValueAsString(fd);
         log.info("Serialized FolderDef:" + fdString);
     }
@@ -44,7 +47,6 @@ public class FileTreeGeneratorTest {
     }
 }
 """;
-        var mapper = new ObjectMapper();
         var fd = mapper.readValue(fdString, FileTreeGenerator.FolderDef.class);
         log.info("Deserialized FolderDef:" + fd);
 

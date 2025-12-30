@@ -1,11 +1,9 @@
 package com.romanpulov.odeonwss.serializer;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.romanpulov.odeonwss.entity.ArtistType;
-
-import java.io.IOException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 public class ArtistTypeSerializer extends StdSerializer<ArtistType> {
     public ArtistTypeSerializer(Class<ArtistType> t) {
@@ -17,7 +15,7 @@ public class ArtistTypeSerializer extends StdSerializer<ArtistType> {
     }
 
     @Override
-    public void serialize(ArtistType value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+    public void serialize(ArtistType value, JsonGenerator gen, SerializationContext provider) {
         gen.writeString(value.getCode());
     }
 }

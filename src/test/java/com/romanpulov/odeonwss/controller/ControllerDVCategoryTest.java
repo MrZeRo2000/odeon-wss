@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.odeonwss.builder.dtobuilder.DVCategoryDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityDVCategoryBuilder;
 import com.romanpulov.odeonwss.dto.DVCategoryDTOImpl;
@@ -19,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.json.JsonMapper;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -31,7 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ControllerDVCategoryTest {
     final static Logger logger = LoggerFactory.getLogger(ControllerDVCategoryTest.class);
 
-    final ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private JsonMapper mapper;
 
     @Autowired
     private MockMvc mockMvc;

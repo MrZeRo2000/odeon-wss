@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.odeonwss.builder.dtobuilder.ArtistDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistCategoryBuilder;
@@ -32,6 +31,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.List;
 
@@ -64,7 +64,7 @@ public class ControllerArtistTest {
     private ArtistService artistService;
 
     @Autowired
-    private ObjectMapper mapper;
+    private JsonMapper mapper;
 
     @Test
     @Sql({"/schema.sql", "/data.sql"})

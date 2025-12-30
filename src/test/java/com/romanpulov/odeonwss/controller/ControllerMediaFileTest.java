@@ -1,11 +1,11 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.odeonwss.builder.dtobuilder.MediaFileDTOBuilder;
 import com.romanpulov.odeonwss.builder.dtobuilder.TrackDTOBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtifactBuilder;
 import com.romanpulov.odeonwss.builder.entitybuilder.EntityArtistBuilder;
 import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.config.AppConfigurationProperties;
 import com.romanpulov.odeonwss.config.ProjectConfigurationProperties;
 import com.romanpulov.odeonwss.entity.Artifact;
 import com.romanpulov.odeonwss.entity.Artist;
@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -56,8 +57,9 @@ public class ControllerMediaFileTest {
     private static final Map<TestFolder, Path> TEMP_FOLDERS = FileTreeGenerator.createTempFolders(TestFolder.class);
 
     static class TestAppConfiguration extends AppConfiguration {
-        public TestAppConfiguration(ServletContext context, ProjectConfigurationProperties projectConfigurationProperties) {
-            super(context, projectConfigurationProperties);
+        public TestAppConfiguration(AppConfigurationProperties appConfigurationProperties,
+                                    ProjectConfigurationProperties projectConfigurationProperties) {
+            super(appConfigurationProperties, projectConfigurationProperties);
             this.pathMap.put(PathType.PT_DV_MUSIC, TEMP_FOLDERS.get(TestFolder.TF_CONTROLLER_MEDIA_FILE_TEST_DV_MUSIC).toString());
         }
     }
@@ -66,8 +68,9 @@ public class ControllerMediaFileTest {
     static class TestAppConfigurationConfig {
         @Bean
         @Primary
-        AppConfiguration getAppConfiguration(ServletContext context, ProjectConfigurationProperties projectConfigurationProperties) {
-            return new TestAppConfiguration(context, projectConfigurationProperties);
+        AppConfiguration getAppConfiguration(AppConfigurationProperties appConfigurationProperties,
+                                             ProjectConfigurationProperties projectConfigurationProperties) {
+            return new TestAppConfiguration(appConfigurationProperties, projectConfigurationProperties);
         }
     }
 
@@ -105,7 +108,7 @@ public class ControllerMediaFileTest {
     private ArtifactRepository artifactRepository;
 
     @Autowired
-    private ObjectMapper mapper;
+    private JsonMapper mapper;
 
     @Test
     @Order(1)

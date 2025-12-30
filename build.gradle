@@ -36,7 +36,7 @@ dependencies {
 	//spring boot
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 
 	//dialects to support SQLite
 	implementation 'org.hibernate.orm:hibernate-community-dialects'
@@ -51,7 +51,7 @@ dependencies {
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 	//api doc
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14'
+	//implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14'
 
 	//jutils
 	implementation 'com.romanpulov:jutils-core:0.4.4'
@@ -61,10 +61,8 @@ dependencies {
 
 	//test
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
-	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-test") {
-		exclude group: "com.vaadin.external.google", module:"android-json"
-	}
+	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 java {
@@ -90,4 +88,8 @@ tasks.register('deployProd', Copy) {
 	into tomcat_webapps
 	include file_name_build
 	rename file_name_build, file_name_prod
+}
+
+configurations.configureEach {
+	exclude group: "com.vaadin.external.google", module: "android-json"
 }

@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.odeonwss.builder.dtobuilder.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.entity.*;
@@ -19,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.List;
 
@@ -59,7 +59,7 @@ public class ControllerTrackTest {
     private MediaFileRepository mediaFileRepository;
 
     @Autowired
-    private ObjectMapper mapper;
+    private JsonMapper mapper;
 
     @Test
     @Sql({"/schema.sql", "/data.sql"})

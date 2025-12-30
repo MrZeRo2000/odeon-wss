@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Component;
 
-import jakarta.servlet.ServletContext;
 import javax.sql.DataSource;
 import java.util.Objects;
 
@@ -19,10 +18,10 @@ public class DatabaseConfiguration {
     }
 
     public DatabaseConfiguration(
-            ServletContext context,
+            AppConfigurationProperties appConfigurationProperties,
             DatabaseConfigurationProperties databaseConfigurationProperties) {
         this.databaseConfigurationProperties = databaseConfigurationProperties;
-        dbUrl = context.getInitParameter("db-url");
+        dbUrl = appConfigurationProperties.getDbUrl();
     }
 
     @Bean

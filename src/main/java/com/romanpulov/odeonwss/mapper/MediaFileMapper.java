@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.mapper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.jutilscore.io.FileUtils;
 import com.romanpulov.odeonwss.dto.ExtraDTO;
 import com.romanpulov.odeonwss.dto.MediaFileDTO;
@@ -10,8 +9,8 @@ import com.romanpulov.odeonwss.entity.MediaFile;
 import com.romanpulov.odeonwss.utils.media.model.MediaFileInfo;
 import com.romanpulov.odeonwss.utils.media.model.MediaFormatInfo;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.json.JsonMapper;
 
-import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -20,9 +19,9 @@ import java.util.List;
 public class MediaFileMapper implements EntityDTOMapper<MediaFile, MediaFileDTO> {
     private final static DateTimeFormatter CHAPTERS_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    private final ObjectMapper mapper;
+    private final JsonMapper mapper;
 
-    public MediaFileMapper(ObjectMapper mapper) {
+    public MediaFileMapper(JsonMapper mapper) {
         this.mapper = mapper;
     }
 
@@ -84,12 +83,8 @@ public class MediaFileMapper implements EntityDTOMapper<MediaFile, MediaFileDTO>
 
     public String chaptersToExtra(List<LocalTime> chapters) {
         if ((chapters != null) && !chapters.isEmpty()) {
-            try {
-                ExtraDTO extraDTO = ExtraDTO.from(chapters.stream().map(v -> v.format(CHAPTERS_FORMATTER)).toList());
-                return mapper.writeValueAsString(extraDTO);
-            } catch (IOException e) {
-                return null;
-            }
+            ExtraDTO extraDTO = ExtraDTO.from(chapters.stream().map(v -> v.format(CHAPTERS_FORMATTER)).toList());
+            return mapper.writeValueAsString(extraDTO);
         } else {
             return null;
         }

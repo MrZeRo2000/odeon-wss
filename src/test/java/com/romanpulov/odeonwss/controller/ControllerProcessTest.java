@@ -1,11 +1,10 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.odeonwss.config.AppConfiguration;
+import com.romanpulov.odeonwss.config.AppConfigurationProperties;
 import com.romanpulov.odeonwss.config.ProjectConfigurationProperties;
 import com.romanpulov.odeonwss.dto.ProcessorRequestDTO;
 import com.romanpulov.odeonwss.generator.FileTreeGenerator;
-import jakarta.servlet.ServletContext;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
@@ -21,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -38,7 +38,8 @@ public class ControllerProcessTest {
     @Value("${test.data.path}")
     String testDataPath;
 
-    final ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private JsonMapper mapper;
 
     @Autowired
     private MockMvc mockMvc;
@@ -50,8 +51,9 @@ public class ControllerProcessTest {
     }
 
     static class TestAppConfiguration extends AppConfiguration {
-        public TestAppConfiguration(ServletContext context, ProjectConfigurationProperties projectConfigurationProperties) {
-            super(context, projectConfigurationProperties);
+        public TestAppConfiguration(AppConfigurationProperties appConfigurationProperties,
+                                    ProjectConfigurationProperties projectConfigurationProperties) {
+            super(appConfigurationProperties, projectConfigurationProperties);
             this.pathMap.put(PathType.PT_MP3, TEMP_FOLDERS.get(TestFolder.TF_CONTROLLER_PROCESS_TEST_MP3).toString());
         }
     }
@@ -60,8 +62,9 @@ public class ControllerProcessTest {
     static class TestAppConfigurationConfig {
         @Bean
         @Primary
-        AppConfiguration getAppConfiguration(ServletContext context, ProjectConfigurationProperties projectConfigurationProperties) {
-            return new TestAppConfiguration(context, projectConfigurationProperties);
+        AppConfiguration getAppConfiguration(AppConfigurationProperties appConfigurationProperties,
+                                             ProjectConfigurationProperties projectConfigurationProperties) {
+            return new TestAppConfiguration(appConfigurationProperties, projectConfigurationProperties);
         }
     }
 

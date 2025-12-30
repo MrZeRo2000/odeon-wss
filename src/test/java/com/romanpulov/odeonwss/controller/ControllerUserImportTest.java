@@ -1,7 +1,6 @@
 package com.romanpulov.odeonwss.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.odeonwss.builder.dtobuilder.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.entity.ArtifactType;
@@ -23,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.json.JsonMapper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,11 +47,8 @@ public class ControllerUserImportTest {
             "Tool"
     );
 
-    final static ObjectMapper mapper = new ObjectMapper();
-
-    static {
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    }
+    @Autowired
+    private JsonMapper mapper;
 
     @Autowired
     private MockMvc mockMvc;

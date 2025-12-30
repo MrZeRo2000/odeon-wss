@@ -1,13 +1,12 @@
 package com.romanpulov.odeonwss.generator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.romanpulov.jutilscore.io.FileUtils;
 import com.romanpulov.odeonwss.dto.*;
 import com.romanpulov.odeonwss.entity.*;
 import com.romanpulov.odeonwss.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,7 +14,7 @@ import java.util.stream.Collectors;
 @Service
 public class DataGenerator {
     @Autowired
-    private ObjectMapper mapper;
+    private JsonMapper mapper;
 
     @Autowired
     private ArtistRepository artistRepository;
@@ -38,7 +37,7 @@ public class DataGenerator {
     @Autowired
     private DVProductRepository dvProductRepository;
 
-    public void generateFromJSON(String json) throws JsonProcessingException {
+    public void generateFromJSON(String json) {
         DataGeneratorDTO data = mapper.readValue(json, DataGeneratorDTO.class);
 
         Map<String, Artist> artistMap = data.getArtists() == null ?
