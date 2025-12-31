@@ -85,7 +85,7 @@ public class ServiceProcessValidateClassicsTest {
     @Test
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
-    void testLoad() throws Exception {
+    void testLoad() {
 
         String json =
                 """

@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.controller;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.romanpulov.odeonwss.builder.dtobuilder.*;
 import com.romanpulov.odeonwss.builder.entitybuilder.*;
 import com.romanpulov.odeonwss.entity.ArtifactType;
@@ -36,12 +35,12 @@ import java.util.List;
 public class ControllerUserImportTest {
     final static Logger logger = LoggerFactory.getLogger(ControllerUserImportTest.class);
 
-    List<String> PRODUCT_NAMES = List.of(
+    final List<String> PRODUCT_NAMES = List.of(
             "Street",
             "Racer"
     );
 
-    List<String> ARTISTS = List.of(
+    final List<String> ARTISTS = List.of(
             "Fergie",
             "Various Artists",
             "Tool"

@@ -29,14 +29,14 @@ public class FileTreeGeneratorTest {
     private JsonMapper mapper;
 
     @Test
-    void testDeserializeFolderDef() throws Exception {
+    void testDeserializeFolderDef() {
         var fd = new FileTreeGenerator.FolderDef("folder1", Map.of("file1", Paths.get("fileSource1")));
         String fdString = mapper.writeValueAsString(fd);
         log.info("Serialized FolderDef:" + fdString);
     }
 
     @Test
-    void testSerializeFolderDef() throws Exception {
+    void testSerializeFolderDef() {
         String fdString =
 """
 {

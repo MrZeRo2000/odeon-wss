@@ -14,7 +14,6 @@ import com.romanpulov.odeonwss.generator.FileTreeGenerator;
 import com.romanpulov.odeonwss.repository.ArtifactRepository;
 import com.romanpulov.odeonwss.repository.ArtifactTypeRepository;
 import com.romanpulov.odeonwss.repository.ArtistRepository;
-import jakarta.servlet.ServletContext;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;

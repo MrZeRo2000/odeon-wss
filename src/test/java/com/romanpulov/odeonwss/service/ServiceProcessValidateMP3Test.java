@@ -396,7 +396,7 @@ public class ServiceProcessValidateMP3Test {
     @Autowired
     MediaFileRepository mediaFileRepository;
 
-    ProcessService service;
+    final ProcessService service;
 
     @Autowired
     DataGenerator dataGenerator;

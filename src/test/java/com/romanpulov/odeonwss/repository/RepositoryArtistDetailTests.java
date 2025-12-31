@@ -26,7 +26,7 @@ public class RepositoryArtistDetailTests {
     @Test
     @Order(1)
     @Sql(value = {"/schema.sql", "/data.sql"})
-    void testCRUD() throws Exception {
+    void testCRUD() {
         Artist artist1 = artistRepository.save(new EntityArtistBuilder().withType(ArtistType.ARTIST).withName("Name 1").build());
         artistDetailRepository.save(new EntityArtistDetailBuilder().withArtist(artist1).withBiography("Bio 1").build());
 

@@ -34,7 +34,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceUserImportDVProductTest {
-    List<String> PRODUCT_NAMES = List.of(
+    final List<String> PRODUCT_NAMES = List.of(
             "The Idol",
             "Cruel Summer"
     );

@@ -14,7 +14,6 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -50,7 +49,7 @@ public class RepositoryDBProcessDetailTests {
 
         List<DBProcessInfo> dbProcessInfoList = StreamSupport
                 .stream(dbProcessInfoRepository.findAll().spliterator(), false)
-                .collect(Collectors.toList());
+                .toList();
         assertThat(dbProcessInfoList.size()).isEqualTo(1L);
 
         DBProcessDetail dbProcessDetail = new DBProcessDetail();
@@ -64,7 +63,7 @@ public class RepositoryDBProcessDetailTests {
 
         List<DBProcessDetail> dbProcessDetails = StreamSupport
                 .stream(dbProcessDetailRepository.findAll().spliterator(), false)
-                .collect(Collectors.toList());
+                .toList();
         assertThat(dbProcessDetails.size()).isEqualTo(1L);
 
         DBProcessDetail savedDBProcessDetail = dbProcessDetails.get(0);

@@ -19,7 +19,7 @@ public class MediaStreamFactory {
         }
     }
 
-    public static Comparator<AbstractMediaStreamInfo> mediaStreamInfoComparator = (s1, s2) -> {
+    public static final Comparator<AbstractMediaStreamInfo> mediaStreamInfoComparator = (s1, s2) -> {
         if (s1 instanceof MediaStreamVideoInfo) {
             return -1;
         } else if (s2 instanceof MediaStreamVideoInfo) {

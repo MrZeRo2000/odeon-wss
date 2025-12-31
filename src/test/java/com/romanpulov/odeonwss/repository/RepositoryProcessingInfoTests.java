@@ -43,16 +43,12 @@ public class RepositoryProcessingInfoTests {
         ProcessInfo processInfo = new ProcessInfo(ProcessorType.LA_VALIDATOR);
         processInfo.setProcessingStatus(null);
 
-        assertThrows(Exception.class, () -> {
-            processInfoRepository.save(processInfo);
-        });
+        assertThrows(Exception.class, () -> processInfoRepository.save(processInfo));
 
         processInfo.setProcessingStatus(ProcessingStatus.FAILURE);
         processInfo.setLastUpdated(null);
 
-        assertThrows(Exception.class, () -> {
-            processInfoRepository.save(processInfo);
-        });
+        assertThrows(Exception.class, () -> processInfoRepository.save(processInfo));
     }
 
     @Test

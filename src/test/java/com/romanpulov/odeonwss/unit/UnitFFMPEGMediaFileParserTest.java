@@ -13,7 +13,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static com.romanpulov.odeonwss.unit.MediaTestData.*;
 
 public class UnitFFMPEGMediaFileParserTest {
-    FFMPEGMediaFileParser parser = new FFMPEGMediaFileParser("../ffmpeg/");
+    final FFMPEGMediaFileParser parser = new FFMPEGMediaFileParser("../ffmpeg/");
 
     @Test
     void testNonMediaFile() {

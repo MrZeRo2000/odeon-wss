@@ -1,6 +1,5 @@
 package com.romanpulov.odeonwss.dto.user;
 
-import com.romanpulov.odeonwss.exception.WrongParameterValueException;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalTime;
@@ -11,7 +10,7 @@ import java.util.List;
 
 @Component
 public class ChapterDurationsTransformer {
-    public List<Long> transform(List<String> chapters) throws WrongParameterValueException {
+    public List<Long> transform(List<String> chapters) {
         List<Long> result = new ArrayList<>();
 
         List<String> cleanChapters = chapters

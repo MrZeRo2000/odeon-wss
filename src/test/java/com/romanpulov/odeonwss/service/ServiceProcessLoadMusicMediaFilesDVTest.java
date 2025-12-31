@@ -87,7 +87,7 @@ public class ServiceProcessLoadMusicMediaFilesDVTest {
     @Order(1)
     @Sql({"/schema.sql", "/data.sql"})
     @Rollback(false)
-    void testPrepare() throws Exception {
+    void testPrepare() {
         String json =
                 """
 {

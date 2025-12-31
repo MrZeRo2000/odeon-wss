@@ -20,7 +20,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class UnitMediaInfoMediaFileParserTest {
     private static final Logger logger = Logger.getLogger(UnitMediaInfoMediaFileParserTest.class.getSimpleName());
 
-    MediaInfoMediaFileParser parser = new MediaInfoMediaFileParser("../MediaInfo");
+    final MediaInfoMediaFileParser parser = new MediaInfoMediaFileParser("../MediaInfo");
 
     static class TestMediaInfoMediaFileParser extends MediaInfoMediaFileParser {
         public TestMediaInfoMediaFileParser() {
@@ -33,7 +33,7 @@ public class UnitMediaInfoMediaFileParserTest {
         }
     }
 
-    TestMediaInfoMediaFileParser testParser = new TestMediaInfoMediaFileParser();
+    final TestMediaInfoMediaFileParser testParser = new TestMediaInfoMediaFileParser();
 
     private String readFileContent(String fileName) throws IOException {
         Path path = Path.of(UnitTestConfiguration.getFullTestFilesPath(fileName));

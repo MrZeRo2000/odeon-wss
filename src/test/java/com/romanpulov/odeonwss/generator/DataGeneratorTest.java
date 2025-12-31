@@ -32,7 +32,7 @@ public class DataGeneratorTest {
 
     @Test
     @Sql({"/schema.sql", "/data.sql"})
-    void testCreateArtists() throws Exception {
+    void testCreateArtists() {
         String json =
 """
 {
@@ -55,7 +55,7 @@ public class DataGeneratorTest {
 
     @Test
     @Sql({"/schema.sql", "/data.sql"})
-    void testMovies() throws Exception {
+    void testMovies() {
         String json =
 """
 {

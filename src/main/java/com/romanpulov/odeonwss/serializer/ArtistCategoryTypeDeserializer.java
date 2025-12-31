@@ -11,7 +11,7 @@ public class ArtistCategoryTypeDeserializer extends StdDeserializer<ArtistCatego
     }
 
     public ArtistCategoryTypeDeserializer() {
-        super((Class<?>) null);
+        super(ArtistCategoryType.class);
     }
 
     @Override

@@ -132,7 +132,7 @@ public class ServiceProcessValidateDVMusicTest {
         return service.getProcessInfo();
     }
 
-    private void internalPrepareImported() throws Exception {
+    private void internalPrepareImported() {
         String json =
                 """
 {
@@ -200,7 +200,7 @@ public class ServiceProcessValidateDVMusicTest {
          */
     }
 
-    private void internalPrepareExisting() throws Exception {
+    private void internalPrepareExisting() {
         String json =
                 """
 {

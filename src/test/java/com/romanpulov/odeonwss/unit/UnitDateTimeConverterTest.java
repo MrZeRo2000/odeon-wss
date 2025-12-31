@@ -9,7 +9,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class UnitDateTimeConverterTest {
 
-    DateTimeConverter dtc = new DateTimeConverter();
+    final DateTimeConverter dtc = new DateTimeConverter();
 
     @Test
     void testMain() {
