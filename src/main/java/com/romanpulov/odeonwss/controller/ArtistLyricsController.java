@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping(value = "/api/artist-lyrics", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ArtistLyricsController
