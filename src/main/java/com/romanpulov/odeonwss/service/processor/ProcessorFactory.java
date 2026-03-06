@@ -38,7 +38,11 @@ public class ProcessorFactory {
 
             DVAnimationLoadProcessor dvAnimationLoadProcessor,
             DVAnimationValidateProcessor dvAnimationValidateProcessor,
-            DVAnimationMediaFilesLoadProcessor dvAnimationMediaFilesLoadProcessor
+            DVAnimationMediaFilesLoadProcessor dvAnimationMediaFilesLoadProcessor,
+
+            DVOtherLoadProcessor dvOtherLoadProcessor,
+            DVOtherValidateProcessor dvOtherValidateProcessor,
+            DVOtherMediaFilesLoadProcessor dvOtherMediaFilesLoadProcessor
     )
     {
         this.appConfiguration = appConfiguration;
@@ -61,6 +65,10 @@ public class ProcessorFactory {
         addProcessorMap(ProcessorType.DV_ANIMATION_LOADER, dvAnimationLoadProcessor, AppConfiguration.PathType.PT_DV_ANIMATION);
         addProcessorMap(ProcessorType.DV_ANIMATION_VALIDATOR, dvAnimationValidateProcessor, AppConfiguration.PathType.PT_DV_ANIMATION);
         addProcessorMap(ProcessorType.DV_ANIMATION_MEDIA_LOADER, dvAnimationMediaFilesLoadProcessor, AppConfiguration.PathType.PT_DV_ANIMATION);
+
+        addProcessorMap(ProcessorType.DV_OTHER_LOADER, dvOtherLoadProcessor, AppConfiguration.PathType.PT_DV_OTHER);
+        addProcessorMap(ProcessorType.DV_OTHER_VALIDATOR, dvOtherValidateProcessor, AppConfiguration.PathType.PT_DV_OTHER);
+        addProcessorMap(ProcessorType.DV_OTHER_MEDIA_LOADER, dvOtherMediaFilesLoadProcessor, AppConfiguration.PathType.PT_DV_OTHER);
     }
 
     public AbstractProcessor fromProcessorType(ProcessorType processorType, ProgressHandler handler) {

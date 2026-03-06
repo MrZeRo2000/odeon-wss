@@ -66,7 +66,7 @@ public abstract class AbstractDVNonMusicValidateProcessor extends AbstractFileSy
                 this,
                 path,
                 this.artifactType.getMediaFileFormats());
-        logger.info("pathValidation:" + pathValidation);
+        logger.info("pathValidation:{}", pathValidation);
 
         if (MediaFileValidator.validateArtifacts(this, pathValidation, dbValidation)) {
             infoHandler(ProcessorMessages.INFO_ARTIFACTS_VALIDATED);

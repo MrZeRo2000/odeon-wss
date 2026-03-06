@@ -1,0 +1,38 @@
+package com.romanpulov.odeonwss.service.processor;
+
+import com.romanpulov.odeonwss.mapper.MediaFileMapper;
+import com.romanpulov.odeonwss.repository.*;
+import com.romanpulov.odeonwss.service.DVProductService;
+import com.romanpulov.odeonwss.service.processor.parser.MediaParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+@Component
+public class DVOtherLoadProcessor extends AbstractDVNonMusicLoadProcessor {
+    @SuppressWarnings("unused")
+    private static final Logger logger = LoggerFactory.getLogger(DVOtherLoadProcessor.class);
+
+    public DVOtherLoadProcessor(
+            ArtifactTypeRepository artifactTypeRepository,
+            ArtifactRepository artifactRepository,
+            TrackRepository trackRepository,
+            MediaFileRepository mediaFileRepository,
+            MediaFileMapper mediaFileMapper,
+            DVTypeRepository dvTypeRepository,
+            DVProductRepository dvProductRepository,
+            DVProductService dvProductService,
+            MediaParser mediaParser) {
+        super(
+                artifactTypeRepository,
+                artifactRepository,
+                trackRepository,
+                mediaFileRepository,
+                mediaFileMapper,
+                dvTypeRepository,
+                dvProductRepository,
+                dvProductService,
+                mediaParser,
+                ArtifactTypeRepository::getWithDVOther);
+    }
+}

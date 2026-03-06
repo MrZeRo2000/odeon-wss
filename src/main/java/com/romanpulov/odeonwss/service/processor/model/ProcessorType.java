@@ -19,6 +19,10 @@ public enum ProcessorType {
     DV_ANIMATION_LOADER("Animation Loader"),
     DV_ANIMATION_VALIDATOR("Animation Validator"),
     DV_ANIMATION_MEDIA_LOADER("Animation media loader"),
+
+    DV_OTHER_LOADER("Other Loader"),
+    DV_OTHER_VALIDATOR("Other Validator"),
+    DV_OTHER_MEDIA_LOADER("Other media loader"),
     ;
 
     public final String label;

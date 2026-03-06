@@ -25,6 +25,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 		p.put("app.dvMusicPath", sc.getInitParameter("dv-music-path"));
 		p.put("app.dvMoviesPath", sc.getInitParameter("dv-movies-path"));
 		p.put("app.dvAnimationPath", sc.getInitParameter("dv-animation-path"));
+		p.put("app.dvOtherPath", sc.getInitParameter("dv-other-path"));
 		p.put("app.ffProbePath", sc.getInitParameter("ffprobe-path"));
 		p.put("app.mediaInfoPath", sc.getInitParameter("mediainfo-path"));
 		p.put("app.mdbPath", sc.getInitParameter("mdb-path"));

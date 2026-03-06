@@ -13,6 +13,7 @@ public class AppConfigurationProperties {
     private String dvMusicPath;
     private String dvMoviesPath;
     private String dvAnimationPath;
+    private String dvOtherPath;
     private String ffProbePath;
     private String mediaInfoPath;
     private String mdbPath;
@@ -71,6 +72,14 @@ public class AppConfigurationProperties {
 
     public void setDvAnimationPath(String dvAnimationPath) {
         this.dvAnimationPath = dvAnimationPath;
+    }
+
+    public String getDvOtherPath() {
+        return dvOtherPath;
+    }
+
+    public void setDvOtherPath(String dvOtherPath) {
+        this.dvOtherPath = dvOtherPath;
     }
 
     public String getFfProbePath() {

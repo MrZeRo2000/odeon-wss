@@ -15,6 +15,7 @@ public class AppConfiguration {
         PT_DV_MUSIC,
         PT_DV_MOVIES,
         PT_DV_ANIMATION,
+        PT_DV_OTHER,
         PT_MDB,
         PT_FFPROBE,
         PT_MEDIAINFO
@@ -40,6 +41,7 @@ public class AppConfiguration {
         this.pathMap.put(PathType.PT_DV_MUSIC, appConfigurationProperties.getDvMusicPath());
         this.pathMap.put(PathType.PT_DV_MOVIES, appConfigurationProperties.getDvMoviesPath());
         this.pathMap.put(PathType.PT_DV_ANIMATION, appConfigurationProperties.getDvAnimationPath());
+        this.pathMap.put(PathType.PT_DV_OTHER, appConfigurationProperties.getDvOtherPath());
         this.pathMap.put(PathType.PT_MDB, appConfigurationProperties.getMdbPath());
         this.pathMap.put(PathType.PT_FFPROBE, appConfigurationProperties.getFfProbePath());
         this.pathMap.put(PathType.PT_MEDIAINFO, appConfigurationProperties.getMediaInfoPath());
