@@ -31,6 +31,8 @@ public class ArtifactTypeService {
                 return appConfiguration.getPathMap().get(AppConfiguration.PathType.PT_DV_MOVIES);
             } else if (v.equals(artifactTypeRepository.getWithDVAnimation().getId())) {
                 return appConfiguration.getPathMap().get(AppConfiguration.PathType.PT_DV_ANIMATION);
+            } else if (v.equals(artifactTypeRepository.getWithDVOther().getId())) {
+                return appConfiguration.getPathMap().get(AppConfiguration.PathType.PT_DV_OTHER);
             } else {
                 return null;
             }

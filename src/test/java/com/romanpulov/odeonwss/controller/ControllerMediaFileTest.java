@@ -50,7 +50,8 @@ public class ControllerMediaFileTest {
     private MockMvc mockMvc;
 
     private enum TestFolder {
-        TF_CONTROLLER_MEDIA_FILE_TEST_DV_MUSIC
+        TF_CONTROLLER_MEDIA_FILE_TEST_DV_MUSIC,
+        TF_CONTROLLER_MEDIA_FILE_TEST_DV_OTHER
     }
 
     private static final Map<TestFolder, Path> TEMP_FOLDERS = FileTreeGenerator.createTempFolders(TestFolder.class);
@@ -86,6 +87,17 @@ public class ControllerMediaFileTest {
                                 "Tori Amos - Fade to Red 2006": {
                                     "Tori Amos - Fade to Red Disk 1 2006.mkv": "sample_1280x720_600.mkv",
                                     "Tori Amos - Fade to Red Disk 2 2006.mkv": "sample_1280x720_with_chapters.mkv"
+                                }
+                            }
+                        """
+        );
+        FileTreeGenerator.generateFromJSON(
+                TEMP_FOLDERS.get(TestFolder.TF_CONTROLLER_MEDIA_FILE_TEST_DV_OTHER),
+                this.testDataPath,
+                """
+                            {
+                                "Other Item": {
+                                    "other_item.mkv": "sample_1280x720_with_chapters.mkv"
                                 }
                             }
                         """
@@ -264,6 +276,13 @@ public class ControllerMediaFileTest {
                         .withTitle("Tori Amos - Fade to Red 2006")
                         .withYear(2002L)
                         .withDuration(12345L)
+                        .build()
+        );
+
+        artifactRepository.save(
+                new EntityArtifactBuilder()
+                        .withArtifactType(artifactTypeRepository.getWithDVOther())
+                        .withTitle("Other Item")
                         .build()
         );
     }
@@ -452,5 +471,13 @@ public class ControllerMediaFileTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", Matchers.hasSize(2)));
+    }
+
+    @Test
+    @Order(7)
+    void testOtherTableFilesNoFiles() throws Exception {
+        this.mockMvc.perform(get("/api/media-file/table-files/5")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }
