@@ -72,7 +72,8 @@ public class TrackUserImportService {
         }
 
         long artifactTypeId = artifact.getArtifactType().getId();
-        if (List.of(artifactTypeRepository.getWithDVAnimation().getId(), artifactTypeRepository.getWithDVMovies().getId())
+        if (List.of(
+                artifactTypeRepository.getWithDVAnimation().getId(), artifactTypeRepository.getWithDVMovies().getId(), artifactTypeRepository.getWithDVOther().getId())
                 .contains(artifactTypeId)) {
             importNonMusicArtifact(data, artifact, mediaFile, dvType, num, titles, result);
         } else if (artifactTypeId == artifactTypeRepository.getWithDVMusic().getId()) {
