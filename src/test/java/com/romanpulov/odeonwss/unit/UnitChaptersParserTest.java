@@ -89,4 +89,16 @@ public class UnitChaptersParserTest {
         assertThat(iterator.next()).isEqualTo((17 - 10) * 60 + (18 - 58));
         assertThat(iterator.next()).isEqualTo((23 - 17) * 60 + (35 - 18));
     }
+
+    @Test
+    void testMKVChapters() throws Exception {
+        var chapters = new String[] {
+            "00:00:04",
+            "00:00:07",
+            "00:00:19"
+        };
+
+        var result = ChaptersParser.parseLines(Lists.list(chapters));
+        assertThat(result.size()).isEqualTo(3);
+    }
 }

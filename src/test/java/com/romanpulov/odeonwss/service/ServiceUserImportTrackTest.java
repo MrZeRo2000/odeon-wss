@@ -69,11 +69,11 @@ public class ServiceUserImportTrackTest {
     @Autowired
     ArtistRepository artistRepository;
 
-    @Autowired
-    EntityManager em;
-
     private ArtifactType getNonMusicArtifactType() {
         return artifactTypeRepository.getWithDVAnimation();
+    }
+    private ArtifactType getOtherArtifactType() {
+        return artifactTypeRepository.getWithDVOther();
     }
     private ArtifactType getMusicArtifactType() {
         return artifactTypeRepository.getWithDVMusic();
@@ -158,6 +158,22 @@ public class ServiceUserImportTrackTest {
         ARTISTS.forEach(s -> artistRepository.save(
                         new EntityArtistBuilder().withType(ArtistType.ARTIST).withName(s).build()
                 ));
+
+        var artifactOtherOne = new EntityArtifactBuilder()
+                .withArtifactType(getOtherArtifactType())
+                .withTitle("Other One")
+                .build();
+        artifactRepository.save(artifactOtherOne);
+
+        var mediaFileOther = new EntityMediaFileBuilder()
+                .withArtifact(artifactOtherOne)
+                .withDuration(48394L)
+                .withName("Other File Name First")
+                .withBitrate(6000L)
+                .withFormat("MKV")
+                .withSize(73495L)
+                .build();
+        mediaFileRepository.save(mediaFileOther);
     }
 
     @Test
@@ -630,4 +646,26 @@ public class ServiceUserImportTrackTest {
         assertThat(tracks_after.get(4).getTitle()).isEqualTo("Nothing Going On");
     }
 
+    @Test
+    @Order(24)
+    @Sql({"/schema.sql", "/data.sql"})
+    void testChaptersOther() throws Exception {
+        internalPrepare();
+
+        var chapters = new String[] {
+                "00:00:04",
+                "00:01:07",
+                "00:04:14"
+        };
+
+        var data = new TrackUserImportDTOBuilder()
+                .withArtifact(new ArtifactDTOBuilder().withId(4L).build())
+                .withDVType(new IdNameDTOBuilder().withId(2L).build())
+                .withMediaFile(new MediaFileDTOBuilder().withId(5L).build())
+                .withTitles(List.of("Sugar", "Milk", "Bread"))
+                .withChapters(Lists.list(chapters))
+                .build();
+
+        service.executeImportTracks(data);
+    }
 }

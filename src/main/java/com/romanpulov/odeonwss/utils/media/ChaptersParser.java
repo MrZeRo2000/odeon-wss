@@ -10,7 +10,15 @@ public class ChaptersParser {
     private static final Pattern REGEXP_PATTERN_TIMESTAMP =
             Pattern.compile("=(\\d{1,2}):(\\d{1,2}):(\\d{1,2})\\.(\\d{1,3})");
 
+    private static final Pattern REGEXP_PATTERN_SIMPLE_TIMESTAMP =
+            Pattern.compile("^(\\d{1,2}):(\\d{1,2}):(\\d{1,2})$");
+
     public static Collection<Long> parseLines(Collection<String> lines) throws ChaptersParsingException {
+        Collection<Long> result = parseSimpleLines(lines);
+        return result.isEmpty() ? parseChapterLines(lines) : result;
+    }
+
+    private static Collection<Long> parseChapterLines(Collection<String> lines) throws ChaptersParsingException {
         Long previousTimeStamp = null;
         List<Long> result = new ArrayList<>();
 
@@ -27,6 +35,31 @@ public class ChaptersParser {
                     if (previousTimeStamp != null) {
                         result.add(timeStamp - previousTimeStamp);
                     }
+                    previousTimeStamp = timeStamp;
+
+                } catch (NumberFormatException e) {
+                    throw new ChaptersParsingException("Error reading parsing line: %s: %s"
+                            .formatted(line, e.getMessage()));
+                }
+        }
+
+        return result;
+    }
+
+    private static Collection<Long> parseSimpleLines(Collection<String> lines) throws ChaptersParsingException {
+        long previousTimeStamp = 0L;
+        List<Long> result = new ArrayList<>();
+
+        for (String line: lines) {
+            Matcher matcher = REGEXP_PATTERN_SIMPLE_TIMESTAMP.matcher(line);
+            if (matcher.find() && matcher.groupCount() == 3)
+                try {
+                    long timeStamp =
+                            (long) Integer.parseInt(matcher.group(1)) * 60 * 60 +
+                                    (long) Integer.parseInt(matcher.group(2)) * 60 +
+                                    Integer.parseInt(matcher.group(3));
+
+                    result.add(timeStamp - previousTimeStamp);
                     previousTimeStamp = timeStamp;
 
                 } catch (NumberFormatException e) {
