@@ -23,7 +23,7 @@ public class UnitChaptersParserTest {
         );
         var result = ChaptersParser.parseLines(chapters);
         assertThat(result.size()).isEqualTo(1);
-        assertThat(result.iterator().next()).isEqualTo(6 * 60 + 28);
+        assertThat(result.getFirst()).isEqualTo(6 * 60 + 28);
     }
 
     @Test
@@ -36,7 +36,7 @@ public class UnitChaptersParserTest {
         );
         var result = ChaptersParser.parseLines(chapters);
         assertThat(result.size()).isEqualTo(1);
-        assertThat(result.iterator().next()).isEqualTo(23 * 60 + 34 + 1);
+        assertThat(result.getFirst()).isEqualTo(23 * 60 + 34 + 1);
     }
 
     @Test
@@ -93,6 +93,7 @@ public class UnitChaptersParserTest {
     @Test
     void testMKVChapters() throws Exception {
         var chapters = new String[] {
+            "00:00:00",
             "00:00:04",
             "00:00:07",
             "00:00:19"
@@ -100,5 +101,10 @@ public class UnitChaptersParserTest {
 
         var result = ChaptersParser.parseLines(Lists.list(chapters));
         assertThat(result.size()).isEqualTo(3);
+
+        var iterator = result.iterator();
+        assertThat(iterator.next()).isEqualTo(4L);
+        assertThat(iterator.next()).isEqualTo(3L);
+        assertThat(iterator.next()).isEqualTo(12L);
     }
 }

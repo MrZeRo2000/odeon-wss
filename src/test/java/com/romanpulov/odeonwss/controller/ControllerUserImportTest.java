@@ -113,7 +113,7 @@ public class ControllerUserImportTest {
 
         var mediaFileFirst = new EntityMediaFileBuilder()
                 .withArtifact(artifactOne)
-                .withDuration(2000L)
+                .withDuration(1170L)
                 .withName("Number One File Name First")
                 .withBitrate(1000L)
                 .withFormat("MKV")

@@ -13,12 +13,12 @@ public class ChaptersParser {
     private static final Pattern REGEXP_PATTERN_SIMPLE_TIMESTAMP =
             Pattern.compile("^(\\d{1,2}):(\\d{1,2}):(\\d{1,2})$");
 
-    public static Collection<Long> parseLines(Collection<String> lines) throws ChaptersParsingException {
-        Collection<Long> result = parseSimpleLines(lines);
+    public static List<Long> parseLines(Collection<String> lines) throws ChaptersParsingException {
+        List<Long> result = parseSimpleLines(lines);
         return result.isEmpty() ? parseChapterLines(lines) : result;
     }
 
-    private static Collection<Long> parseChapterLines(Collection<String> lines) throws ChaptersParsingException {
+    private static List<Long> parseChapterLines(Collection<String> lines) throws ChaptersParsingException {
         Long previousTimeStamp = null;
         List<Long> result = new ArrayList<>();
 
@@ -46,7 +46,7 @@ public class ChaptersParser {
         return result;
     }
 
-    private static Collection<Long> parseSimpleLines(Collection<String> lines) throws ChaptersParsingException {
+    private static List<Long> parseSimpleLines(Collection<String> lines) throws ChaptersParsingException {
         long previousTimeStamp = 0L;
         List<Long> result = new ArrayList<>();
 
@@ -59,8 +59,11 @@ public class ChaptersParser {
                                     (long) Integer.parseInt(matcher.group(2)) * 60 +
                                     Integer.parseInt(matcher.group(3));
 
-                    result.add(timeStamp - previousTimeStamp);
-                    previousTimeStamp = timeStamp;
+                    long duration = timeStamp - previousTimeStamp;
+                    if (duration > 0L) {
+                        result.add(timeStamp - previousTimeStamp);
+                        previousTimeStamp = timeStamp;
+                    }
 
                 } catch (NumberFormatException e) {
                     throw new ChaptersParsingException("Error reading parsing line: %s: %s"

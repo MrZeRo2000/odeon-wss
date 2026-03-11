@@ -15,6 +15,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TrackUserImportService {
@@ -100,11 +101,19 @@ public class TrackUserImportService {
             throw new EmptyParameterException("Chapters");
         }
 
-        Collection<Long> durations;
+        List<Long> durations;
         try {
             durations = ChaptersParser.parseLines(chapters);
         } catch (ChaptersParsingException e) {
             throw new WrongParameterValueException("Chapters", e.getMessage());
+        }
+
+        long lastDuration = mediaFile.getDuration() -
+                durations
+                .stream()
+                .collect(Collectors.summarizingLong(Long::longValue)).getSum();
+        if  (lastDuration > 1) {
+            durations.add(lastDuration);
         }
 
         if (titles.size() != durations.size()) {
@@ -157,8 +166,8 @@ public class TrackUserImportService {
         Artist defaultArtist;
         if (artists != null && artists.size() == 1) {
             defaultArtist = artistRepository
-                    .findFirstByTypeAndName(ArtistType.ARTIST, artists.get(0))
-                    .orElseThrow(() -> new WrongParameterValueException("Artists", artists.get(0) + " not found"));
+                    .findFirstByTypeAndName(ArtistType.ARTIST, artists.getFirst())
+                    .orElseThrow(() -> new WrongParameterValueException("Artists", artists.getFirst() + " not found"));
         } else {
             defaultArtist = null;
         }

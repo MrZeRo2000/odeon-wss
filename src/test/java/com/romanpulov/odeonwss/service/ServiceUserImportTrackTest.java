@@ -12,7 +12,6 @@ import com.romanpulov.odeonwss.exception.EmptyParameterException;
 import com.romanpulov.odeonwss.exception.WrongParameterValueException;
 import com.romanpulov.odeonwss.repository.*;
 import com.romanpulov.odeonwss.service.user.TrackUserImportService;
-import jakarta.persistence.EntityManager;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -89,7 +88,7 @@ public class ServiceUserImportTrackTest {
 
         var mediaFileFirst = new EntityMediaFileBuilder()
                 .withArtifact(artifactOne)
-                .withDuration(2000L)
+                .withDuration(1170L)
                 .withName("Number One File Name First")
                 .withBitrate(1000L)
                 .withFormat("MKV")
@@ -277,7 +276,7 @@ public class ServiceUserImportTrackTest {
                 .withArtifact(new ArtifactDTOBuilder().withId(1L).build())
                 .withDVType(new IdNameDTOBuilder().withId(2L).build())
                 .withMediaFile(new MediaFileDTOBuilder().withId(1L).build())
-                .withTitles(List.of("White", "Green", "Magenta"))
+                .withTitles(List.of("White", "Green", "Magenta", "Brown"))
                 .withChapters(Lists.list(chapters))
                 .build();
 
@@ -662,7 +661,7 @@ public class ServiceUserImportTrackTest {
                 .withArtifact(new ArtifactDTOBuilder().withId(4L).build())
                 .withDVType(new IdNameDTOBuilder().withId(2L).build())
                 .withMediaFile(new MediaFileDTOBuilder().withId(5L).build())
-                .withTitles(List.of("Sugar", "Milk", "Bread"))
+                .withTitles(List.of("Sugar", "Milk", "Bread", "Honey"))
                 .withChapters(Lists.list(chapters))
                 .build();
 
