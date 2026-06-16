@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!--
+        Bind the application name to THIS webapp's logback context.
+
+        The default Spring Boot pattern renders the name via %esb(){APPLICATION_NAME}, whose
+        converter reads the logback *context* property map first and only falls back to the
+        JVM-global System property. Because all WARs in this shared Tomcat live in one JVM,
+        that System property is shared and leaks whichever app set it (price-fox-wss). Setting
+        a context-scoped property here keeps each app reporting its own name. base.xml is
+        included unchanged, so the console/file appenders and pattern stay version-proof.
+    -->
+    <springProperty scope="context" name="APPLICATION_NAME" source="spring.application.name" defaultValue="odeon-wss"/>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+</configuration>
