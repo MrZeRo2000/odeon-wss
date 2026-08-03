@@ -81,6 +81,15 @@ public class ControllerArtistLyricsTest {
 
     @Test
     @Order(2)
+    void testGet() throws Exception {
+        this.mockMvc.perform(get("/api/artist-lyrics/2")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+        ;
+    }
+
+    @Test
+    @Order(2)
     void testGetTable() throws Exception {
         this.mockMvc.perform(get("/api/artist-lyrics/table")
                 .accept(MediaType.APPLICATION_JSON))
