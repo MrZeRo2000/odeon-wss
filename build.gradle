@@ -13,19 +13,26 @@ ext {
 	file_name_int = 'odeon-int-wss.war'
 }
 
+group = 'com.romanpulov'
+version = '0.15.11'
 
-tasks.named('processResources') {
+def resourceProps = [
+		name: project.name,
+		version: project.version,
+		description: project.description ?: ''
+]
+
+tasks.named('processResources', ProcessResources) {
+	inputs.properties(resourceProps)
+
 	filesMatching('project.properties') {
-		expand(project.properties)
+		expand(resourceProps)
 	}
 }
 
 bootWar {
 	archiveFileName = file_name_build
 }
-
-group = 'com.romanpulov'
-version = '0.15.10'
 
 repositories {
 	mavenCentral()
@@ -92,4 +99,8 @@ tasks.register('deployProd', Copy) {
 
 configurations.configureEach {
 	exclude group: "com.vaadin.external.google", module: "android-json"
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs += ['-Xlint:deprecation']
 }

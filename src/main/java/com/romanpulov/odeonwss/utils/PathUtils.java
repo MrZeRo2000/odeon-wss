@@ -1,7 +1,7 @@
 package com.romanpulov.odeonwss.utils;
 
 import com.romanpulov.odeonwss.service.processor.parser.NamesParser;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
