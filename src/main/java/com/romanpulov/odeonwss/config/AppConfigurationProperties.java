@@ -18,12 +18,17 @@ public class AppConfigurationProperties {
     private String mediaInfoPath;
     private String mdbPath;
 
+    private String resolvePropertyPath(String propertyPath) {
+        String homePath = System.getProperty("user.home");
+        return propertyPath.replace("{USER_HOME}", homePath).replace("\\", "/");
+    }
+
     public String getDbUrl() {
         return dbUrl;
     }
 
     public void setDbUrl(String dbUrl) {
-        this.dbUrl = dbUrl;
+        this.dbUrl = resolvePropertyPath(dbUrl);
     }
 
     public String getMp3Path() {
@@ -31,7 +36,7 @@ public class AppConfigurationProperties {
     }
 
     public void setMp3Path(String mp3Path) {
-        this.mp3Path = mp3Path;
+        this.mp3Path = resolvePropertyPath(mp3Path);
     }
 
     public String getLaPath() {
@@ -39,7 +44,7 @@ public class AppConfigurationProperties {
     }
 
     public void setLaPath(String laPath) {
-        this.laPath = laPath;
+        this.laPath = resolvePropertyPath(laPath);
     }
 
     public String getClassicsPath() {
@@ -47,7 +52,7 @@ public class AppConfigurationProperties {
     }
 
     public void setClassicsPath(String classicsPath) {
-        this.classicsPath = classicsPath;
+        this.classicsPath = resolvePropertyPath(classicsPath);
     }
 
     public String getDvMusicPath() {
@@ -55,7 +60,7 @@ public class AppConfigurationProperties {
     }
 
     public void setDvMusicPath(String dvMusicPath) {
-        this.dvMusicPath = dvMusicPath;
+        this.dvMusicPath = resolvePropertyPath(dvMusicPath);
     }
 
     public String getDvMoviesPath() {
@@ -63,7 +68,7 @@ public class AppConfigurationProperties {
     }
 
     public void setDvMoviesPath(String dvMoviesPath) {
-        this.dvMoviesPath = dvMoviesPath;
+        this.dvMoviesPath = resolvePropertyPath(dvMoviesPath);
     }
 
     public String getDvAnimationPath() {
@@ -71,7 +76,7 @@ public class AppConfigurationProperties {
     }
 
     public void setDvAnimationPath(String dvAnimationPath) {
-        this.dvAnimationPath = dvAnimationPath;
+        this.dvAnimationPath = resolvePropertyPath(dvAnimationPath);
     }
 
     public String getDvOtherPath() {
@@ -79,7 +84,7 @@ public class AppConfigurationProperties {
     }
 
     public void setDvOtherPath(String dvOtherPath) {
-        this.dvOtherPath = dvOtherPath;
+        this.dvOtherPath = resolvePropertyPath(dvOtherPath);
     }
 
     public String getFfProbePath() {
@@ -87,7 +92,7 @@ public class AppConfigurationProperties {
     }
 
     public void setFfProbePath(String ffProbePath) {
-        this.ffProbePath = ffProbePath;
+        this.ffProbePath = resolvePropertyPath(ffProbePath);
     }
 
     public String getMediaInfoPath() {
@@ -95,7 +100,7 @@ public class AppConfigurationProperties {
     }
 
     public void setMediaInfoPath(String mediaInfoPath) {
-        this.mediaInfoPath = mediaInfoPath;
+        this.mediaInfoPath = resolvePropertyPath(mediaInfoPath);
     }
 
     public String getMdbPath() {
@@ -103,6 +108,6 @@ public class AppConfigurationProperties {
     }
 
     public void setMdbPath(String mdbPath) {
-        this.mdbPath = mdbPath;
+        this.mdbPath = resolvePropertyPath(mdbPath);
     }
 }
